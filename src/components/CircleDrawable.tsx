@@ -27,6 +27,7 @@ const CircleDrawable = ({
         stroke="black"
         radius={radius}
         {...shapeProps}
+        hitStrokeWidth={16}
         onTransformEnd={(e: any) => {
           if (!e.target) return;
 
@@ -39,11 +40,13 @@ const CircleDrawable = ({
           node.scaleY(1);
 
           onChange({
-            ...shapeProps,
-            x: node.x(),
-            y: node.y(),
-            width: Math.max(5, node.width() * scaleX),
-            height: Math.max(node.height() * scaleY),
+            shapeProps: {
+              ...shapeProps,
+              x: node.x(),
+              y: node.y(),
+              width: Math.max(5, node.width() * scaleX),
+              height: Math.max(node.height() * scaleY),
+            },
           });
         }}
       />

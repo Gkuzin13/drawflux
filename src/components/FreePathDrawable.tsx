@@ -34,6 +34,7 @@ const FreePathDrawable = ({
         tension={0.5}
         lineCap="round"
         lineJoin="round"
+        hitStrokeWidth={16}
       />
     </ShapeDrawable>
   );

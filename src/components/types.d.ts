@@ -1,9 +1,14 @@
 export type DrawableProps = {
   shapeProps: ShapeProps;
   isSelected: boolean;
-  onSelect: (args: any) => void;
-  onChange: (args: ShapeProps) => void;
+  text: string;
+  type: string;
+  isDrawable: boolean;
+  onSelect: () => void;
+  onChange: (args: OnChangeArgs) => void;
 };
+
+export type OnChangeArgs = Pick<DrawableProps, 'shapeProps' | 'text'>;
 
 export type ShapeProps = {
   id: string;

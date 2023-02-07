@@ -1,7 +1,6 @@
 import Konva from 'konva';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Arrow, Circle, Group } from 'react-konva';
-import ShapeDrawable from './ShapeDrawable';
 import type { DrawableProps } from './types';
 
 const ArrowDrawable = ({
@@ -14,8 +13,6 @@ const ArrowDrawable = ({
 
   useEffect(() => {
     setPoints(shapeProps.points);
-    console.log('updating state');
-    console.log(...shapeProps.points);
   }, [shapeProps]);
 
   const onAnchorDragMove = (e: any) => {
@@ -41,23 +38,27 @@ const ArrowDrawable = ({
       draggable={true}
       onDragEnd={(e: any) => {
         onChange({
-          ...shapeProps,
-          points,
-          x: e.target.x(),
-          y: e.target.y(),
+          shapeProps: {
+            ...shapeProps,
+            points,
+            x: e.target.x(),
+            y: e.target.y(),
+          },
         });
       }}
     >
-      <Circle
-        x={points[0].x}
-        y={points[0].y}
-        visible={isSelected}
-        id="anchor1"
-        fill="gray"
-        radius={6}
-        draggable={true}
-        onDragMove={onAnchorDragMove}
-      />
+      {isSelected && (
+        <Circle
+          x={points[0].x}
+          y={points[0].y}
+          visible={isSelected}
+          id="anchor1"
+          fill="gray"
+          radius={6}
+          draggable={true}
+          onDragMove={onAnchorDragMove}
+        />
+      )}
       <Arrow
         stroke="black"
         fill="white"
@@ -65,19 +66,22 @@ const ArrowDrawable = ({
         pointerLength={16}
         pointerWidth={16}
         points={points.map((p) => [p.x, p.y]).flat()}
-        onClick={() => onSelect(shapeProps.id)}
-        onTap={() => onSelect(shapeProps.id)}
+        hitStrokeWidth={32}
+        onClick={onSelect}
+        onTap={onSelect}
       />
-      <Circle
-        x={points[1].x}
-        y={points[1].y}
-        visible={isSelected}
-        id="anchor2"
-        fill="gray"
-        radius={6}
-        draggable={true}
-        onDragMove={onAnchorDragMove}
-      />
+      {isSelected && (
+        <Circle
+          x={points[1].x}
+          y={points[1].y}
+          visible={isSelected}
+          id="anchor2"
+          fill="gray"
+          radius={6}
+          draggable={true}
+          onDragMove={onAnchorDragMove}
+        />
+      )}
     </Group>
   );
 };

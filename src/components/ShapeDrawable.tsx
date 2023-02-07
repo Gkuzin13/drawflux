@@ -3,24 +3,28 @@ import {
   cloneElement,
   isValidElement,
   PropsWithChildren,
+  ReactElement,
   useEffect,
   useRef,
 } from 'react';
-import { Transformer } from 'react-konva';
+import { KonvaNodeEvents, Transformer } from 'react-konva';
 import Konva from 'konva';
 import { DrawableProps } from './types';
 import { TransformerConfig } from 'konva/lib/shapes/Transformer';
 
 interface Props extends PropsWithChildren, DrawableProps {
   transformerConfig?: TransformerConfig;
+  transformerEvents?: KonvaNodeEvents;
 }
 
 const ShapeDrawable = ({
   shapeProps,
+  text,
   isSelected,
   onChange,
   onSelect,
   transformerConfig,
+  transformerEvents,
   children,
 }: Props) => {
   const trRef = useRef<Konva.Transformer>(null);
@@ -35,29 +39,28 @@ const ShapeDrawable = ({
 
   return (
     <>
-      {Children.map(children, (child) => {
-        if (!isValidElement(child)) return;
-
-        return cloneElement(child, {
-          ref: shapeRef,
-          onPress: onSelect(shapeProps.id),
-          onTap: onSelect(shapeProps.id),
-          draggable: true,
-          strokeScaleEnabled: false,
-          onDragEnd: (e: any) => {
-            onChange({
-              ...shapeProps,
-              x: e.target.x(),
-              y: e.target.y(),
-            });
-          },
-        } as any);
+      {cloneElement(Children.only(children) as ReactElement, {
+        ref: shapeRef,
+        onClick: onSelect,
+        onTap: onSelect,
+        strokeScaleEnabled: false,
+        draggable: true,
+        onDragEnd: (e: any) => {
+          onChange({
+            shapeProps: { ...shapeProps, x: e.target.x(), y: e.target.y() },
+            text,
+          });
+        },
       })}
       {isSelected && (
         <Transformer
           ref={trRef}
-          {...transformerConfig}
           ignoreStroke={true}
+          anchorStroke="gray"
+          anchorFill="gray"
+          anchorSize={6}
+          anchorCornerRadius={6}
+          borderStroke="gray"
           rotationSnaps={[0, 90, 180, 270]}
           shouldOverdrawWholeArea={true}
           boundBoxFunc={(oldBox, newBox) => {
@@ -67,6 +70,8 @@ const ShapeDrawable = ({
 
             return newBox;
           }}
+          {...transformerConfig}
+          {...transformerEvents}
         />
       )}
     </>

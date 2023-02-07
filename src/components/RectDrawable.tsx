@@ -24,6 +24,7 @@ const RectDrawable = ({
         x={p1.x}
         y={p1.y}
         stroke="black"
+        hitStrokeWidth={16}
         onTransformEnd={(e: any) => {
           if (!e.target) return;
 
@@ -36,14 +37,16 @@ const RectDrawable = ({
           node.scaleY(1);
 
           onChange({
-            ...shapeProps,
-            points: [
-              { x: node.x(), y: node.y() },
-              {
-                x: Math.max(5, node.width() * scaleX) + node.x(),
-                y: Math.max(node.height() * scaleY) + node.y(),
-              },
-            ],
+            shapeProps: {
+              ...shapeProps,
+              points: [
+                { x: node.x(), y: node.y() },
+                {
+                  x: Math.max(5, node.width() * scaleX) + node.x(),
+                  y: Math.max(node.height() * scaleY) + node.y(),
+                },
+              ],
+            },
           });
         }}
       />
