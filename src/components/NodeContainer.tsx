@@ -1,44 +1,45 @@
 import {
   Children,
   cloneElement,
-  isValidElement,
   PropsWithChildren,
   ReactElement,
   useEffect,
   useRef,
 } from 'react';
-import { KonvaNodeEvents, Transformer } from 'react-konva';
+import { Group, KonvaNodeEvents } from 'react-konva';
 import Konva from 'konva';
 import { DrawableProps } from './types';
 import { TransformerConfig } from 'konva/lib/shapes/Transformer';
+import NodeTransformer from './NodeTransformer';
 
 interface Props extends PropsWithChildren, DrawableProps {
   transformerConfig?: TransformerConfig;
   transformerEvents?: KonvaNodeEvents;
 }
 
-const ShapeDrawable = ({
+const NodeContainer = ({
   shapeProps,
   text,
   isSelected,
   onChange,
   onSelect,
+  onContextMenu,
   transformerConfig,
   transformerEvents,
   children,
 }: Props) => {
-  const trRef = useRef<Konva.Transformer>(null);
+  const transformerRef = useRef<Konva.Transformer>(null);
   const shapeRef = useRef<Konva.Shape>(null);
 
   useEffect(() => {
-    if (isSelected && trRef.current && shapeRef.current) {
-      trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer()?.batchDraw();
+    if (isSelected && transformerRef.current && shapeRef.current) {
+      transformerRef.current.nodes([shapeRef.current]);
+      transformerRef.current.getLayer()?.batchDraw();
     }
   }, [isSelected]);
 
   return (
-    <>
+    <Group onContextMenu={(e) => onContextMenu(e, shapeProps.id)}>
       {cloneElement(Children.only(children) as ReactElement, {
         ref: shapeRef,
         onClick: onSelect,
@@ -53,29 +54,14 @@ const ShapeDrawable = ({
         },
       })}
       {isSelected && (
-        <Transformer
-          ref={trRef}
-          ignoreStroke={true}
-          anchorStroke="gray"
-          anchorFill="gray"
-          anchorSize={6}
-          anchorCornerRadius={6}
-          borderStroke="gray"
-          rotationSnaps={[0, 90, 180, 270]}
-          shouldOverdrawWholeArea={true}
-          boundBoxFunc={(oldBox, newBox) => {
-            if (newBox.width < 5 || newBox.height < 5) {
-              return oldBox;
-            }
-
-            return newBox;
-          }}
-          {...transformerConfig}
-          {...transformerEvents}
+        <NodeTransformer
+          transformerConfig={transformerConfig}
+          transformerEvents={transformerEvents}
+          ref={transformerRef}
         />
       )}
-    </>
+    </Group>
   );
 };
 
-export default ShapeDrawable;
+export default NodeContainer;

@@ -1,13 +1,15 @@
 import Konva from 'konva';
 import { Circle } from 'react-konva';
-import ShapeDrawable from './ShapeDrawable';
+import NodeContainer from './NodeContainer';
 import type { DrawableProps } from './types';
 
 const CircleDrawable = ({
   shapeProps,
   isSelected,
+  type,
   onChange,
   onSelect,
+  onContextMenu,
 }: DrawableProps) => {
   const [p1, p2] = shapeProps.points;
 
@@ -17,11 +19,14 @@ const CircleDrawable = ({
   const radius = Math.sqrt(dx * dx + dy * dy);
 
   return (
-    <ShapeDrawable
+    <NodeContainer
+      isDrawable={true}
+      type={type}
       shapeProps={shapeProps}
       isSelected={isSelected}
       onChange={onChange}
       onSelect={onSelect}
+      onContextMenu={onContextMenu}
     >
       <Circle
         stroke="black"
@@ -50,7 +55,7 @@ const CircleDrawable = ({
           });
         }}
       />
-    </ShapeDrawable>
+    </NodeContainer>
   );
 };
 

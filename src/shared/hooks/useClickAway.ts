@@ -8,6 +8,7 @@ const useClickAway = (ref: RefObject<HTMLElement>, handler: () => void) => {
       const { target } = event ?? {};
 
       if (ref.current && !ref.current.contains(target)) {
+        console.log('clicked away');
         handler();
       }
     };

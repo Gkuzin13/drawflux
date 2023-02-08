@@ -8,7 +8,7 @@ type ActionsStore = {
 export const useActionsStore = create<ActionsStore>()((set) => ({
   removeEmptyTextNodes: (drawables) =>
     drawables.filter((drawable) => {
-      if (!drawable.text.length) return false;
+      if (!drawable.text?.length) return false;
 
       return true;
     }),

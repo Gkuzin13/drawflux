@@ -1,25 +1,8 @@
-import { useClickAway } from '@/shared/hooks/useClickAway';
-import Konva from 'konva';
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { Text } from 'react-konva';
-import { Html } from 'react-konva-utils';
-import ShapeDrawable from './ShapeDrawable';
+import { useEffect, useState } from 'react';
 import { DrawableProps } from './types';
 import { ENTER_KEY, ESCAPE_KEY } from '@/shared/constants/event-keys';
 import EditableTextInput from './EditableTextInput';
 import ResizableText from './ResizableText';
-
-const textareaStaticStyles: React.CSSProperties = {
-  position: 'absolute',
-  border: 'none',
-  padding: '0px',
-  margin: '0px',
-  overflow: 'hidden',
-  background: 'none',
-  outline: 'none',
-  resize: 'none',
-  transformOrigin: 'left top',
-};
 
 const EditableText = ({
   shapeProps,
@@ -28,33 +11,35 @@ const EditableText = ({
   type,
   onChange,
   onSelect,
+  onContextMenu,
 }: DrawableProps) => {
-  const [editing, setEditing] = useState(true);
+  const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(text);
 
   useEffect(() => {
-    if (!isSelected && editing) {
-      setEditing(false);
+    if (!text?.length) {
+      setEditing(true);
     }
-  }, [isSelected, editing]);
+  }, [text]);
+
+  const handleTextSave = () => {
+    setEditing(false);
+
+    onChange({
+      shapeProps,
+      text: value,
+    });
+  };
 
   const handleEscapeKeys = (e: any) => {
     if ((e.key === ENTER_KEY && !e.shiftKey) || e.key === ESCAPE_KEY) {
-      setEditing(false);
-
-      const { value } = e.target as HTMLTextAreaElement;
-
-      onChange({
-        shapeProps,
-        text: value,
-      });
+      handleTextSave();
     }
   };
 
   const handleTextChange = (e: any) => {
     const { value } = e.target as HTMLTextAreaElement;
     setValue(() => value);
-    console.log(value);
   };
 
   if (editing) {
@@ -64,9 +49,10 @@ const EditableText = ({
         height={shapeProps.height!}
         x={shapeProps.x}
         y={shapeProps.y}
-        value={value}
+        value={value || ''}
         onTextChange={handleTextChange}
         onKeyDown={handleEscapeKeys}
+        onClickAway={handleTextSave}
       />
     );
   }
@@ -81,6 +67,7 @@ const EditableText = ({
       isDrawable={false}
       onSelect={onSelect}
       onDoubleClick={() => setEditing(true)}
+      onContextMenu={onContextMenu}
     />
   );
 };

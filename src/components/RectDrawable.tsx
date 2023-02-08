@@ -1,22 +1,27 @@
 import Konva from 'konva';
 import { Rect } from 'react-konva';
-import ShapeDrawable from './ShapeDrawable';
+import NodeContainer from './NodeContainer';
 import type { DrawableProps } from './types';
 
 const RectDrawable = ({
   shapeProps,
+  type,
   isSelected,
+  onContextMenu,
   onChange,
   onSelect,
 }: DrawableProps) => {
   const [p1, p2] = shapeProps.points;
 
   return (
-    <ShapeDrawable
+    <NodeContainer
+      isDrawable={true}
+      type={type}
       shapeProps={shapeProps}
       isSelected={isSelected}
       onChange={onChange}
       onSelect={onSelect}
+      onContextMenu={onContextMenu}
     >
       <Rect
         width={p2.x - p1.x}
@@ -50,7 +55,7 @@ const RectDrawable = ({
           });
         }}
       />
-    </ShapeDrawable>
+    </NodeContainer>
   );
 };
 

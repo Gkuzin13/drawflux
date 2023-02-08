@@ -1,4 +1,5 @@
-import { FocusEventHandler, useState } from 'react';
+import { useClickAway } from '@/shared/hooks/useClickAway';
+import { useRef } from 'react';
 import { Html } from 'react-konva-utils';
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
   value: string;
   onTextChange: (e: any) => void;
   onKeyDown: (e: any) => void;
+  onClickAway: () => void;
 };
 
 const getStyle = (
@@ -50,8 +52,13 @@ const EditableTextInput = ({
   value,
   onTextChange,
   onKeyDown,
+  onClickAway,
 }: Props) => {
   const style = getStyle(width, height, 16);
+
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  useClickAway(ref, onClickAway);
 
   function onFocus(e: React.FocusEvent) {
     const target = e.target as HTMLTextAreaElement;
@@ -65,6 +72,7 @@ const EditableTextInput = ({
   return (
     <Html groupProps={{ x, y }} divProps={{ style: { opacity: 1 } }}>
       <textarea
+        ref={ref}
         autoFocus
         value={value}
         onChange={onTextChange}

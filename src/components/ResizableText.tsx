@@ -1,7 +1,7 @@
 import Konva from 'konva';
 import { useRef } from 'react';
 import { Text } from 'react-konva';
-import ShapeDrawable from './ShapeDrawable';
+import NodeContainer from './NodeContainer';
 import { DrawableProps } from './types';
 
 type Props = {
@@ -16,6 +16,7 @@ const ResizableText = ({
   onChange,
   onSelect,
   onDoubleClick,
+  onContextMenu,
 }: Props) => {
   const textRef = useRef<Konva.Text>(null);
 
@@ -38,7 +39,7 @@ const ResizableText = ({
   };
 
   return (
-    <ShapeDrawable
+    <NodeContainer
       isDrawable={false}
       type={type}
       text={text}
@@ -46,9 +47,10 @@ const ResizableText = ({
       shapeProps={shapeProps}
       onChange={onChange}
       onSelect={onSelect}
-      transformerEvents={{ onDblClick: onDoubleClick }}
+      onContextMenu={onContextMenu}
+      transformerEvents={{ onDblClick: onDoubleClick, onDblTap: onDoubleClick }}
       transformerConfig={{
-        enabledAnchors: ['middle-left', 'middle-right'],
+        enabledAnchors: [],
         boundBoxFunc: (oldBox, newBox) => {
           newBox.width = Math.max(30, newBox.width);
           return newBox;
@@ -64,7 +66,7 @@ const ResizableText = ({
         onDblClick={onDoubleClick}
         onDblTap={onDoubleClick}
       />
-    </ShapeDrawable>
+    </NodeContainer>
   );
 };
 

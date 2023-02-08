@@ -1,6 +1,6 @@
-import React, { createElement, useEffect } from 'react';
+import React, { createElement, useEffect, useRef } from 'react';
 import { Stage, Layer } from 'react-konva';
-import { NextUIProvider } from '@nextui-org/react';
+import { Container, Dropdown, NextUIProvider } from '@nextui-org/react';
 import ArrowDrawable from './components/ArrowDrawable';
 import CircleDrawable from './components/CircleDrawable';
 import RectDrawable from './components/RectDrawable';
@@ -8,8 +8,10 @@ import FreePathDrawable from './components/FreePathDrawable';
 import { useState } from 'react';
 import { DrawableProps } from './components/types';
 import EditableText from './components/EditableText';
-import { useActionsStore } from './stores/actionsStore';
 import { ESCAPE_KEY } from './shared/constants/event-keys';
+import { Html } from 'react-konva-utils';
+import { KonvaEventObject } from 'konva/lib/Node';
+import Konva from 'konva';
 
 const drawing_modes = {
   ARROW: 'arrow',
@@ -34,10 +36,34 @@ export type Drawable = {
 const App = () => {
   const [drawables, setDrawables] = React.useState<Drawable[]>([]);
   const [newDrawable, setNewDrawable] = React.useState<Drawable | null>(null);
-  const [mode, setMode] = React.useState(drawing_modes.EDITABLE_TEXT);
+  const [mode, setMode] = React.useState(drawing_modes.ARROW);
   const [selected, setSelected] = useState<string | null>(null);
+  const [contextMenu, setContextMenu] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
-  const { removeEmptyTextNodes } = useActionsStore();
+  const contextMenuRef = useRef<Konva.Stage>(null);
+
+  const handleOnContextMenu = (
+    e: KonvaEventObject<PointerEvent>,
+    id: string,
+  ) => {
+    e.evt.preventDefault();
+
+    const position = e.target?.getStage()?.getPointerPosition();
+
+    setMenuPosition({ x: position?.x || 0, y: position?.y || 0 });
+
+    setContextMenu(id);
+    setSelected(id);
+  };
+
+  function removeNode(id: string) {
+    const updatedNodes = [...drawables].filter(
+      (drawable) => drawable.shapeProps.id !== id,
+    );
+
+    setDrawables(updatedNodes);
+  }
 
   const onMouseDown = (e: any) => {
     const clickedOnEmpty = e.target === e.target.getStage();
@@ -65,6 +91,7 @@ const App = () => {
       };
 
       setNewDrawable(newNode);
+      setSelected(!newNode.isDrawable ? newNode.shapeProps.id : null);
       console.log('mousedown: adding new node state');
     }
   };
@@ -137,6 +164,7 @@ const App = () => {
         <button onClick={() => setDrawables([])}>Clear</button>
 
         <Stage
+          ref={contextMenuRef}
           width={window.innerWidth}
           height={window.innerHeight}
           onMouseDown={onMouseDown}
@@ -158,6 +186,7 @@ const App = () => {
                   isDrawable: drawable.isDrawable,
                   type: drawable.type,
                   text: drawable.text,
+                  onContextMenu: handleOnContextMenu,
                   onSelect: () => setSelected(drawable.shapeProps.id),
                   onChange: (newAttrs) => {
                     const draws = [...drawables];
@@ -168,12 +197,45 @@ const App = () => {
                       ...newAttrs,
                     };
 
-                    setDrawables(removeEmptyTextNodes(draws));
-                    setNewDrawable(null);
+                    setDrawables(draws);
+                    console.log(newAttrs.shapeProps);
+                    if (!draws[i].isDrawable) {
+                      setNewDrawable(null);
+                    }
+
+                    console.log('updating nodes state');
                   },
                 })
               );
             })}
+            <Html>
+              <Container
+                css={{
+                  position: 'absolute',
+                  top: menuPosition.y + 'px',
+                  left: menuPosition.x + 'px',
+                }}
+              >
+                <Dropdown
+                  isOpen={Boolean(contextMenu?.length)}
+                  closeOnSelect
+                  onClose={() => setContextMenu(null)}
+                  offset={-12}
+                >
+                  <Dropdown.Button flat css={{ visibility: 'hidden' }}>
+                    Trigger
+                  </Dropdown.Button>
+                  <Dropdown.Menu
+                    onAction={() => contextMenu && removeNode(contextMenu)}
+                    aria-label="Static Actions"
+                  >
+                    <Dropdown.Item key="delete" color="error">
+                      Delete
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Container>
+            </Html>
           </Layer>
         </Stage>
       </>

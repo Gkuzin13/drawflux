@@ -6,6 +6,7 @@ import type { DrawableProps } from './types';
 const ArrowDrawable = ({
   shapeProps,
   isSelected,
+  onContextMenu,
   onSelect,
   onChange,
 }: DrawableProps) => {
@@ -35,8 +36,9 @@ const ArrowDrawable = ({
 
   return (
     <Group
+      onSelect={onSelect}
       draggable={true}
-      onDragEnd={(e: any) => {
+      onDragEnd={(e: any) =>
         onChange({
           shapeProps: {
             ...shapeProps,
@@ -44,8 +46,9 @@ const ArrowDrawable = ({
             x: e.target.x(),
             y: e.target.y(),
           },
-        });
-      }}
+        })
+      }
+      onContextMenu={(e) => onContextMenu(e, shapeProps.id)}
     >
       {isSelected && (
         <Circle
@@ -66,7 +69,8 @@ const ArrowDrawable = ({
         pointerLength={16}
         pointerWidth={16}
         points={points.map((p) => [p.x, p.y]).flat()}
-        hitStrokeWidth={32}
+        hitStrokeWidth={48}
+        id={shapeProps.id}
         onClick={onSelect}
         onTap={onSelect}
       />
