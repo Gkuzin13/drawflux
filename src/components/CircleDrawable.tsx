@@ -1,17 +1,17 @@
 import Konva from 'konva';
 import { Circle } from 'react-konva';
 import NodeContainer from './NodeContainer';
-import type { DrawableProps } from './types';
+import type { NodeComponentProps } from './types';
 
 const CircleDrawable = ({
-  shapeProps,
+  nodeProps,
   isSelected,
   type,
-  onChange,
+  onNodeChange,
   onSelect,
   onContextMenu,
-}: DrawableProps) => {
-  const [p1, p2] = shapeProps.points;
+}: NodeComponentProps) => {
+  const [p1, p2] = nodeProps.points;
 
   const dx = p1.x - p2.x;
   const dy = p1.y - p2.y;
@@ -20,18 +20,17 @@ const CircleDrawable = ({
 
   return (
     <NodeContainer
-      isDrawable={true}
       type={type}
-      shapeProps={shapeProps}
+      nodeProps={nodeProps}
       isSelected={isSelected}
-      onChange={onChange}
+      onNodeChange={onNodeChange}
       onSelect={onSelect}
       onContextMenu={onContextMenu}
     >
       <Circle
         stroke="black"
         radius={radius}
-        {...shapeProps}
+        {...nodeProps}
         hitStrokeWidth={16}
         onTransformEnd={(e: any) => {
           if (!e.target) return;
@@ -44,9 +43,10 @@ const CircleDrawable = ({
           node.scaleX(1);
           node.scaleY(1);
 
-          onChange({
-            shapeProps: {
-              ...shapeProps,
+          onNodeChange({
+            type,
+            nodeProps: {
+              ...nodeProps,
               x: node.x(),
               y: node.y(),
               width: Math.max(5, node.width() * scaleX),

@@ -8,20 +8,23 @@ import {
 } from 'react';
 import { Group, KonvaNodeEvents } from 'react-konva';
 import Konva from 'konva';
-import { DrawableProps } from './types';
+import { NodeComponentProps } from './types';
 import { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import NodeTransformer from './NodeTransformer';
 
-interface Props extends PropsWithChildren, DrawableProps {
+interface Props extends PropsWithChildren, NodeComponentProps {
   transformerConfig?: TransformerConfig;
   transformerEvents?: KonvaNodeEvents;
 }
 
+type NodeRef = Konva.Circle | Konva.Rect | Konva.Text | Konva.Line;
+
 const NodeContainer = ({
-  shapeProps,
+  nodeProps,
   text,
+  type,
   isSelected,
-  onChange,
+  onNodeChange,
   onSelect,
   onContextMenu,
   transformerConfig,
@@ -29,27 +32,28 @@ const NodeContainer = ({
   children,
 }: Props) => {
   const transformerRef = useRef<Konva.Transformer>(null);
-  const shapeRef = useRef<Konva.Shape>(null);
+  const nodeRef = useRef<NodeRef>(null);
 
   useEffect(() => {
-    if (isSelected && transformerRef.current && shapeRef.current) {
-      transformerRef.current.nodes([shapeRef.current]);
+    if (isSelected && transformerRef.current && nodeRef.current) {
+      transformerRef.current.nodes([nodeRef.current]);
       transformerRef.current.getLayer()?.batchDraw();
     }
   }, [isSelected]);
 
   return (
-    <Group onContextMenu={(e) => onContextMenu(e, shapeProps.id)}>
+    <Group onContextMenu={(e) => onContextMenu(e, nodeProps.id)}>
       {cloneElement(Children.only(children) as ReactElement, {
-        ref: shapeRef,
+        ref: nodeRef,
         onClick: onSelect,
         onTap: onSelect,
         strokeScaleEnabled: false,
         draggable: true,
         onDragEnd: (e: any) => {
-          onChange({
-            shapeProps: { ...shapeProps, x: e.target.x(), y: e.target.y() },
+          onNodeChange({
+            type,
             text,
+            nodeProps: { ...nodeProps, x: e.target.x(), y: e.target.y() },
           });
         },
       })}

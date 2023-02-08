@@ -1,21 +1,21 @@
+import { NodeProps } from '@/shared/constants/base';
 import { useClickAway } from '@/shared/hooks/useClickAway';
 import { useRef } from 'react';
 import { Html } from 'react-konva-utils';
 
 type Props = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  nodeProps: NodeProps;
   value: string;
   onTextChange: (e: any) => void;
   onKeyDown: (e: any) => void;
   onClickAway: () => void;
+  onBlur: () => void;
 };
 
 const getStyle = (
   width: number,
   height: number,
+  rotation: number,
   fontSize: number,
 ): React.CSSProperties => {
   const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
@@ -45,16 +45,19 @@ const getStyle = (
 };
 
 const EditableTextInput = ({
-  x,
-  y,
-  width,
-  height,
+  nodeProps,
   value,
   onTextChange,
   onKeyDown,
   onClickAway,
+  onBlur,
 }: Props) => {
-  const style = getStyle(width, height, 16);
+  const style = getStyle(
+    nodeProps.width,
+    nodeProps.height,
+    nodeProps.rotation,
+    16,
+  );
 
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -70,14 +73,27 @@ const EditableTextInput = ({
   }
 
   return (
-    <Html groupProps={{ x, y }} divProps={{ style: { opacity: 1 } }}>
+    <Html
+      groupProps={{
+        x: nodeProps.x,
+        y: nodeProps.y,
+        width: nodeProps.width,
+        height: nodeProps.height,
+        rotation: nodeProps.rotation,
+      }}
+      divProps={{
+        style: {
+          opacity: 1,
+        },
+      }}
+    >
       <textarea
         ref={ref}
-        autoFocus
         value={value}
         onChange={onTextChange}
         onKeyDown={onKeyDown}
         onFocus={onFocus}
+        onBlur={onBlur}
         style={style}
       />
     </Html>

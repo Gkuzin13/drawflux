@@ -1,26 +1,13 @@
-export type DrawableProps = {
-  shapeProps: ShapeProps;
+import { Node, NodeProps } from '@/shared/constants/base';
+
+export interface NodeComponentProps extends Node {
   isSelected: boolean;
-  text?: string;
-  type: string;
-  isDrawable: boolean;
   onSelect: () => void;
-  onChange: (args: OnChangeArgs) => void;
+  onNodeChange: (args: onNodeChangeArgs) => void;
   onContextMenu: (e: KonvaEventObject<PointerEvent>, id: string) => void;
-};
+}
 
-export type OnChangeArgs = Pick<DrawableProps, 'shapeProps' | 'text'>;
-
-export type ShapeProps = {
-  id: string;
-  points: Point[];
-  x: number;
-  y: number;
-  width?: number;
-  height?: number;
-};
-
-export type Point = {
-  x: number;
-  y: number;
-};
+export type onNodeChangeArgs = Pick<
+  NodeComponentProps,
+  'nodeProps' | 'text' | 'type'
+>;

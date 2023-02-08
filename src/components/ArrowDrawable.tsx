@@ -1,20 +1,21 @@
 import Konva from 'konva';
 import { useEffect, useState } from 'react';
 import { Arrow, Circle, Group } from 'react-konva';
-import type { DrawableProps } from './types';
+import type { NodeComponentProps } from './types';
 
 const ArrowDrawable = ({
-  shapeProps,
+  nodeProps,
+  type,
   isSelected,
   onContextMenu,
   onSelect,
-  onChange,
-}: DrawableProps) => {
-  const [points, setPoints] = useState(shapeProps.points);
+  onNodeChange,
+}: NodeComponentProps) => {
+  const [points, setPoints] = useState(nodeProps.points);
 
   useEffect(() => {
-    setPoints(shapeProps.points);
-  }, [shapeProps]);
+    setPoints(nodeProps.points);
+  }, [nodeProps]);
 
   const onAnchorDragMove = (e: any) => {
     if (!e.target) return;
@@ -39,16 +40,17 @@ const ArrowDrawable = ({
       onSelect={onSelect}
       draggable={true}
       onDragEnd={(e: any) =>
-        onChange({
-          shapeProps: {
-            ...shapeProps,
+        onNodeChange({
+          type,
+          nodeProps: {
+            ...nodeProps,
             points,
             x: e.target.x(),
             y: e.target.y(),
           },
         })
       }
-      onContextMenu={(e) => onContextMenu(e, shapeProps.id)}
+      onContextMenu={(e) => onContextMenu(e, nodeProps.id)}
     >
       {isSelected && (
         <Circle
@@ -70,7 +72,7 @@ const ArrowDrawable = ({
         pointerWidth={16}
         points={points.map((p) => [p.x, p.y]).flat()}
         hitStrokeWidth={48}
-        id={shapeProps.id}
+        id={nodeProps.id}
         onClick={onSelect}
         onTap={onSelect}
       />

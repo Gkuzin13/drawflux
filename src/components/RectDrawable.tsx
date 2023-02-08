@@ -1,25 +1,24 @@
 import Konva from 'konva';
 import { Rect } from 'react-konva';
 import NodeContainer from './NodeContainer';
-import type { DrawableProps } from './types';
+import type { NodeComponentProps } from './types';
 
 const RectDrawable = ({
-  shapeProps,
+  nodeProps,
   type,
   isSelected,
   onContextMenu,
-  onChange,
+  onNodeChange,
   onSelect,
-}: DrawableProps) => {
-  const [p1, p2] = shapeProps.points;
+}: NodeComponentProps) => {
+  const [p1, p2] = nodeProps.points;
 
   return (
     <NodeContainer
-      isDrawable={true}
       type={type}
-      shapeProps={shapeProps}
+      nodeProps={nodeProps}
       isSelected={isSelected}
-      onChange={onChange}
+      onNodeChange={onNodeChange}
       onSelect={onSelect}
       onContextMenu={onContextMenu}
     >
@@ -28,6 +27,7 @@ const RectDrawable = ({
         height={p2.y - p1.y}
         x={p1.x}
         y={p1.y}
+        rotation={nodeProps.rotation}
         stroke="black"
         hitStrokeWidth={16}
         onTransformEnd={(e: any) => {
@@ -41,9 +41,10 @@ const RectDrawable = ({
           node.scaleX(1);
           node.scaleY(1);
 
-          onChange({
-            shapeProps: {
-              ...shapeProps,
+          onNodeChange({
+            type,
+            nodeProps: {
+              ...nodeProps,
               points: [
                 { x: node.x(), y: node.y() },
                 {

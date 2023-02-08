@@ -1,19 +1,20 @@
 import Konva from 'konva';
+import { KonvaEventObject } from 'konva/lib/Node';
 import { useRef } from 'react';
 import { Text } from 'react-konva';
 import NodeContainer from './NodeContainer';
-import { DrawableProps } from './types';
+import { NodeComponentProps } from './types';
 
 type Props = {
   onDoubleClick: () => void;
-} & DrawableProps;
+} & NodeComponentProps;
 
 const ResizableText = ({
-  shapeProps,
+  nodeProps,
   text,
   isSelected,
   type,
-  onChange,
+  onNodeChange,
   onSelect,
   onDoubleClick,
   onContextMenu,
@@ -31,21 +32,21 @@ const ResizableText = ({
         scaleX: 1,
       });
 
-      onChange({
-        shapeProps: { ...shapeProps, width: newWidth, height: newHeight },
+      onNodeChange({
+        nodeProps: { ...nodeProps, width: newWidth, height: newHeight },
         text,
+        type,
       });
     }
   };
 
   return (
     <NodeContainer
-      isDrawable={false}
       type={type}
       text={text}
       isSelected={isSelected}
-      shapeProps={shapeProps}
-      onChange={onChange}
+      nodeProps={nodeProps}
+      onNodeChange={onNodeChange}
       onSelect={onSelect}
       onContextMenu={onContextMenu}
       transformerEvents={{ onDblClick: onDoubleClick, onDblTap: onDoubleClick }}
@@ -58,13 +59,27 @@ const ResizableText = ({
       }}
     >
       <Text
-        {...shapeProps}
+        {...nodeProps}
         text={text}
         fontSize={16}
         perfectDrawEnabled={false}
         onTransform={handleResize}
         onDblClick={onDoubleClick}
         onDblTap={onDoubleClick}
+        onTransformEnd={(e: KonvaEventObject<Event>) => {
+          if (!e.target) return;
+
+          const node = e.target as Konva.Rect;
+
+          onNodeChange({
+            type,
+            text,
+            nodeProps: {
+              ...nodeProps,
+              rotation: node.rotation(),
+            },
+          });
+        }}
       />
     </NodeContainer>
   );

@@ -1,34 +1,39 @@
-import { useEffect, useState } from 'react';
-import { DrawableProps } from './types';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { NodeComponentProps } from './types';
 import { ENTER_KEY, ESCAPE_KEY } from '@/shared/constants/event-keys';
 import EditableTextInput from './EditableTextInput';
 import ResizableText from './ResizableText';
 
 const EditableText = ({
-  shapeProps,
+  nodeProps,
   isSelected,
   text,
   type,
-  onChange,
+  onNodeChange,
   onSelect,
   onContextMenu,
-}: DrawableProps) => {
+}: NodeComponentProps) => {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(text);
 
   useEffect(() => {
-    if (!text?.length) {
+    if (!text) {
       setEditing(true);
     }
   }, [text]);
 
-  const handleTextSave = () => {
-    setEditing(false);
+  const onDoubleClick = () => {
+    setEditing(true);
+  };
 
-    onChange({
-      shapeProps,
+  const handleTextSave = () => {
+    onNodeChange({
+      nodeProps,
       text: value,
+      type,
     });
+
+    setEditing(false);
   };
 
   const handleEscapeKeys = (e: any) => {
@@ -39,34 +44,32 @@ const EditableText = ({
 
   const handleTextChange = (e: any) => {
     const { value } = e.target as HTMLTextAreaElement;
+
     setValue(() => value);
   };
 
   if (editing) {
     return (
       <EditableTextInput
-        width={shapeProps.width!}
-        height={shapeProps.height!}
-        x={shapeProps.x}
-        y={shapeProps.y}
+        nodeProps={nodeProps}
         value={value || ''}
         onTextChange={handleTextChange}
         onKeyDown={handleEscapeKeys}
         onClickAway={handleTextSave}
+        onBlur={handleTextSave}
       />
     );
   }
 
   return (
     <ResizableText
-      shapeProps={shapeProps}
+      nodeProps={nodeProps}
       isSelected={isSelected}
       text={value}
       type={type}
-      onChange={onChange}
-      isDrawable={false}
+      onNodeChange={onNodeChange}
       onSelect={onSelect}
-      onDoubleClick={() => setEditing(true)}
+      onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
     />
   );

@@ -1,39 +1,43 @@
+import { Point } from '@/shared/constants/base';
+import Konva from 'konva';
 import { useEffect, useState } from 'react';
 import { Line } from 'react-konva';
 import NodeContainer from './NodeContainer';
-import type { DrawableProps, Point } from './types';
+import type { NodeComponentProps } from './types';
 
 const FreePathDrawable = ({
-  shapeProps,
+  nodeProps,
   type,
   isSelected,
-  onChange,
+  onNodeChange,
   onSelect,
   onContextMenu,
-}: DrawableProps) => {
-  const [points, setPoints] = useState<Point[]>(shapeProps.points);
+}: NodeComponentProps) => {
+  const [points, setPoints] = useState<Point[]>(nodeProps.points);
 
   const flattenedPoints = points.map((p) => [p.x, p.y]).flat();
 
   useEffect(() => {
-    const lastPoints = shapeProps.points[shapeProps.points.length - 1];
+    const lastPoints = nodeProps.points[nodeProps.points.length - 1];
 
     setPoints([...points, lastPoints]);
-  }, [shapeProps.points]);
+  }, [nodeProps.points]);
 
   return (
     <NodeContainer
-      isDrawable={true}
       type={type}
-      shapeProps={shapeProps}
+      nodeProps={nodeProps}
       isSelected={isSelected}
-      onChange={onChange}
+      onNodeChange={onNodeChange}
       onSelect={onSelect}
       onContextMenu={onContextMenu}
+      transformerConfig={{ enabledAnchors: [] }}
     >
       <Line
-        id={shapeProps.id}
+        id={nodeProps.id}
         points={flattenedPoints}
+        rotation={nodeProps.rotation}
+        perfectDrawEnabled={false}
         fill="black"
         stroke="black"
         strokeWidth={3}
@@ -41,6 +45,22 @@ const FreePathDrawable = ({
         lineCap="round"
         lineJoin="round"
         hitStrokeWidth={16}
+        onTransformEnd={(e: any) => {
+          if (!e.target) return;
+
+          const node = e.target as Konva.Rect;
+
+          node.scaleX(1);
+          node.scaleY(1);
+
+          onNodeChange({
+            type,
+            nodeProps: {
+              ...nodeProps,
+              rotation: node.rotation(),
+            },
+          });
+        }}
       />
     </NodeContainer>
   );
