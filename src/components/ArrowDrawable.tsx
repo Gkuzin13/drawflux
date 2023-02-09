@@ -42,6 +42,7 @@ const ArrowDrawable = ({
       onDragEnd={(e: any) =>
         onNodeChange({
           type,
+          text: null,
           nodeProps: {
             ...nodeProps,
             points,

@@ -5,6 +5,7 @@ import FreePathDrawable from '@/components/FreePathDrawable';
 import EditableText from '@/components/EditableText';
 import type { SimpleColors } from '@nextui-org/react';
 import { ACTION_TYPES } from '@/stores/nodesSlice';
+import { NodeComponentProps } from '@/components/types';
 
 export const NODE_TYPES = Object.freeze({
   ARROW: 'Arrow',
@@ -21,27 +22,27 @@ export const BASE_MENU_ITEMS: MenuItem[] = [
 export const NODES_MAP: NodeMap = {
   [NODE_TYPES.ARROW]: {
     component: ArrowDrawable,
-    isDrawable: true,
+    draftMode: 'drawing',
     menuItems: [...BASE_MENU_ITEMS],
   },
   [NODE_TYPES.CIRCLE]: {
     component: CircleDrawable,
-    isDrawable: true,
+    draftMode: 'drawing',
     menuItems: [...BASE_MENU_ITEMS],
   },
   [NODE_TYPES.RECTANGLE]: {
     component: RectDrawable,
-    isDrawable: true,
+    draftMode: 'drawing',
     menuItems: [...BASE_MENU_ITEMS],
   },
   [NODE_TYPES.FREE_PATH]: {
     component: FreePathDrawable,
-    isDrawable: true,
+    draftMode: 'drawing',
     menuItems: [...BASE_MENU_ITEMS],
   },
   [NODE_TYPES.EDITABLE_TEXT]: {
     component: EditableText,
-    isDrawable: false,
+    draftMode: 'text',
     menuItems: [...BASE_MENU_ITEMS],
   },
 };
@@ -50,9 +51,11 @@ export type NodeMap = {
   [K in NodeType]: NodeMapItem;
 };
 
+export type DraftMode = 'drawing' | 'text';
+
 export type NodeMapItem = {
-  component: (args: any) => JSX.Element;
-  isDrawable: boolean;
+  component: (props: NodeComponentProps) => JSX.Element;
+  draftMode: DraftMode;
   menuItems: MenuItem[];
 };
 
@@ -61,8 +64,10 @@ export type NodeType = (typeof NODE_TYPES)[keyof typeof NODE_TYPES];
 export type Node = {
   type: NodeType;
   nodeProps: NodeProps;
-  text?: string;
+  text: string | null;
 };
+
+export type DrawableNode = Node;
 
 export type Point = {
   x: number;

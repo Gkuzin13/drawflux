@@ -21,6 +21,7 @@ const RectDrawable = ({
       onNodeChange={onNodeChange}
       onSelect={onSelect}
       onContextMenu={onContextMenu}
+      text={null}
     >
       <Rect
         width={p2.x - p1.x}
@@ -43,6 +44,7 @@ const RectDrawable = ({
 
           onNodeChange({
             type,
+            text: null,
             nodeProps: {
               ...nodeProps,
               points: [

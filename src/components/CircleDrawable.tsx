@@ -7,6 +7,7 @@ const CircleDrawable = ({
   nodeProps,
   isSelected,
   type,
+  text,
   onNodeChange,
   onSelect,
   onContextMenu,
@@ -21,6 +22,7 @@ const CircleDrawable = ({
   return (
     <NodeContainer
       type={type}
+      text={text}
       nodeProps={nodeProps}
       isSelected={isSelected}
       onNodeChange={onNodeChange}
@@ -45,6 +47,7 @@ const CircleDrawable = ({
 
           onNodeChange({
             type,
+            text: null,
             nodeProps: {
               ...nodeProps,
               x: node.x(),

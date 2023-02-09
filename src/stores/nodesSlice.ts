@@ -30,29 +30,28 @@ export const reducer = (
     case ACTION_TYPES.ADD:
       if (!payload) return state;
 
-      return { ...state, nodes: [...state.nodes, payload] };
+      return { ...state, nodes: state.nodes.concat([payload]) };
     case ACTION_TYPES.UPDATE:
-      if (!payload?.nodeProps) return state;
-
-      const nodeIdx = state.nodes.findIndex(
-        (node) => node.nodeProps.id === payload?.nodeProps.id,
-      );
-
-      if (nodeIdx === -1) return state;
-
-      let nodesCopy = [...state.nodes];
-
-      nodesCopy[nodeIdx] = payload;
-
-      return { ...state, nodes: nodesCopy };
+      return {
+        ...state,
+        nodes: state.nodes.map((node) => {
+          if (node.nodeProps.id === payload?.nodeProps.id) {
+            return payload;
+          }
+          return node;
+        }),
+      };
     case ACTION_TYPES.DELETE:
-      const updatedNodes = state.nodes.filter(
-        (drawable) => drawable.nodeProps.id !== payload?.nodeProps.id,
-      );
-
-      return { ...state, nodes: updatedNodes };
+      return {
+        ...state,
+        nodes: state.nodes.filter(
+          (drawable) => drawable.nodeProps.id !== payload?.nodeProps.id,
+        ),
+      };
     case ACTION_TYPES.DELETE_ALL:
       return { ...state, nodes: [] };
+    default:
+      return state;
   }
 };
 

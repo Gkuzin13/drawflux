@@ -1,10 +1,11 @@
-import React, { createElement, useEffect } from 'react';
+import React, { createElement, useEffect, useRef } from 'react';
 import { Stage, Layer } from 'react-konva';
-import { NextUIProvider } from '@nextui-org/react';
+import { Button, Container, NextUIProvider, Row } from '@nextui-org/react';
 import { useState } from 'react';
 import { ESCAPE_KEY } from './shared/constants/event-keys';
 import { KonvaEventObject } from 'konva/lib/Node';
 import {
+  DraftMode,
   Node,
   NodeMapItem,
   NODES_MAP,
@@ -15,12 +16,20 @@ import NodeMenu from './components/NodeMenu';
 import { createNode } from './shared/utils/createNode';
 import { ActionTypes, ACTION_TYPES, useStageStore } from './stores/nodesSlice';
 import Konva from 'konva';
+import { getPointerPosition } from './shared/utils/lib';
 
 type ActiveNodeMenu = Node & Pick<NodeMapItem, 'menuItems'>;
 
+type DraftNode = {
+  draftMode: DraftMode;
+  node: Node;
+};
+
+const defaultNode = NODE_TYPES.EDITABLE_TEXT;
+
 const App = () => {
-  const [newNode, setNewNode] = React.useState<Node | null>(null);
-  const [mode, setMode] = React.useState<NodeType>(NODE_TYPES.EDITABLE_TEXT);
+  const [draftNodeType, setDraftNodeType] = useState<NodeType>(defaultNode);
+  const [draftNode, setDraftNode] = React.useState<DraftNode | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<ActiveNodeMenu | null>(null);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
@@ -46,6 +55,8 @@ const App = () => {
     delete node.menuItems;
 
     dispatch({ type, payload: contextMenu as Node });
+
+    setSelected(null);
   };
 
   const handleOnContextMenu = (
@@ -54,7 +65,7 @@ const App = () => {
   ) => {
     e.evt.preventDefault();
 
-    const position = e.target?.getStage()?.getPointerPosition();
+    const position = getPointerPosition(e.target);
 
     setMenuPosition({ x: position?.x || 0, y: position?.y || 0 });
 
@@ -69,92 +80,129 @@ const App = () => {
     }
   };
 
-  const updateNewNodeProps = (x: number, y: number) => {
-    setNewNode((prevState) => {
-      if (!prevState) return prevState;
+  const updateNodePoints = (x: number, y: number) => {
+    setDraftNode((prevState) => {
+      if (!prevState?.node) return prevState;
+
+      const { node } = prevState;
+
+      const updatedNode: Node = {
+        type: node.type,
+        text: node.text,
+        nodeProps: {
+          ...node.nodeProps,
+          points: [node.nodeProps.points[0], { x, y }],
+        },
+      };
+
       return {
         ...prevState,
-        nodeProps: {
-          ...prevState.nodeProps,
-          points: [prevState.nodeProps.points[0], { x, y }],
-        },
+        node: updatedNode,
       };
     });
   };
 
-  const onMouseDown = (e: any) => {
-    const clickedOnEmpty = e.target === e.target.getStage();
+  const onMoveStart = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    const stage = e.target.getStage();
+
+    const clickedOnEmpty = e.target === stage;
 
     if (clickedOnEmpty) {
       setSelected(null);
     }
 
     if (clickedOnEmpty && !selected) {
-      const { x, y } = e.target.getStage().getPointerPosition();
+      const position = getPointerPosition(stage);
 
-      setNewNode(createNode({ type: mode, x, y }));
+      const newNode = createNode({
+        type: draftNodeType,
+        x: position?.x || 0,
+        y: position?.y || 0,
+      });
 
-      console.log('mousedown: adding new node state', newNode);
+      const { draftMode } = NODES_MAP[draftNodeType];
+
+      setDraftNode({ draftMode, node: newNode });
+
+      console.log('moveStart: added new draft node', newNode);
     }
   };
 
-  const onMouseMove = (e: any) => {
-    if (newNode && NODES_MAP[newNode.type].isDrawable) {
-      const { x, y } = e.target.getStage().getPointerPosition();
+  const onMove = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    if (draftNode?.node && draftNode.draftMode === 'drawing') {
+      const position = getPointerPosition(e.target);
 
-      updateNewNodeProps(x, y);
+      updateNodePoints(position?.x || 0, position?.y || 0);
 
-      console.log('mousemove: updating new node points and props');
+      console.log('move: updating draft points', draftNode.node);
     }
   };
 
-  const onMouseUp = (e: any) => {
-    if (newNode) {
-      const { x, y } = e.target.getStage().getPointerPosition();
+  const onMoveEnd = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    if (draftNode?.node && draftNode.draftMode === 'drawing') {
+      dispatch({ type: ACTION_TYPES.ADD, payload: draftNode.node });
 
-      updateNewNodeProps(x, y);
+      setDraftNode(null);
 
-      if (newNode.type === 'Editable Text' && !newNode.text?.length) {
-        setNewNode(null);
+      console.log('moveEnd: adding draft to nodes state', draftNode.node);
+    }
+  };
 
+  const handleNodeChange = (node: Node) => {
+    setDraftNode(null);
+
+    if (draftNode?.node) {
+      const draftMode = NODES_MAP[node.type].draftMode;
+
+      if (draftMode === 'text' && !node.text?.length) {
+        console.log('empty text node');
         return;
       }
 
-      dispatch({ type: ACTION_TYPES.ADD, payload: newNode });
-
-      setNewNode(null);
-      console.log('mouseup: adding node to list', nodes);
-    }
-  };
-
-  const handleNodeChange = (changedNode: Node) => {
-    setNewNode(null);
-
-    if (changedNode.nodeProps.id === newNode?.nodeProps.id) {
       dispatch({
         type: ACTION_TYPES.ADD,
-        payload: changedNode,
+        payload: node,
       });
     } else {
       dispatch({
         type: ACTION_TYPES.UPDATE,
-        payload: changedNode,
+        payload: node,
       });
     }
-
-    console.log('updating nodes state', changedNode);
+    console.log('updating changed node in nodes state', nodes);
   };
 
   const handleSelected = (id: string) => {
     setSelected(id);
   };
 
+  const onNodeTypeChange = (type: NodeType) => {
+    setDraftNodeType(type);
+  };
+
+  function getComponentProps(node: Node) {
+    return {
+      key: node.nodeProps.id,
+      nodeProps: node.nodeProps,
+      type: node.type,
+      text: node.text,
+      isSelected: selected === node.nodeProps.id,
+      onContextMenu: handleOnContextMenu,
+      onSelect: () => handleSelected(node.nodeProps.id),
+      onNodeChange: handleNodeChange,
+    };
+  }
+
+  function getComponent(type: NodeType) {
+    return NODES_MAP[type].component;
+  }
+
   return (
     <NextUIProvider>
       <>
         {Object.values(NODE_TYPES).map((mode, i) => {
           return (
-            <button key={i} onClick={() => setMode(mode)}>
+            <button key={i} onClick={() => onNodeTypeChange(mode)}>
               {mode}
             </button>
           );
@@ -165,28 +213,17 @@ const App = () => {
         <Stage
           width={window.innerWidth}
           height={window.innerHeight}
-          onMouseDown={onMouseDown}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
+          onMouseDown={onMoveStart}
+          onMouseMove={onMove}
+          onMouseUp={onMoveEnd}
         >
           <Layer>
-            {[...nodes, newNode].map((drawable, i) => {
-              if (!drawable) return null;
+            {[...nodes, draftNode?.node].map((node) => {
+              if (!node) return null;
 
-              const element = NODES_MAP[drawable.type]?.component;
-
-              return (
-                element &&
-                createElement(element, {
-                  key: drawable.nodeProps.id,
-                  nodeProps: drawable.nodeProps,
-                  type: drawable.type,
-                  text: drawable.text,
-                  isSelected: selected === drawable.nodeProps.id,
-                  onContextMenu: handleOnContextMenu,
-                  onSelect: () => handleSelected(drawable.nodeProps.id),
-                  onNodeChange: handleNodeChange,
-                })
+              return createElement(
+                getComponent(node.type),
+                getComponentProps(node),
               );
             })}
           </Layer>

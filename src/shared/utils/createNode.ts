@@ -1,4 +1,4 @@
-import { Node } from '../constants/base';
+import { Node, NodeProps } from '../constants/base';
 
 type CreateNodeArgs = {
   x: number;
@@ -7,6 +7,7 @@ type CreateNodeArgs = {
 
 export function createNode({ type, x, y }: CreateNodeArgs): Node {
   return {
+    text: null,
     type,
     nodeProps: {
       id: `node-${Date.now()}`,
@@ -16,6 +17,7 @@ export function createNode({ type, x, y }: CreateNodeArgs): Node {
         { x, y },
         { x, y },
       ],
+      rotation: 0,
     },
   };
 }

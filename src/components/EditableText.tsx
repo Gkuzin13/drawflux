@@ -20,7 +20,11 @@ const EditableText = ({
     if (!text) {
       setEditing(true);
     }
-  }, [text]);
+  }, []);
+
+  useEffect(() => {
+    console.log(nodeProps.width, nodeProps.height);
+  }, [nodeProps.width, nodeProps.height]);
 
   const onDoubleClick = () => {
     setEditing(true);
@@ -36,7 +40,7 @@ const EditableText = ({
     setEditing(false);
   };
 
-  const handleEscapeKeys = (e: any) => {
+  const handleKeyDown = (e: any) => {
     if ((e.key === ENTER_KEY && !e.shiftKey) || e.key === ESCAPE_KEY) {
       handleTextSave();
     }
@@ -54,9 +58,8 @@ const EditableText = ({
         nodeProps={nodeProps}
         value={value || ''}
         onTextChange={handleTextChange}
-        onKeyDown={handleEscapeKeys}
+        onKeyDown={handleKeyDown}
         onClickAway={handleTextSave}
-        onBlur={handleTextSave}
       />
     );
   }

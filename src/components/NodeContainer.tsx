@@ -21,7 +21,7 @@ type NodeRef = Konva.Circle | Konva.Rect | Konva.Text | Konva.Line;
 
 const NodeContainer = ({
   nodeProps,
-  text,
+  text = null,
   type,
   isSelected,
   onNodeChange,
@@ -51,8 +51,8 @@ const NodeContainer = ({
         draggable: true,
         onDragEnd: (e: any) => {
           onNodeChange({
-            type,
             text,
+            type,
             nodeProps: { ...nodeProps, x: e.target.x(), y: e.target.y() },
           });
         },
