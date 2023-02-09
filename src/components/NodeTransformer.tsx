@@ -1,3 +1,4 @@
+import { CURSOR_STYLES } from '@/shared/constants/base';
 import Konva from 'konva';
 import { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import { ForwardedRef, forwardRef } from 'react';
@@ -17,11 +18,15 @@ const NodeTransformer = forwardRef(
       <Transformer
         ref={ref}
         ignoreStroke={true}
+        anchorFill="white"
         anchorStroke="gray"
-        anchorFill="gray"
-        anchorSize={10}
-        anchorCornerRadius={10}
+        anchorSize={8}
+        name="test"
+        anchorCornerRadius={6}
+        cursorType={CURSOR_STYLES.ALL_SCROLL}
         borderStroke="gray"
+        padding={6}
+        rotateAnchorOffset={14}
         rotationSnaps={[0, 90, 180, 270]}
         shouldOverdrawWholeArea={true}
         boundBoxFunc={(oldBox, newBox) => {

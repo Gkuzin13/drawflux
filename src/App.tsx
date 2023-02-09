@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ESCAPE_KEY } from './shared/constants/event-keys';
 import { KonvaEventObject } from 'konva/lib/Node';
 import {
+  CURSOR_STYLES,
   DraftMode,
   Node,
   NodeMapItem,
@@ -15,7 +16,6 @@ import {
 import NodeMenu from './components/NodeMenu';
 import { createNode } from './shared/utils/createNode';
 import { ActionTypes, ACTION_TYPES, useStageStore } from './stores/nodesSlice';
-import Konva from 'konva';
 import { getPointerPosition } from './shared/utils/lib';
 
 type ActiveNodeMenu = Node & Pick<NodeMapItem, 'menuItems'>;
@@ -102,6 +102,22 @@ const App = () => {
     });
   };
 
+  const setCursorStyle = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    const stage = e.target.getStage();
+
+    if (!stage) return;
+
+    if (e.target !== stage && !draftNode) {
+      const { cursorType } = e.target.attrs;
+      const parentCursorStyle = e.target.parent?.attrs.cursorType;
+
+      stage.container().style.cursor =
+        cursorType || parentCursorStyle || CURSOR_STYLES.DEFAULT;
+    } else {
+      stage.container().style.cursor = CURSOR_STYLES.DEFAULT;
+    }
+  };
+
   const onMoveStart = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
     const stage = e.target.getStage();
 
@@ -123,8 +139,6 @@ const App = () => {
       const { draftMode } = NODES_MAP[draftNodeType];
 
       setDraftNode({ draftMode, node: newNode });
-
-      console.log('moveStart: added new draft node', newNode);
     }
   };
 
@@ -133,9 +147,9 @@ const App = () => {
       const position = getPointerPosition(e.target);
 
       updateNodePoints(position?.x || 0, position?.y || 0);
-
-      console.log('move: updating draft points', draftNode.node);
     }
+
+    setCursorStyle(e);
   };
 
   const onMoveEnd = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
@@ -143,8 +157,6 @@ const App = () => {
       dispatch({ type: ACTION_TYPES.ADD, payload: draftNode.node });
 
       setDraftNode(null);
-
-      console.log('moveEnd: adding draft to nodes state', draftNode.node);
     }
   };
 
@@ -152,13 +164,6 @@ const App = () => {
     setDraftNode(null);
 
     if (draftNode?.node) {
-      const draftMode = NODES_MAP[node.type].draftMode;
-
-      if (draftMode === 'text' && !node.text?.length) {
-        console.log('empty text node');
-        return;
-      }
-
       dispatch({
         type: ACTION_TYPES.ADD,
         payload: node,
@@ -169,7 +174,6 @@ const App = () => {
         payload: node,
       });
     }
-    console.log('updating changed node in nodes state', nodes);
   };
 
   const handleSelected = (id: string) => {
@@ -178,6 +182,7 @@ const App = () => {
 
   const onNodeTypeChange = (type: NodeType) => {
     setDraftNodeType(type);
+    setDraftNode(null);
   };
 
   function getComponentProps(node: Node) {

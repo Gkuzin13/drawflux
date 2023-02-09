@@ -53,10 +53,6 @@ const EditableTextInput = ({
 
   const ref = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    console.log('dim in input' + nodeProps.width, nodeProps.height);
-  }, [nodeProps.width, nodeProps.height]);
-
   useClickAway(ref, onClickAway);
 
   function onFocus(e: React.FocusEvent) {

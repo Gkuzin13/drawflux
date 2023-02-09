@@ -33,7 +33,6 @@ const CircleDrawable = ({
         stroke="black"
         radius={radius}
         {...nodeProps}
-        hitStrokeWidth={16}
         onTransformEnd={(e: any) => {
           if (!e.target) return;
 

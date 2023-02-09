@@ -1,3 +1,4 @@
+import { CURSOR_STYLES } from '@/shared/constants/base';
 import Konva from 'konva';
 import { Rect } from 'react-konva';
 import NodeContainer from './NodeContainer';
@@ -13,6 +14,9 @@ const RectDrawable = ({
 }: NodeComponentProps) => {
   const [p1, p2] = nodeProps.points;
 
+  const width = p2.x - p1.x;
+  const height = p2.y - p1.y;
+
   return (
     <NodeContainer
       type={type}
@@ -24,13 +28,12 @@ const RectDrawable = ({
       text={null}
     >
       <Rect
-        width={p2.x - p1.x}
-        height={p2.y - p1.y}
+        width={width}
+        height={height}
         x={p1.x}
         y={p1.y}
         rotation={nodeProps.rotation}
         stroke="black"
-        hitStrokeWidth={16}
         onTransformEnd={(e: any) => {
           if (!e.target) return;
 

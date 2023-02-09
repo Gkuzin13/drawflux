@@ -11,6 +11,7 @@ import Konva from 'konva';
 import { NodeComponentProps } from './types';
 import { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import NodeTransformer from './NodeTransformer';
+import { CURSOR_STYLES } from '@/shared/constants/base';
 
 interface Props extends PropsWithChildren, NodeComponentProps {
   transformerConfig?: TransformerConfig;
@@ -48,6 +49,9 @@ const NodeContainer = ({
         onClick: onSelect,
         onTap: onSelect,
         strokeScaleEnabled: false,
+        hitStrokeWidth: 12,
+        cursorType: CURSOR_STYLES.ALL_SCROLL,
+        fillEnabled: type === 'Editable Text',
         draggable: true,
         onDragEnd: (e: any) => {
           onNodeChange({

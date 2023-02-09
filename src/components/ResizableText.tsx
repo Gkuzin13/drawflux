@@ -51,7 +51,6 @@ const ResizableText = ({
       onContextMenu={onContextMenu}
       transformerEvents={{ onDblClick: onDoubleClick, onDblTap: onDoubleClick }}
       transformerConfig={{
-        rotateAnchorOffset: 16,
         enabledAnchors: [],
         boundBoxFunc: (oldBox, newBox) => {
           newBox.width = Math.max(30, newBox.width);

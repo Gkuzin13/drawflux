@@ -8,6 +8,7 @@ import type { NodeComponentProps } from './types';
 const FreePathDrawable = ({
   nodeProps,
   type,
+  text,
   isSelected,
   onNodeChange,
   onSelect,
@@ -26,6 +27,7 @@ const FreePathDrawable = ({
   return (
     <NodeContainer
       type={type}
+      text={null}
       nodeProps={nodeProps}
       isSelected={isSelected}
       onNodeChange={onNodeChange}
@@ -44,7 +46,6 @@ const FreePathDrawable = ({
         tension={0.5}
         lineCap="round"
         lineJoin="round"
-        hitStrokeWidth={16}
         onTransformEnd={(e: any) => {
           if (!e.target) return;
 
@@ -55,6 +56,7 @@ const FreePathDrawable = ({
 
           onNodeChange({
             type,
+            text,
             nodeProps: {
               ...nodeProps,
               rotation: node.rotation(),

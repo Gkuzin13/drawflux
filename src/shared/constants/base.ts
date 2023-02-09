@@ -89,3 +89,14 @@ export type MenuItem = {
   name: string;
   color: SimpleColors;
 };
+
+export const CURSOR_STYLES = Object.freeze({
+  POINTER: 'pointer',
+  DEFAULT: 'default',
+  ALL_SCROLL: 'all-scroll',
+  GRAB: 'GRAB',
+  EW_RESIZE: 'ew-resize',
+  NS_RESIZE: 'ns-resize',
+  NESW_RESIZE: 'nesw-resize',
+  NWSE_RESIZE: 'nwse-resize',
+});

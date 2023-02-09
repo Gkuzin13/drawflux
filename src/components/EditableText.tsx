@@ -22,10 +22,6 @@ const EditableText = ({
     }
   }, []);
 
-  useEffect(() => {
-    console.log(nodeProps.width, nodeProps.height);
-  }, [nodeProps.width, nodeProps.height]);
-
   const onDoubleClick = () => {
     setEditing(true);
   };
