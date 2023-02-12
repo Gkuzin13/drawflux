@@ -1,9 +1,3 @@
-import React, { createElement, useEffect, useRef } from 'react';
-import { Stage, Layer } from 'react-konva';
-import { Button, Container, NextUIProvider, Row } from '@nextui-org/react';
-import { useState } from 'react';
-import { ESCAPE_KEY } from './shared/constants/event-keys';
-import { KonvaEventObject } from 'konva/lib/Node';
 import {
   CURSOR_STYLES,
   DraftMode,
@@ -13,6 +7,12 @@ import {
   NodeType,
   NODE_TYPES,
 } from './shared/constants/base';
+import React, { createElement, useEffect } from 'react';
+import { Stage, Layer } from 'react-konva';
+import { NextUIProvider } from '@nextui-org/react';
+import { useState } from 'react';
+import { ESCAPE_KEY } from './shared/constants/event-keys';
+import { KonvaEventObject } from 'konva/lib/Node';
 import NodeMenu from './components/NodeMenu';
 import { createNode } from './shared/utils/createNode';
 import { ActionTypes, ACTION_TYPES, useStageStore } from './stores/nodesSlice';
@@ -198,10 +198,6 @@ const App = () => {
     };
   }
 
-  function getComponent(type: NodeType) {
-    return NODES_MAP[type].component;
-  }
-
   return (
     <NextUIProvider>
       <>
@@ -227,7 +223,7 @@ const App = () => {
               if (!node) return null;
 
               return createElement(
-                getComponent(node.type),
+                NODES_MAP[node.type]?.component,
                 getComponentProps(node),
               );
             })}

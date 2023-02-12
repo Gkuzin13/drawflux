@@ -1,8 +1,7 @@
-import { CURSOR_STYLES } from '@/shared/constants/base';
 import Konva from 'konva';
-import { useEffect, useState } from 'react';
-import { Arrow, Circle, Group } from 'react-konva';
+import { Group, Shape } from 'react-konva';
 import TransformerAnchor from './ArrowTransformer/TransformerAnchor';
+import { CURSOR_STYLES } from '@/shared/constants/base';
 import type { NodeComponentProps } from './types';
 
 const ArrowDrawable = ({
@@ -13,29 +12,33 @@ const ArrowDrawable = ({
   onSelect,
   onNodeChange,
 }: NodeComponentProps) => {
-  const [points, setPoints] = useState(nodeProps.points);
+  const { points } = nodeProps;
 
-  useEffect(() => {
-    setPoints(nodeProps.points);
-  }, [nodeProps]);
+  const middlePointActive = points[2] ? true : false;
 
   const onAnchorDragMove = (e: any) => {
     if (!e.target) return;
 
     const node = e.target as Konva.Circle;
-    const { id } = node.attrs;
+    const updatedIndex = node.attrs.id.split('-')[1];
 
-    if (id === 'anchor1') {
-      const updatedPoints = [{ x: node.x(), y: node.y() }, points[1]];
+    let updatedPoints = [...points];
 
-      setPoints(updatedPoints);
-      return;
-    }
+    updatedPoints[updatedIndex] = { x: node.x(), y: node.y() };
 
-    const updatedPoints = [points[0], { x: node.x(), y: node.y() }];
-
-    setPoints(updatedPoints);
+    onNodeChange({
+      type,
+      text: null,
+      nodeProps: {
+        ...nodeProps,
+        points: updatedPoints,
+      },
+    });
   };
+
+  function getDefaultAnchorPoint(start: number, end: number) {
+    return (start + end) / 2;
+  }
 
   return (
     <Group
@@ -55,35 +58,79 @@ const ArrowDrawable = ({
       }
       onContextMenu={(e) => onContextMenu(e, nodeProps.id)}
     >
-      {isSelected && (
-        <TransformerAnchor
-          id="anchor1"
-          x={points[0].x}
-          y={points[0].y}
-          onDragMove={onAnchorDragMove}
-        />
-      )}
-      <Arrow
+      <Shape
         id={nodeProps.id}
-        stroke="black"
-        fill="white"
-        tension={0.2}
         cursorType={CURSOR_STYLES.ALL_SCROLL}
-        pointerLength={16}
-        pointerWidth={16}
-        points={points.map((p) => [p.x, p.y]).flat()}
+        stroke="black"
         hitStrokeWidth={14}
+        sceneFunc={(ctx, shape) => {
+          // Draw lines
+          ctx.beginPath();
+          ctx.moveTo(points[0].x, points[0].y);
+          if (middlePointActive) {
+            ctx.lineTo(points[2].x, points[2].y);
+          }
+          ctx.lineTo(points[1].x, points[1].y);
+          ctx.fillStrokeShape(shape);
+
+          // Draw arrow pointer
+          const PI2 = Math.PI * 2;
+
+          const pointerRotationPoint = middlePointActive ? 2 : 0;
+          const dx = points[1].x - points[pointerRotationPoint].x;
+          const dy = points[1].y - points[pointerRotationPoint].y;
+
+          const radians = (Math.atan2(dy, dx) + PI2) % PI2;
+          const length = 24;
+          const width = 24;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.translate(points[1].x, points[1].y);
+          ctx.rotate(radians);
+          ctx.moveTo(0, 0);
+          ctx.lineTo(-length, width / 2);
+          ctx.moveTo(0, 0);
+          ctx.lineTo(-length, -width / 2);
+          ctx.restore();
+          ctx.fillStrokeShape(shape);
+        }}
         onClick={onSelect}
         onTap={onSelect}
-        lineJoin="round"
       />
       {isSelected && (
-        <TransformerAnchor
-          id="anchor2"
-          x={points[1].x}
-          y={points[1].y}
-          onDragMove={onAnchorDragMove}
-        />
+        <>
+          <TransformerAnchor
+            key={`anchor-0`}
+            id={`anchor-0`}
+            x={points[0].x}
+            y={points[0].y}
+            onDragMove={onAnchorDragMove}
+          />
+          <TransformerAnchor
+            key={`anchor-1`}
+            id={`anchor-1`}
+            x={points[1].x}
+            y={points[1].y}
+            onDragMove={onAnchorDragMove}
+          />
+          <TransformerAnchor
+            key={`anchor-2`}
+            id={`anchor-2`}
+            active={middlePointActive}
+            x={
+              middlePointActive
+                ? points[2].x
+                : getDefaultAnchorPoint(points[0].x, points[1].x)
+            }
+            y={
+              middlePointActive
+                ? points[2].y
+                : getDefaultAnchorPoint(points[0].y, points[1].y)
+            }
+            onDragMove={onAnchorDragMove}
+          />
+        </>
       )}
     </Group>
   );

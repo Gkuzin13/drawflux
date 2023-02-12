@@ -19,7 +19,7 @@ export const BASE_MENU_ITEMS: MenuItem[] = [
   { key: ACTION_TYPES.DELETE, color: 'error', name: 'Delete' },
 ];
 
-export const NODES_MAP: NodeMap = {
+export const NODES_MAP: NodeMap = Object.freeze({
   [NODE_TYPES.ARROW]: {
     component: ArrowDrawable,
     draftMode: 'drawing',
@@ -45,7 +45,18 @@ export const NODES_MAP: NodeMap = {
     draftMode: 'text',
     menuItems: [...BASE_MENU_ITEMS],
   },
-};
+});
+
+export const CURSOR_STYLES = Object.freeze({
+  POINTER: 'pointer',
+  DEFAULT: 'default',
+  ALL_SCROLL: 'all-scroll',
+  GRAB: 'GRAB',
+  EW_RESIZE: 'ew-resize',
+  NS_RESIZE: 'ns-resize',
+  NESW_RESIZE: 'nesw-resize',
+  NWSE_RESIZE: 'nwse-resize',
+});
 
 export type NodeMap = {
   [K in NodeType]: NodeMapItem;
@@ -79,8 +90,8 @@ export type NodeProps = {
   points: Point[];
   x: number;
   y: number;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   rotation: number;
 };
 
@@ -89,14 +100,3 @@ export type MenuItem = {
   name: string;
   color: SimpleColors;
 };
-
-export const CURSOR_STYLES = Object.freeze({
-  POINTER: 'pointer',
-  DEFAULT: 'default',
-  ALL_SCROLL: 'all-scroll',
-  GRAB: 'GRAB',
-  EW_RESIZE: 'ew-resize',
-  NS_RESIZE: 'ns-resize',
-  NESW_RESIZE: 'nesw-resize',
-  NWSE_RESIZE: 'nwse-resize',
-});
