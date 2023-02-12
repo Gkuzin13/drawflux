@@ -183,6 +183,7 @@ const App = () => {
   const onNodeTypeChange = (type: NodeType) => {
     setDraftNodeType(type);
     setDraftNode(null);
+    setSelected(null);
   };
 
   function getComponentProps(node: Node) {

@@ -82,7 +82,7 @@ const ArrowDrawable = ({
 
           const radians = (Math.atan2(dy, dx) + PI2) % PI2;
           const length = 24;
-          const width = 24;
+          const width = 18;
 
           ctx.save();
           ctx.beginPath();

@@ -25,7 +25,7 @@ const NodeMenu = ({ isOpen, x, y, menuItems, onClose, onAction }: Props) => {
           }}
         ></Dropdown.Button>
         <Dropdown.Menu onAction={onAction} aria-label="Actions">
-          <Dropdown.Section title="Actions">
+          <Dropdown.Section>
             {menuItems.map((item) => {
               return (
                 <Dropdown.Item key={item.key} color={item.color}>

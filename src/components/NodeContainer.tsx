@@ -50,6 +50,7 @@ const NodeContainer = ({
         onTap: onSelect,
         strokeScaleEnabled: false,
         hitStrokeWidth: 12,
+        perfectDrawEnabled: false,
         cursorType: CURSOR_STYLES.ALL_SCROLL,
         fillEnabled: type === 'Editable Text',
         draggable: true,

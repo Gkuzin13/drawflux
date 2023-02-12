@@ -39,7 +39,6 @@ const FreePathDrawable = ({
         id={nodeProps.id}
         points={flattenedPoints}
         rotation={nodeProps.rotation}
-        perfectDrawEnabled={false}
         fill="black"
         stroke="black"
         strokeWidth={3}
