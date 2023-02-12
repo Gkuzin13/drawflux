@@ -1,66 +1,50 @@
-import { Node } from '@/shared/constants/base';
-import { create, StateCreator, StoreApi } from 'zustand';
+import { Node, NodeProps } from '@/shared/constants/base';
+import { createAction, createSlice } from '@reduxjs/toolkit';
+import { ACTION_TYPES } from './actions';
+import { RootState } from './store';
 
-export type NodesSlice = {
+export type NodesState = {
   nodes: Node[];
-  dispatch: (args: ReducerArgs) => any;
 };
 
-export type StageStore = NodesSlice;
+const { ADD_NODE, UPDATE_NODE, DELETE_NODE, DELETE_ALL_NODES } = ACTION_TYPES;
 
-export type ActionTypes = (typeof ACTION_TYPES)[keyof typeof ACTION_TYPES];
-
-export type ReducerArgs = {
-  type: ActionTypes;
-  payload?: Node;
-};
-
-export const ACTION_TYPES = Object.freeze({
-  ADD: 'add',
-  UPDATE: 'update',
-  DELETE: 'delete',
-  DELETE_ALL: 'delete-all',
-});
-
-export const reducer = (
-  state: NodesSlice,
-  { type, payload }: ReducerArgs,
-): NodesSlice => {
-  switch (type) {
-    case ACTION_TYPES.ADD:
-      if (!payload) return state;
-
-      return { ...state, nodes: state.nodes.concat([payload]) };
-    case ACTION_TYPES.UPDATE:
-      return {
-        ...state,
-        nodes: state.nodes.map((node) => {
-          if (node.nodeProps.id === payload?.nodeProps.id) {
-            return payload;
-          }
-          return node;
-        }),
-      };
-    case ACTION_TYPES.DELETE:
-      return {
-        ...state,
-        nodes: state.nodes.filter(
-          (drawable) => drawable.nodeProps.id !== payload?.nodeProps.id,
-        ),
-      };
-    case ACTION_TYPES.DELETE_ALL:
-      return { ...state, nodes: [] };
-    default:
-      return state;
-  }
-};
-
-export const createNodesSlice: StateCreator<NodesSlice> = (set) => ({
+const initialState: NodesState = {
   nodes: [],
-  dispatch: (args: ReducerArgs) =>
-    set((state: NodesSlice) => reducer(state, args)),
+};
+
+export const nodesSlice = createSlice({
+  name: 'nodes',
+  initialState,
+  extraReducers: (builder) => {
+    builder
+      .addCase(createAction<Node>(ADD_NODE), (state, action) => {
+        state.nodes.push(action.payload);
+      })
+      .addCase(createAction<Node>(UPDATE_NODE), (state, action) => {
+        const nodeIndex = state.nodes.findIndex((node) => {
+          return node.nodeProps.id === action.payload.nodeProps.id;
+        });
+
+        if (nodeIndex >= 0) {
+          state.nodes[nodeIndex] = action.payload;
+        }
+      })
+      .addCase(
+        createAction<Pick<NodeProps, 'id'>>(DELETE_NODE),
+        (state, action) => {
+          state.nodes = state.nodes.filter(
+            (node) => node.nodeProps.id !== action.payload.id,
+          );
+        },
+      )
+      .addCase(createAction<undefined>(DELETE_ALL_NODES), (state) => {
+        state.nodes = [];
+      });
+  },
+  reducers: {},
 });
 
-export const useStageStore = create<StageStore>()((...a) => ({
-  ...createNodesSlice(...a),
-}));
+export const selectNodes = (state: RootState) => state;
+
+export default nodesSlice.reducer;

@@ -15,17 +15,19 @@
   },
   "dependencies": {
     "@nextui-org/react": "^1.0.0-beta.12",
+    "@reduxjs/toolkit": "^1.9.2",
     "konva": "^8.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-konva": "^18.2.4",
     "react-konva-utils": "^0.3.2",
-    "zustand": "^4.3.2"
+    "react-redux": "^8.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.18.6",
+    "@redux-devtools/core": "^3.13.1",
     "@storybook/addon-actions": "^6.5.16",
     "@storybook/addon-essentials": "^6.5.16",
     "@storybook/addon-interactions": "^6.5.16",

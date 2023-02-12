@@ -4,7 +4,7 @@ import RectDrawable from '@/components/RectDrawable';
 import FreePathDrawable from '@/components/FreePathDrawable';
 import EditableText from '@/components/EditableText';
 import type { SimpleColors } from '@nextui-org/react';
-import { ACTION_TYPES } from '@/stores/nodesSlice';
+import { ACTION_TYPES } from '@/stores/actions';
 import { NodeComponentProps } from '@/components/types';
 
 export const NODE_TYPES = Object.freeze({
@@ -16,7 +16,7 @@ export const NODE_TYPES = Object.freeze({
 });
 
 export const BASE_MENU_ITEMS: MenuItem[] = [
-  { key: ACTION_TYPES.DELETE, color: 'error', name: 'Delete' },
+  { key: ACTION_TYPES.DELETE_NODE, color: 'error', name: 'Delete' },
 ];
 
 export const NODES_MAP: NodeMap = Object.freeze({
@@ -52,10 +52,6 @@ export const CURSOR_STYLES = Object.freeze({
   DEFAULT: 'default',
   ALL_SCROLL: 'all-scroll',
   GRAB: 'GRAB',
-  EW_RESIZE: 'ew-resize',
-  NS_RESIZE: 'ns-resize',
-  NESW_RESIZE: 'nesw-resize',
-  NWSE_RESIZE: 'nwse-resize',
 });
 
 export type NodeMap = {

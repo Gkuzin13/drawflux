@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import Konva from 'konva';
 import { Group, Shape } from 'react-konva';
 import TransformerAnchor from './ArrowTransformer/TransformerAnchor';
@@ -12,7 +13,11 @@ const ArrowDrawable = ({
   onSelect,
   onNodeChange,
 }: NodeComponentProps) => {
-  const { points } = nodeProps;
+  const [points, setPoints] = useState(nodeProps.points);
+
+  useEffect(() => {
+    setPoints(nodeProps.points);
+  }, [nodeProps.points]);
 
   const middlePointActive = points[2] ? true : false;
 
@@ -26,12 +31,16 @@ const ArrowDrawable = ({
 
     updatedPoints[updatedIndex] = { x: node.x(), y: node.y() };
 
+    setPoints(updatedPoints);
+  };
+
+  const onAnchorDragEnd = () => {
     onNodeChange({
       type,
       text: null,
       nodeProps: {
         ...nodeProps,
-        points: updatedPoints,
+        points: points,
       },
     });
   };
@@ -44,7 +53,7 @@ const ArrowDrawable = ({
     <Group
       onSelect={onSelect}
       draggable={true}
-      onDragEnd={(e: any) =>
+      onDragEnd={(e: any) => {
         onNodeChange({
           type,
           text: null,
@@ -54,8 +63,8 @@ const ArrowDrawable = ({
             x: e.target.x(),
             y: e.target.y(),
           },
-        })
-      }
+        });
+      }}
       onContextMenu={(e) => onContextMenu(e, nodeProps.id)}
     >
       <Shape

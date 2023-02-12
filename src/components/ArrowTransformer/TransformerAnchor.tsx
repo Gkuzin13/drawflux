@@ -26,12 +26,9 @@ const TransformerAnchor = ({ active = true, id, x, y, onDragMove }: Props) => {
       strokeWidth={hovering ? 12 : 1}
       hitStrokeWidth={16}
       radius={5}
-      shadowEnabled={hovering}
-      shadowColor={'black'}
-      shadowForStrokeEnabled={true}
       draggable={true}
       onDragMove={onDragMove}
-      onMouseOver={(e) => setHovering(true)}
+      onMouseOver={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     />
   );

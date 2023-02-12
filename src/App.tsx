@@ -15,8 +15,11 @@ import { ESCAPE_KEY } from './shared/constants/event-keys';
 import { KonvaEventObject } from 'konva/lib/Node';
 import NodeMenu from './components/NodeMenu';
 import { createNode } from './shared/utils/createNode';
-import { ActionTypes, ACTION_TYPES, useStageStore } from './stores/nodesSlice';
 import { getPointerPosition } from './shared/utils/lib';
+import { selectNodes } from './stores/nodesSlice';
+import { useAppDispatch, useAppSelector } from './stores/hooks';
+import { ActionType, ACTION_TYPES } from './stores/actions';
+import { NodeComponentProps } from './components/types';
 
 type ActiveNodeMenu = Node & Pick<NodeMapItem, 'menuItems'>;
 
@@ -25,7 +28,7 @@ type DraftNode = {
   node: Node;
 };
 
-const defaultNode = NODE_TYPES.EDITABLE_TEXT;
+const defaultNode = NODE_TYPES.ARROW;
 
 const App = () => {
   const [draftNodeType, setDraftNodeType] = useState<NodeType>(defaultNode);
@@ -34,7 +37,11 @@ const App = () => {
   const [contextMenu, setContextMenu] = useState<ActiveNodeMenu | null>(null);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
-  const { nodes, dispatch } = useStageStore();
+  const { past, present, future } = useAppSelector(selectNodes);
+
+  const nodes = present.nodes as Node[];
+
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const handleEscapeKeys = (e: any) => {
@@ -49,12 +56,10 @@ const App = () => {
     };
   }, []);
 
-  const onNodeMenuAction = (type: ActionTypes) => {
+  const onNodeMenuAction = (type: ActionType) => {
     let node = { ...contextMenu };
 
-    delete node.menuItems;
-
-    dispatch({ type, payload: contextMenu as Node });
+    dispatch({ type, payload: { id: node.nodeProps?.id } });
 
     setSelected(null);
   };
@@ -152,27 +157,31 @@ const App = () => {
     setCursorStyle(e);
   };
 
-  const onMoveEnd = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+  const onMoveEnd = () => {
     if (draftNode?.node && draftNode.draftMode === 'drawing') {
-      dispatch({ type: ACTION_TYPES.ADD, payload: draftNode.node });
+      dispatch({
+        type: ACTION_TYPES.ADD_NODE,
+        payload: draftNode.node,
+      });
 
       setDraftNode(null);
     }
   };
 
   const handleNodeChange = (node: Node) => {
-    setDraftNode(null);
-
     if (draftNode?.node) {
       dispatch({
-        type: ACTION_TYPES.ADD,
+        type: ACTION_TYPES.ADD_NODE,
         payload: node,
       });
+
+      setDraftNode(null);
     } else {
       dispatch({
-        type: ACTION_TYPES.UPDATE,
+        type: ACTION_TYPES.UPDATE_NODE,
         payload: node,
       });
+      console.log('update');
     }
   };
 
@@ -186,7 +195,7 @@ const App = () => {
     setSelected(null);
   };
 
-  function getComponentProps(node: Node) {
+  function getComponentProps(node: Node): NodeComponentProps & { key: string } {
     return {
       key: node.nodeProps.id,
       nodeProps: node.nodeProps,
@@ -209,9 +218,25 @@ const App = () => {
             </button>
           );
         })}
-        <button onClick={() => dispatch({ type: ACTION_TYPES.DELETE_ALL })}>
+        <button
+          onClick={() => dispatch({ type: ACTION_TYPES.DELETE_ALL_NODES })}
+        >
           Clear All
         </button>
+        <div>
+          <button
+            disabled={!past.length}
+            onClick={() => dispatch({ type: ACTION_TYPES.UNDO })}
+          >
+            Undo
+          </button>
+          <button
+            disabled={!future.length}
+            onClick={() => dispatch({ type: ACTION_TYPES.REDO })}
+          >
+            Redo
+          </button>
+        </div>
         <Stage
           width={window.innerWidth}
           height={window.innerHeight}
@@ -236,7 +261,7 @@ const App = () => {
           y={menuPosition.y}
           menuItems={contextMenu?.menuItems || []}
           onClose={() => setContextMenu(null)}
-          onAction={(key) => onNodeMenuAction(key as ActionTypes)}
+          onAction={(key) => onNodeMenuAction(key as ActionType)}
         />
       </>
     </NextUIProvider>
