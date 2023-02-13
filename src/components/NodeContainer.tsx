@@ -55,7 +55,6 @@ const NodeContainer = ({
         perfectDrawEnabled: false,
         cursorType: CURSOR.ALL_SCROLL,
         fillEnabled: type === 'text',
-        draggable: true,
         onDragEnd: (event: KonvaEventObject<DragEndEvent>) => {
           onNodeChange({
             type,

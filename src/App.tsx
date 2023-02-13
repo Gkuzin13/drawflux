@@ -13,9 +13,12 @@ import { CURSOR } from './shared/constants';
 import { SHAPES } from './shared/shapes';
 import { getElement } from './shared/element';
 import type { MenuItem, NodeType } from './shared/element';
+import { IoHandRightOutline } from 'react-icons/io5';
+
+type ToolType = NodeType['type'] | 'hand';
 
 const App = () => {
-  const [toolType, setToolType] = useState<NodeType['type']>('arrow');
+  const [toolType, setToolType] = useState<ToolType>('arrow');
   const [draftNode, setDraftNode] = useState<NodeType | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<MenuItem[] | null>(null);
@@ -93,6 +96,11 @@ const App = () => {
 
     if (!stage) return;
 
+    if (toolType === 'hand') {
+      stage.container().style.cursor = CURSOR.GRAB;
+      return;
+    }
+
     if (e.target !== stage && !draftNode) {
       const { cursorType } = e.target.attrs;
       const parentCursorStyle = e.target.parent?.attrs.cursorType;
@@ -115,6 +123,8 @@ const App = () => {
       setSelected(null);
     }
 
+    if (toolType === 'hand') return;
+
     if (clickedOnEmpty && !selected && !draftNode) {
       const position = e.target.getStage()?.getRelativePointerPosition();
 
@@ -125,7 +135,7 @@ const App = () => {
   };
 
   const onMove = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
-    if (draftNode && isDrawable(draftNode.type)) {
+    if (draftNode && isDrawable(draftNode.type) && toolType !== 'hand') {
       const position = e.target.getStage()?.getRelativePointerPosition();
 
       updateNodePoints(position?.x || 0, position?.y || 0);
@@ -135,10 +145,12 @@ const App = () => {
   };
 
   const onMoveEnd = () => {
+    if (toolType === 'hand') return;
+
     if (draftNode && isDrawable(draftNode.type)) {
       dispatch({
         type: ACTION_TYPES.ADD_NODE,
-        payload: draftNode,
+        payload: { ...draftNode },
       });
 
       setDraftNode(null);
@@ -206,7 +218,7 @@ const App = () => {
     }
   };
 
-  const onNodeTypeChange = (type: NodeType['type']) => {
+  const onNodeTypeChange = (type: ToolType) => {
     setToolType(type);
     setDraftNode(null);
     setSelected(null);
@@ -221,6 +233,7 @@ const App = () => {
       text: node.text,
       key: node.nodeProps.id,
       isSelected: selected === node.nodeProps.id,
+      draggable: toolType !== 'hand',
       onContextMenu: handleOnContextMenu,
       onSelect: () => setSelected(node.nodeProps.id),
       onNodeChange: handleNodeChange,
@@ -230,6 +243,10 @@ const App = () => {
   return (
     <NextUIProvider>
       <>
+        <button onClick={() => onNodeTypeChange('hand')}>
+          <span>Panning Tool</span>
+          <IoHandRightOutline />
+        </button>
         {Object.values(SHAPES).map((shape, i) => {
           return (
             <button key={i} onClick={() => onNodeTypeChange(shape.value)}>
@@ -268,9 +285,10 @@ const App = () => {
           onMouseUp={onMoveEnd}
           onWheel={onWheel}
           style={{ backgroundColor: '#fafafa' }}
+          draggable={toolType === 'hand'}
         >
           <Layer>
-            {[...nodes, draftNode].map((node: NodeType) => {
+            {[...nodes, draftNode].map((node: NodeType | null) => {
               if (!node) return null;
 
               return createElement(getElement(node), getComponentProps(node));
