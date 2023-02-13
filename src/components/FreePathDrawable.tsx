@@ -1,5 +1,6 @@
-import { Point } from '@/shared/constants/base';
+import { Point } from '@/shared/element';
 import Konva from 'konva';
+import { KonvaEventObject } from 'konva/lib/Node';
 import { useEffect, useState } from 'react';
 import { Line } from 'react-konva';
 import NodeContainer from './NodeContainer';
@@ -45,10 +46,10 @@ const FreePathDrawable = ({
         tension={0.5}
         lineCap="round"
         lineJoin="round"
-        onTransformEnd={(e: any) => {
-          if (!e.target) return;
+        onTransformEnd={(event: KonvaEventObject<Event>) => {
+          if (!event.target) return;
 
-          const node = e.target as Konva.Rect;
+          const node = event.target as Konva.Rect;
 
           node.scaleX(1);
           node.scaleY(1);

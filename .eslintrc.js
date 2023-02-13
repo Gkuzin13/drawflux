@@ -9,6 +9,8 @@ module.exports = {
     'eslint-config-prettier',
     'plugin:storybook/recommended',
   ],
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
   settings: {
     react: {
       version: 'detect',
@@ -24,7 +26,9 @@ module.exports = {
       },
     },
   },
+  root: true,
   rules: {
     'no-console': 'warn',
+    'no-case-declarations': 'off',
   },
 };

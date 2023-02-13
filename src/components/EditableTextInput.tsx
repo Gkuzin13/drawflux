@@ -1,13 +1,13 @@
-import { NodeProps } from '@/shared/constants/base';
+import { NodeProps } from '@/shared/element';
 import { useClickAway } from '@/shared/hooks/useClickAway';
-import { useEffect, useRef } from 'react';
+import { ChangeEvent, useRef } from 'react';
 import { Html } from 'react-konva-utils';
 
 type Props = {
   nodeProps: NodeProps;
   value: string;
-  onTextChange: (e: any) => void;
-  onKeyDown: (e: any) => void;
+  onTextChange: (event: ChangeEvent) => void;
+  onKeyDown: (event: React.KeyboardEvent) => void;
   onClickAway: () => void;
 };
 
@@ -49,7 +49,7 @@ const EditableTextInput = ({
   onKeyDown,
   onClickAway,
 }: Props) => {
-  const style = getStyle(nodeProps.width, nodeProps.height, 16);
+  const style = getStyle(nodeProps?.width || 0, nodeProps.height || 0, 16);
 
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -78,7 +78,6 @@ const EditableTextInput = ({
         onChange={onTextChange}
         onKeyDown={onKeyDown}
         onFocus={onFocus}
-        autoFocus
         style={style}
       />
     </Html>

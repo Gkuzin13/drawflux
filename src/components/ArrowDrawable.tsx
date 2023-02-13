@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import Konva from 'konva';
 import { Group, Shape } from 'react-konva';
 import TransformerAnchor from './ArrowTransformer/TransformerAnchor';
-import { CURSOR_STYLES } from '@/shared/constants/base';
+import { CURSOR } from '@/shared/constants';
+import { KonvaEventObject } from 'konva/lib/Node';
 import type { NodeComponentProps } from './types';
+import { DragEndEvent } from '@react-types/shared';
 
 const ArrowDrawable = ({
   nodeProps,
@@ -21,28 +23,17 @@ const ArrowDrawable = ({
 
   const middlePointActive = points[2] ? true : false;
 
-  const onAnchorDragMove = (e: any) => {
-    if (!e.target) return;
+  const onAnchorDragMove = (event: KonvaEventObject<DragEvent>) => {
+    if (!event.target) return;
 
-    const node = e.target as Konva.Circle;
+    const node = event.target as Konva.Circle;
     const updatedIndex = node.attrs.id.split('-')[1];
 
-    let updatedPoints = [...points];
+    const updatedPoints = [...points];
 
     updatedPoints[updatedIndex] = { x: node.x(), y: node.y() };
 
     setPoints(updatedPoints);
-  };
-
-  const onAnchorDragEnd = () => {
-    onNodeChange({
-      type,
-      text: null,
-      nodeProps: {
-        ...nodeProps,
-        points: points,
-      },
-    });
   };
 
   function getDefaultAnchorPoint(start: number, end: number) {
@@ -53,15 +44,15 @@ const ArrowDrawable = ({
     <Group
       onSelect={onSelect}
       draggable={true}
-      onDragEnd={(e: any) => {
+      onDragEnd={(event: KonvaEventObject<DragEvent>) => {
         onNodeChange({
           type,
           text: null,
           nodeProps: {
             ...nodeProps,
             points,
-            x: e.target.x(),
-            y: e.target.y(),
+            x: event.target.x(),
+            y: event.target.y(),
           },
         });
       }}
@@ -69,7 +60,7 @@ const ArrowDrawable = ({
     >
       <Shape
         id={nodeProps.id}
-        cursorType={CURSOR_STYLES.ALL_SCROLL}
+        cursorType={CURSOR.ALL_SCROLL}
         stroke="black"
         hitStrokeWidth={14}
         sceneFunc={(ctx, shape) => {

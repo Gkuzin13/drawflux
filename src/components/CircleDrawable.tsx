@@ -1,5 +1,7 @@
+import { getNormalizedPoints } from '@/shared/utils/draw';
 import Konva from 'konva';
-import { Circle } from 'react-konva';
+import { KonvaEventObject } from 'konva/lib/Node';
+import { Ellipse } from 'react-konva';
 import NodeContainer from './NodeContainer';
 import type { NodeComponentProps } from './types';
 
@@ -12,12 +14,10 @@ const CircleDrawable = ({
   onSelect,
   onContextMenu,
 }: NodeComponentProps) => {
-  const [p1, p2] = nodeProps.points;
-
-  const dx = p1.x - p2.x;
-  const dy = p1.y - p2.y;
-
-  const radius = Math.sqrt(dx * dx + dy * dy);
+  const { p1, p2 } = getNormalizedPoints(
+    nodeProps.points[0],
+    nodeProps.points[1],
+  );
 
   return (
     <NodeContainer
@@ -29,14 +29,15 @@ const CircleDrawable = ({
       onSelect={onSelect}
       onContextMenu={onContextMenu}
     >
-      <Circle
+      <Ellipse
         stroke="black"
-        radius={radius}
+        radiusY={p2.y - p1.y}
+        radiusX={p2.x - p1.x}
         {...nodeProps}
-        onTransformEnd={(e: any) => {
-          if (!e.target) return;
+        onTransformEnd={(event: KonvaEventObject<Event>) => {
+          if (!event.target) return;
 
-          const node = e.target as Konva.Circle;
+          const node = event.target as Konva.Circle;
 
           const scaleX = node.scaleX();
           const scaleY = node.scaleY();

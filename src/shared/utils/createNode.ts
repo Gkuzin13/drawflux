@@ -1,23 +1,23 @@
-import { Node, NodeProps } from '../constants/base';
+import type { NodeType, NodeProps } from '../element';
 
-type CreateNodeArgs = {
-  x: number;
-  y: number;
-} & Pick<Node, 'type'>;
+export class Node implements NodeType {
+  type: NodeType['type'];
+  text = null;
+  nodeProps = {
+    id: `node-${Date.now()}`,
+    x: 0,
+    y: 0,
+    points: [],
+    rotation: 0,
+  } as NodeProps;
 
-export function createNode({ type, x, y }: CreateNodeArgs): Node {
-  return {
-    text: null,
-    type,
-    nodeProps: {
-      id: `node-${Date.now()}`,
-      x,
-      y,
-      points: [
-        { x, y },
-        { x, y },
-      ],
-      rotation: 0,
-    },
-  };
+  constructor(type: NodeType['type'], x: number, y: number) {
+    this.type = type;
+    this.nodeProps.x = x;
+    this.nodeProps.y = y;
+    this.nodeProps.points = [
+      { x, y },
+      { x, y },
+    ];
+  }
 }

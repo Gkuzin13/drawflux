@@ -1,10 +1,10 @@
-import { Node, NodeProps } from '@/shared/constants/base';
+import { NodeType, NodeProps } from '@/shared/element';
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { ACTION_TYPES } from './actions';
 import { RootState } from './store';
 
 export type NodesState = {
-  nodes: Node[];
+  nodes: NodeType[];
 };
 
 const { ADD_NODE, UPDATE_NODE, DELETE_NODE, DELETE_ALL_NODES } = ACTION_TYPES;
@@ -18,10 +18,10 @@ export const nodesSlice = createSlice({
   initialState,
   extraReducers: (builder) => {
     builder
-      .addCase(createAction<Node>(ADD_NODE), (state, action) => {
+      .addCase(createAction<NodeType>(ADD_NODE), (state, action) => {
         state.nodes.push(action.payload);
       })
-      .addCase(createAction<Node>(UPDATE_NODE), (state, action) => {
+      .addCase(createAction<NodeType>(UPDATE_NODE), (state, action) => {
         const nodeIndex = state.nodes.findIndex((node) => {
           return node.nodeProps.id === action.payload.nodeProps.id;
         });

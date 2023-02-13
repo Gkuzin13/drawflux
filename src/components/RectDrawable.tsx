@@ -1,5 +1,6 @@
-import { CURSOR_STYLES } from '@/shared/constants/base';
+import { getNormalizedPoints } from '@/shared/utils/draw';
 import Konva from 'konva';
+import { KonvaEventObject } from 'konva/lib/Node';
 import { Rect } from 'react-konva';
 import NodeContainer from './NodeContainer';
 import type { NodeComponentProps } from './types';
@@ -12,10 +13,10 @@ const RectDrawable = ({
   onNodeChange,
   onSelect,
 }: NodeComponentProps) => {
-  const [p1, p2] = nodeProps.points;
-
-  const width = p2.x - p1.x;
-  const height = p2.y - p1.y;
+  const { p1, p2 } = getNormalizedPoints(
+    nodeProps.points[0],
+    nodeProps.points[1],
+  );
 
   return (
     <NodeContainer
@@ -28,16 +29,17 @@ const RectDrawable = ({
       text={null}
     >
       <Rect
-        width={width}
-        height={height}
+        width={p2.x - p1.x}
+        height={p2.y - p1.y}
         x={p1.x}
         y={p1.y}
         rotation={nodeProps.rotation}
         stroke="black"
-        onTransformEnd={(e: any) => {
-          if (!e.target) return;
+        cornerRadius={2}
+        onTransformEnd={(event: KonvaEventObject<Event>) => {
+          if (!event.target) return;
 
-          const node = e.target as Konva.Rect;
+          const node = event.target as Konva.Rect;
 
           const scaleX = node.scaleX();
           const scaleY = node.scaleY();

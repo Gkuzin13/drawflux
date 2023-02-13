@@ -1,4 +1,4 @@
-import { CURSOR_STYLES } from '@/shared/constants/base';
+import { CURSOR } from '@/shared/constants';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useState } from 'react';
 import { Circle } from 'react-konva';
@@ -19,7 +19,7 @@ const TransformerAnchor = ({ active = true, id, x, y, onDragMove }: Props) => {
       x={x}
       y={y}
       id={id}
-      cursorType={CURSOR_STYLES.POINTER}
+      cursorType={CURSOR.POINTER}
       stroke="rgba(0, 81, 255, 0.4)"
       fillAfterStrokeEnabled={true}
       fill={active ? 'white' : 'rgba(0, 81, 255, 0.4)'}

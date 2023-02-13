@@ -2,13 +2,12 @@ import { RefObject, useEffect } from 'react';
 
 const EVENTS = ['mousedown', 'touchstart'];
 
-const useClickAway = (ref: RefObject<HTMLElement>, handler: () => void) => {
+const useClickAway = (ref: RefObject<Element>, handler: () => void) => {
   useEffect(() => {
-    const listener = (event: any) => {
-      const { target } = event ?? {};
+    const listener = (event: Event) => {
+      const element = event?.target as Element;
 
-      if (ref.current && !ref.current.contains(target)) {
-        console.log('clicked away');
+      if (ref.current && !ref.current.contains(element)) {
         handler();
       }
     };
@@ -20,7 +19,7 @@ const useClickAway = (ref: RefObject<HTMLElement>, handler: () => void) => {
     return () => {
       EVENTS.forEach((fn) => document.removeEventListener(fn, listener));
     };
-  }, [ref, handler]);
+  }, [ref.current, handler]);
 };
 
 export { useClickAway };

@@ -1,41 +1,37 @@
-import { Node } from '@/shared/constants/base';
-import { AnyAction, Reducer } from '@reduxjs/toolkit';
-import { ACTION_TYPES } from './actions';
+import { NodeType } from '@/shared/element';
+import { Action, Reducer } from '@reduxjs/toolkit';
+import { ActionType, ACTION_TYPES } from './actions';
 
-const { UNDO, REDO } = ACTION_TYPES;
-
-export type HistoryState = {
-  past: Node[];
-  present: Node;
-  future: Node[];
+export type HistoryState<T> = {
+  past: NodeType[];
+  present: T;
+  future: NodeType[];
 };
 
-interface HistoryReducerReturn extends Omit<HistoryState, 'present'> {
-  present: { nodes: Node[] };
-}
-
-function undoable(reducer: Reducer) {
-  const initialState: HistoryState = {
-    past: [],
-    present: reducer(undefined, { type: '' }),
-    future: [],
+function undoable<T>(reducer: Reducer<T, Action<ActionType | undefined>>) {
+  const initialState = {
+    past: [] as NodeType[],
+    present: reducer(undefined, { type: undefined }),
+    future: [] as NodeType[],
   };
 
-  return function (state = initialState, action: AnyAction): HistoryState {
+  return function (state = initialState, action: { type: ActionType }) {
     const { past, present, future } = state;
 
     switch (action.type) {
-      case UNDO:
+      case ACTION_TYPES.UNDO:
         const previous = past[past.length - 1];
         const newPast = past.slice(0, past.length - 1);
+
         return {
           past: newPast,
           present: previous,
           future: [present, ...future],
         };
-      case REDO:
+      case ACTION_TYPES.REDO:
         const next = future[0];
         const newFuture = future.slice(1);
+
         return {
           past: [...past, present],
           present: next,
@@ -43,9 +39,11 @@ function undoable(reducer: Reducer) {
         };
       default:
         const newPresent = reducer(present, action);
+
         if (present === newPresent) {
           return state;
         }
+
         return {
           past: [...past, present],
           present: newPresent,

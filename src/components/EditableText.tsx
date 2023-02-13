@@ -1,8 +1,8 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { NodeComponentProps } from './types';
-import { ENTER_KEY, ESCAPE_KEY } from '@/shared/constants/event-keys';
 import EditableTextInput from './EditableTextInput';
 import ResizableText from './ResizableText';
+import { KEYS } from '@/shared/keys';
 
 const EditableText = ({
   nodeProps,
@@ -14,7 +14,7 @@ const EditableText = ({
   onContextMenu,
 }: NodeComponentProps) => {
   const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState(text);
+  const [value, setValue] = useState(text || '');
 
   useEffect(() => {
     if (!text) {
@@ -27,23 +27,30 @@ const EditableText = ({
   };
 
   const handleTextSave = () => {
-    onNodeChange({
-      nodeProps,
-      text: value,
-      type,
-    });
+    if (!value.length) {
+      onNodeChange(null);
+    } else {
+      onNodeChange({
+        nodeProps,
+        text: value,
+        type,
+      });
+    }
 
     setEditing(false);
   };
 
-  const handleKeyDown = (e: any) => {
-    if ((e.key === ENTER_KEY && !e.shiftKey) || e.key === ESCAPE_KEY) {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (
+      (event.key === KEYS.ENTER && !event.shiftKey) ||
+      event.key === KEYS.ESCAPE
+    ) {
       handleTextSave();
     }
   };
 
-  const handleTextChange = (e: any) => {
-    const { value } = e.target as HTMLTextAreaElement;
+  const handleTextChange = (event: ChangeEvent) => {
+    const { value } = event.target as HTMLTextAreaElement;
 
     setValue(() => value);
   };
@@ -52,7 +59,7 @@ const EditableText = ({
     return (
       <EditableTextInput
         nodeProps={nodeProps}
-        value={value || ''}
+        value={value}
         onTextChange={handleTextChange}
         onKeyDown={handleKeyDown}
         onClickAway={handleTextSave}
