@@ -10,7 +10,8 @@ const FreePathDrawable = ({
   nodeProps,
   type,
   text,
-  isSelected,
+  selected,
+  draggable,
   onNodeChange,
   onSelect,
   onContextMenu,
@@ -30,7 +31,8 @@ const FreePathDrawable = ({
       type={type}
       text={null}
       nodeProps={nodeProps}
-      isSelected={isSelected}
+      selected={selected}
+      draggable={draggable}
       onNodeChange={onNodeChange}
       onSelect={onSelect}
       onContextMenu={onContextMenu}

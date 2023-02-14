@@ -8,7 +8,8 @@ import type { NodeComponentProps } from './types';
 const RectDrawable = ({
   nodeProps,
   type,
-  isSelected,
+  selected,
+  draggable,
   onContextMenu,
   onNodeChange,
   onSelect,
@@ -22,7 +23,8 @@ const RectDrawable = ({
     <NodeContainer
       type={type}
       nodeProps={nodeProps}
-      isSelected={isSelected}
+      selected={selected}
+      draggable={draggable}
       onNodeChange={onNodeChange}
       onSelect={onSelect}
       onContextMenu={onContextMenu}

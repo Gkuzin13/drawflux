@@ -5,12 +5,12 @@ import TransformerAnchor from './ArrowTransformer/TransformerAnchor';
 import { CURSOR } from '@/shared/constants';
 import { KonvaEventObject } from 'konva/lib/Node';
 import type { NodeComponentProps } from './types';
-import { DragEndEvent } from '@react-types/shared';
 
 const ArrowDrawable = ({
   nodeProps,
   type,
-  isSelected,
+  selected,
+  draggable,
   onContextMenu,
   onSelect,
   onNodeChange,
@@ -43,7 +43,7 @@ const ArrowDrawable = ({
   return (
     <Group
       onSelect={onSelect}
-      draggable={true}
+      draggable={draggable}
       onDragEnd={(event: KonvaEventObject<DragEvent>) => {
         onNodeChange({
           type,
@@ -98,7 +98,7 @@ const ArrowDrawable = ({
         onClick={onSelect}
         onTap={onSelect}
       />
-      {isSelected && (
+      {selected && (
         <>
           <TransformerAnchor
             key={`anchor-0`}
@@ -106,6 +106,7 @@ const ArrowDrawable = ({
             x={points[0].x}
             y={points[0].y}
             onDragMove={onAnchorDragMove}
+            draggable={draggable}
           />
           <TransformerAnchor
             key={`anchor-1`}
@@ -113,6 +114,7 @@ const ArrowDrawable = ({
             x={points[1].x}
             y={points[1].y}
             onDragMove={onAnchorDragMove}
+            draggable={draggable}
           />
           <TransformerAnchor
             key={`anchor-2`}
@@ -129,6 +131,7 @@ const ArrowDrawable = ({
                 : getDefaultAnchorPoint(points[0].y, points[1].y)
             }
             onDragMove={onAnchorDragMove}
+            draggable={draggable}
           />
         </>
       )}

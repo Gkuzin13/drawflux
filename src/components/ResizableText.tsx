@@ -12,7 +12,7 @@ type Props = {
 const ResizableText = ({
   nodeProps,
   text,
-  isSelected,
+  selected,
   type,
   onNodeChange,
   onSelect,
@@ -44,7 +44,7 @@ const ResizableText = ({
     <NodeContainer
       type={type}
       text={text}
-      isSelected={isSelected}
+      selected={selected}
       nodeProps={nodeProps}
       onNodeChange={onNodeChange}
       onSelect={onSelect}

@@ -5,13 +5,21 @@ import { Circle } from 'react-konva';
 
 type Props = {
   active?: boolean;
+  draggable: boolean;
   id: string;
   x: number;
   y: number;
   onDragMove: (e: KonvaEventObject<DragEvent>) => void;
 };
 
-const TransformerAnchor = ({ active = true, id, x, y, onDragMove }: Props) => {
+const TransformerAnchor = ({
+  active = true,
+  draggable,
+  id,
+  x,
+  y,
+  onDragMove,
+}: Props) => {
   const [hovering, setHovering] = useState(false);
 
   return (
@@ -26,7 +34,7 @@ const TransformerAnchor = ({ active = true, id, x, y, onDragMove }: Props) => {
       strokeWidth={hovering ? 12 : 1}
       hitStrokeWidth={16}
       radius={5}
-      draggable={true}
+      draggable={draggable}
       onDragMove={onDragMove}
       onMouseOver={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}

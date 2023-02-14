@@ -6,7 +6,8 @@ import { KEYS } from '@/shared/keys';
 
 const EditableText = ({
   nodeProps,
-  isSelected,
+  selected,
+  draggable,
   text,
   type,
   onNodeChange,
@@ -70,7 +71,8 @@ const EditableText = ({
   return (
     <ResizableText
       nodeProps={nodeProps}
-      isSelected={isSelected}
+      selected={selected}
+      draggable={draggable}
       text={value}
       type={type}
       onNodeChange={onNodeChange}

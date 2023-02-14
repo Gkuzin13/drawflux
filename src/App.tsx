@@ -14,6 +14,7 @@ import { SHAPES } from './shared/shapes';
 import { getElement } from './shared/element';
 import type { MenuItem, NodeType } from './shared/element';
 import { IoHandRightOutline } from 'react-icons/io5';
+import Konva from 'konva';
 
 type ToolType = NodeType['type'] | 'hand';
 
@@ -166,35 +167,41 @@ const App = () => {
     }
   };
 
+  const zoomStageRelativeToPointerPosition = (
+    stage: Konva.Stage,
+    event: WheelEvent,
+  ) => {
+    const oldScale = stage.scaleX();
+    const pointer = stage.getRelativePointerPosition() || { x: 0, y: 0 };
+    const scaleBy = 1.1;
+
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    };
+
+    const direction = event.deltaY > 0 ? -1 : 1;
+
+    const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+    stage.scale({ x: newScale, y: newScale });
+
+    const newPos = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    };
+
+    stage.position(newPos);
+
+    setStageScale(Math.round(newScale * 100));
+  };
+
   const onWheel = (e: KonvaEventObject<WheelEvent>) => {
     const stage = e.target.getStage();
 
     if (e.evt.ctrlKey && stage) {
       e.evt.preventDefault();
-
-      const oldScale = stage.scaleX();
-      const pointer = stage.getRelativePointerPosition() || { x: 0, y: 0 };
-      const scaleBy = 1.1;
-
-      const mousePointTo = {
-        x: (pointer.x - stage.x()) / oldScale,
-        y: (pointer.y - stage.y()) / oldScale,
-      };
-
-      const direction = e.evt.deltaY > 0 ? -1 : 1;
-
-      const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-
-      stage.scale({ x: newScale, y: newScale });
-
-      const newPos = {
-        x: pointer.x - mousePointTo.x * newScale,
-        y: pointer.y - mousePointTo.y * newScale,
-      };
-
-      stage.position(newPos);
-
-      setStageScale(Math.round(newScale * 100));
+      zoomStageRelativeToPointerPosition(stage, e.evt);
     }
   };
 
@@ -223,22 +230,6 @@ const App = () => {
     setDraftNode(null);
     setSelected(null);
   };
-
-  function getComponentProps(
-    node: NodeType,
-  ): NodeComponentProps & { key: string } {
-    return {
-      nodeProps: node.nodeProps,
-      type: node.type,
-      text: node.text,
-      key: node.nodeProps.id,
-      isSelected: selected === node.nodeProps.id,
-      draggable: toolType !== 'hand',
-      onContextMenu: handleOnContextMenu,
-      onSelect: () => setSelected(node.nodeProps.id),
-      onNodeChange: handleNodeChange,
-    };
-  }
 
   return (
     <NextUIProvider>
@@ -291,7 +282,17 @@ const App = () => {
             {[...nodes, draftNode].map((node: NodeType | null) => {
               if (!node) return null;
 
-              return createElement(getElement(node), getComponentProps(node));
+              return createElement(getElement(node), {
+                nodeProps: node.nodeProps,
+                type: node.type,
+                text: node.text,
+                key: node.nodeProps.id,
+                selected: selected === node.nodeProps.id && toolType !== 'hand',
+                draggable: toolType !== 'hand',
+                onContextMenu: handleOnContextMenu,
+                onSelect: () => setSelected(node.nodeProps.id),
+                onNodeChange: handleNodeChange,
+              } as NodeComponentProps);
             })}
           </Layer>
         </Stage>

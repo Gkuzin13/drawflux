@@ -26,7 +26,8 @@ const NodeContainer = ({
   nodeProps,
   text = null,
   type,
-  isSelected,
+  selected,
+  draggable,
   onNodeChange,
   onSelect,
   onContextMenu,
@@ -38,11 +39,11 @@ const NodeContainer = ({
   const nodeRef = useRef<NodeRef>(null);
 
   useEffect(() => {
-    if (isSelected && transformerRef.current && nodeRef.current) {
+    if (selected && transformerRef.current && nodeRef.current) {
       transformerRef.current.nodes([nodeRef.current]);
       transformerRef.current.getLayer()?.batchDraw();
     }
-  }, [isSelected]);
+  }, [selected]);
 
   return (
     <Group onContextMenu={(e) => onContextMenu(e, nodeProps.id)}>
@@ -50,6 +51,7 @@ const NodeContainer = ({
         ref: nodeRef,
         onClick: onSelect,
         onTap: onSelect,
+        draggable: draggable,
         strokeScaleEnabled: false,
         hitStrokeWidth: 12,
         perfectDrawEnabled: false,
@@ -67,7 +69,7 @@ const NodeContainer = ({
           });
         },
       })}
-      {isSelected && (
+      {selected && (
         <NodeTransformer
           transformerConfig={transformerConfig}
           transformerEvents={transformerEvents}

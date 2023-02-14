@@ -7,7 +7,8 @@ import type { NodeComponentProps } from './types';
 
 const CircleDrawable = ({
   nodeProps,
-  isSelected,
+  selected,
+  draggable,
   type,
   text,
   onNodeChange,
@@ -24,7 +25,8 @@ const CircleDrawable = ({
       type={type}
       text={text}
       nodeProps={nodeProps}
-      isSelected={isSelected}
+      selected={selected}
+      draggable={draggable}
       onNodeChange={onNodeChange}
       onSelect={onSelect}
       onContextMenu={onContextMenu}
