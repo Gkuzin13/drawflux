@@ -11,7 +11,7 @@ import Konva from 'konva';
 import { NodeComponentProps } from './types';
 import { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import NodeTransformer from './NodeTransformer';
-import { CURSOR } from '@/shared/constants';
+import { CURSOR } from '@/client/shared/constants';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { DragEndEvent } from '@react-types/shared';
 

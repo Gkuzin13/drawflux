@@ -1,4 +1,4 @@
-import { MenuItem } from '@/shared/element';
+import { MenuItem } from '@/client/shared/element';
 import { Container, Dropdown } from '@nextui-org/react';
 import { Key } from 'react';
 

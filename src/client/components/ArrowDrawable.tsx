@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Konva from 'konva';
 import { Group, Shape } from 'react-konva';
 import TransformerAnchor from './ArrowTransformer/TransformerAnchor';
-import { CURSOR } from '@/shared/constants';
+import { CURSOR } from '@/client/shared/constants';
 import { KonvaEventObject } from 'konva/lib/Node';
 import type { NodeComponentProps } from './types';
 

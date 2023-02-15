@@ -1,4 +1,4 @@
-import { Point } from '@/shared/element';
+import { Point } from '@/client/shared/element';
 import Konva from 'konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { useEffect, useState } from 'react';

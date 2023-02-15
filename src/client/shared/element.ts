@@ -1,8 +1,8 @@
-import ArrowDrawable from '@/components/ArrowDrawable';
-import CircleDrawable from '@/components/CircleDrawable';
-import RectDrawable from '@/components/RectDrawable';
-import FreePathDrawable from '@/components/FreePathDrawable';
-import EditableText from '@/components/EditableText';
+import ArrowDrawable from '@/client/components/ArrowDrawable';
+import CircleDrawable from '@/client/components/CircleDrawable';
+import RectDrawable from '@/client/components/RectDrawable';
+import FreePathDrawable from '@/client/components/FreePathDrawable';
+import EditableText from '@/client/components/EditableText';
 import { SimpleColors } from '@nextui-org/react';
 
 export const ELEMENTS = {

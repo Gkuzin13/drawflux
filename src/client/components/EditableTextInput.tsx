@@ -1,5 +1,5 @@
-import { NodeProps } from '@/shared/element';
-import { useClickAway } from '@/shared/hooks/useClickAway';
+import { NodeProps } from '@/client/shared/element';
+import { useClickAway } from '@/client/shared/hooks/useClickAway';
 import { ChangeEvent, useEffect, useRef } from 'react';
 import { Html } from 'react-konva-utils';
 

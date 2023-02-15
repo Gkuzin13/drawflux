@@ -1,4 +1,4 @@
-import { getNormalizedPoints } from '@/shared/utils/draw';
+import { getNormalizedPoints } from '@/client/shared/utils/draw';
 import Konva from 'konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Ellipse } from 'react-konva';

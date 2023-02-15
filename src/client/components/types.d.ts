@@ -1,4 +1,4 @@
-import { NodeType } from '@/shared/element';
+import { NodeType } from '@/client/shared/element';
 
 export type NodeComponentProps = {
   selected: boolean;
