@@ -1,5 +1,4 @@
 import Konva from 'konva';
-import { KonvaEventObject } from 'konva/lib/Node';
 import { useRef } from 'react';
 import { Text } from 'react-konva';
 import NodeContainer from './NodeContainer';
@@ -60,10 +59,10 @@ const ResizableText = ({
         onTransform={handleResize}
         onDblClick={onDoubleClick}
         onDblTap={onDoubleClick}
-        onTransformEnd={(e: KonvaEventObject<Event>) => {
-          if (!e.target) return;
+        onTransformEnd={(event) => {
+          if (!event.target) return;
 
-          const node = e.target as Konva.Rect;
+          const node = event.target as Konva.Rect;
 
           onNodeChange({
             type: restProps.type,

@@ -1,6 +1,5 @@
 import { getNormalizedPoints } from '@/client/shared/utils/draw';
 import Konva from 'konva';
-import { KonvaEventObject } from 'konva/lib/Node';
 import { Rect } from 'react-konva';
 import NodeContainer from './NodeContainer';
 import type { NodeComponentProps } from './types';
@@ -30,7 +29,7 @@ const RectDrawable = ({
         y={p1.y}
         rotation={nodeProps.rotation}
         cornerRadius={2}
-        onTransformEnd={(event: KonvaEventObject<Event>) => {
+        onTransformEnd={(event) => {
           if (!event.target) return;
 
           const node = event.target as Konva.Rect;
