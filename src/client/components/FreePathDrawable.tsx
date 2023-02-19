@@ -8,13 +8,8 @@ import type { NodeComponentProps } from './types';
 
 const FreePathDrawable = ({
   nodeProps,
-  type,
-  text,
-  selected,
-  draggable,
   onNodeChange,
-  onSelect,
-  onContextMenu,
+  ...restProps
 }: NodeComponentProps) => {
   const [points, setPoints] = useState<Point[]>(nodeProps.points);
 
@@ -28,26 +23,15 @@ const FreePathDrawable = ({
 
   return (
     <NodeContainer
-      type={type}
-      text={null}
       nodeProps={nodeProps}
-      selected={selected}
-      draggable={draggable}
-      onNodeChange={onNodeChange}
-      onSelect={onSelect}
-      onContextMenu={onContextMenu}
       transformerConfig={{ enabledAnchors: [] }}
+      onNodeChange={onNodeChange}
+      {...restProps}
     >
       <Line
         id={nodeProps.id}
         points={flattenedPoints}
         rotation={nodeProps.rotation}
-        fill="black"
-        stroke="black"
-        strokeWidth={3}
-        tension={0.5}
-        lineCap="round"
-        lineJoin="round"
         onTransformEnd={(event: KonvaEventObject<Event>) => {
           if (!event.target) return;
 
@@ -57,8 +41,9 @@ const FreePathDrawable = ({
           node.scaleY(1);
 
           onNodeChange({
-            type,
-            text,
+            type: restProps.type,
+            text: null,
+            style: restProps.style,
             nodeProps: {
               ...nodeProps,
               rotation: node.rotation(),

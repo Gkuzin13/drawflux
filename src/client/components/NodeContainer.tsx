@@ -14,6 +14,8 @@ import NodeTransformer from './NodeTransformer';
 import { CURSOR } from '@/client/shared/constants';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { DragEndEvent } from '@react-types/shared';
+import { getStyleValues } from '../shared/element';
+import useAnimatedLine from '../shared/hooks/useAnimatedLine';
 
 interface Props extends PropsWithChildren, NodeComponentProps {
   transformerConfig?: TransformerConfig;
@@ -39,6 +41,15 @@ const NodeContainer = ({
   const transformerRef = useRef<Konva.Transformer>(null);
   const nodeRef = useRef<NodeRef>(null);
 
+  const { dash, strokeWidth } = getStyleValues(style);
+
+  useAnimatedLine(
+    nodeRef.current,
+    dash[0] + dash[1],
+    style.animated,
+    style.line,
+  );
+
   useEffect(() => {
     if (selected && transformerRef.current && nodeRef.current) {
       transformerRef.current.nodes([nodeRef.current]);
@@ -52,6 +63,10 @@ const NodeContainer = ({
         ref: nodeRef,
         onClick: onSelect,
         onTap: onSelect,
+        dash,
+        strokeWidth: type === 'text' ? 0 : strokeWidth,
+        stroke: style.color,
+        lineCap: 'round',
         draggable: draggable,
         strokeScaleEnabled: false,
         hitStrokeWidth: 12,

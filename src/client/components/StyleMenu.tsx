@@ -7,7 +7,6 @@ type Props = {
 };
 
 const StyleMenu = ({ style, onStyleChange }: Props) => {
-  console.log(style);
   return (
     <div>
       Styles
@@ -39,6 +38,11 @@ const StyleMenu = ({ style, onStyleChange }: Props) => {
             </button>
           );
         })}
+        <button
+          onClick={() => onStyleChange({ ...style, animated: !style.animated })}
+        >
+          Animated
+        </button>
         <span>Size:</span>
         {Object.values(SIZE).map((size) => {
           return (

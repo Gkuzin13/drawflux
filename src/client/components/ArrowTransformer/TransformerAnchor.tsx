@@ -1,16 +1,17 @@
 import { CURSOR } from '@/client/shared/constants';
 import { KonvaEventObject } from 'konva/lib/Node';
+import { Vector2d } from 'konva/lib/types';
 import { useState } from 'react';
 import { Circle } from 'react-konva';
 
-type Props = {
+export type TransformerAnchorProps = {
   active?: boolean;
   draggable: boolean;
   id: string;
   x: number;
   y: number;
   onDragMove: (e: KonvaEventObject<DragEvent>) => void;
-  dragBoundFunc?: (e: any) => void;
+  dragBoundFunc?: (position: Vector2d) => void;
 };
 
 const TransformerAnchor = ({
@@ -21,7 +22,7 @@ const TransformerAnchor = ({
   y,
   onDragMove,
   dragBoundFunc,
-}: Props) => {
+}: TransformerAnchorProps) => {
   const [hovering, setHovering] = useState(false);
 
   return (

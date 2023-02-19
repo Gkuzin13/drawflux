@@ -4,6 +4,7 @@ const defaultStyle: NodeStyle = {
   line: 'solid',
   color: 'black',
   size: 'medium',
+  animated: false,
 };
 export class Node implements NodeType {
   type: NodeType['type'];

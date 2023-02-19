@@ -15,7 +15,6 @@ import { getElement, NodeStyle } from './shared/element';
 import type { MenuItem, NodeType } from './shared/element';
 import { IoHandRightOutline } from 'react-icons/io5';
 import Konva from 'konva';
-import { COLOR, LINE, SIZE } from './shared/style';
 import StyleMenu from './components/StyleMenu';
 
 type ToolType = NodeType['type'] | 'hand';
@@ -245,9 +244,9 @@ const App = () => {
         type: ACTION_TYPES.UPDATE_NODE,
         payload: node,
       });
-
-      console.log(node);
     }
+
+    console.log(node);
   };
 
   const onNodeTypeChange = (type: ToolType) => {
@@ -261,7 +260,7 @@ const App = () => {
 
     setStyleMenu({
       open: styleMenu.open,
-      style: node?.style!,
+      style: node?.style,
     });
   };
 
@@ -271,7 +270,7 @@ const App = () => {
 
       setStyleMenu({
         open: !styleMenu.open,
-        style: node?.style!,
+        style: node?.style,
       });
     } else {
       setStyleMenu({ ...styleMenu, open: !styleMenu.open });

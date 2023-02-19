@@ -57,6 +57,13 @@ export const getLineValue = (size: NodeLIne) => {
   }
 };
 
+export const getStyleValues = (style: NodeStyle) => {
+  const dash = getLineValue(style.line);
+  const strokeWidth = getSizeValue(style.size);
+
+  return { dash, strokeWidth };
+};
+
 export type ElementType = (typeof ELEMENTS)[keyof typeof ELEMENTS];
 
 export type NodeType = {
@@ -80,6 +87,7 @@ export type NodeStyle = {
   color: NodeColor;
   line: NodeLIne;
   size: NodeSize;
+  animated?: boolean;
 };
 
 export type NodeLIne = (typeof LINE)[keyof typeof LINE];

@@ -7,13 +7,9 @@ import type { NodeComponentProps } from './types';
 
 const CircleDrawable = ({
   nodeProps,
-  selected,
-  draggable,
-  type,
-  text,
+  style,
   onNodeChange,
-  onSelect,
-  onContextMenu,
+  ...restProps
 }: NodeComponentProps) => {
   const { p1, p2 } = getNormalizedPoints(
     nodeProps.points[0],
@@ -22,17 +18,13 @@ const CircleDrawable = ({
 
   return (
     <NodeContainer
-      type={type}
-      text={text}
       nodeProps={nodeProps}
-      selected={selected}
-      draggable={draggable}
+      style={style}
       onNodeChange={onNodeChange}
-      onSelect={onSelect}
-      onContextMenu={onContextMenu}
+      {...restProps}
     >
       <Ellipse
-        stroke="black"
+        stroke={style.color as string}
         radiusY={p2.y - p1.y}
         radiusX={p2.x - p1.x}
         {...nodeProps}
@@ -48,7 +40,8 @@ const CircleDrawable = ({
           node.scaleY(1);
 
           onNodeChange({
-            type,
+            type: restProps.type,
+            style,
             text: null,
             nodeProps: {
               ...nodeProps,

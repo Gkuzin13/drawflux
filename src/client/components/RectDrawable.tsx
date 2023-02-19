@@ -7,12 +7,9 @@ import type { NodeComponentProps } from './types';
 
 const RectDrawable = ({
   nodeProps,
-  type,
-  selected,
-  draggable,
-  onContextMenu,
   onNodeChange,
-  onSelect,
+  style,
+  ...restProps
 }: NodeComponentProps) => {
   const { p1, p2 } = getNormalizedPoints(
     nodeProps.points[0],
@@ -21,14 +18,10 @@ const RectDrawable = ({
 
   return (
     <NodeContainer
-      type={type}
       nodeProps={nodeProps}
-      selected={selected}
-      draggable={draggable}
       onNodeChange={onNodeChange}
-      onSelect={onSelect}
-      onContextMenu={onContextMenu}
-      text={null}
+      style={style}
+      {...restProps}
     >
       <Rect
         width={p2.x - p1.x}
@@ -36,7 +29,6 @@ const RectDrawable = ({
         x={p1.x}
         y={p1.y}
         rotation={nodeProps.rotation}
-        stroke="black"
         cornerRadius={2}
         onTransformEnd={(event: KonvaEventObject<Event>) => {
           if (!event.target) return;
@@ -50,7 +42,8 @@ const RectDrawable = ({
           node.scaleY(1);
 
           onNodeChange({
-            type,
+            style,
+            type: restProps.type,
             text: null,
             nodeProps: {
               ...nodeProps,

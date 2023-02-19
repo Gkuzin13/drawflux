@@ -11,13 +11,11 @@ type Props = {
 
 const ResizableText = ({
   nodeProps,
-  text,
-  selected,
-  type,
   onNodeChange,
   onSelect,
   onDoubleClick,
   onContextMenu,
+  ...restProps
 }: Props) => {
   const textRef = useRef<Konva.Text>(null);
 
@@ -34,17 +32,14 @@ const ResizableText = ({
 
       onNodeChange({
         nodeProps: { ...nodeProps, width: newWidth, height: newHeight },
-        text,
-        type,
+        ...restProps,
       });
     }
   };
 
   return (
     <NodeContainer
-      type={type}
-      text={text}
-      selected={selected}
+      {...restProps}
       nodeProps={nodeProps}
       onNodeChange={onNodeChange}
       onSelect={onSelect}
@@ -60,7 +55,7 @@ const ResizableText = ({
     >
       <Text
         {...nodeProps}
-        text={text || ''}
+        text={restProps.text || ''}
         fontSize={16}
         onTransform={handleResize}
         onDblClick={onDoubleClick}
@@ -71,8 +66,9 @@ const ResizableText = ({
           const node = e.target as Konva.Rect;
 
           onNodeChange({
-            type,
-            text,
+            type: restProps.type,
+            text: restProps.text,
+            style: restProps.style,
             nodeProps: {
               ...nodeProps,
               x: node.x(),

@@ -6,10 +6,11 @@ import { KEYS } from '@/client/shared/keys';
 
 const EditableText = ({
   nodeProps,
-  selected,
-  draggable,
   text,
+  selected,
   type,
+  style,
+  draggable,
   onNodeChange,
   onSelect,
   onContextMenu,
@@ -33,6 +34,7 @@ const EditableText = ({
     } else {
       onNodeChange({
         nodeProps,
+        style,
         text: value,
         type,
       });
@@ -70,6 +72,7 @@ const EditableText = ({
 
   return (
     <ResizableText
+      style={style}
       nodeProps={nodeProps}
       selected={selected}
       draggable={draggable}
