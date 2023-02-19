@@ -26,6 +26,7 @@ const NodeContainer = ({
   nodeProps,
   text = null,
   type,
+  style,
   selected,
   draggable,
   onNodeChange,
@@ -61,6 +62,7 @@ const NodeContainer = ({
           onNodeChange({
             type,
             text,
+            style,
             nodeProps: {
               ...nodeProps,
               x: event.target.x(),

@@ -1,6 +1,6 @@
-import { router as users } from './user.js';
+import { userRouter } from './user.js';
 import type { Express } from 'express';
 
 export const mountRoutes = (app: Express) => {
-  app.use('/users', users);
+  app.use('/users', userRouter);
 };

@@ -1,4 +1,4 @@
-import { NodeType, NodeProps } from '@/shared/element';
+import { NodeType, NodeProps } from '@/client/shared/element';
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { ACTION_TYPES } from './actions';
 import { RootState } from './store';

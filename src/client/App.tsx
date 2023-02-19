@@ -11,12 +11,25 @@ import { NodeComponentProps } from './components/types';
 import { KEYS } from './shared/keys';
 import { CURSOR } from './shared/constants';
 import { SHAPES } from './shared/shapes';
-import { getElement } from './shared/element';
+import { getElement, NodeStyle } from './shared/element';
 import type { MenuItem, NodeType } from './shared/element';
 import { IoHandRightOutline } from 'react-icons/io5';
 import Konva from 'konva';
+import { COLOR, LINE, SIZE } from './shared/style';
+import StyleMenu from './components/StyleMenu';
 
 type ToolType = NodeType['type'] | 'hand';
+
+const defaultStyle: NodeStyle = {
+  line: 'solid',
+  color: 'black',
+  size: 'medium',
+};
+
+type StyleMenuType = {
+  open: boolean;
+  style: NodeStyle;
+};
 
 const App = () => {
   const [toolType, setToolType] = useState<ToolType>('arrow');
@@ -25,12 +38,23 @@ const App = () => {
   const [contextMenu, setContextMenu] = useState<MenuItem[] | null>(null);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [stageScale, setStageScale] = useState(100);
-
+  const [styleMenu, setStyleMenu] = useState<StyleMenuType>({
+    open: false,
+    style: defaultStyle,
+  });
   const { past, present, future } = useAppSelector(selectNodes);
 
   const nodes = present.nodes;
 
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (selected) {
+      const node = nodes.find((node) => node.nodeProps.id === selected);
+
+      node && handleNodeChange({ ...node, style: styleMenu.style });
+    }
+  }, [styleMenu.style]);
 
   useEffect(() => {
     const handleEscapeKeys = (e: KeyboardEvent) => {
@@ -78,8 +102,7 @@ const App = () => {
       if (!prevNode) return prevNode;
 
       const updatedNode: NodeType = {
-        type: prevNode.type,
-        text: prevNode.text,
+        ...prevNode,
         nodeProps: {
           ...prevNode.nodeProps,
           points: [prevNode.nodeProps.points[0], { x, y }],
@@ -222,6 +245,8 @@ const App = () => {
         type: ACTION_TYPES.UPDATE_NODE,
         payload: node,
       });
+
+      console.log(node);
     }
   };
 
@@ -229,6 +254,28 @@ const App = () => {
     setToolType(type);
     setDraftNode(null);
     setSelected(null);
+  };
+
+  const onNodeSelect = (node: NodeType) => {
+    setSelected(node.nodeProps.id);
+
+    setStyleMenu({
+      open: styleMenu.open,
+      style: node?.style!,
+    });
+  };
+
+  const onStyleMenuToggle = () => {
+    if (selected) {
+      const node = nodes.find((node) => node.nodeProps.id === selected);
+
+      setStyleMenu({
+        open: !styleMenu.open,
+        style: node?.style!,
+      });
+    } else {
+      setStyleMenu({ ...styleMenu, open: !styleMenu.open });
+    }
   };
 
   return (
@@ -246,11 +293,20 @@ const App = () => {
             </button>
           );
         })}
+        {styleMenu.open && (
+          <StyleMenu
+            style={styleMenu.style}
+            onStyleChange={(updatedStyle) =>
+              setStyleMenu({ ...styleMenu, style: updatedStyle })
+            }
+          />
+        )}
         <button
           onClick={() => dispatch({ type: ACTION_TYPES.DELETE_ALL_NODES })}
         >
           Clear All
         </button>
+        <button onClick={onStyleMenuToggle}>Styles</button>
         <div>
           <button
             disabled={!past.length}
@@ -283,14 +339,15 @@ const App = () => {
               if (!node) return null;
 
               return createElement(getElement(node), {
+                key: node.nodeProps.id,
                 nodeProps: node.nodeProps,
                 type: node.type,
                 text: node.text,
-                key: node.nodeProps.id,
+                style: node.style,
                 selected: selected === node.nodeProps.id && toolType !== 'hand',
                 draggable: toolType !== 'hand',
                 onContextMenu: handleOnContextMenu,
-                onSelect: () => setSelected(node.nodeProps.id),
+                onSelect: () => onNodeSelect(node),
                 onNodeChange: handleNodeChange,
               } as NodeComponentProps);
             })}

@@ -1,8 +1,14 @@
-import type { NodeType, NodeProps } from '../element';
+import type { NodeType, NodeProps, NodeStyle } from '../element';
 
+const defaultStyle: NodeStyle = {
+  line: 'solid',
+  color: 'black',
+  size: 'medium',
+};
 export class Node implements NodeType {
   type: NodeType['type'];
   text = null;
+  style = defaultStyle;
   nodeProps = {
     id: `node-${Date.now()}`,
     x: 0,

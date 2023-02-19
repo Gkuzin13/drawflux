@@ -1,35 +1,35 @@
 import Router from 'express-promise-router';
-import { getQuery } from '../utils/string.js';
-import { query, loadRoute } from '../../server/db/index.js';
+import { loadRoute, getQuery } from '../utils/string.js';
+import * as db from '../../server/db/index.js';
 
 const queries = {
   getUsers: getQuery('get-users'),
   getUser: getQuery('get-user'),
-  postUser: getQuery('post-user'),
+  postUser: getQuery('create-user'),
 };
 
-const router = Router();
+const userRouter = Router();
 
-router.get(
+userRouter.get(
   '/',
-  loadRoute(async () => query(queries.getUsers, [])),
+  loadRoute(() => db.query(queries.getUsers, [])),
 );
 
-router.get(
+userRouter.get(
   '/:id',
-  loadRoute(async (req) => {
+  loadRoute((req) => {
     const { id } = req.params;
-    return query(queries.getUser, [id]);
+    return db.query(queries.getUser, [id]);
   }),
 );
 
-router.post(
+userRouter.post(
   '/',
-  loadRoute(async (req) => {
+  loadRoute((req) => {
     const { name, email } = req.body;
 
-    return query(queries.postUser, [name, email]);
+    return db.query(queries.postUser, [name, email]);
   }),
 );
 
-export { router };
+export { userRouter };

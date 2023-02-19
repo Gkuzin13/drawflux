@@ -10,6 +10,7 @@ type Props = {
   x: number;
   y: number;
   onDragMove: (e: KonvaEventObject<DragEvent>) => void;
+  dragBoundFunc?: (e: any) => void;
 };
 
 const TransformerAnchor = ({
@@ -19,6 +20,7 @@ const TransformerAnchor = ({
   x,
   y,
   onDragMove,
+  dragBoundFunc,
 }: Props) => {
   const [hovering, setHovering] = useState(false);
 
@@ -38,6 +40,7 @@ const TransformerAnchor = ({
       onDragMove={onDragMove}
       onMouseOver={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
+      dragBoundFunc={dragBoundFunc as any}
     />
   );
 };
