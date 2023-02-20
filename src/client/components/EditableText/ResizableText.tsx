@@ -1,8 +1,8 @@
 import Konva from 'konva';
 import { useRef } from 'react';
 import { Text } from 'react-konva';
-import NodeContainer from './NodeContainer';
-import { NodeComponentProps } from './types';
+import NodeContainer from '../NodeContainer';
+import { NodeComponentProps } from '../types';
 
 type Props = {
   onDoubleClick: () => void;

@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import Konva from 'konva';
-import ArrowTransformer from './ArrowTransformer/ArrowTransformer';
-import ArrowHead from './ArrowTransformer/ArrowHead';
-import ArrowLine from './ArrowTransformer/ArrowLine';
+import ArrowTransformer from './ArrowTransformer';
+import ArrowHead from './ArrowHead';
+import ArrowLine from './ArrowLine';
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
 import { Group } from 'react-konva';
 import { CURSOR } from '@/client/shared/constants';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { getLineValue, getSizeValue } from '../shared/element';
-import type { NodeComponentProps } from './types';
+import { getLineValue, getSizeValue } from '../../shared/element';
+import type { NodeComponentProps } from '../types';
 
 const ArrowDrawable = ({
   nodeProps,
@@ -29,7 +29,7 @@ const ArrowDrawable = ({
 
   const lineRef = useRef<Konva.Line>(null);
 
-  const { animating } = useAnimatedLine(
+  useAnimatedLine(
     lineRef.current,
     dash[0] + dash[1],
     style.animated,

@@ -1,8 +1,8 @@
-import ArrowDrawable from '@/client/components/ArrowDrawable';
-import CircleDrawable from '@/client/components/CircleDrawable';
+import ArrowDrawable from '@/client/components/ArrowDrawable/ArrowDrawable';
+import EllipseDrawable from '@/client/components/EllipseDrawable';
 import RectDrawable from '@/client/components/RectDrawable';
 import FreePathDrawable from '@/client/components/FreePathDrawable';
-import EditableText from '@/client/components/EditableText';
+import EditableText from '@/client/components/EditableText/EditableText';
 import { SimpleColors } from '@nextui-org/react';
 import { COLOR, LINE, SIZE } from './style';
 
@@ -21,7 +21,7 @@ export const getElement = (element: NodeType) => {
     case 'rectangle':
       return RectDrawable;
     case 'ellipse':
-      return CircleDrawable;
+      return EllipseDrawable;
     case 'draw':
       return FreePathDrawable;
     case 'text':
