@@ -1,4 +1,4 @@
-import { NodeType } from '@/shared/element';
+import { NodeType } from '@/client/shared/element';
 import { Action, Reducer } from '@reduxjs/toolkit';
 import { ActionType, ACTION_TYPES } from './actions';
 

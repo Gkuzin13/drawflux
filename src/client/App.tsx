@@ -4,7 +4,7 @@ import { NextUIProvider } from '@nextui-org/react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import NodeMenu from './components/NodeMenu';
 import { Node } from './shared/utils/createNode';
-import { selectNodes } from './stores/nodesSlice';
+import { selectNodes, nodesActions } from './stores/nodesSlice';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
 import { ActionType, ACTION_TYPES } from './stores/actions';
 import { NodeComponentProps } from './components/types';
@@ -12,10 +12,10 @@ import { KEYS } from './shared/keys';
 import { CURSOR } from './shared/constants';
 import { SHAPES } from './shared/shapes';
 import { getElement, NodeStyle } from './shared/element';
-import type { MenuItem, NodeType } from './shared/element';
 import { IoHandRightOutline } from 'react-icons/io5';
 import Konva from 'konva';
 import StyleMenu from './components/StyleMenu';
+import type { MenuItem, NodeType } from './shared/element';
 
 type ToolType = NodeType['type'] | 'hand';
 
@@ -56,18 +56,24 @@ const App = () => {
   }, [styleMenu.style]);
 
   useEffect(() => {
-    const handleEscapeKeys = (e: KeyboardEvent) => {
-      if (e.key === KEYS.ESCAPE) {
-        setDraftNode(null);
-        setSelected(null);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case KEYS.DELETE:
+          if (!selected) return;
+          dispatch(nodesActions.delete({ id: selected }));
+          break;
+        case KEYS.ESCAPE:
+          setDraftNode(null);
+          setSelected(null);
+          break;
       }
     };
-    window.addEventListener('keydown', handleEscapeKeys);
+    window.addEventListener('keyup', handleKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handleEscapeKeys);
+      window.removeEventListener('keyup', handleKeyDown);
     };
-  }, []);
+  }, [selected]);
 
   const onNodeMenuAction = (type: ActionType) => {
     // dispatch({ type, payload: { id: node.nodeProps?.id } });
@@ -171,10 +177,7 @@ const App = () => {
     if (toolType === 'hand') return;
 
     if (draftNode && isDrawable(draftNode.type)) {
-      dispatch({
-        type: ACTION_TYPES.ADD_NODE,
-        payload: { ...draftNode },
-      });
+      dispatch(nodesActions.add(draftNode));
 
       setDraftNode(null);
     }
@@ -233,20 +236,12 @@ const App = () => {
       return;
     }
     if (draftNode) {
-      dispatch({
-        type: ACTION_TYPES.ADD_NODE,
-        payload: node,
-      });
+      dispatch(nodesActions.add(node));
 
       setDraftNode(null);
     } else {
-      dispatch({
-        type: ACTION_TYPES.UPDATE_NODE,
-        payload: node,
-      });
+      dispatch(nodesActions.update(node));
     }
-
-    console.log(node);
   };
 
   const onNodeTypeChange = (type: ToolType) => {
@@ -268,10 +263,11 @@ const App = () => {
     if (selected) {
       const node = nodes.find((node) => node.nodeProps.id === selected);
 
-      setStyleMenu({
-        open: !styleMenu.open,
-        style: node?.style,
-      });
+      node &&
+        setStyleMenu({
+          open: !styleMenu.open,
+          style: node?.style,
+        });
     } else {
       setStyleMenu({ ...styleMenu, open: !styleMenu.open });
     }
@@ -300,9 +296,7 @@ const App = () => {
             }
           />
         )}
-        <button
-          onClick={() => dispatch({ type: ACTION_TYPES.DELETE_ALL_NODES })}
-        >
+        <button onClick={() => dispatch(nodesActions.deleteAll())}>
           Clear All
         </button>
         <button onClick={onStyleMenuToggle}>Styles</button>
