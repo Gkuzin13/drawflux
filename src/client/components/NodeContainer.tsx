@@ -30,6 +30,7 @@ const NodeContainer = ({
   type,
   style,
   selected,
+  opacity,
   draggable,
   onNodeChange,
   onSelect,
@@ -58,7 +59,7 @@ const NodeContainer = ({
   }, [selected]);
 
   return (
-    <Group onContextMenu={(e) => onContextMenu(e, nodeProps.id)}>
+    <>
       {cloneElement(Children.only(children) as ReactElement, {
         ref: nodeRef,
         onClick: onSelect,
@@ -67,6 +68,7 @@ const NodeContainer = ({
         strokeWidth: type === 'text' ? 0 : strokeWidth,
         stroke: style.color,
         lineCap: 'round',
+        opacity,
         draggable: draggable,
         strokeScaleEnabled: false,
         hitStrokeWidth: 12,
@@ -93,7 +95,7 @@ const NodeContainer = ({
           ref={transformerRef}
         />
       )}
-    </Group>
+    </>
   );
 };
 

@@ -1,6 +1,6 @@
 import { getNormalizedPoints } from '@/client/shared/utils/draw';
 import Konva from 'konva';
-import { Rect } from 'react-konva';
+import { Group, Rect } from 'react-konva';
 import NodeContainer from './NodeContainer';
 import type { NodeComponentProps } from './types';
 
@@ -10,10 +10,7 @@ const RectDrawable = ({
   style,
   ...restProps
 }: NodeComponentProps) => {
-  const { p1, p2 } = getNormalizedPoints(
-    nodeProps.points[0],
-    nodeProps.points[1],
-  );
+  const [p1, p2] = nodeProps.points;
 
   return (
     <NodeContainer
@@ -25,10 +22,7 @@ const RectDrawable = ({
       <Rect
         width={p2.x - p1.x}
         height={p2.y - p1.y}
-        x={p1.x}
-        y={p1.y}
-        rotation={nodeProps.rotation}
-        cornerRadius={2}
+        {...nodeProps}
         onTransformEnd={(event) => {
           if (!event.target) return;
 

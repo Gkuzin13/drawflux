@@ -8,4 +8,5 @@ export const KEYS = {
   A: 'a',
   P: 'p',
   T: 't',
+  V: 'v',
 };

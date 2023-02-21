@@ -5,6 +5,7 @@ import {
   IoReturnUpForwardOutline,
   IoPencilOutline,
   IoTextOutline,
+  IoAddOutline,
 } from 'react-icons/io5';
 
 export const SHAPES = [

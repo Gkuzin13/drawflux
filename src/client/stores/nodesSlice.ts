@@ -1,4 +1,4 @@
-import { NodeType, NodeProps } from '@/client/shared/element';
+import { NodeType } from '@/client/shared/element';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
 
@@ -14,26 +14,32 @@ export const nodesSlice = createSlice({
   name: 'nodes',
   initialState,
   reducers: {
-    add: (state, action: PayloadAction<NodeType>) => {
-      state.nodes.push(action.payload);
+    add: (state, action: PayloadAction<NodeType[]>) => {
+      state.nodes = [...state.nodes, ...action.payload];
     },
-    update: (state, action: PayloadAction<NodeType>) => {
-      const nodeIndex = state.nodes.findIndex((node) => {
-        return node.nodeProps.id === action.payload.nodeProps.id;
+    update: (state, action: PayloadAction<NodeType[]>) => {
+      const nodesMap = new Map<string, NodeType>();
+
+      action.payload.forEach((node) => {
+        nodesMap.set(node.nodeProps.id, node);
       });
 
-      if (nodeIndex >= 0) {
-        state.nodes[nodeIndex] = action.payload;
-      }
-    },
-    delete: (state, action: PayloadAction<Pick<NodeProps, 'id'>>) => {
-      const nodeIndex = state.nodes.findIndex((node) => {
-        return node.nodeProps.id === action.payload.id;
-      });
+      return {
+        nodes: state.nodes.map((node) => {
+          if (nodesMap.has(node.nodeProps.id)) {
+            return nodesMap.get(node.nodeProps.id) as NodeType;
+          }
 
-      if (nodeIndex >= 0) {
-        state.nodes.splice(nodeIndex, 1);
-      }
+          return node;
+        }),
+      };
+    },
+    delete: (state, action: PayloadAction<string[]>) => {
+      const ids = new Set<string>(action.payload);
+
+      return {
+        nodes: state.nodes.filter((node) => !ids.has(node.nodeProps.id)),
+      };
     },
     deleteAll: (state) => {
       state.nodes = [];

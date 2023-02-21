@@ -23,9 +23,8 @@ const CircleDrawable = ({
       {...restProps}
     >
       <Ellipse
-        stroke={style.color as string}
-        radiusY={p2.y - p1.y}
         radiusX={p2.x - p1.x}
+        radiusY={p2.y - p1.y}
         {...nodeProps}
         onTransformEnd={(event) => {
           if (!event.target) return;
