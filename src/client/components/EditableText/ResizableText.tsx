@@ -70,8 +70,7 @@ const ResizableText = ({
             style: restProps.style,
             nodeProps: {
               ...nodeProps,
-              x: node.x(),
-              y: node.y(),
+              point: [node.x(), node.y()],
               rotation: node.rotation(),
             },
           });

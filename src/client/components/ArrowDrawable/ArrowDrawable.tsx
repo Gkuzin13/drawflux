@@ -7,7 +7,7 @@ import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
 import { Group } from 'react-konva';
 import { CURSOR } from '@/client/shared/constants';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { getLineValue, getSizeValue } from '../../shared/element';
+import { getLineValue, getSizeValue, Point } from '../../shared/element';
 import type { NodeComponentProps } from '../types';
 
 const ArrowDrawable = ({
@@ -20,9 +20,12 @@ const ArrowDrawable = ({
   onSelect,
   onNodeChange,
 }: NodeComponentProps) => {
-  const [points, setPoints] = useState(nodeProps.points);
+  const initialPoints = [nodeProps.point, nodeProps.point];
 
-  const [start, end, control] = points;
+  const [start, control, end] = [
+    nodeProps.point,
+    ...(nodeProps.points || initialPoints),
+  ] as Point[];
 
   const strokeWidth = getSizeValue(style.size);
   const dash = getLineValue(style.line);
@@ -36,26 +39,29 @@ const ArrowDrawable = ({
     style.line,
   );
 
-  useEffect(() => {
-    setPoints(nodeProps.points);
-  }, [nodeProps.points]);
-
   return (
     <Group
       id={nodeProps.id}
       cursorType={CURSOR.ALL_SCROLL}
       onSelect={onSelect}
       draggable={draggable}
-      onDragEnd={(event: KonvaEventObject<DragEvent>) => {
+      onDragEnd={(event) => {
+        if (event.target.nodeType !== 'Group') return;
+
+        const group = event.target as Konva.Group & Konva.Shape;
+
+        const points: Point[] = group
+          .getChildren((child) => child.attrs?.id?.includes('anchor'))
+          .map((child) => [child.x(), child.y()]);
+
         onNodeChange({
           type,
           style,
           text: null,
           nodeProps: {
             ...nodeProps,
-            points,
-            x: event.target.x(),
-            y: event.target.y(),
+            point: points[0],
+            points: [points[1], points[2]],
           },
         });
       }}
@@ -80,9 +86,20 @@ const ArrowDrawable = ({
       />
       {selected && (
         <ArrowTransformer
-          points={points}
+          points={[start, control, end]}
           draggable={draggable}
-          onAnchorMove={(points) => setPoints(points)}
+          onAnchorMove={(points) =>
+            onNodeChange({
+              type,
+              style,
+              text: null,
+              nodeProps: {
+                ...nodeProps,
+                point: points[0],
+                points: [points[1], points[2]],
+              },
+            })
+          }
         />
       )}
     </Group>

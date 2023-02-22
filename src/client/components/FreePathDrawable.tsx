@@ -1,6 +1,4 @@
-import { Point } from '@/client/shared/element';
 import Konva from 'konva';
-import { useEffect, useState } from 'react';
 import { Line } from 'react-konva';
 import NodeContainer from './NodeContainer';
 import type { NodeComponentProps } from './types';
@@ -10,14 +8,7 @@ const FreePathDrawable = ({
   onNodeChange,
   ...restProps
 }: NodeComponentProps) => {
-  const [points, setPoints] = useState<Point[]>(nodeProps.points);
-
-  const flattenedPoints = points.map((p) => [p.x, p.y]).flat();
-
-  useEffect(() => {
-    const lastPoint = nodeProps.points[nodeProps.points.length - 1];
-    setPoints([...points, lastPoint]);
-  }, [nodeProps.points]);
+  const flattenedPoints = nodeProps.points?.flat() || [];
 
   return (
     <NodeContainer
@@ -27,7 +18,6 @@ const FreePathDrawable = ({
       {...restProps}
     >
       <Line
-        id={nodeProps.id}
         points={flattenedPoints}
         rotation={nodeProps.rotation}
         onTransformEnd={(event) => {

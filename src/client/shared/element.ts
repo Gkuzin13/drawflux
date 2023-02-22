@@ -75,12 +75,12 @@ export type NodeType = {
 
 export type NodeProps = {
   id: string;
-  points: Point[];
-  x: number;
-  y: number;
+  point: Point;
+  points?: Point[];
   width?: number;
   height?: number;
   rotation: number;
+  visible: boolean;
 };
 
 export type NodeStyle = {
@@ -94,10 +94,7 @@ export type NodeLIne = (typeof LINE)[keyof typeof LINE];
 export type NodeColor = (typeof COLOR)[keyof typeof COLOR];
 export type NodeSize = (typeof SIZE)[keyof typeof SIZE];
 
-export type Point = {
-  x: number;
-  y: number;
-};
+export type Point = [number, number];
 
 export type MenuItem = {
   key: string;

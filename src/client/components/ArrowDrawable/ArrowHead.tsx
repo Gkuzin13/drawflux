@@ -23,8 +23,8 @@ const ArrowHead = ({
       strokeWidth={strokeWidth}
       lineCap="round"
       sceneFunc={(ctx, shape) => {
-        const dx = endPosition.x - headRotationPosition.x;
-        const dy = endPosition.y - headRotationPosition.y;
+        const dx = endPosition[0] - headRotationPosition[0];
+        const dy = endPosition[1] - headRotationPosition[1];
 
         const radians = (Math.atan2(dy, dx) + PI2) % PI2;
         const length = 2.8 * strokeWidth;
@@ -33,7 +33,7 @@ const ArrowHead = ({
         ctx.save();
 
         ctx.beginPath();
-        ctx.translate(endPosition.x, endPosition.y);
+        ctx.translate(endPosition[0], endPosition[1]);
         ctx.rotate(radians);
 
         ctx.moveTo(0, 0);

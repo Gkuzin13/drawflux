@@ -12,19 +12,15 @@ export class Node implements NodeType {
   style = defaultStyle;
   nodeProps = {
     id: `node-${Date.now()}`,
-    x: 0,
-    y: 0,
-    points: [],
+    width: 0,
+    height: 0,
+    point: [0, 0],
     rotation: 0,
+    visible: true,
   } as NodeProps;
 
   constructor(type: NodeType['type'], x: number, y: number) {
     this.type = type;
-    this.nodeProps.x = x;
-    this.nodeProps.y = y;
-    this.nodeProps.points = [
-      { x, y },
-      { x, y },
-    ];
+    this.nodeProps.point = [x, y];
   }
 }

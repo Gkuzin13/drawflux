@@ -4,13 +4,13 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import TransformerAnchor from './TransformerAnchor';
 
 type Props = {
-  points: Point[];
+  points: [Point, Point, Point];
   draggable: boolean;
   onAnchorMove: (updatedPoints: Point[]) => void;
 };
 
 const ArrowTransformer = ({ points, draggable, onAnchorMove }: Props) => {
-  const [start, end, control] = points;
+  const [start, control, end] = points;
 
   const onAnchorDragMove = (event: KonvaEventObject<DragEvent>) => {
     if (!event.target) return;
@@ -20,10 +20,10 @@ const ArrowTransformer = ({ points, draggable, onAnchorMove }: Props) => {
 
     const updatedPoints = [...points];
 
-    updatedPoints[draggedIndex] = { x: node.x(), y: node.y() };
+    updatedPoints[draggedIndex] = [node.x(), node.y()];
 
-    if (draggedIndex !== '2' && control) {
-      updatedPoints[2] = clampAnchorPoint(
+    if (draggedIndex !== '1') {
+      updatedPoints[1] = clampAnchorPoint(
         getControlPointAfterDrag(
           updatedPoints[draggedIndex],
           points[draggedIndex],
@@ -31,7 +31,6 @@ const ArrowTransformer = ({ points, draggable, onAnchorMove }: Props) => {
         ),
       );
     }
-
     onAnchorMove(updatedPoints);
   };
 
@@ -39,30 +38,27 @@ const ArrowTransformer = ({ points, draggable, onAnchorMove }: Props) => {
     prevPoint: Point,
     draggedPoint: Point,
     controlPoint: Point,
-  ) {
+  ): Point {
     // Calculate the displacement of the dragged point from its original position
     const displacement = {
-      x: prevPoint.x - draggedPoint.x,
-      y: prevPoint.y - draggedPoint.y,
+      x: prevPoint[0] - draggedPoint[0],
+      y: prevPoint[1] - draggedPoint[1],
     };
 
     // If the dragged point is not the middle point, move the middle point with it
-    return {
-      x: controlPoint.x + displacement.x,
-      y: controlPoint.y + displacement.y,
-    };
+    return [controlPoint[0] + displacement.x, controlPoint[1] + displacement.y];
   }
 
-  function clampAnchorPoint(position: Point) {
-    const dx = end.x - start.x;
-    const dy = end.y - start.y;
+  function clampAnchorPoint(position: Point): Point {
+    const dx = end[0] - start[0];
+    const dy = end[1] - start[1];
 
     const length = Math.sqrt(dx ** 2 + dy ** 2);
 
     // Calculate the midpoint between the two points
     const mid = {
-      x: (start.x + end.x) / 2,
-      y: (start.y + end.y) / 2,
+      x: (start[0] + end[0]) / 2,
+      y: (start[1] + end[1]) / 2,
     };
 
     // Calculate a perpendicular vector to the line connecting the two points
@@ -73,17 +69,10 @@ const ArrowTransformer = ({ points, draggable, onAnchorMove }: Props) => {
 
     // Calculate the distance of the drag from the midpoint along the perpendicular vector
     let dragDist =
-      (position.x - mid.x) * perp.x + (position.y - mid.y) * perp.y;
+      (position[0] - mid.x) * perp.x + (position[1] - mid.y) * perp.y;
     dragDist = Math.max(Math.min(dragDist, length / 2), -length / 2);
 
-    return {
-      x: mid.x + perp.x * dragDist,
-      y: mid.y + perp.y * dragDist,
-    };
-  }
-
-  function getDefaultControlPosition(start: number, end: number) {
-    return (start + end) / 2;
+    return [mid.x + perp.x * dragDist, mid.y + perp.y * dragDist];
   }
 
   return (
@@ -91,28 +80,32 @@ const ArrowTransformer = ({ points, draggable, onAnchorMove }: Props) => {
       <TransformerAnchor
         key={`anchor-0`}
         id={`anchor-0`}
-        x={start.x}
-        y={start.y}
+        x={start[0]}
+        y={start[1]}
         onDragMove={onAnchorDragMove}
         draggable={draggable}
       />
       <TransformerAnchor
         key={`anchor-1`}
         id={`anchor-1`}
-        x={end.x}
-        y={end.y}
+        active={true}
+        x={control[0]}
+        y={control[1]}
         onDragMove={onAnchorDragMove}
         draggable={draggable}
+        dragBoundFunc={({ x, y }) => {
+          const newPos = clampAnchorPoint([x, y]);
+
+          return { x: newPos[0], y: newPos[1] };
+        }}
       />
       <TransformerAnchor
         key={`anchor-2`}
         id={`anchor-2`}
-        active={control ? true : false}
-        x={control ? control.x : getDefaultControlPosition(start.x, end.x)}
-        y={control ? control.y : getDefaultControlPosition(start.y, end.y)}
+        x={end[0]}
+        y={end[1]}
         onDragMove={onAnchorDragMove}
         draggable={draggable}
-        dragBoundFunc={clampAnchorPoint}
       />
     </>
   );

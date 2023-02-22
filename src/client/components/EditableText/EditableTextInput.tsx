@@ -71,8 +71,8 @@ const EditableTextInput = ({
   return (
     <Html
       groupProps={{
-        x: nodeProps.x,
-        y: nodeProps.y,
+        x: nodeProps.point[0],
+        y: nodeProps.point[1],
         rotation: nodeProps.rotation,
       }}
     >

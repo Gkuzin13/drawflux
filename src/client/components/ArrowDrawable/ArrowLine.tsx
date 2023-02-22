@@ -6,7 +6,7 @@ import { Line } from 'react-konva';
 type Props = {
   start: Point;
   end: Point;
-  control?: Point;
+  control: Point;
   color: NodeColor;
   dash: number[];
   strokeWidth: number;
@@ -27,13 +27,8 @@ const ArrowLine = forwardRef(
         dash={dash}
         sceneFunc={(ctx, shape) => {
           ctx.beginPath();
-          ctx.moveTo(start.x, start.y);
-          ctx.quadraticCurveTo(
-            control ? control.x : start.x,
-            control ? control.y : start.y,
-            end.x,
-            end.y,
-          );
+          ctx.moveTo(start[0], start[1]);
+          ctx.quadraticCurveTo(control[0], control[1], end[0], end[1]);
 
           ctx.fillStrokeShape(shape);
         }}

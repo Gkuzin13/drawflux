@@ -1,12 +1,12 @@
-import React, { useState, createElement, useEffect, useRef } from 'react';
-import { Stage, Layer, Rect, Group } from 'react-konva';
+import { useState, createElement, useEffect, useRef } from 'react';
+import { Stage, Layer, Group } from 'react-konva';
 import { NextUIProvider } from '@nextui-org/react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import NodeMenu from './components/NodeMenu';
 import { Node } from './shared/utils/createNode';
 import { selectNodes, nodesActions } from './stores/nodesSlice';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
-import { ActionType, ACTION_TYPES } from './stores/actions';
+import { ACTION_TYPES } from './stores/actions';
 import { NodeComponentProps } from './components/types';
 import { KEYS } from './shared/keys';
 import { CURSOR } from './shared/constants';
@@ -17,9 +17,8 @@ import Konva from 'konva';
 import StyleMenu from './components/StyleMenu';
 import type { MenuItem, NodeType } from './shared/element';
 import SelectTool from './components/SelectTool';
-import { getNormalizedPoints } from './shared/utils/draw';
+import { normalizePoints } from './shared/utils/draw';
 import NodeTransformer from './components/NodeTransformer';
-import { IRect } from 'konva/lib/types';
 
 type ToolType = NodeType['type'] | 'hand' | 'select';
 
@@ -35,7 +34,7 @@ type StyleMenuType = {
 };
 
 const App = () => {
-  const [toolType, setToolType] = useState<ToolType>('rectangle');
+  const [toolType, setToolType] = useState<ToolType>('ellipse');
   const [draftNode, setDraftNode] = useState<NodeType | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [contextMenu, setContextMenu] = useState<MenuItem[] | null>(null);
@@ -47,6 +46,8 @@ const App = () => {
   });
   const [selectedNodes, setSelectedNodes] = useState<NodeType[]>([]);
   const [selectBoxSize, setSelectBoxSize] = useState<Point[] | null>(null);
+
+  const posStart = useRef<Point>([0, 0]);
 
   const { past, present, future } = useAppSelector(selectNodes);
 
@@ -94,7 +95,7 @@ const App = () => {
     };
   }, [selected]);
 
-  const onNodeMenuAction = (type: ActionType) => {
+  const onNodeMenuAction = () => {
     // dispatch({ type, payload: { id: node.nodeProps?.id } });
 
     setSelected([]);
@@ -115,20 +116,6 @@ const App = () => {
     if (selectedNode) {
       setSelected([id]);
     }
-  };
-
-  const updateNodePoints = (x: number, y: number) => {
-    setDraftNode((prevNode) => {
-      if (!prevNode) return prevNode;
-
-      return {
-        ...prevNode,
-        nodeProps: {
-          ...prevNode.nodeProps,
-          points: [prevNode.nodeProps.points[0], { x, y }],
-        },
-      };
-    });
   };
 
   const setCursorStyle = (
@@ -163,11 +150,11 @@ const App = () => {
 
     const otherChildren = layer.getChildren((child) => child.attrs.id);
 
-    const { p1, p2 } = getNormalizedPoints(selectBoxSize[0], selectBoxSize[1]);
+    const [p1, p2] = normalizePoints(selectBoxSize[0], selectBoxSize[1]);
 
     const intersectedChildren = otherChildren.filter((child) =>
       Konva.Util.haveIntersection(
-        { x: p1.x, y: p1.y, width: p2.x - p1.x, height: p2.y - p1.y },
+        { x: p1[0], y: p1[1], width: p2[0] - p1[0], height: p2[1] - p1[1] },
         child.getClientRect(),
       ),
     );
@@ -176,11 +163,73 @@ const App = () => {
       intersectedChildren.map(({ attrs }) => attrs.id),
     );
 
-    const selectedNewChildren = [
-      ...nodes.filter((node) => childrenIds.has(node.nodeProps.id)),
-    ];
-    console.log(selectedNewChildren);
-    setSelectedNodes(selectedNewChildren);
+    setSelectedNodes(
+      nodes.filter((node) => childrenIds.has(node.nodeProps.id)),
+    );
+  };
+
+  function getDefaultControlPoint(start: Point, end: Point): Point {
+    return [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
+  }
+
+  const drawNodeByType = (node: NodeType, position: Point): NodeType => {
+    switch (node.type) {
+      case 'draw': {
+        const points = node.nodeProps?.points || [];
+
+        return {
+          ...node,
+          nodeProps: { ...node.nodeProps, points: [...points, position] },
+        };
+      }
+      case 'arrow': {
+        const defaultControlPoint = getDefaultControlPoint(
+          node.nodeProps.point,
+          position,
+        );
+        return {
+          ...node,
+          nodeProps: {
+            ...node.nodeProps,
+            points: [defaultControlPoint, position],
+          },
+        };
+      }
+      case 'rectangle': {
+        const [p1, p2] = normalizePoints(posStart.current, [
+          position[0],
+          position[1],
+        ]);
+
+        return {
+          ...node,
+          nodeProps: {
+            ...node.nodeProps,
+            point: p1,
+            width: p2[0] - p1[0],
+            height: p2[1] - p1[1],
+          },
+        };
+      }
+      case 'ellipse': {
+        const [p1, p2] = normalizePoints(node.nodeProps.point, [
+          position[0],
+          position[1],
+        ]);
+
+        return {
+          ...node,
+          nodeProps: {
+            ...node.nodeProps,
+            width: p2[0] - p1[0],
+            height: p2[1] - p1[1],
+          },
+        };
+      }
+      default: {
+        return node;
+      }
+    }
   };
 
   const onMoveStart = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
@@ -196,11 +245,16 @@ const App = () => {
 
     if (!position) return;
 
+    posStart.current = [position.x, position.y];
+
     switch (toolType) {
       case 'hand':
         break;
       case 'select':
-        setSelectBoxSize([position, position]);
+        setSelectBoxSize([
+          [position.x, position.y],
+          [position.x, position.y],
+        ]);
         break;
       default:
         if (selected.length) break;
@@ -227,11 +281,17 @@ const App = () => {
         setSelectBoxSize((prevSize) => {
           if (!prevSize) return prevSize;
 
-          return [prevSize[0], position];
+          return [prevSize[0], [position.x, position.y]];
         });
         break;
       default:
-        updateNodePoints(position.x, position.y);
+        if (draftNode) {
+          setDraftNode((prevNode) => {
+            return prevNode
+              ? drawNodeByType(prevNode, [position.x, position.y])
+              : prevNode;
+          });
+        }
     }
 
     setCursorStyle(e);
@@ -333,36 +393,51 @@ const App = () => {
     }
   };
 
-  const handleGroupDragStart = (e: any) => {};
+  const onGroupDragStart = (event: KonvaEventObject<DragEvent>) => {
+    const group = event.target as Konva.Group & Konva.Shape;
 
-  const onGroupDragEnd = (e: KonvaEventObject<DragEvent>) => {
-    const group = e.target as Konva.Group;
-
-    const nodeMap = new Map<string, NodeType>([]);
+    const nodeMap = new Map<string, NodeType>();
 
     selectedNodes.forEach((node) => nodeMap.set(node.nodeProps.id, node));
 
-    const children = [...group.getChildren()].map((child) => {
-      const node = nodeMap.get(child.attrs.id);
+    const hiddenNodes = group
+      .getChildren()
+      .map((child) => {
+        const node = nodeMap.get(child.attrs.id);
 
-      if (!node) return null;
-      const { x, y } = child.getAbsolutePosition();
+        if (!node) return null;
 
-      return {
-        ...node,
-        nodeProps: {
-          ...node.nodeProps,
-          x: x,
-          y: y,
-        },
-      };
-    });
+        return { ...node, nodeProps: { ...node.nodeProps, visible: false } };
+      })
+      .filter((node) => node) as NodeType[];
 
-    dispatch(nodesActions.update(children));
+    dispatch(nodesActions.update(hiddenNodes));
   };
 
-  const onGroupDrag = (e: KonvaEventObject<DragEvent>) => {
-    const group = e.target as Konva.Group;
+  const onGroupDragEnd = (event: KonvaEventObject<DragEvent>) => {
+    const group = event.target as Konva.Group & Konva.Shape;
+
+    const nodeMap = new Map<string, NodeType>();
+
+    selectedNodes.forEach((node) => nodeMap.set(node.nodeProps.id, node));
+
+    const updatedNodes = group
+      .getChildren()
+      .map((child) => {
+        const node = nodeMap.get(child.attrs.id);
+
+        if (!node) return null;
+
+        const { x, y } = child.getAbsolutePosition();
+
+        return {
+          ...node,
+          nodeProps: { ...node.nodeProps, point: [x, y], visible: true },
+        };
+      })
+      .filter((node) => node) as NodeType[];
+
+    dispatch(nodesActions.update(updatedNodes));
   };
 
   return (
@@ -449,17 +524,13 @@ const App = () => {
             {selectedNodes.length ? (
               <Group
                 ref={nodeRef}
-                onDragStart={handleGroupDragStart}
                 onDragEnd={onGroupDragEnd}
-                onDragMove={onGroupDrag}
+                onDragStart={onGroupDragStart}
               >
                 {selectedNodes.map((node, index) => {
                   return createElement(getElement(node), {
                     key: index,
-                    nodeProps: node.nodeProps,
-                    type: node.type,
-                    text: node.text,
-                    style: { ...node.style, color: 'red' },
+                    ...node,
                     selected: false,
                     draggable: false,
                     onContextMenu: () => null,
@@ -480,7 +551,7 @@ const App = () => {
           y={menuPosition.y}
           menuItems={contextMenu || []}
           onClose={() => setContextMenu(null)}
-          onAction={(key) => onNodeMenuAction(key as ActionType)}
+          onAction={(key) => onNodeMenuAction()}
         />
       </>
     </NextUIProvider>

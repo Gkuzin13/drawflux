@@ -6,7 +6,7 @@ import {
   useEffect,
   useRef,
 } from 'react';
-import { Group, KonvaNodeEvents } from 'react-konva';
+import { KonvaNodeEvents } from 'react-konva';
 import Konva from 'konva';
 import { NodeComponentProps } from './types';
 import { TransformerConfig } from 'konva/lib/shapes/Transformer';
@@ -30,7 +30,6 @@ const NodeContainer = ({
   type,
   style,
   selected,
-  opacity,
   draggable,
   onNodeChange,
   onSelect,
@@ -62,13 +61,14 @@ const NodeContainer = ({
     <>
       {cloneElement(Children.only(children) as ReactElement, {
         ref: nodeRef,
+        id: nodeProps.id,
         onClick: onSelect,
         onTap: onSelect,
         dash,
         strokeWidth: type === 'text' ? 0 : strokeWidth,
         stroke: style.color,
         lineCap: 'round',
-        opacity,
+        visible: nodeProps.visible,
         draggable: draggable,
         strokeScaleEnabled: false,
         hitStrokeWidth: 12,
@@ -82,8 +82,7 @@ const NodeContainer = ({
             style,
             nodeProps: {
               ...nodeProps,
-              x: event.target.x(),
-              y: event.target.y(),
+              point: [event.target.x(), event.target.y()],
             },
           });
         },
