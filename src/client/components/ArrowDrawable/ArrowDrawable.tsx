@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import Konva from 'konva';
 import ArrowTransformer from './ArrowTransformer';
-import ArrowHead from './ArrowHead';
-import ArrowLine from './ArrowLine';
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
-import { Group } from 'react-konva';
-import { CURSOR } from '@/client/shared/constants';
-import { KonvaEventObject } from 'konva/lib/Node';
 import { getLineValue, getSizeValue, Point } from '../../shared/element';
 import type { NodeComponentProps } from '../types';
+import ArrowHead from './ArrowHead';
+import ArrowLine from './ArrowLine';
+import { Group, Line } from 'react-konva';
+import { IRect } from 'konva/lib/types';
 
 const ArrowDrawable = ({
   nodeProps,
@@ -20,12 +19,20 @@ const ArrowDrawable = ({
   onSelect,
   onNodeChange,
 }: NodeComponentProps) => {
-  const initialPoints = [nodeProps.point, nodeProps.point];
-
-  const [start, control, end] = [
+  const [points, setPoints] = useState<Point[]>([
     nodeProps.point,
-    ...(nodeProps.points || initialPoints),
-  ] as Point[];
+    ...(nodeProps?.points || [nodeProps.point, nodeProps.point]),
+  ]);
+  const [dragging, setDragging] = useState(false);
+
+  useEffect(() => {
+    setPoints([
+      nodeProps.point,
+      ...(nodeProps?.points || [nodeProps.point, nodeProps.point]),
+    ]);
+  }, [nodeProps.point, nodeProps.points]);
+
+  const [start, control, end] = points;
 
   const strokeWidth = getSizeValue(style.size);
   const dash = getLineValue(style.line);
@@ -42,17 +49,29 @@ const ArrowDrawable = ({
   return (
     <Group
       id={nodeProps.id}
-      cursorType={CURSOR.ALL_SCROLL}
-      onSelect={onSelect}
+      onTap={onSelect}
+      onClick={onSelect}
       draggable={draggable}
+      visible={nodeProps.visible}
+      onDragStart={(event) => {
+        if (event.target.nodeType !== 'Group') {
+          return;
+        }
+        onSelect();
+        setDragging(true);
+      }}
       onDragEnd={(event) => {
-        if (event.target.nodeType !== 'Group') return;
-
         const group = event.target as Konva.Group & Konva.Shape;
 
-        const points: Point[] = group
-          .getChildren((child) => child.attrs?.id?.includes('anchor'))
-          .map((child) => [child.x(), child.y()]);
+        if (!group.hasChildren()) return;
+
+        const anchors = group.getChildren(
+          (child) => child.className === 'Circle',
+        );
+
+        const updatedPoints: Point[] = anchors.map((anchor) => {
+          return [anchor.x(), anchor.y()];
+        });
 
         onNodeChange({
           type,
@@ -60,35 +79,34 @@ const ArrowDrawable = ({
           text: null,
           nodeProps: {
             ...nodeProps,
-            point: points[0],
-            points: [points[1], points[2]],
+            point: updatedPoints[0],
+            points: [updatedPoints[1], updatedPoints[2]],
           },
         });
+
+        setDragging(false);
       }}
-      onContextMenu={(e) => onContextMenu(e, nodeProps.id)}
-      onClick={onSelect}
-      onTap={onSelect}
     >
       <ArrowHead
-        endPosition={end}
-        headRotationPosition={control ?? start}
-        color={style.color}
         strokeWidth={strokeWidth}
+        color={style.color}
+        end={end}
+        control={control}
       />
       <ArrowLine
         ref={lineRef}
-        start={start}
-        end={end}
-        control={control}
+        points={points}
         color={style.color}
-        strokeWidth={strokeWidth}
         dash={dash}
+        strokeWidth={strokeWidth}
       />
       {selected && (
         <ArrowTransformer
           points={[start, control, end]}
-          draggable={draggable}
-          onAnchorMove={(points) =>
+          draggable
+          visible={!dragging}
+          onTransform={(points) => setPoints(points)}
+          onTransformEnd={(points) => {
             onNodeChange({
               type,
               style,
@@ -98,8 +116,8 @@ const ArrowDrawable = ({
                 point: points[0],
                 points: [points[1], points[2]],
               },
-            })
-          }
+            });
+          }}
         />
       )}
     </Group>

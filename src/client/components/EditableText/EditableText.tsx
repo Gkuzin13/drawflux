@@ -29,16 +29,12 @@ const EditableText = ({
   };
 
   const handleTextSave = () => {
-    if (!value.length) {
-      onNodeChange(null);
-    } else {
-      onNodeChange({
-        nodeProps,
-        style,
-        text: value,
-        type,
-      });
-    }
+    onNodeChange({
+      nodeProps,
+      style,
+      text: value,
+      type,
+    });
 
     setEditing(false);
   };
@@ -55,7 +51,7 @@ const EditableText = ({
   const handleTextChange = (event: ChangeEvent) => {
     const { value } = event.target as HTMLTextAreaElement;
 
-    setValue(() => value);
+    setValue(value);
   };
 
   if (editing) {

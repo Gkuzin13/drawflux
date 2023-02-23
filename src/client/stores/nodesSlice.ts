@@ -15,6 +15,7 @@ export const nodesSlice = createSlice({
   initialState,
   reducers: {
     add: (state, action: PayloadAction<NodeType[]>) => {
+      console.log(action.payload);
       state.nodes = [...state.nodes, ...action.payload];
     },
     update: (state, action: PayloadAction<NodeType[]>) => {

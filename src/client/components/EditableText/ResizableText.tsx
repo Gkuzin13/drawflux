@@ -53,7 +53,8 @@ const ResizableText = ({
       }}
     >
       <Text
-        {...nodeProps}
+        x={nodeProps.point[0]}
+        y={nodeProps.point[1]}
         text={restProps.text || ''}
         fontSize={16}
         onTransform={handleResize}

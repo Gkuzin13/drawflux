@@ -73,8 +73,8 @@ const NodeContainer = ({
         strokeScaleEnabled: false,
         hitStrokeWidth: 12,
         perfectDrawEnabled: false,
-        cursorType: CURSOR.ALL_SCROLL,
         fillEnabled: type === 'text',
+        onDragStart: onSelect,
         onDragEnd: (event: KonvaEventObject<DragEndEvent>) => {
           onNodeChange({
             type,

@@ -5,11 +5,19 @@ import TransformerAnchor from './TransformerAnchor';
 
 type Props = {
   points: [Point, Point, Point];
+  visible: boolean;
   draggable: boolean;
-  onAnchorMove: (updatedPoints: Point[]) => void;
+  onTransform: (updatedPoints: Point[]) => void;
+  onTransformEnd: (updatedPoints: Point[]) => void;
 };
 
-const ArrowTransformer = ({ points, draggable, onAnchorMove }: Props) => {
+const ArrowTransformer = ({
+  points,
+  draggable,
+  visible,
+  onTransform,
+  onTransformEnd,
+}: Props) => {
   const [start, control, end] = points;
 
   const onAnchorDragMove = (event: KonvaEventObject<DragEvent>) => {
@@ -31,7 +39,11 @@ const ArrowTransformer = ({ points, draggable, onAnchorMove }: Props) => {
         ),
       );
     }
-    onAnchorMove(updatedPoints);
+    onTransform(updatedPoints);
+  };
+
+  const onAnchorDragEnd = () => {
+    onTransformEnd(points);
   };
 
   function getControlPointAfterDrag(
@@ -83,7 +95,9 @@ const ArrowTransformer = ({ points, draggable, onAnchorMove }: Props) => {
         x={start[0]}
         y={start[1]}
         onDragMove={onAnchorDragMove}
-        draggable={draggable}
+        onDragEnd={onAnchorDragEnd}
+        draggable
+        visible={visible}
       />
       <TransformerAnchor
         key={`anchor-1`}
@@ -91,7 +105,9 @@ const ArrowTransformer = ({ points, draggable, onAnchorMove }: Props) => {
         active={true}
         x={control[0]}
         y={control[1]}
+        visible={visible}
         onDragMove={onAnchorDragMove}
+        onDragEnd={onAnchorDragEnd}
         draggable={draggable}
         dragBoundFunc={({ x, y }) => {
           const newPos = clampAnchorPoint([x, y]);
@@ -105,7 +121,9 @@ const ArrowTransformer = ({ points, draggable, onAnchorMove }: Props) => {
         x={end[0]}
         y={end[1]}
         onDragMove={onAnchorDragMove}
-        draggable={draggable}
+        onDragEnd={onAnchorDragEnd}
+        draggable
+        visible={visible}
       />
     </>
   );

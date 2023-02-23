@@ -19,6 +19,7 @@ import type { MenuItem, NodeType } from './shared/element';
 import SelectTool from './components/SelectTool';
 import { normalizePoints } from './shared/utils/draw';
 import NodeTransformer from './components/NodeTransformer';
+import { IRect } from 'konva/lib/types';
 
 type ToolType = NodeType['type'] | 'hand' | 'select';
 
@@ -34,7 +35,7 @@ type StyleMenuType = {
 };
 
 const App = () => {
-  const [toolType, setToolType] = useState<ToolType>('ellipse');
+  const [toolType, setToolType] = useState<ToolType>('text');
   const [draftNode, setDraftNode] = useState<NodeType | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [contextMenu, setContextMenu] = useState<MenuItem[] | null>(null);
@@ -46,6 +47,7 @@ const App = () => {
   });
   const [selectedNodes, setSelectedNodes] = useState<NodeType[]>([]);
   const [selectBoxSize, setSelectBoxSize] = useState<Point[] | null>(null);
+  const [drawing, setDrawing] = useState(false);
 
   const posStart = useRef<Point>([0, 0]);
 
@@ -125,39 +127,53 @@ const App = () => {
 
     if (!stage) return;
 
+    if (drawing) {
+      stage.container().style.cursor = CURSOR.CROSSHAIR;
+      return;
+    }
+
     if (toolType === 'hand') {
       stage.container().style.cursor = CURSOR.GRAB;
       return;
     }
 
-    if (e.target !== stage && !draftNode) {
-      const { cursorType } = e.target.attrs;
-      const parentCursorStyle = e.target.parent?.attrs.cursorType;
+    if (toolType === 'select') {
+      const isOverNode = e.target !== stage;
 
-      stage.container().style.cursor =
-        cursorType || parentCursorStyle || CURSOR.DEFAULT;
-    } else if (draftNode) {
-      stage.container().style.cursor = CURSOR.CROSSHAIR;
-    } else {
+      if (isOverNode) {
+        stage.container().style.cursor =
+          e.target.attrs?.cursorType || CURSOR.ALL_SCROLL;
+        return;
+      }
+
       stage.container().style.cursor = CURSOR.DEFAULT;
     }
   };
+
+  function haveIntersection(p1: Point, p2: Point, nodeRect: IRect) {
+    return Konva.Util.haveIntersection(
+      { x: p1[0], y: p1[1], width: p2[0] - p1[0], height: p2[1] - p1[1] },
+      nodeRect,
+    );
+  }
 
   const setIntersectingNodes = (stage: Konva.Stage) => {
     if (!selectBoxSize) return;
 
     const layer = stage.getChildren((child) => child.nodeType === 'Layer')[0];
-
     const otherChildren = layer.getChildren((child) => child.attrs.id);
 
     const [p1, p2] = normalizePoints(selectBoxSize[0], selectBoxSize[1]);
 
-    const intersectedChildren = otherChildren.filter((child) =>
-      Konva.Util.haveIntersection(
-        { x: p1[0], y: p1[1], width: p2[0] - p1[0], height: p2[1] - p1[1] },
-        child.getClientRect(),
-      ),
-    );
+    const intersectedChildren = otherChildren.filter((child) => {
+      if (child.hasChildren()) {
+        const group = child as Konva.Group;
+        return group.getChildren().some((c) => {
+          return haveIntersection(p1, p2, c.getClientRect());
+        });
+      }
+      return haveIntersection(p1, p2, child.getClientRect());
+    });
 
     const childrenIds = new Set<string>(
       intersectedChildren.map(({ attrs }) => attrs.id),
@@ -251,14 +267,11 @@ const App = () => {
       case 'hand':
         break;
       case 'select':
-        setSelectBoxSize([
-          [position.x, position.y],
-          [position.x, position.y],
-        ]);
+        setSelectBoxSize([posStart.current, [position.x, position.y]]);
         break;
       default:
         if (selected.length) break;
-        setDraftNode(new Node(toolType, position.x, position.y));
+        setDraftNode({ ...new Node(toolType, position.x, position.y) });
     }
 
     setSelected([]);
@@ -284,14 +297,21 @@ const App = () => {
           return [prevSize[0], [position.x, position.y]];
         });
         break;
+      case 'text':
+        break;
       default:
-        if (draftNode) {
-          setDraftNode((prevNode) => {
-            return prevNode
-              ? drawNodeByType(prevNode, [position.x, position.y])
-              : prevNode;
-          });
+        if (!draftNode) {
+          setDrawing(false);
+          break;
         }
+
+        setDraftNode((prevNode) => {
+          return prevNode
+            ? drawNodeByType(prevNode, [position.x, position.y])
+            : prevNode;
+        });
+
+        setDrawing(true);
     }
 
     setCursorStyle(e);
@@ -304,11 +324,16 @@ const App = () => {
       case 'select':
         setSelectBoxSize(null);
         break;
-      default:
-        if (!draftNode) break;
-
-        dispatch(nodesActions.add([draftNode]));
+      default: {
+        if (!drawing) {
+          setDraftNode(null);
+          break;
+        }
+        dispatch(nodesActions.add([draftNode!]));
         setDraftNode(null);
+        setDrawing(false);
+        setToolType('select');
+      }
     }
   };
 
@@ -350,18 +375,20 @@ const App = () => {
     }
   };
 
-  const handleNodeChange = (node: NodeType | null) => {
-    if (!node) {
+  const handleNodeChange = (node: NodeType) => {
+    if (draftNode?.nodeProps.id === node.nodeProps.id) {
       setDraftNode(null);
+      setToolType('select');
+
+      if (!node.text) {
+        return;
+      }
+
+      dispatch(nodesActions.add([node]));
       return;
     }
-    if (draftNode) {
-      dispatch(nodesActions.add([node]));
 
-      setDraftNode(null);
-    } else {
-      dispatch(nodesActions.update([node]));
-    }
+    dispatch(nodesActions.update([node]));
   };
 
   const onNodeTypeChange = (type: ToolType) => {
@@ -427,6 +454,22 @@ const App = () => {
         const node = nodeMap.get(child.attrs.id);
 
         if (!node) return null;
+
+        if (node.type === 'arrow') {
+          const { x, y, width, height } = child.getClientRect();
+          return {
+            ...node,
+            nodeProps: {
+              ...node.nodeProps,
+              point: [x, y],
+              points: [
+                [x + width / 2, y + height],
+                [x + width, y + height],
+              ],
+              visible: true,
+            },
+          };
+        }
 
         const { x, y } = child.getAbsolutePosition();
 
@@ -500,10 +543,11 @@ const App = () => {
           draggable={toolType === 'hand'}
         >
           <Layer>
-            {[...nodes, draftNode].map((node, index) => {
+            {[...nodes, draftNode].map((node) => {
               if (!node) return null;
+
               return createElement(getElement(node), {
-                key: index,
+                key: node.nodeProps.id,
                 nodeProps: node.nodeProps,
                 type: node.type,
                 text: node.text,
@@ -527,9 +571,9 @@ const App = () => {
                 onDragEnd={onGroupDragEnd}
                 onDragStart={onGroupDragStart}
               >
-                {selectedNodes.map((node, index) => {
+                {selectedNodes.map((node) => {
                   return createElement(getElement(node), {
-                    key: index,
+                    key: `group-${node.nodeProps.id}`,
                     ...node,
                     selected: false,
                     draggable: false,
@@ -541,7 +585,10 @@ const App = () => {
               </Group>
             ) : null}
             {selectedNodes.length ? (
-              <NodeTransformer ref={transformerRef} />
+              <NodeTransformer
+                ref={transformerRef}
+                transformerConfig={{ enabledAnchors: [] }}
+              />
             ) : null}
           </Layer>
         </Stage>

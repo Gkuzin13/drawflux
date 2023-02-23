@@ -12,8 +12,6 @@ export class Node implements NodeType {
   style = defaultStyle;
   nodeProps = {
     id: `node-${Date.now()}`,
-    width: 0,
-    height: 0,
     point: [0, 0],
     rotation: 0,
     visible: true,
