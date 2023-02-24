@@ -1,24 +1,20 @@
-import type { NodeType, NodeProps, NodeStyle } from '../element';
+import type { NodeType, Point } from '../element';
 
-const defaultStyle: NodeStyle = {
-  line: 'solid',
-  color: 'black',
-  size: 'medium',
-  animated: false,
+export const createNode = (type: NodeType['type'], point: Point): NodeType => {
+  return {
+    type,
+    text: null,
+    style: {
+      line: 'solid',
+      color: 'black',
+      size: 'medium',
+      animated: false,
+    },
+    nodeProps: {
+      id: `node-${Date.now()}`,
+      point,
+      rotation: 0,
+      visible: true,
+    },
+  };
 };
-export class Node implements NodeType {
-  type: NodeType['type'];
-  text = null;
-  style = defaultStyle;
-  nodeProps = {
-    id: `node-${Date.now()}`,
-    point: [0, 0],
-    rotation: 0,
-    visible: true,
-  } as NodeProps;
-
-  constructor(type: NodeType['type'], x: number, y: number) {
-    this.type = type;
-    this.nodeProps.point = [x, y];
-  }
-}

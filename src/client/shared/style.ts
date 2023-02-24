@@ -1,8 +1,25 @@
+import { TbLineDashed, TbMinus, TbLineDotted } from 'react-icons/tb';
+import { HiOutlineFilm } from 'react-icons/hi2';
+
 const LINE = {
-  SOLID: 'solid',
-  DASHED: 'dashed',
-  DOTTED: 'dotted',
+  SOLID: {
+    icon: TbMinus,
+    value: 'solid',
+  },
+  DASHED: {
+    icon: TbLineDashed,
+    value: 'dashed',
+  },
+  DOTTED: {
+    value: 'dotted',
+    icon: TbLineDotted,
+  },
 } as const;
+
+const ANIMATED = {
+  value: 'animated',
+  icon: HiOutlineFilm,
+};
 
 const SIZE = {
   SMALL: 'small',
@@ -26,4 +43,4 @@ const COLOR = [
   'teal',
 ] as const;
 
-export { LINE, SIZE, COLOR };
+export { LINE, SIZE, COLOR, ANIMATED };

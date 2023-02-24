@@ -1,5 +1,4 @@
 import { MenuItem } from '@/client/shared/element';
-import { Container, Dropdown } from '@nextui-org/react';
 import { Key } from 'react';
 
 type Props = {
@@ -13,8 +12,8 @@ type Props = {
 
 const NodeMenu = ({ isOpen, x, y, menuItems, onClose, onAction }: Props) => {
   return (
-    <Container>
-      <Dropdown isOpen={isOpen} closeOnSelect onClose={onClose} offset={36}>
+    <div>
+      {/* <Dropdown isOpen={isOpen} closeOnSelect onClose={onClose} offset={36}>
         <Dropdown.Button
           disabled
           css={{
@@ -35,8 +34,8 @@ const NodeMenu = ({ isOpen, x, y, menuItems, onClose, onAction }: Props) => {
             })}
           </Dropdown.Section>
         </Dropdown.Menu>
-      </Dropdown>
-    </Container>
+      </Dropdown> */}
+    </div>
   );
 };
 

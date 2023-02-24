@@ -3,7 +3,6 @@ import EllipseDrawable from '@/client/components/EllipseDrawable';
 import RectDrawable from '@/client/components/RectDrawable';
 import FreePathDrawable from '@/client/components/FreePathDrawable';
 import EditableText from '@/client/components/EditableText/EditableText';
-import { SimpleColors } from '@nextui-org/react';
 import { COLOR, LINE, SIZE } from './style';
 
 export const ELEMENTS = {
@@ -90,7 +89,7 @@ export type NodeStyle = {
   animated?: boolean;
 };
 
-export type NodeLIne = (typeof LINE)[keyof typeof LINE];
+export type NodeLIne = (typeof LINE)[keyof typeof LINE]['value'];
 export type NodeColor = (typeof COLOR)[keyof typeof COLOR];
 export type NodeSize = (typeof SIZE)[keyof typeof SIZE];
 
@@ -99,5 +98,5 @@ export type Point = [number, number];
 export type MenuItem = {
   key: string;
   name: string;
-  color: SimpleColors;
+  color: string;
 };

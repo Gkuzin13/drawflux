@@ -1,27 +1,24 @@
 import { useState, createElement, useEffect, useRef } from 'react';
 import { Stage, Layer, Group } from 'react-konva';
-import { NextUIProvider } from '@nextui-org/react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import NodeMenu from './components/NodeMenu';
-import { Node } from './shared/utils/createNode';
+import { createNode } from './shared/utils/createNode';
 import { selectNodes, nodesActions } from './stores/nodesSlice';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
-import { ACTION_TYPES } from './stores/actions';
 import { NodeComponentProps } from './components/types';
 import { KEYS } from './shared/keys';
-import { CURSOR } from './shared/constants';
-import { SHAPES } from './shared/shapes';
+import { CURSOR } from './shared/cursor';
 import { getElement, NodeStyle, Point } from './shared/element';
-import { IoAddOutline, IoHandRightOutline } from 'react-icons/io5';
 import Konva from 'konva';
-import StyleMenu from './components/StyleMenu';
+import StylesDock from './components/StylesDock/StylesDock';
 import type { MenuItem, NodeType } from './shared/element';
 import SelectTool from './components/SelectTool';
 import { normalizePoints } from './shared/utils/draw';
 import NodeTransformer from './components/NodeTransformer';
 import { IRect } from 'konva/lib/types';
-
-type ToolType = NodeType['type'] | 'hand' | 'select';
+import ToolsDock from './components/ToolsDock';
+import { Tool } from './shared/tool';
+import ControlDock from './components/ControlDock';
 
 const defaultStyle: NodeStyle = {
   line: 'solid',
@@ -29,22 +26,14 @@ const defaultStyle: NodeStyle = {
   size: 'medium',
 };
 
-type StyleMenuType = {
-  open: boolean;
-  style: NodeStyle;
-};
-
 const App = () => {
-  const [toolType, setToolType] = useState<ToolType>('text');
+  const [toolType, setToolType] = useState<Tool['value']>('rectangle');
   const [draftNode, setDraftNode] = useState<NodeType | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [contextMenu, setContextMenu] = useState<MenuItem[] | null>(null);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [stageScale, setStageScale] = useState(100);
-  const [styleMenu, setStyleMenu] = useState<StyleMenuType>({
-    open: false,
-    style: defaultStyle,
-  });
+  const [styleMenu, setStyleMenu] = useState<NodeStyle>(defaultStyle);
   const [selectedNodes, setSelectedNodes] = useState<NodeType[]>([]);
   const [selectBoxSize, setSelectBoxSize] = useState<Point[] | null>(null);
   const [drawing, setDrawing] = useState(false);
@@ -72,9 +61,9 @@ const App = () => {
     if (selected.length === 1) {
       const node = nodes.find((node) => node.nodeProps.id === selected[0]);
 
-      node && handleNodeChange({ ...node, style: styleMenu.style });
+      node && handleNodeChange({ ...node, style: styleMenu });
     }
-  }, [styleMenu.style]);
+  }, [styleMenu]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -271,7 +260,7 @@ const App = () => {
         break;
       default:
         if (selected.length) break;
-        setDraftNode({ ...new Node(toolType, position.x, position.y) });
+        setDraftNode(createNode(toolType, [position.x, position.y]));
     }
 
     setSelected([]);
@@ -377,21 +366,22 @@ const App = () => {
 
   const handleNodeChange = (node: NodeType) => {
     if (draftNode?.nodeProps.id === node.nodeProps.id) {
-      setDraftNode(null);
       setToolType('select');
 
       if (!node.text) {
+        setDraftNode(null);
         return;
       }
 
       dispatch(nodesActions.add([node]));
+      setDraftNode(null);
       return;
     }
 
     dispatch(nodesActions.update([node]));
   };
 
-  const onNodeTypeChange = (type: ToolType) => {
+  const onNodeTypeChange = (type: Tool['value']) => {
     setToolType(type);
     setDraftNode(null);
     setSelected([]);
@@ -399,25 +389,7 @@ const App = () => {
 
   const onNodeSelect = (node: NodeType) => {
     setSelected([node.nodeProps.id]);
-
-    setStyleMenu({
-      open: styleMenu.open,
-      style: node?.style,
-    });
-  };
-
-  const onStyleMenuToggle = () => {
-    if (selected) {
-      const node = nodes.find((node) => node.nodeProps.id === selected[0]);
-
-      node &&
-        setStyleMenu({
-          open: !styleMenu.open,
-          style: node?.style,
-        });
-    } else {
-      setStyleMenu({ ...styleMenu, open: !styleMenu.open });
-    }
+    setStyleMenu(node.style);
   };
 
   const onGroupDragStart = (event: KonvaEventObject<DragEvent>) => {
@@ -484,124 +456,91 @@ const App = () => {
   };
 
   return (
-    <NextUIProvider>
-      <>
-        <button onClick={() => onNodeTypeChange('hand')}>
-          <span>Panning Tool</span>
-          <IoHandRightOutline />
-        </button>
-        <button onClick={() => onNodeTypeChange('select')}>
-          <span>Select</span>
-          <IoAddOutline />
-        </button>
-        {Object.values(SHAPES).map((shape, i) => {
-          return (
-            <button key={i} onClick={() => onNodeTypeChange(shape.value)}>
-              <span>{shape.value}</span>
-              {createElement(shape.icon)}
-            </button>
-          );
-        })}
-        {styleMenu.open && (
-          <StyleMenu
-            style={styleMenu.style}
-            onStyleChange={(updatedStyle) =>
-              setStyleMenu({ ...styleMenu, style: updatedStyle })
-            }
-          />
-        )}
-        <button onClick={() => dispatch(nodesActions.deleteAll())}>
-          Clear All
-        </button>
-        <button onClick={onStyleMenuToggle}>Styles</button>
-        <div>
-          <button
-            disabled={!past.length}
-            onClick={() => dispatch({ type: ACTION_TYPES.UNDO })}
-          >
-            Undo
-          </button>
-          <button
-            disabled={!future.length}
-            onClick={() => dispatch({ type: ACTION_TYPES.REDO })}
-          >
-            Redo
-          </button>
-        </div>
-        <div>
-          <span>Zoom: {stageScale}%</span>
-        </div>
-        <Stage
-          ref={stageRef}
-          width={window.innerWidth}
-          height={window.innerHeight}
-          onMouseDown={onMoveStart}
-          onMouseMove={onMove}
-          onMouseUp={onMoveEnd}
-          onWheel={onWheel}
-          style={{ backgroundColor: '#fafafa' }}
-          draggable={toolType === 'hand'}
-        >
-          <Layer>
-            {[...nodes, draftNode].map((node) => {
-              if (!node) return null;
+    <>
+      <ToolsDock onToolSelect={onNodeTypeChange} />
+      <StylesDock
+        style={styleMenu}
+        onStyleChange={(updatedStyle) => setStyleMenu(updatedStyle)}
+      />
+      <ControlDock
+        onHistoryControl={(type) => dispatch({ type })}
+        onNodesControl={dispatch}
+        undoDisabled={!past.length}
+        redoDisabled={!future.length}
+      />
+      <div>
+        <span>Zoom: {stageScale}%</span>
+      </div>
+      <Stage
+        ref={stageRef}
+        width={window.innerWidth}
+        height={window.innerHeight}
+        onMouseDown={onMoveStart}
+        onMouseMove={onMove}
+        onMouseUp={onMoveEnd}
+        onWheel={onWheel}
+        style={{ backgroundColor: '#fafafa' }}
+        draggable={toolType === 'hand'}
+      >
+        <Layer>
+          {[...nodes, draftNode].map((node) => {
+            if (!node) return null;
 
-              return createElement(getElement(node), {
-                key: node.nodeProps.id,
-                nodeProps: node.nodeProps,
-                type: node.type,
-                text: node.text,
-                style: node.style,
-                selected: selected.includes(node.nodeProps.id),
-                draggable: toolType !== 'hand',
-                opacity: !selectedNodes.some(
-                  (n) => n.nodeProps.id === node.nodeProps.id,
-                )
-                  ? 1
-                  : 0,
-                onContextMenu: handleOnContextMenu,
-                onSelect: () => onNodeSelect(node),
-                onNodeChange: handleNodeChange,
-              } as NodeComponentProps);
-            })}
-            {selectBoxSize ? <SelectTool points={selectBoxSize} /> : null}
-            {selectedNodes.length ? (
-              <Group
-                ref={nodeRef}
-                onDragEnd={onGroupDragEnd}
-                onDragStart={onGroupDragStart}
-              >
-                {selectedNodes.map((node) => {
-                  return createElement(getElement(node), {
-                    key: `group-${node.nodeProps.id}`,
-                    ...node,
-                    selected: false,
-                    draggable: false,
-                    onContextMenu: () => null,
-                    onSelect: () => null,
-                    onNodeChange: () => null,
-                  } as NodeComponentProps);
-                })}
-              </Group>
-            ) : null}
-            {selectedNodes.length ? (
-              <NodeTransformer
-                ref={transformerRef}
-                transformerConfig={{ enabledAnchors: [] }}
-              />
-            ) : null}
-          </Layer>
-        </Stage>
-        <NodeMenu
-          isOpen={Boolean(contextMenu)}
-          x={menuPosition.x}
-          y={menuPosition.y}
-          menuItems={contextMenu || []}
-          onClose={() => setContextMenu(null)}
-          onAction={(key) => onNodeMenuAction()}
-        />
-      </>
-    </NextUIProvider>
+            return createElement(getElement(node), {
+              key: node.nodeProps.id,
+              nodeProps: node.nodeProps,
+              type: node.type,
+              text: node.text,
+              style: node.style,
+              selected: selected.includes(node.nodeProps.id),
+              draggable: toolType !== 'hand',
+              opacity: !selectedNodes.some(
+                (n) => n.nodeProps.id === node.nodeProps.id,
+              )
+                ? 1
+                : 0,
+              onContextMenu: handleOnContextMenu,
+              onSelect: () => onNodeSelect(node),
+              onNodeChange: handleNodeChange,
+            } as NodeComponentProps);
+          })}
+          {selectBoxSize ? <SelectTool points={selectBoxSize} /> : null}
+          {selectedNodes.length ? (
+            <Group
+              ref={nodeRef}
+              onDragEnd={onGroupDragEnd}
+              onDragStart={onGroupDragStart}
+            >
+              {selectedNodes.map((node) => {
+                return createElement(getElement(node), {
+                  key: `group-${node.nodeProps.id}`,
+                  ...node,
+                  selected: false,
+                  draggable: false,
+                  onContextMenu: () => null,
+                  onSelect: () => null,
+                  onNodeChange: () => null,
+                } as NodeComponentProps);
+              })}
+            </Group>
+          ) : null}
+          {selectedNodes.length ? (
+            <NodeTransformer
+              ref={transformerRef}
+              transformerConfig={{ enabledAnchors: [] }}
+            />
+          ) : null}
+        </Layer>
+      </Stage>
+      <NodeMenu
+        isOpen={Boolean(contextMenu)}
+        x={menuPosition.x}
+        y={menuPosition.y}
+        menuItems={contextMenu || []}
+        onClose={() => setContextMenu(null)}
+        onAction={(key) => onNodeMenuAction()}
+      />
+    </>
   );
 };
 

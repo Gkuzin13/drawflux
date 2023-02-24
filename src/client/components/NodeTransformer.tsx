@@ -1,4 +1,4 @@
-import { CURSOR } from '@/client/shared/constants';
+import { CURSOR } from '@/client/shared/cursor';
 import Konva from 'konva';
 import { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import { ForwardedRef, forwardRef } from 'react';

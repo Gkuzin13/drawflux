@@ -5,10 +5,19 @@ import {
   IoReturnUpForwardOutline,
   IoPencilOutline,
   IoTextOutline,
-  IoAddOutline,
+  IoHandRightOutline,
 } from 'react-icons/io5';
+import { RxCursorArrow } from 'react-icons/rx';
+import { IconType } from 'react-icons';
+import { ELEMENTS } from './element';
 
-export const SHAPES = [
+export type Tool = {
+  icon: IconType;
+  value: (typeof ELEMENTS)[keyof typeof ELEMENTS] | 'hand' | 'select';
+  key: (typeof KEYS)[keyof typeof KEYS];
+};
+
+export const TOOLS: Tool[] = [
   {
     icon: IoEllipseOutline,
     value: 'ellipse',
@@ -34,4 +43,14 @@ export const SHAPES = [
     value: 'text',
     key: KEYS.T,
   },
-] as const;
+  {
+    icon: IoHandRightOutline,
+    value: 'hand',
+    key: KEYS.H,
+  },
+  {
+    icon: RxCursorArrow,
+    value: 'select',
+    key: KEYS.V,
+  },
+];

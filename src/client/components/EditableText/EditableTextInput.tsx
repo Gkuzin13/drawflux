@@ -62,9 +62,10 @@ const EditableTextInput = ({
   }, [ref.current]);
 
   function onFocus(element: HTMLTextAreaElement) {
-    const end = element.value.length;
-
-    element.setSelectionRange(end, end);
+    if (value) {
+      const end = element.value.length;
+      element.setSelectionRange(end, end);
+    }
     element.focus();
   }
 

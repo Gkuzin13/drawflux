@@ -1,4 +1,4 @@
-import { CURSOR } from '@/client/shared/constants';
+import { CURSOR } from '@/client/shared/cursor';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Vector2d } from 'konva/lib/types';
 import { useState } from 'react';
