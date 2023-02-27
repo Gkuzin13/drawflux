@@ -11,9 +11,7 @@ import Konva from 'konva';
 import { NodeComponentProps } from './types';
 import { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import NodeTransformer from './NodeTransformer';
-import { CURSOR } from '@/client/shared/constants';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { DragEndEvent } from '@react-types/shared';
 import { getStyleValues } from '../shared/element';
 import useAnimatedLine from '../shared/hooks/useAnimatedLine';
 
@@ -33,7 +31,6 @@ const NodeContainer = ({
   draggable,
   onNodeChange,
   onSelect,
-  onContextMenu,
   transformerConfig,
   transformerEvents,
   children,
@@ -75,7 +72,7 @@ const NodeContainer = ({
         perfectDrawEnabled: false,
         fillEnabled: type === 'text',
         onDragStart: onSelect,
-        onDragEnd: (event: KonvaEventObject<DragEndEvent>) => {
+        onDragEnd: (event: KonvaEventObject<DragEvent>) => {
           onNodeChange({
             type,
             text,

@@ -1,7 +1,7 @@
 import { useState, createElement, useEffect, useRef } from 'react';
 import { Stage, Layer, Group } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
-import NodeMenu from './components/NodeMenu';
+import ContextMenu from './components/ContextMenu/ContextMenu';
 import { createNode } from './shared/utils/createNode';
 import { selectNodes, nodesActions } from './stores/nodesSlice';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
@@ -11,7 +11,7 @@ import { CURSOR } from './shared/cursor';
 import { getElement, NodeStyle, Point } from './shared/element';
 import Konva from 'konva';
 import StylesDock from './components/StylesDock/StylesDock';
-import type { MenuItem, NodeType } from './shared/element';
+import type { NodeType } from './shared/element';
 import SelectTool from './components/SelectTool';
 import { normalizePoints } from './shared/utils/draw';
 import NodeTransformer from './components/NodeTransformer';
@@ -24,6 +24,13 @@ import { drawArrow } from './components/ArrowDrawable/helpers/drawArrow';
 import { drawRect } from './components/RectDrawable/helpers/drawRect';
 import { drawEllipse } from './components/EllipseDrawable/helpers/drawEllipse';
 import { drawFreePath } from './components/FreePathDrawable/helpers/drawFreePath';
+import {
+  DEFAULT_MENU,
+  DEFAULT_NODE_MENU,
+  MenuItem,
+  MENU_ACTIONS,
+} from './shared/menu';
+import { Html } from 'react-konva-utils';
 
 const defaultStyle: NodeStyle = {
   line: 'solid',
@@ -36,7 +43,7 @@ const App = () => {
   const [draftNode, setDraftNode] = useState<NodeType | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [contextMenu, setContextMenu] = useState<MenuItem[] | null>(null);
-  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+  const [menuPosition, setMenuPosition] = useState<Point>([0, 0]);
   const [stageScale, setStageScale] = useState(100);
   const [styleMenu, setStyleMenu] = useState<NodeStyle>(defaultStyle);
   const [selectedNodes, setSelectedNodes] = useState<NodeType[]>([]);
@@ -56,11 +63,11 @@ const App = () => {
   const nodeRef = useRef(null);
 
   useEffect(() => {
-    if (selectBoxSize && transformerRef.current && nodeRef.current) {
+    if (selectedNodes && transformerRef.current && nodeRef.current) {
       transformerRef.current.nodes([nodeRef.current]);
       transformerRef.current.getLayer()?.batchDraw();
     }
-  }, [selectBoxSize]);
+  }, [selectedNodes]);
 
   useEffect(() => {
     if (selected.length === 1) {
@@ -91,27 +98,56 @@ const App = () => {
     };
   }, [selected]);
 
-  const onNodeMenuAction = () => {
-    // dispatch({ type, payload: { id: node.nodeProps?.id } });
+  const onNodeMenuAction = (key: MenuItem['key']) => {
+    switch (key) {
+      case MENU_ACTIONS.DELETE_NODE:
+        dispatch(nodesActions.delete(selected));
+        break;
+      case MENU_ACTIONS.SELECT_ALL:
+        setSelectedNodes(nodes);
+        break;
+    }
 
     setSelected([]);
+    setContextMenu(null);
   };
 
-  const handleOnContextMenu = (
-    e: KonvaEventObject<PointerEvent>,
-    id: string,
-  ) => {
+  const handleOnContextMenu = (e: KonvaEventObject<PointerEvent>) => {
     e.evt.preventDefault();
 
-    const position = e.target.getPosition();
+    const stage = e.target.getStage();
 
-    setMenuPosition({ x: position?.x || 0, y: position?.y || 0 });
+    const position = stage && stage.getRelativePointerPosition();
 
-    const selectedNode = nodes.find((node) => node.nodeProps.id === id);
+    if (!position) return;
 
-    if (selectedNode) {
-      setSelected([id]);
+    setMenuPosition([position.x, position.y]);
+
+    const clickedOnEmpty = e.target === e.target.getStage();
+
+    if (clickedOnEmpty) {
+      setContextMenu(DEFAULT_MENU);
+      return;
     }
+
+    let id = null;
+
+    if (e.target.parent?.nodeType === 'Group') {
+      const group = e.target.parent;
+
+      const node = nodes.find((node) => node.nodeProps.id === group.attrs.id);
+
+      if (node) {
+        id = node.nodeProps.id;
+      }
+    } else {
+      id = e.target.attrs.id;
+    }
+
+    if (!id) return;
+
+    setSelected([id]);
+    setContextMenu(DEFAULT_NODE_MENU);
   };
 
   const setCursorStyle = (
@@ -199,9 +235,18 @@ const App = () => {
   };
 
   const onMoveStart = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    const mouseEvent = e.evt as MouseEvent;
+
+    if (mouseEvent.button !== 0) return;
+
     const stage = e.target.getStage();
 
     const clickedOnEmpty = e.target === stage;
+
+    if (clickedOnEmpty && contextMenu) {
+      setContextMenu(null);
+      return;
+    }
 
     if (!clickedOnEmpty) {
       return;
@@ -229,6 +274,7 @@ const App = () => {
 
     setSelected([]);
     setSelectedNodes([]);
+    setContextMenu(null);
   };
 
   const onMove = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
@@ -240,9 +286,9 @@ const App = () => {
       case 'hand':
         break;
       case 'select':
-        const stage = stageRef.current;
-
-        stage && setIntersectingNodes(stage);
+        if (stageRef.current) {
+          setIntersectingNodes(stageRef.current);
+        }
 
         setSelectBoxSize((prevSize) => {
           if (!prevSize) return prevSize;
@@ -259,9 +305,8 @@ const App = () => {
         }
 
         setDraftNode((prevNode) => {
-          return prevNode
-            ? drawNodeByType(prevNode, [position.x, position.y])
-            : prevNode;
+          if (!prevNode) return prevNode;
+          return drawNodeByType(prevNode, [position.x, position.y]);
         });
 
         setDrawing(true);
@@ -282,10 +327,12 @@ const App = () => {
           setDraftNode(null);
           break;
         }
-        dispatch(nodesActions.add([draftNode!]));
-        setDraftNode(null);
-        setDrawing(false);
-        setToolType('select');
+        if (draftNode) {
+          dispatch(nodesActions.add([draftNode]));
+          setDraftNode(null);
+          setDrawing(false);
+          setToolType('select');
+        }
       }
     }
   };
@@ -447,6 +494,7 @@ const App = () => {
         onMouseDown={onMoveStart}
         onMouseMove={onMove}
         onMouseUp={onMoveEnd}
+        onContextMenu={handleOnContextMenu}
         onWheel={onWheel}
         style={{ backgroundColor: '#fafafa' }}
         draggable={toolType === 'hand'}
@@ -466,7 +514,6 @@ const App = () => {
               key: node.nodeProps.id,
               selected: selected.includes(node.nodeProps.id),
               draggable: toolType !== 'hand',
-              onContextMenu: handleOnContextMenu,
               onSelect: () => onNodeSelect(node),
               onNodeChange: handleNodeChange,
             } as NodeComponentProps);
@@ -479,12 +526,12 @@ const App = () => {
               onDragStart={onGroupDragStart}
             >
               {selectedNodes.map((node) => {
+                console.log(node);
                 return createElement(getElement(node), {
                   key: `group-${node.nodeProps.id}`,
                   ...node,
                   selected: false,
                   draggable: false,
-                  onContextMenu: () => null,
                   onSelect: () => null,
                   onNodeChange: () => null,
                 } as NodeComponentProps);
@@ -497,16 +544,21 @@ const App = () => {
               transformerConfig={{ enabledAnchors: [] }}
             />
           ) : null}
+          <Html
+            groupProps={{
+              x: menuPosition[0],
+              y: menuPosition[1],
+            }}
+          >
+            {contextMenu && (
+              <ContextMenu
+                menuItems={contextMenu}
+                onAction={onNodeMenuAction}
+              />
+            )}
+          </Html>
         </Layer>
       </Stage>
-      <NodeMenu
-        isOpen={Boolean(contextMenu)}
-        x={menuPosition.x}
-        y={menuPosition.y}
-        menuItems={contextMenu || []}
-        onClose={() => setContextMenu(null)}
-        onAction={(key) => onNodeMenuAction()}
-      />
     </>
   );
 };

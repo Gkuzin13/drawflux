@@ -15,7 +15,6 @@ const ArrowDrawable = ({
   style,
   selected,
   draggable,
-  onContextMenu,
   onSelect,
   onNodeChange,
 }: NodeComponentProps) => {

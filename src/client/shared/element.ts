@@ -90,13 +90,7 @@ export type NodeStyle = {
 };
 
 export type NodeLIne = (typeof LINE)[keyof typeof LINE]['value'];
-export type NodeColor = (typeof COLOR)[keyof typeof COLOR];
+export type NodeColor = (typeof COLOR)[number];
 export type NodeSize = (typeof SIZE)[keyof typeof SIZE];
 
 export type Point = [number, number];
-
-export type MenuItem = {
-  key: string;
-  name: string;
-  color: string;
-};
