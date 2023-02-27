@@ -10,7 +10,7 @@ const useAnimatedLine = (
   maxOffset: number,
   animated: NodeStyle['animated'],
   lineStyle: NodeStyle['line'],
-  speed = 1,
+  speed = 1.25,
 ) => {
   const [animating, setAnimating] = useState(false);
 

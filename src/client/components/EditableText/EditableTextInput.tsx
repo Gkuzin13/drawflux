@@ -1,5 +1,4 @@
 import { NodeProps } from '@/client/shared/element';
-import { useClickAway } from '@/client/shared/hooks/useClickAway';
 import { ChangeEvent, useEffect, useRef } from 'react';
 import { Html } from 'react-konva-utils';
 
@@ -49,25 +48,16 @@ const EditableTextInput = ({
   onKeyDown,
   onClickAway,
 }: Props) => {
-  const style = getStyle(nodeProps.width!, nodeProps.height!, 16);
-
   const ref = useRef<HTMLTextAreaElement>(null);
 
-  useClickAway(ref, onClickAway);
-
   useEffect(() => {
-    if (ref.current) {
-      onFocus(ref.current);
+    if (value && ref.current) {
+      const end = ref.current.value.length;
+      ref.current.setSelectionRange(end, end);
     }
   }, [ref.current]);
 
-  function onFocus(element: HTMLTextAreaElement) {
-    if (value) {
-      const end = element.value.length;
-      element.setSelectionRange(end, end);
-    }
-    element.focus();
-  }
+  const style = getStyle(nodeProps.width!, nodeProps.height!, 16);
 
   return (
     <Html
@@ -82,8 +72,9 @@ const EditableTextInput = ({
         value={value}
         onChange={onTextChange}
         onKeyDown={onKeyDown}
-        onFocus={({ target }) => onFocus(target)}
         style={style}
+        autoFocus={true}
+        onBlur={onClickAway}
       />
     </Html>
   );

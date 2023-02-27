@@ -22,19 +22,27 @@ const EditableText = ({
     if (!text) {
       setEditing(true);
     }
-  }, []);
+
+    return () => {
+      setEditing(false);
+    };
+  }, [text]);
 
   const onDoubleClick = () => {
     setEditing(true);
   };
 
   const handleTextSave = () => {
-    onNodeChange({
-      nodeProps,
-      style,
-      text: value,
-      type,
-    });
+    if (!value) {
+      onNodeChange(null);
+    } else {
+      onNodeChange({
+        nodeProps,
+        style,
+        text: value,
+        type,
+      });
+    }
 
     setEditing(false);
   };

@@ -5,5 +5,5 @@ export type NodeComponentProps = {
   draggable: boolean;
   onSelect: () => void;
   onContextMenu: (e: KonvaEventObject<PointerEvent>, id: string) => void;
-  onNodeChange: (node: NodeType) => void;
+  onNodeChange: (node: NodeType | null) => void;
 } & NodeType;

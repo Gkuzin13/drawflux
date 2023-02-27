@@ -21,7 +21,7 @@ const RectDrawable = ({
         y={nodeProps.point[1]}
         width={nodeProps.width}
         height={nodeProps.height}
-        cornerRadius={1}
+        cornerRadius={4}
         onTransformEnd={(event) => {
           if (!event.target) return;
 

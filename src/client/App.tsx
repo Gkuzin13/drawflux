@@ -27,7 +27,7 @@ const defaultStyle: NodeStyle = {
 };
 
 const App = () => {
-  const [toolType, setToolType] = useState<Tool['value']>('rectangle');
+  const [toolType, setToolType] = useState<Tool['value']>('text');
   const [draftNode, setDraftNode] = useState<NodeType | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [contextMenu, setContextMenu] = useState<MenuItem[] | null>(null);
@@ -259,8 +259,11 @@ const App = () => {
         setSelectBoxSize([posStart.current, [position.x, position.y]]);
         break;
       default:
-        if (selected.length) break;
-        setDraftNode(createNode(toolType, [position.x, position.y]));
+        if (!draftNode) {
+          setDraftNode(createNode(toolType, [position.x, position.y]));
+          break;
+        }
+        setToolType('select');
     }
 
     setSelected([]);
@@ -364,10 +367,14 @@ const App = () => {
     }
   };
 
-  const handleNodeChange = (node: NodeType) => {
-    if (draftNode?.nodeProps.id === node.nodeProps.id) {
+  const handleNodeChange = (node: NodeType | null) => {
+    if (!node) {
+      setDraftNode(null);
       setToolType('select');
+      return;
+    }
 
+    if (draftNode?.nodeProps.id === node.nodeProps.id) {
       if (!node.text) {
         setDraftNode(null);
         return;
@@ -375,6 +382,7 @@ const App = () => {
 
       dispatch(nodesActions.add([node]));
       setDraftNode(null);
+      setToolType('select');
       return;
     }
 
