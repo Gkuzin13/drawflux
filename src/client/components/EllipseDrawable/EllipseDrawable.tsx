@@ -1,7 +1,7 @@
 import Konva from 'konva';
 import { Ellipse } from 'react-konva';
-import NodeContainer from './NodeContainer';
-import type { NodeComponentProps } from './types';
+import NodeContainer from '../NodeContainer';
+import type { NodeComponentProps } from '../types';
 
 const CircleDrawable = ({
   nodeProps,

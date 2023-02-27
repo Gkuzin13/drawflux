@@ -6,8 +6,8 @@ import { getLineValue, getSizeValue, Point } from '../../shared/element';
 import type { NodeComponentProps } from '../types';
 import ArrowHead from './ArrowHead';
 import ArrowLine from './ArrowLine';
-import { Group, Line } from 'react-konva';
-import { IRect } from 'konva/lib/types';
+import { Group } from 'react-konva';
+import { getAnchorsPosition } from './helpers/getAnchorsPosition';
 
 const ArrowDrawable = ({
   nodeProps,
@@ -65,13 +65,9 @@ const ArrowDrawable = ({
 
         if (!group.hasChildren()) return;
 
-        const anchors = group.getChildren(
-          (child) => child.className === 'Circle',
-        );
+        const updatedPoints = getAnchorsPosition(group);
 
-        const updatedPoints: Point[] = anchors.map((anchor) => {
-          return [anchor.x(), anchor.y()];
-        });
+        setPoints(updatedPoints);
 
         onNodeChange({
           type,
@@ -83,6 +79,9 @@ const ArrowDrawable = ({
             points: [updatedPoints[1], updatedPoints[2]],
           },
         });
+
+        group.x(0);
+        group.y(0);
 
         setDragging(false);
       }}
@@ -100,26 +99,24 @@ const ArrowDrawable = ({
         dash={dash}
         strokeWidth={strokeWidth}
       />
-      {selected && (
-        <ArrowTransformer
-          points={[start, control, end]}
-          draggable
-          visible={!dragging}
-          onTransform={(points) => setPoints(points)}
-          onTransformEnd={(points) => {
-            onNodeChange({
-              type,
-              style,
-              text: null,
-              nodeProps: {
-                ...nodeProps,
-                point: points[0],
-                points: [points[1], points[2]],
-              },
-            });
-          }}
-        />
-      )}
+      <ArrowTransformer
+        points={[start, control, end]}
+        draggable
+        visible={selected && !dragging}
+        onTransform={(points) => setPoints(points)}
+        onTransformEnd={(points) => {
+          onNodeChange({
+            type,
+            style,
+            text: null,
+            nodeProps: {
+              ...nodeProps,
+              point: points[0],
+              points: [points[1], points[2]],
+            },
+          });
+        }}
+      />
     </Group>
   );
 };

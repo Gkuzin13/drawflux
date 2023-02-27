@@ -1,7 +1,7 @@
 import Konva from 'konva';
 import { Rect } from 'react-konva';
-import NodeContainer from './NodeContainer';
-import type { NodeComponentProps } from './types';
+import NodeContainer from '../NodeContainer';
+import type { NodeComponentProps } from '../types';
 
 const RectDrawable = ({
   nodeProps,

@@ -19,6 +19,11 @@ import { IRect } from 'konva/lib/types';
 import ToolsDock from './components/ToolsDock';
 import { Tool } from './shared/tool';
 import ControlDock from './components/ControlDock';
+import { getAnchorsPosition } from './components/ArrowDrawable/helpers/getAnchorsPosition';
+import { drawArrow } from './components/ArrowDrawable/helpers/drawArrow';
+import { drawRect } from './components/RectDrawable/helpers/drawRect';
+import { drawEllipse } from './components/EllipseDrawable/helpers/drawEllipse';
+import { drawFreePath } from './components/FreePathDrawable/helpers/drawFreePath';
 
 const defaultStyle: NodeStyle = {
   line: 'solid',
@@ -27,7 +32,7 @@ const defaultStyle: NodeStyle = {
 };
 
 const App = () => {
-  const [toolType, setToolType] = useState<Tool['value']>('text');
+  const [toolType, setToolType] = useState<Tool['value']>('arrow');
   const [draftNode, setDraftNode] = useState<NodeType | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [contextMenu, setContextMenu] = useState<MenuItem[] | null>(null);
@@ -173,63 +178,19 @@ const App = () => {
     );
   };
 
-  function getDefaultControlPoint(start: Point, end: Point): Point {
-    return [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
-  }
-
   const drawNodeByType = (node: NodeType, position: Point): NodeType => {
     switch (node.type) {
       case 'draw': {
-        const points = node.nodeProps?.points || [];
-
-        return {
-          ...node,
-          nodeProps: { ...node.nodeProps, points: [...points, position] },
-        };
+        return drawFreePath(node, position);
       }
       case 'arrow': {
-        const defaultControlPoint = getDefaultControlPoint(
-          node.nodeProps.point,
-          position,
-        );
-        return {
-          ...node,
-          nodeProps: {
-            ...node.nodeProps,
-            points: [defaultControlPoint, position],
-          },
-        };
+        return drawArrow(node, position);
       }
       case 'rectangle': {
-        const [p1, p2] = normalizePoints(posStart.current, [
-          position[0],
-          position[1],
-        ]);
-
-        return {
-          ...node,
-          nodeProps: {
-            ...node.nodeProps,
-            point: p1,
-            width: p2[0] - p1[0],
-            height: p2[1] - p1[1],
-          },
-        };
+        return drawRect(node, posStart.current, position);
       }
       case 'ellipse': {
-        const [p1, p2] = normalizePoints(node.nodeProps.point, [
-          position[0],
-          position[1],
-        ]);
-
-        return {
-          ...node,
-          nodeProps: {
-            ...node.nodeProps,
-            width: p2[0] - p1[0],
-            height: p2[1] - p1[1],
-          },
-        };
+        return drawEllipse(node, position);
       }
       default: {
         return node;
@@ -435,17 +396,17 @@ const App = () => {
 
         if (!node) return null;
 
-        if (node.type === 'arrow') {
-          const { x, y, width, height } = child.getClientRect();
+        if (node.type === 'arrow' && child.hasChildren()) {
+          const updatedPoints = getAnchorsPosition(
+            child as Konva.Group & Konva.Shape,
+          );
+
           return {
             ...node,
             nodeProps: {
               ...node.nodeProps,
-              point: [x, y],
-              points: [
-                [x + width / 2, y + height],
-                [x + width, y + height],
-              ],
+              point: updatedPoints[0],
+              points: [updatedPoints[1], updatedPoints[2]],
               visible: true,
             },
           };
@@ -458,7 +419,7 @@ const App = () => {
           nodeProps: { ...node.nodeProps, point: [x, y], visible: true },
         };
       })
-      .filter((node) => node) as NodeType[];
+      .filter(Boolean) as NodeType[];
 
     dispatch(nodesActions.update(updatedNodes));
   };
@@ -495,18 +456,16 @@ const App = () => {
             if (!node) return null;
 
             return createElement(getElement(node), {
+              ...node,
+              nodeProps: {
+                ...node.nodeProps,
+                visible: !selectedNodes.some(
+                  (n) => n.nodeProps.id === node.nodeProps.id,
+                ),
+              },
               key: node.nodeProps.id,
-              nodeProps: node.nodeProps,
-              type: node.type,
-              text: node.text,
-              style: node.style,
               selected: selected.includes(node.nodeProps.id),
               draggable: toolType !== 'hand',
-              opacity: !selectedNodes.some(
-                (n) => n.nodeProps.id === node.nodeProps.id,
-              )
-                ? 1
-                : 0,
               onContextMenu: handleOnContextMenu,
               onSelect: () => onNodeSelect(node),
               onNodeChange: handleNodeChange,

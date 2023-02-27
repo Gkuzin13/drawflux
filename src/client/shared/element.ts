@@ -1,7 +1,7 @@
 import ArrowDrawable from '@/client/components/ArrowDrawable/ArrowDrawable';
-import EllipseDrawable from '@/client/components/EllipseDrawable';
-import RectDrawable from '@/client/components/RectDrawable';
-import FreePathDrawable from '@/client/components/FreePathDrawable';
+import EllipseDrawable from '@/client/components/EllipseDrawable/EllipseDrawable';
+import RectDrawable from '@/client/components/RectDrawable/RectDrawable';
+import FreePathDrawable from '@/client/components/FreePathDrawable/FreePathDrawable';
 import EditableText from '@/client/components/EditableText/EditableText';
 import { COLOR, LINE, SIZE } from './style';
 

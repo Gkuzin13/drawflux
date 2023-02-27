@@ -1,7 +1,7 @@
 import Konva from 'konva';
 import { Line } from 'react-konva';
-import NodeContainer from './NodeContainer';
-import type { NodeComponentProps } from './types';
+import NodeContainer from '../NodeContainer';
+import type { NodeComponentProps } from '../types';
 
 const FreePathDrawable = ({
   nodeProps,
