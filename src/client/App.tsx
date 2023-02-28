@@ -1,5 +1,5 @@
 import { useState, createElement, useEffect, useRef } from 'react';
-import { Stage, Layer, Group } from 'react-konva';
+import { Stage, Layer } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import ContextMenu from './components/ContextMenu/ContextMenu';
 import { createNode } from './shared/utils/createNode';
@@ -14,12 +14,10 @@ import StylesDock from './components/StylesDock/StylesDock';
 import type { NodeType } from './shared/element';
 import SelectTool from './components/SelectTool';
 import { normalizePoints } from './shared/utils/draw';
-import NodeTransformer from './components/NodeTransformer';
 import { IRect } from 'konva/lib/types';
 import ToolsDock from './components/ToolsDock';
 import { Tool } from './shared/tool';
 import ControlDock from './components/ControlDock';
-import { getAnchorsPosition } from './components/ArrowDrawable/helpers/getAnchorsPosition';
 import { drawArrow } from './components/ArrowDrawable/helpers/drawArrow';
 import { drawRect } from './components/RectDrawable/helpers/drawRect';
 import { drawEllipse } from './components/EllipseDrawable/helpers/drawEllipse';
@@ -31,6 +29,7 @@ import {
   MENU_ACTIONS,
 } from './shared/menu';
 import { Html } from 'react-konva-utils';
+import NodeGroupTransformer from './components/NodeGroupTransformer/NodeGroupTransformer';
 
 const defaultStyle: NodeStyle = {
   line: 'solid',
@@ -59,15 +58,6 @@ const App = () => {
   const dispatch = useAppDispatch();
 
   const stageRef = useRef<Konva.Stage>(null);
-  const transformerRef = useRef<Konva.Transformer>(null);
-  const nodeRef = useRef(null);
-
-  useEffect(() => {
-    if (selectedNodes && transformerRef.current && nodeRef.current) {
-      transformerRef.current.nodes([nodeRef.current]);
-      transformerRef.current.getLayer()?.batchDraw();
-    }
-  }, [selectedNodes]);
 
   useEffect(() => {
     if (selected.length === 1) {
@@ -75,7 +65,7 @@ const App = () => {
 
       node && handleNodeChange({ ...node, style: styleMenu });
     }
-  }, [styleMenu]);
+  }, [styleMenu, selected]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -130,24 +120,25 @@ const App = () => {
       return;
     }
 
-    let id = null;
-
-    if (e.target.parent?.nodeType === 'Group') {
+    function getNodeId(
+      target: KonvaEventObject<PointerEvent>['target'],
+      currentNodes: NodeType[],
+    ) {
       const group = e.target.parent;
 
-      const node = nodes.find((node) => node.nodeProps.id === group.attrs.id);
+      const node = currentNodes.find(
+        (node) => node.nodeProps.id === group?.attrs.id,
+      );
 
-      if (node) {
-        id = node.nodeProps.id;
-      }
-    } else {
-      id = e.target.attrs.id;
+      return node?.nodeProps.id || (target.attrs?.id as string) || null;
     }
 
-    if (!id) return;
+    const id = getNodeId(e.target, nodes);
 
-    setSelected([id]);
-    setContextMenu(DEFAULT_NODE_MENU);
+    if (id) {
+      setSelected([id]);
+      setContextMenu(DEFAULT_NODE_MENU);
+    }
   };
 
   const setCursorStyle = (
@@ -342,7 +333,7 @@ const App = () => {
     event: WheelEvent,
   ) => {
     const oldScale = stage.scaleX();
-    const pointer = stage.getRelativePointerPosition() || { x: 0, y: 0 };
+    const pointer = stage.getRelativePointerPosition();
     const scaleBy = 1.1;
 
     const mousePointTo = {
@@ -383,13 +374,13 @@ const App = () => {
     }
 
     if (draftNode?.nodeProps.id === node.nodeProps.id) {
+      setDraftNode(null);
+
       if (!node.text) {
-        setDraftNode(null);
         return;
       }
 
       dispatch(nodesActions.add([node]));
-      setDraftNode(null);
       setToolType('select');
       return;
     }
@@ -406,69 +397,6 @@ const App = () => {
   const onNodeSelect = (node: NodeType) => {
     setSelected([node.nodeProps.id]);
     setStyleMenu(node.style);
-  };
-
-  const onGroupDragStart = (event: KonvaEventObject<DragEvent>) => {
-    const group = event.target as Konva.Group & Konva.Shape;
-
-    const nodeMap = new Map<string, NodeType>();
-
-    selectedNodes.forEach((node) => nodeMap.set(node.nodeProps.id, node));
-
-    const hiddenNodes = group
-      .getChildren()
-      .map((child) => {
-        const node = nodeMap.get(child.attrs.id);
-
-        if (!node) return null;
-
-        return { ...node, nodeProps: { ...node.nodeProps, visible: false } };
-      })
-      .filter((node) => node) as NodeType[];
-
-    dispatch(nodesActions.update(hiddenNodes));
-  };
-
-  const onGroupDragEnd = (event: KonvaEventObject<DragEvent>) => {
-    const group = event.target as Konva.Group & Konva.Shape;
-
-    const nodeMap = new Map<string, NodeType>();
-
-    selectedNodes.forEach((node) => nodeMap.set(node.nodeProps.id, node));
-
-    const updatedNodes = group
-      .getChildren()
-      .map((child) => {
-        const node = nodeMap.get(child.attrs.id);
-
-        if (!node) return null;
-
-        if (node.type === 'arrow' && child.hasChildren()) {
-          const updatedPoints = getAnchorsPosition(
-            child as Konva.Group & Konva.Shape,
-          );
-
-          return {
-            ...node,
-            nodeProps: {
-              ...node.nodeProps,
-              point: updatedPoints[0],
-              points: [updatedPoints[1], updatedPoints[2]],
-              visible: true,
-            },
-          };
-        }
-
-        const { x, y } = child.getAbsolutePosition();
-
-        return {
-          ...node,
-          nodeProps: { ...node.nodeProps, point: [x, y], visible: true },
-        };
-      })
-      .filter(Boolean) as NodeType[];
-
-    dispatch(nodesActions.update(updatedNodes));
   };
 
   return (
@@ -503,13 +431,14 @@ const App = () => {
           {[...nodes, draftNode].map((node) => {
             if (!node) return null;
 
-            return createElement(getElement(node), {
-              ...node,
-              nodeProps: {
-                ...node.nodeProps,
-                visible: !selectedNodes.some(
-                  (n) => n.nodeProps.id === node.nodeProps.id,
-                ),
+            const visible = !selectedNodes.some(
+              (n) => n.nodeProps.id === node.nodeProps.id,
+            );
+
+            return createElement(getElement(node.type), {
+              node: {
+                ...node,
+                nodeProps: { ...node.nodeProps, visible },
               },
               key: node.nodeProps.id,
               selected: selected.includes(node.nodeProps.id),
@@ -520,36 +449,9 @@ const App = () => {
           })}
           {selectBoxSize ? <SelectTool points={selectBoxSize} /> : null}
           {selectedNodes.length ? (
-            <Group
-              ref={nodeRef}
-              onDragEnd={onGroupDragEnd}
-              onDragStart={onGroupDragStart}
-            >
-              {selectedNodes.map((node) => {
-                console.log(node);
-                return createElement(getElement(node), {
-                  key: `group-${node.nodeProps.id}`,
-                  ...node,
-                  selected: false,
-                  draggable: false,
-                  onSelect: () => null,
-                  onNodeChange: () => null,
-                } as NodeComponentProps);
-              })}
-            </Group>
+            <NodeGroupTransformer selectedNodes={selectedNodes} />
           ) : null}
-          {selectedNodes.length ? (
-            <NodeTransformer
-              ref={transformerRef}
-              transformerConfig={{ enabledAnchors: [] }}
-            />
-          ) : null}
-          <Html
-            groupProps={{
-              x: menuPosition[0],
-              y: menuPosition[1],
-            }}
-          >
+          <Html groupProps={{ x: menuPosition[0], y: menuPosition[1] }}>
             {contextMenu && (
               <ContextMenu
                 menuItems={contextMenu}

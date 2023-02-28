@@ -1,29 +1,25 @@
-import { ForwardedRef, forwardRef } from 'react';
+import { Point } from '@/client/shared/element';
 import Konva from 'konva';
-import { NodeColor, Point } from '@/client/shared/element';
+import { LineConfig } from 'konva/lib/shapes/Line';
+import { ForwardedRef, forwardRef } from 'react';
 import { Line } from 'react-konva';
 
 type Props = {
+  id: string;
   points: Point[];
-  color: NodeColor;
   dash: number[];
-  strokeWidth: number;
+  config: LineConfig;
 };
 
 const ArrowLine = forwardRef(
-  (
-    { points, color, dash, strokeWidth }: Props,
-    ref: ForwardedRef<Konva.Line>,
-  ) => {
+  ({ id, dash, points, config }: Props, ref: ForwardedRef<Konva.Line>) => {
     const [start, control, end] = points;
     return (
       <Line
         ref={ref}
-        stroke={color as string}
-        hitStrokeWidth={14}
-        lineCap="round"
-        strokeWidth={strokeWidth}
+        {...config}
         dash={dash}
+        id={id}
         points={[...points.flat()]}
         sceneFunc={(ctx, shape) => {
           ctx.beginPath();

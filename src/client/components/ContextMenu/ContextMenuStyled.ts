@@ -1,7 +1,6 @@
 import { styled } from '@stitches/react';
 
 export const ContextMenuContainer = styled('div', {
-  position: 'fixed',
   width: '200px',
   zIndex: 999,
   backgroundColor: 'white',

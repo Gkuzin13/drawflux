@@ -1,52 +1,91 @@
+import {
+  createDefaultNodeConfig,
+  getStyleValues,
+} from '@/client/shared/element';
+import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
+import useTransformer from '@/client/shared/hooks/useTransformer';
 import Konva from 'konva';
+import { RefObject } from 'react';
 import { Rect } from 'react-konva';
-import NodeContainer from '../NodeContainer';
+import NodeTransformer from '../NodeTransformer';
 import type { NodeComponentProps } from '../types';
 
 const RectDrawable = ({
-  nodeProps,
+  node,
+  selected,
+  draggable,
   onNodeChange,
-  style,
-  ...restProps
-}: NodeComponentProps) => {
+  onSelect,
+}: Omit<NodeComponentProps, 'text'>) => {
+  const { nodeRef, transformerRef } = useTransformer<Konva.Rect>(selected);
+
+  const { dash, strokeWidth } = getStyleValues(node.style);
+
+  useAnimatedLine(
+    nodeRef.current,
+    dash[0] + dash[1],
+    node.style.animated,
+    node.style.line,
+  );
+
+  const { nodeProps, style } = node;
+
+  const config = createDefaultNodeConfig({
+    visible: nodeProps.visible,
+    strokeWidth,
+    stroke: style.color,
+    id: nodeProps.id,
+    rotation: nodeProps.rotation,
+    draggable,
+    dash,
+  });
+
   return (
-    <NodeContainer
-      nodeProps={nodeProps}
-      onNodeChange={onNodeChange}
-      style={style}
-      {...restProps}
-    >
+    <>
       <Rect
+        ref={nodeRef}
         x={nodeProps.point[0]}
         y={nodeProps.point[1]}
         width={nodeProps.width}
         height={nodeProps.height}
-        cornerRadius={4}
-        onTransformEnd={(event) => {
-          if (!event.target) return;
-
-          const node = event.target as Konva.Rect;
-
-          const scaleX = node.scaleX();
-          const scaleY = node.scaleY();
-
-          node.scaleX(1);
-          node.scaleY(1);
-
+        cornerRadius={8}
+        {...config}
+        onDragStart={onSelect}
+        onDragEnd={(event) => {
           onNodeChange({
-            style,
-            type: restProps.type,
-            text: null,
+            ...node,
             nodeProps: {
               ...nodeProps,
-              point: [node.x(), node.y()],
-              width: Math.max(5, node.width() * scaleX) + node.x(),
-              height: Math.max(node.height() * scaleY) + node.y(),
+              point: [event.target.x(), event.target.y()],
             },
           });
         }}
+        onTransformEnd={(event) => {
+          if (!event.target) return;
+
+          const rect = event.target as Konva.Rect;
+
+          const scaleX = rect.scaleX();
+          const scaleY = rect.scaleY();
+
+          rect.scaleX(1);
+          rect.scaleY(1);
+
+          onNodeChange({
+            ...node,
+            nodeProps: {
+              ...nodeProps,
+              point: [rect.x(), rect.y()],
+              width: Math.max(5, rect.width() * scaleX),
+              height: Math.max(rect.height() * scaleY),
+            },
+          });
+        }}
+        onTap={onSelect}
+        onClick={onSelect}
       />
-    </NodeContainer>
+      {selected && <NodeTransformer ref={transformerRef} />}
+    </>
   );
 };
 

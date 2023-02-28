@@ -4,6 +4,8 @@ import RectDrawable from '@/client/components/RectDrawable/RectDrawable';
 import FreePathDrawable from '@/client/components/FreePathDrawable/FreePathDrawable';
 import EditableText from '@/client/components/EditableText/EditableText';
 import { COLOR, LINE, SIZE } from './style';
+import { NodeConfig } from 'konva/lib/Node';
+import { ShapeConfig } from 'konva/lib/Shape';
 
 export const ELEMENTS = {
   ARROW: 'arrow',
@@ -13,8 +15,8 @@ export const ELEMENTS = {
   TEXT: 'text',
 } as const;
 
-export const getElement = (element: NodeType) => {
-  switch (element.type) {
+export const getElement = (element: NodeType['type']) => {
+  switch (element) {
     case 'arrow':
       return ArrowDrawable;
     case 'rectangle':
@@ -63,6 +65,33 @@ export const getStyleValues = (style: NodeStyle) => {
   return { dash, strokeWidth };
 };
 
+export const createDefaultNodeConfig = ({
+  visible,
+  strokeWidth,
+  stroke,
+  id,
+  rotation,
+  draggable,
+  dash,
+  ...rest
+}: NodeConfig & ShapeConfig): NodeConfig & ShapeConfig => {
+  return {
+    lineCap: 'round',
+    strokeScaleEnabled: false,
+    perfectDrawEnabled: false,
+    hitStrokeWidth: 12,
+    fillEnabled: false,
+    visible,
+    strokeWidth,
+    stroke,
+    id,
+    rotation,
+    draggable,
+    dash,
+    ...rest,
+  };
+};
+
 export type ElementType = (typeof ELEMENTS)[keyof typeof ELEMENTS];
 
 export type NodeType = {
@@ -87,6 +116,7 @@ export type NodeStyle = {
   line: NodeLIne;
   size: NodeSize;
   animated?: boolean;
+  fontSize?: number;
 };
 
 export type NodeLIne = (typeof LINE)[keyof typeof LINE]['value'];

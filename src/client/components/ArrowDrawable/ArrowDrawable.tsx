@@ -2,102 +2,98 @@ import { useEffect, useRef, useState } from 'react';
 import Konva from 'konva';
 import ArrowTransformer from './ArrowTransformer';
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
-import { getLineValue, getSizeValue, Point } from '../../shared/element';
+import {
+  createDefaultNodeConfig,
+  getStyleValues,
+  Point,
+} from '../../shared/element';
 import type { NodeComponentProps } from '../types';
+import { Group, Line, Shape } from 'react-konva';
+import { getPointsAbsolutePosition } from '@/client/shared/utils/position';
 import ArrowHead from './ArrowHead';
 import ArrowLine from './ArrowLine';
-import { Group } from 'react-konva';
-import { getAnchorsPosition } from './helpers/getAnchorsPosition';
 
 const ArrowDrawable = ({
-  nodeProps,
-  type,
-  style,
+  node,
   selected,
   draggable,
   onSelect,
   onNodeChange,
 }: NodeComponentProps) => {
   const [points, setPoints] = useState<Point[]>([
-    nodeProps.point,
-    ...(nodeProps?.points || [nodeProps.point, nodeProps.point]),
+    node.nodeProps.point,
+    ...(node.nodeProps?.points || [node.nodeProps.point, node.nodeProps.point]),
   ]);
   const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
     setPoints([
-      nodeProps.point,
-      ...(nodeProps?.points || [nodeProps.point, nodeProps.point]),
+      node.nodeProps.point,
+      ...(node.nodeProps?.points || [
+        node.nodeProps.point,
+        node.nodeProps.point,
+      ]),
     ]);
-  }, [nodeProps.point, nodeProps.points]);
+  }, [node.nodeProps.point, node.nodeProps.points]);
 
   const [start, control, end] = points;
 
-  const strokeWidth = getSizeValue(style.size);
-  const dash = getLineValue(style.line);
+  const { dash, strokeWidth } = getStyleValues(node.style);
 
   const lineRef = useRef<Konva.Line>(null);
 
   useAnimatedLine(
     lineRef.current,
     dash[0] + dash[1],
-    style.animated,
-    style.line,
+    node.style.animated,
+    node.style.line,
   );
 
+  const config = createDefaultNodeConfig({
+    stroke: node.style.color,
+    strokeWidth,
+    visible: node.nodeProps.visible,
+  });
+
   return (
-    <Group
-      id={nodeProps.id}
-      onTap={onSelect}
-      onClick={onSelect}
-      draggable={draggable}
-      visible={nodeProps.visible}
-      onDragStart={(event) => {
-        if (event.target.nodeType !== 'Group') {
-          return;
-        }
-        onSelect();
-        setDragging(true);
-      }}
-      onDragEnd={(event) => {
-        const group = event.target as Konva.Group & Konva.Shape;
+    <>
+      <Group
+        id={node.nodeProps.id}
+        draggable={draggable}
+        onDragStart={() => setDragging(true)}
+        onDragEnd={(event) => {
+          const [firstPoint, ...restPoints] = getPointsAbsolutePosition(
+            points,
+            event.target,
+          );
 
-        if (!group.hasChildren()) return;
+          setPoints([firstPoint, ...restPoints]);
 
-        const updatedPoints = getAnchorsPosition(group);
+          onNodeChange({
+            ...node,
+            nodeProps: {
+              ...node.nodeProps,
+              point: firstPoint,
+              points: restPoints,
+            },
+          });
 
-        setPoints(updatedPoints);
+          event.target.position({ x: 0, y: 0 });
 
-        onNodeChange({
-          type,
-          style,
-          text: null,
-          nodeProps: {
-            ...nodeProps,
-            point: updatedPoints[0],
-            points: [updatedPoints[1], updatedPoints[2]],
-          },
-        });
-
-        group.x(0);
-        group.y(0);
-
-        setDragging(false);
-      }}
-    >
-      <ArrowHead
-        strokeWidth={strokeWidth}
-        color={style.color}
-        end={end}
-        control={control}
-      />
-      <ArrowLine
-        ref={lineRef}
-        points={points}
-        color={style.color}
-        dash={dash}
-        strokeWidth={strokeWidth}
-      />
+          setDragging(false);
+        }}
+        onTap={onSelect}
+        onClick={onSelect}
+      >
+        <ArrowHead control={control} end={end} config={config} />
+        <ArrowLine
+          ref={lineRef}
+          id={node.nodeProps.id}
+          points={points}
+          dash={dash}
+          config={config}
+        />
+      </Group>
       <ArrowTransformer
         points={[start, control, end]}
         draggable
@@ -105,18 +101,16 @@ const ArrowDrawable = ({
         onTransform={(points) => setPoints(points)}
         onTransformEnd={(points) => {
           onNodeChange({
-            type,
-            style,
-            text: null,
+            ...node,
             nodeProps: {
-              ...nodeProps,
+              ...node.nodeProps,
               point: points[0],
               points: [points[1], points[2]],
             },
           });
         }}
       />
-    </Group>
+    </>
   );
 };
 

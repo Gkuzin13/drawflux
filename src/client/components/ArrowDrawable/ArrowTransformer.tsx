@@ -24,13 +24,13 @@ const ArrowTransformer = ({
     if (!event.target) return;
 
     const node = event.target as Konva.Circle;
-    const draggedIndex = node.attrs.id.split('-')[1];
+    const draggedIndex = +node.name().split('-')[1];
 
     const updatedPoints = [...points];
 
     updatedPoints[draggedIndex] = [node.x(), node.y()];
 
-    if (draggedIndex !== '1') {
+    if (draggedIndex !== 1) {
       updatedPoints[1] = clampAnchorPoint(
         getControlPointAfterDrag(
           updatedPoints[draggedIndex],
@@ -91,7 +91,7 @@ const ArrowTransformer = ({
     <>
       <TransformerAnchor
         key={`anchor-0`}
-        id={`anchor-0`}
+        name={`anchor-0`}
         x={start[0]}
         y={start[1]}
         onDragMove={onAnchorDragMove}
@@ -101,7 +101,7 @@ const ArrowTransformer = ({
       />
       <TransformerAnchor
         key={`anchor-1`}
-        id={`anchor-1`}
+        name={`anchor-1`}
         active={true}
         x={control[0]}
         y={control[1]}
@@ -117,7 +117,7 @@ const ArrowTransformer = ({
       />
       <TransformerAnchor
         key={`anchor-2`}
-        id={`anchor-2`}
+        name={`anchor-2`}
         x={end[0]}
         y={end[1]}
         onDragMove={onAnchorDragMove}

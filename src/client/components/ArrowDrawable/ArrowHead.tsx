@@ -1,29 +1,26 @@
-import { NodeColor, Point } from '@/client/shared/element';
+import { Point } from '@/client/shared/element';
+import { NodeConfig } from 'konva/lib/Node';
 import { Shape } from 'react-konva';
 
 type Props = {
-  end: Point;
   control: Point;
-  color: NodeColor;
-  strokeWidth: number;
+  end: Point;
+  config: NodeConfig;
 };
 
-const ArrowHead = ({ end, control, color, strokeWidth }: Props) => {
-  const PI2 = Math.PI * 2;
-
+const ArrowHead = ({ control, end, config }: Props) => {
   return (
     <Shape
-      stroke={color as string}
-      hitStrokeWidth={14}
-      strokeWidth={strokeWidth}
-      lineCap="round"
+      {...config}
       sceneFunc={(ctx, shape) => {
+        const PI2 = Math.PI * 2;
+
         const dx = end[0] - control[0];
         const dy = end[1] - control[1];
 
         const radians = (Math.atan2(dy, dx) + PI2) % PI2;
-        const length = 2.8 * strokeWidth;
-        const width = 2.8 * strokeWidth;
+        const length = 3 * config.strokeWidth;
+        const width = 4 * config.strokeWidth;
 
         ctx.save();
 

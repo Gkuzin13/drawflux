@@ -8,9 +8,9 @@ export type TransformerAnchorProps = {
   active?: boolean;
   draggable: boolean;
   visible: boolean;
-  id: string;
   x: number;
   y: number;
+  name: string;
   onDragMove: (e: KonvaEventObject<DragEvent>) => void;
   onDragEnd: (e: KonvaEventObject<DragEvent>) => void;
   dragBoundFunc?: (position: Vector2d) => void;
@@ -20,7 +20,7 @@ const TransformerAnchor = ({
   active = true,
   visible,
   draggable,
-  id,
+  name,
   x,
   y,
   onDragMove,
@@ -32,7 +32,7 @@ const TransformerAnchor = ({
     <Circle
       x={x}
       y={y}
-      id={id}
+      name={name}
       visible={visible}
       cursorType={CURSOR.POINTER}
       stroke="rgba(0, 81, 255, 0.4)"

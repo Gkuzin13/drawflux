@@ -5,42 +5,32 @@ import ResizableText from '../EditableText/ResizableText';
 import { KEYS } from '@/client/shared/keys';
 
 const EditableText = ({
-  nodeProps,
-  text,
+  node,
   selected,
-  type,
-  style,
   draggable,
   onNodeChange,
   onSelect,
-  onContextMenu,
 }: NodeComponentProps) => {
   const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState(text || '');
+  const [value, setValue] = useState(node.text || '');
 
   useEffect(() => {
-    if (!text) {
+    if (!node.text) {
       setEditing(true);
     }
 
     return () => {
       setEditing(false);
     };
-  }, [text]);
-
-  const onDoubleClick = () => {
-    setEditing(true);
-  };
+  }, [node.text]);
 
   const handleTextSave = () => {
     if (!value) {
       onNodeChange(null);
     } else {
       onNodeChange({
-        nodeProps,
-        style,
+        ...node,
         text: value,
-        type,
       });
     }
 
@@ -65,7 +55,7 @@ const EditableText = ({
   if (editing) {
     return (
       <EditableTextInput
-        nodeProps={nodeProps}
+        node={node}
         value={value}
         onTextChange={handleTextChange}
         onKeyDown={handleKeyDown}
@@ -76,16 +66,12 @@ const EditableText = ({
 
   return (
     <ResizableText
-      style={style}
-      nodeProps={nodeProps}
+      node={node}
       selected={selected}
       draggable={draggable}
-      text={value}
-      type={type}
       onNodeChange={onNodeChange}
       onSelect={onSelect}
-      onDoubleClick={onDoubleClick}
-      onContextMenu={onContextMenu}
+      onDoubleClick={() => setEditing(true)}
     />
   );
 };
