@@ -17,16 +17,17 @@ const ResizableText = ({
   onSelect,
   onDoubleClick,
 }: Props) => {
-  const { nodeRef, transformerRef } = useTransformer<Konva.Text>(selected);
+  const { nodeRef, transformerRef } = useTransformer<Konva.Text>([selected]);
 
   const { nodeProps, style } = node;
 
   const config = createDefaultNodeConfig({
     visible: nodeProps.visible,
-    stroke: style.color,
+    fill: style.color,
     id: nodeProps.id,
     rotation: nodeProps.rotation,
     fillEnabled: true,
+    opacity: style.opacity,
     strokeWidth: 0,
     draggable,
   });

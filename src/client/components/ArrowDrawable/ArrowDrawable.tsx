@@ -8,7 +8,7 @@ import {
   Point,
 } from '../../shared/element';
 import type { NodeComponentProps } from '../types';
-import { Group, Line, Shape } from 'react-konva';
+import { Group } from 'react-konva';
 import { getPointsAbsolutePosition } from '@/client/shared/utils/position';
 import ArrowHead from './ArrowHead';
 import ArrowLine from './ArrowLine';
@@ -36,11 +36,10 @@ const ArrowDrawable = ({
     ]);
   }, [node.nodeProps.point, node.nodeProps.points]);
 
-  const [start, control, end] = points;
+  const lineRef = useRef<Konva.Line>(null);
 
   const { dash, strokeWidth } = getStyleValues(node.style);
-
-  const lineRef = useRef<Konva.Line>(null);
+  const [start, control, end] = points;
 
   useAnimatedLine(
     lineRef.current,
@@ -52,7 +51,6 @@ const ArrowDrawable = ({
   const config = createDefaultNodeConfig({
     stroke: node.style.color,
     strokeWidth,
-    visible: node.nodeProps.visible,
   });
 
   return (
@@ -60,6 +58,8 @@ const ArrowDrawable = ({
       <Group
         id={node.nodeProps.id}
         draggable={draggable}
+        visible={node.nodeProps.visible}
+        opacity={node.style.opacity}
         onDragStart={() => setDragging(true)}
         onDragEnd={(event) => {
           const [firstPoint, ...restPoints] = getPointsAbsolutePosition(
@@ -86,13 +86,7 @@ const ArrowDrawable = ({
         onClick={onSelect}
       >
         <ArrowHead control={control} end={end} config={config} />
-        <ArrowLine
-          ref={lineRef}
-          id={node.nodeProps.id}
-          points={points}
-          dash={dash}
-          config={config}
-        />
+        <ArrowLine ref={lineRef} points={points} dash={dash} config={config} />
       </Group>
       <ArrowTransformer
         points={[start, control, end]}

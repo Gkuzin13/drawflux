@@ -1,37 +1,37 @@
-import { getElement, NodeType, Point } from '@/client/shared/element';
+import { getElement, NodeType } from '@/client/shared/element';
+import useTransformer from '@/client/shared/hooks/useTransformer';
 import { getPointsAbsolutePosition } from '@/client/shared/utils/position';
-import { useAppDispatch } from '@/client/stores/hooks';
-import { nodesActions } from '@/client/stores/nodesSlice';
 import Konva from 'konva';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { createElement, useEffect, useRef } from 'react';
+import { createElement, useState } from 'react';
 import { Group } from 'react-konva';
 import NodeTransformer from '../NodeTransformer';
 import { NodeComponentProps } from '../types';
 
 type Props = {
   selectedNodes: NodeType[];
+  onDragStart: (nodes: NodeType[]) => void;
+  onDragEnd: (nodes: NodeType[]) => void;
 };
 
-const NodeGroupTransformer = ({ selectedNodes }: Props) => {
-  const transformerRef = useRef<Konva.Transformer>(null);
-  const nodeRef = useRef(null);
+const NodeGroupTransformer = ({
+  selectedNodes,
+  onDragStart,
+  onDragEnd,
+}: Props) => {
+  const [dragging, setDragging] = useState(false);
 
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (selectedNodes && transformerRef.current && nodeRef.current) {
-      transformerRef.current.nodes([nodeRef.current]);
-      transformerRef.current.getLayer()?.batchDraw();
-    }
-  }, [selectedNodes]);
+  const { transformerRef, nodeRef } = useTransformer<Konva.Group>([
+    selectedNodes,
+  ]);
 
   const onGroupDragStart = (event: KonvaEventObject<DragEvent>) => {
+    setDragging(true);
     const group = event.target as Konva.Group & Konva.Shape;
 
-    const nodeMap = new Map<string, NodeType>();
-
-    selectedNodes.forEach((node) => nodeMap.set(node.nodeProps.id, node));
+    const nodeMap = new Map<string, NodeType>(
+      selectedNodes.map((node) => [node.nodeProps.id, node]),
+    );
 
     const hiddenNodes = group
       .getChildren()
@@ -44,15 +44,15 @@ const NodeGroupTransformer = ({ selectedNodes }: Props) => {
       })
       .filter(Boolean) as NodeType[];
 
-    dispatch(nodesActions.update(hiddenNodes));
+    onDragStart(hiddenNodes);
   };
 
   const onGroupDragEnd = (event: KonvaEventObject<DragEvent>) => {
     const group = event.target as Konva.Group & Konva.Shape;
 
-    const nodeMap = new Map<string, NodeType>();
-
-    selectedNodes.forEach((node) => nodeMap.set(node.nodeProps.id, node));
+    const nodeMap = new Map<string, NodeType>(
+      selectedNodes.map((node) => [node.nodeProps.id, node]),
+    );
 
     const updatedNodes = group
       .getChildren()
@@ -75,6 +75,7 @@ const NodeGroupTransformer = ({ selectedNodes }: Props) => {
               ...node.nodeProps,
               point: firstPoint,
               points: restPoints,
+              visible: true,
             },
           };
         }
@@ -87,8 +88,9 @@ const NodeGroupTransformer = ({ selectedNodes }: Props) => {
         };
       })
       .filter(Boolean) as NodeType[];
-    console.log(updatedNodes);
-    dispatch(nodesActions.update(updatedNodes));
+
+    onDragEnd(updatedNodes);
+    setDragging(false);
   };
 
   return (
@@ -100,8 +102,14 @@ const NodeGroupTransformer = ({ selectedNodes }: Props) => {
       >
         {selectedNodes.map((node) => {
           return createElement(getElement(node.type), {
-            key: `group-${node.nodeProps.id}`,
-            node,
+            key: node.nodeProps.id,
+            node: {
+              ...node,
+              style: {
+                ...node.style,
+                opacity: dragging ? 1 : 0,
+              },
+            },
             selected: false,
             draggable: false,
             onSelect: () => null,

@@ -5,7 +5,6 @@ import {
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
 import useTransformer from '@/client/shared/hooks/useTransformer';
 import Konva from 'konva';
-import { RefObject } from 'react';
 import { Ellipse } from 'react-konva';
 import NodeTransformer from '../NodeTransformer';
 import type { NodeComponentProps } from '../types';
@@ -19,7 +18,7 @@ const CircleDrawable = ({
 }: NodeComponentProps) => {
   const { dash, strokeWidth } = getStyleValues(node.style);
 
-  const { nodeRef, transformerRef } = useTransformer<Konva.Ellipse>(selected);
+  const { nodeRef, transformerRef } = useTransformer<Konva.Ellipse>([selected]);
 
   useAnimatedLine(
     nodeRef.current,
@@ -36,6 +35,7 @@ const CircleDrawable = ({
     stroke: style.color,
     id: nodeProps.id,
     rotation: nodeProps.rotation,
+    opacity: style.opacity,
     draggable,
     dash,
   });

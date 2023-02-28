@@ -2,16 +2,16 @@ import Konva from 'konva';
 import { Transformer } from 'konva/lib/shapes/Transformer';
 import { useEffect, useRef } from 'react';
 
-const useTransformer = <T extends Konva.Node>(nodeSelected: boolean) => {
+const useTransformer = <T extends Konva.Node>(deps: any[]) => {
   const nodeRef = useRef<T>(null);
   const transformerRef = useRef<Transformer>(null);
 
   useEffect(() => {
-    if (nodeSelected && transformerRef.current && nodeRef.current) {
+    if (transformerRef.current && nodeRef.current) {
       transformerRef.current.nodes([nodeRef.current]);
       transformerRef.current.getLayer()?.batchDraw();
     }
-  }, [nodeSelected]);
+  }, [...deps]);
 
   return { nodeRef, transformerRef };
 };

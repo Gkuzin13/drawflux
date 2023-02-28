@@ -5,21 +5,19 @@ import { ForwardedRef, forwardRef } from 'react';
 import { Line } from 'react-konva';
 
 type Props = {
-  id: string;
   points: Point[];
   dash: number[];
   config: LineConfig;
 };
 
 const ArrowLine = forwardRef(
-  ({ id, dash, points, config }: Props, ref: ForwardedRef<Konva.Line>) => {
+  ({ dash, points, config }: Props, ref: ForwardedRef<Konva.Line>) => {
     const [start, control, end] = points;
     return (
       <Line
         ref={ref}
         {...config}
         dash={dash}
-        id={id}
         points={[...points.flat()]}
         sceneFunc={(ctx, shape) => {
           ctx.beginPath();

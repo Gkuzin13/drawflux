@@ -5,7 +5,6 @@ import {
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
 import useTransformer from '@/client/shared/hooks/useTransformer';
 import Konva from 'konva';
-import { RefObject } from 'react';
 import { Rect } from 'react-konva';
 import NodeTransformer from '../NodeTransformer';
 import type { NodeComponentProps } from '../types';
@@ -17,7 +16,7 @@ const RectDrawable = ({
   onNodeChange,
   onSelect,
 }: Omit<NodeComponentProps, 'text'>) => {
-  const { nodeRef, transformerRef } = useTransformer<Konva.Rect>(selected);
+  const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
 
   const { dash, strokeWidth } = getStyleValues(node.style);
 
@@ -36,6 +35,7 @@ const RectDrawable = ({
     stroke: style.color,
     id: nodeProps.id,
     rotation: nodeProps.rotation,
+    opacity: style.opacity,
     draggable,
     dash,
   });

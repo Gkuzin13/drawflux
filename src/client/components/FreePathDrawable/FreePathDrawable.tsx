@@ -19,7 +19,7 @@ const FreePathDrawable = ({
 }: NodeComponentProps) => {
   const { dash, strokeWidth } = getStyleValues(node.style);
 
-  const { nodeRef, transformerRef } = useTransformer<Konva.Line>(selected);
+  const { nodeRef, transformerRef } = useTransformer<Konva.Line>([selected]);
 
   useAnimatedLine(
     nodeRef.current,
@@ -38,6 +38,7 @@ const FreePathDrawable = ({
     stroke: style.color,
     id: nodeProps.id,
     rotation: nodeProps.rotation,
+    opacity: style.opacity,
     draggable,
     dash,
   });

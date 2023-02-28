@@ -189,10 +189,12 @@ const App = () => {
     const intersectedChildren = otherChildren.filter((child) => {
       if (child.hasChildren()) {
         const group = child as Konva.Group;
+
         return group.getChildren().some((c) => {
           return haveIntersection(p1, p2, c.getClientRect());
         });
       }
+
       return haveIntersection(p1, p2, child.getClientRect());
     });
 
@@ -277,15 +279,14 @@ const App = () => {
       case 'hand':
         break;
       case 'select':
-        if (stageRef.current) {
-          setIntersectingNodes(stageRef.current);
-        }
-
         setSelectBoxSize((prevSize) => {
           if (!prevSize) return prevSize;
 
           return [prevSize[0], [position.x, position.y]];
         });
+        if (stageRef.current) {
+          setIntersectingNodes(stageRef.current);
+        }
         break;
       case 'text':
         break;
@@ -430,16 +431,8 @@ const App = () => {
         <Layer>
           {[...nodes, draftNode].map((node) => {
             if (!node) return null;
-
-            const visible = !selectedNodes.some(
-              (n) => n.nodeProps.id === node.nodeProps.id,
-            );
-
             return createElement(getElement(node.type), {
-              node: {
-                ...node,
-                nodeProps: { ...node.nodeProps, visible },
-              },
+              node,
               key: node.nodeProps.id,
               selected: selected.includes(node.nodeProps.id),
               draggable: toolType !== 'hand',
@@ -449,7 +442,13 @@ const App = () => {
           })}
           {selectBoxSize ? <SelectTool points={selectBoxSize} /> : null}
           {selectedNodes.length ? (
-            <NodeGroupTransformer selectedNodes={selectedNodes} />
+            <NodeGroupTransformer
+              selectedNodes={selectedNodes}
+              onDragStart={(nodes) => {
+                dispatch(nodesActions.update(nodes));
+              }}
+              onDragEnd={(nodes) => dispatch(nodesActions.update(nodes))}
+            />
           ) : null}
           <Html groupProps={{ x: menuPosition[0], y: menuPosition[1] }}>
             {contextMenu && (

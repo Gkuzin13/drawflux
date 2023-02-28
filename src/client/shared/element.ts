@@ -81,6 +81,7 @@ export const createDefaultNodeConfig = ({
     perfectDrawEnabled: false,
     hitStrokeWidth: 12,
     fillEnabled: false,
+    opacity: 1,
     visible,
     strokeWidth,
     stroke,
@@ -117,6 +118,7 @@ export type NodeStyle = {
   size: NodeSize;
   animated?: boolean;
   fontSize?: number;
+  opacity?: number;
 };
 
 export type NodeLIne = (typeof LINE)[keyof typeof LINE]['value'];
