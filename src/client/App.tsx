@@ -30,6 +30,7 @@ import {
 } from './shared/menu';
 import { Html } from 'react-konva-utils';
 import NodeGroupTransformer from './components/NodeGroupTransformer/NodeGroupTransformer';
+import { getPointsAbsolutePosition } from './shared/utils/position';
 
 const defaultStyle: NodeStyle = {
   line: 'solid',
@@ -161,7 +162,7 @@ const App = () => {
     if (toolType === 'select') {
       const isOverNode = e.target !== stage;
 
-      if (isOverNode) {
+      if (isOverNode && !drawing) {
         stage.container().style.cursor =
           e.target.attrs?.cursorType || CURSOR.ALL_SCROLL;
         return;
@@ -346,6 +347,8 @@ const App = () => {
 
     const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
 
+    if (!sanitizeStageZoom([newScale, newScale])) return;
+
     stage.scale({ x: newScale, y: newScale });
 
     const newPos = {
@@ -356,6 +359,17 @@ const App = () => {
     stage.position(newPos);
 
     setStageScale(Math.round(newScale * 100));
+  };
+
+  const sanitizeStageZoom = (zoom: Point) => {
+    if (zoom[0] < 0.1 || zoom[1] < 0.1) {
+      return false;
+    }
+    if (zoom[0] > 2 || zoom[1] > 2) {
+      return false;
+    }
+
+    return true;
   };
 
   const onWheel = (e: KonvaEventObject<WheelEvent>) => {
@@ -427,6 +441,52 @@ const App = () => {
         onWheel={onWheel}
         style={{ backgroundColor: '#fafafa' }}
         draggable={toolType === 'hand'}
+        onDragEnd={(event) => {
+          if (event.target.getStage() !== event.target) return;
+
+          const stage = event.target as Konva.Stage;
+
+          const nodesMap = new Map(
+            nodes.map((node) => [node.nodeProps.id, node]),
+          );
+
+          const shapes = stage
+            .getChildren()[0]
+            .getChildren((child) => child.attrs.id);
+
+          const updatedNodes = shapes
+            .map((child) => {
+              const node = nodesMap.get(child.attrs.id);
+
+              if (!node) return;
+
+              if (node.nodeProps.points) {
+                const points = [node.nodeProps.point, ...node.nodeProps.points];
+
+                const [firstPoint, ...restPoints] = getPointsAbsolutePosition(
+                  points,
+                  child,
+                );
+
+                return {
+                  ...node,
+                  nodeProps: {
+                    ...node.nodeProps,
+                    point: firstPoint,
+                    points: restPoints,
+                  },
+                };
+              }
+
+              const { x, y } = child.getAbsolutePosition();
+
+              return {
+                ...node,
+                nodeProps: { ...node.nodeProps, point: [x, y] },
+              };
+            })
+            .filter(Boolean) as NodeType[];
+        }}
       >
         <Layer>
           {[...nodes, draftNode].map((node) => {

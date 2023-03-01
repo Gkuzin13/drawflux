@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Konva from 'konva';
 import ArrowTransformer from './ArrowTransformer';
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
@@ -26,7 +26,7 @@ const ArrowDrawable = ({
   ]);
   const [dragging, setDragging] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setPoints([
       node.nodeProps.point,
       ...(node.nodeProps?.points || [
@@ -51,6 +51,7 @@ const ArrowDrawable = ({
   const config = createDefaultNodeConfig({
     stroke: node.style.color,
     strokeWidth,
+    visible: node.nodeProps.visible,
   });
 
   return (
