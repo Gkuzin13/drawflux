@@ -58,7 +58,6 @@ const App = () => {
   const dispatch = useAppDispatch();
 
   const stageRef = useRef<Konva.Stage>(null);
-
   const selectRectRef = useRef<Konva.Rect>(null);
 
   useEffect(() => {
@@ -70,8 +69,28 @@ const App = () => {
   }, [styleMenu, selected]);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      switch (e.key) {
+    if (!stageRef.current) return;
+
+    switch (toolType) {
+      case 'hand':
+        stageRef.current.container().style.cursor = CURSOR.GRAB;
+        break;
+      case 'select':
+        stageRef.current.container().style.cursor = CURSOR.DEFAULT;
+        break;
+      default:
+        if (drawing) {
+          stageRef.current.container().style.cursor = CURSOR.CROSSHAIR;
+        } else {
+          stageRef.current.container().style.cursor = CURSOR.DEFAULT;
+        }
+        break;
+    }
+  }, [toolType, drawing, stageRef.current]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
         case KEYS.DELETE:
           if (!selected.length) return;
           dispatch(nodesActions.delete(selected));
@@ -92,12 +111,15 @@ const App = () => {
           setSelected([]);
       }
     };
-    window.addEventListener('keyup', handleKeyDown);
+
+    if (toolType !== 'text') {
+      window.addEventListener('keyup', handleKeyDown);
+    }
 
     return () => {
       window.removeEventListener('keyup', handleKeyDown);
     };
-  }, [selected]);
+  }, [selected, toolType]);
 
   const onNodeMenuAction = (key: MenuItem['key']) => {
     switch (key) {
@@ -152,29 +174,6 @@ const App = () => {
       setSelected([id]);
       setContextMenu(DEFAULT_NODE_MENU);
     }
-  };
-
-  const setCursorStyle = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
-    const stage = e.target.getStage() as Konva.Stage;
-
-    if (drawing && toolType !== 'select') {
-      stage.container().style.cursor = CURSOR.CROSSHAIR;
-      return;
-    }
-
-    if (toolType === 'hand') {
-      stage.container().style.cursor = CURSOR.GRAB;
-      return;
-    }
-
-    const isOverNode = e.target !== stage;
-
-    if (isOverNode && !drawing) {
-      stage.container().style.cursor = CURSOR.ALL_SCROLL;
-      return;
-    }
-
-    stage.container().style.cursor = CURSOR.DEFAULT;
   };
 
   const setIntersectingNodes = (stage: Konva.Stage, selectRect: IRect) => {
@@ -257,9 +256,17 @@ const App = () => {
         );
         setDrawing(true);
         break;
+      case 'text':
+        if (!draftNode) {
+          setDraftNode(createNode(toolType, [position.x, position.y]));
+          break;
+        }
+        setToolType('select');
+        break;
       default:
         if (!draftNode) {
           setDraftNode(createNode(toolType, [position.x, position.y]));
+          setDrawing(true);
           break;
         }
         setToolType('select');
@@ -275,40 +282,23 @@ const App = () => {
 
     if (!position) return;
 
-    switch (toolType) {
-      case 'hand':
-        break;
-      case 'select':
-        if (!drawing) return;
+    if (toolType === 'select' && drawing) {
+      setSelectBoxSize(
+        drawRectangle([posStart.current, [position.x, position.y]]),
+      );
 
-        setSelectBoxSize(
-          drawRectangle([posStart.current, [position.x, position.y]]),
+      if (stageRef.current && selectRectRef.current) {
+        setIntersectingNodes(
+          stageRef.current,
+          selectRectRef.current.getClientRect(),
         );
-
-        if (stageRef.current && selectRectRef.current) {
-          setIntersectingNodes(
-            stageRef.current,
-            selectRectRef.current.getClientRect(),
-          );
-        }
-        break;
-      case 'text':
-        break;
-      default:
-        if (!draftNode) {
-          setDrawing(false);
-          break;
-        }
-
-        setDraftNode((prevNode) => {
-          if (!prevNode) return prevNode;
-          return drawNodeByType(prevNode, [position.x, position.y]);
-        });
-
-        setDrawing(true);
+      }
     }
 
-    setCursorStyle(e);
+    setDraftNode((prevNode) => {
+      if (!prevNode) return prevNode;
+      return drawNodeByType(prevNode, [position.x, position.y]);
+    });
   };
 
   const onMoveEnd = () => {
@@ -330,9 +320,9 @@ const App = () => {
           setDraftNode(null);
           break;
         }
-        if (draftNode) {
-          dispatch(nodesActions.add([draftNode]));
-        }
+        if (!draftNode) return;
+
+        dispatch(nodesActions.add([draftNode]));
         setDraftNode(null);
         setToolType('select');
         setDrawing(false);
@@ -423,6 +413,18 @@ const App = () => {
     setStyleMenu(node.style);
   };
 
+  const setCursorOnStageDragEvent = (event: KonvaEventObject<DragEvent>) => {
+    const stage = event.target as Konva.Stage;
+
+    if (stage !== event.target.getStage()) return;
+
+    if (event.type === 'dragstart') {
+      stage.container().style.cursor = CURSOR.GRABBING;
+    } else {
+      stage.container().style.cursor = CURSOR.GRAB;
+    }
+  };
+
   return (
     <>
       <div style={{ position: 'absolute', zIndex: 1 }}>
@@ -452,6 +454,8 @@ const App = () => {
         onWheel={onWheel}
         style={{ backgroundColor: '#fafafa' }}
         draggable={toolType === 'hand'}
+        onDragStart={setCursorOnStageDragEvent}
+        onDragEnd={setCursorOnStageDragEvent}
       >
         <Layer>
           {[...nodes, draftNode].map((node) => {
@@ -477,7 +481,12 @@ const App = () => {
               onDragEnd={(nodes) => dispatch(nodesActions.update(nodes))}
             />
           ) : null}
-          <Html groupProps={{ x: menuPosition[0], y: menuPosition[1] }}>
+          <Html
+            groupProps={{
+              x: menuPosition[0],
+              y: menuPosition[1],
+            }}
+          >
             {contextMenu && (
               <ContextMenu
                 menuItems={contextMenu}

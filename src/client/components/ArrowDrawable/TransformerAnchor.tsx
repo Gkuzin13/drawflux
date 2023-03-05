@@ -20,7 +20,6 @@ const TransformerAnchor = ({
   active = true,
   visible,
   draggable,
-  name,
   x,
   y,
   onDragMove,
@@ -32,7 +31,6 @@ const TransformerAnchor = ({
     <Circle
       x={x}
       y={y}
-      name={name}
       visible={visible}
       cursorType={CURSOR.POINTER}
       stroke="rgba(0, 81, 255, 0.4)"

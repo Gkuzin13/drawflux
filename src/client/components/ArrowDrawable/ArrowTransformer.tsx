@@ -8,8 +8,14 @@ type Props = {
   visible: boolean;
   draggable: boolean;
   onTransform: (updatedPoints: Point[]) => void;
-  onTransformEnd: (updatedPoints: Point[]) => void;
+  onTransformEnd: (points: Point[]) => void;
 };
+
+const ANCHOR_INDEX = {
+  START: 0,
+  CONTROL: 1,
+  END: 2,
+} as const;
 
 const ArrowTransformer = ({
   points,
@@ -20,24 +26,15 @@ const ArrowTransformer = ({
 }: Props) => {
   const [start, control, end] = points;
 
-  const onAnchorDragMove = (event: KonvaEventObject<DragEvent>) => {
+  const onAnchorDragMove = (
+    event: KonvaEventObject<DragEvent>,
+    index: number,
+  ) => {
     const node = event.target as Konva.Circle;
-
-    const draggedIndex = +node.name().split('-')[1];
 
     const updatedPoints = [...points];
 
-    updatedPoints[draggedIndex] = [node.x(), node.y()];
-
-    if (draggedIndex !== 1) {
-      updatedPoints[1] = clampAnchorPoint(
-        getControlPointAfterDrag(
-          updatedPoints[draggedIndex],
-          points[draggedIndex],
-          control,
-        ),
-      );
-    }
+    updatedPoints[index] = [node.x(), node.y()];
 
     onTransform(updatedPoints);
   };
@@ -47,30 +44,34 @@ const ArrowTransformer = ({
   };
 
   function getControlPointAfterDrag(
-    prevPoint: Point,
-    draggedPoint: Point,
+    newPos: Point,
+    prevPos: Point,
     controlPoint: Point,
   ): Point {
     // Calculate the displacement of the dragged point from its original position
     const displacement = {
-      x: prevPoint[0] - draggedPoint[0],
-      y: prevPoint[1] - draggedPoint[1],
+      x: newPos[0] - prevPos[0],
+      y: newPos[1] - prevPos[1],
     };
 
     // If the dragged point is not the middle point, move the middle point with it
     return [controlPoint[0] + displacement.x, controlPoint[1] + displacement.y];
   }
 
-  function clampAnchorPoint(position: Point): Point {
-    const dx = end[0] - start[0];
-    const dy = end[1] - start[1];
+  function clampAnchorPoint(
+    position: Point,
+    startPos: Point,
+    endPos: Point,
+  ): Point {
+    const dx = endPos[0] - startPos[0];
+    const dy = endPos[1] - startPos[1];
 
     const length = Math.sqrt(dx ** 2 + dy ** 2);
 
     // Calculate the midpoint between the two points
     const mid = {
-      x: (start[0] + end[0]) / 2,
-      y: (start[1] + end[1]) / 2,
+      x: (startPos[0] + endPos[0]) / 2,
+      y: (startPos[1] + endPos[1]) / 2,
     };
 
     // Calculate a perpendicular vector to the line connecting the two points
@@ -86,7 +87,6 @@ const ArrowTransformer = ({
 
     return [mid.x + perp.x * dragDist, mid.y + perp.y * dragDist];
   }
-
   return (
     <>
       <TransformerAnchor
@@ -94,7 +94,7 @@ const ArrowTransformer = ({
         name={`anchor-0`}
         x={start[0]}
         y={start[1]}
-        onDragMove={onAnchorDragMove}
+        onDragMove={(event) => onAnchorDragMove(event, ANCHOR_INDEX.START)}
         onDragEnd={onAnchorDragEnd}
         draggable
         visible={visible}
@@ -106,21 +106,16 @@ const ArrowTransformer = ({
         x={control[0]}
         y={control[1]}
         visible={visible}
-        onDragMove={onAnchorDragMove}
+        onDragMove={(event) => onAnchorDragMove(event, ANCHOR_INDEX.CONTROL)}
         onDragEnd={onAnchorDragEnd}
         draggable={draggable}
-        dragBoundFunc={({ x, y }) => {
-          const newPos = clampAnchorPoint([x, y]);
-
-          return { x: newPos[0], y: newPos[1] };
-        }}
       />
       <TransformerAnchor
         key={`anchor-2`}
         name={`anchor-2`}
         x={end[0]}
         y={end[1]}
-        onDragMove={onAnchorDragMove}
+        onDragMove={(event) => onAnchorDragMove(event, ANCHOR_INDEX.END)}
         onDragEnd={onAnchorDragEnd}
         draggable
         visible={visible}

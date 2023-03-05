@@ -52,7 +52,7 @@ const EditableTextInput = ({
       const end = ref.current.value.length;
       ref.current.setSelectionRange(end, end);
     }
-  }, [ref.current]);
+  }, [ref.current, value]);
 
   const { nodeProps } = node;
 

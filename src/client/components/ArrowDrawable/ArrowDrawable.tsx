@@ -39,6 +39,7 @@ const ArrowDrawable = ({
   const lineRef = useRef<Konva.Line>(null);
 
   const { dash, strokeWidth } = getStyleValues(node.style);
+
   const [start, control, end] = points;
 
   useAnimatedLine(
@@ -98,14 +99,16 @@ const ArrowDrawable = ({
           points={[start, control, end]}
           visible={!dragging}
           draggable
-          onTransform={(points) => setPoints(points)}
-          onTransformEnd={(points) => {
+          onTransform={(updatedPoints) => setPoints(updatedPoints)}
+          onTransformEnd={(updatedPoints) => {
+            setPoints(updatedPoints);
+
             onNodeChange({
               ...node,
               nodeProps: {
                 ...node.nodeProps,
-                point: points[0],
-                points: [points[1], points[2]],
+                point: updatedPoints[0],
+                points: [updatedPoints[1], updatedPoints[2]],
               },
             });
           }}
