@@ -63,9 +63,13 @@ const ArrowDrawable = ({
         opacity={node.style.opacity}
         onDragStart={() => setDragging(true)}
         onDragEnd={(event) => {
+          const group = event.target as Konva.Group & Konva.Shape;
+          const stage = group.getStage() as Konva.Stage;
+
           const [firstPoint, ...restPoints] = getPointsAbsolutePosition(
             points,
-            event.target,
+            group,
+            stage,
           );
 
           setPoints([firstPoint, ...restPoints]);
@@ -79,7 +83,7 @@ const ArrowDrawable = ({
             },
           });
 
-          event.target.position({ x: 0, y: 0 });
+          group.position({ x: 0, y: 0 });
 
           setDragging(false);
         }}
@@ -89,22 +93,24 @@ const ArrowDrawable = ({
         <ArrowHead control={control} end={end} config={config} />
         <ArrowLine ref={lineRef} points={points} dash={dash} config={config} />
       </Group>
-      <ArrowTransformer
-        points={[start, control, end]}
-        draggable
-        visible={selected && !dragging}
-        onTransform={(points) => setPoints(points)}
-        onTransformEnd={(points) => {
-          onNodeChange({
-            ...node,
-            nodeProps: {
-              ...node.nodeProps,
-              point: points[0],
-              points: [points[1], points[2]],
-            },
-          });
-        }}
-      />
+      {selected && (
+        <ArrowTransformer
+          points={[start, control, end]}
+          visible={!dragging}
+          draggable
+          onTransform={(points) => setPoints(points)}
+          onTransformEnd={(points) => {
+            onNodeChange({
+              ...node,
+              nodeProps: {
+                ...node.nodeProps,
+                point: points[0],
+                points: [points[1], points[2]],
+              },
+            });
+          }}
+        />
+      )}
     </>
   );
 };

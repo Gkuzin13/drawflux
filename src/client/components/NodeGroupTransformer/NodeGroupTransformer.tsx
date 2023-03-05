@@ -50,6 +50,8 @@ const NodeGroupTransformer = ({
   const onGroupDragEnd = (event: KonvaEventObject<DragEvent>) => {
     const group = event.target as Konva.Group & Konva.Shape;
 
+    const stage = group.getStage() as Konva.Stage;
+
     const nodeMap = new Map<string, NodeType>(
       selectedNodes.map((node) => [node.nodeProps.id, node]),
     );
@@ -67,6 +69,7 @@ const NodeGroupTransformer = ({
           const [firstPoint, ...restPoints] = getPointsAbsolutePosition(
             points,
             child,
+            stage,
           );
 
           return {
@@ -80,7 +83,7 @@ const NodeGroupTransformer = ({
           };
         }
 
-        const { x, y } = child.getAbsolutePosition();
+        const { x, y } = child.getAbsolutePosition(stage);
 
         return {
           ...node,

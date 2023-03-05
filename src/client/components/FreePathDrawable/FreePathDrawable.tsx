@@ -1,10 +1,10 @@
 import {
   createDefaultNodeConfig,
   getStyleValues,
-  Point,
 } from '@/client/shared/element';
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
 import useTransformer from '@/client/shared/hooks/useTransformer';
+import { getPointsAbsolutePosition } from '@/client/shared/utils/position';
 import Konva from 'konva';
 import { Line } from 'react-konva';
 import NodeTransformer from '../NodeTransformer';
@@ -51,18 +51,12 @@ const FreePathDrawable = ({
         {...config}
         onDragStart={onSelect}
         onDragEnd={(event) => {
-          if (!nodeRef.current) return;
+          const line = event.target as Konva.Line;
+          const stage = line.getStage() as Konva.Stage;
 
           const points = nodeProps.points || [];
 
-          const updatedPoints: Point[] = points.map((point) => {
-            const { x, y } = nodeRef.current!.getAbsoluteTransform().point({
-              x: point[0],
-              y: point[1],
-            });
-
-            return [x, y];
-          });
+          const updatedPoints = getPointsAbsolutePosition(points, line, stage);
 
           onNodeChange({
             ...node,
@@ -72,21 +66,27 @@ const FreePathDrawable = ({
             },
           });
 
-          event.target.position({ x: 0, y: 0 });
+          line.position({ x: 0, y: 0 });
         }}
         onTransformEnd={(event) => {
-          const line = event.target as Konva.Rect;
+          const line = event.target as Konva.Line;
+          const stage = line.getStage() as Konva.Stage;
 
-          line.scaleX(1);
-          line.scaleY(1);
+          const points = nodeProps.points || [];
+
+          const updatedPoints = getPointsAbsolutePosition(points, line, stage);
 
           onNodeChange({
             ...node,
             nodeProps: {
               ...node.nodeProps,
+              points: updatedPoints,
               rotation: line.rotation(),
             },
           });
+
+          line.scale({ x: 1, y: 1 });
+          line.position({ x: 0, y: 0 });
         }}
         onTap={onSelect}
         onClick={onSelect}

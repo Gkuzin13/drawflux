@@ -13,7 +13,7 @@ import Konva from 'konva';
 import StylesDock from './components/StylesDock/StylesDock';
 import type { NodeType } from './shared/element';
 import SelectTool from './components/SelectTool';
-import { normalizePoints } from './shared/utils/draw';
+import { drawRectangle } from './shared/utils/draw';
 import { IRect } from 'konva/lib/types';
 import ToolsDock from './components/ToolsDock';
 import { Tool } from './shared/tool';
@@ -30,7 +30,6 @@ import {
 } from './shared/menu';
 import { Html } from 'react-konva-utils';
 import NodeGroupTransformer from './components/NodeGroupTransformer/NodeGroupTransformer';
-import { getPointsAbsolutePosition } from './shared/utils/position';
 
 const defaultStyle: NodeStyle = {
   line: 'solid',
@@ -47,7 +46,7 @@ const App = () => {
   const [stageScale, setStageScale] = useState(100);
   const [styleMenu, setStyleMenu] = useState<NodeStyle>(defaultStyle);
   const [selectedNodes, setSelectedNodes] = useState<NodeType[]>([]);
-  const [selectBoxSize, setSelectBoxSize] = useState<Point[] | null>(null);
+  const [selectBoxSize, setSelectBoxSize] = useState<IRect | null>(null);
   const [drawing, setDrawing] = useState(false);
 
   const posStart = useRef<Point>([0, 0]);
@@ -59,6 +58,8 @@ const App = () => {
   const dispatch = useAppDispatch();
 
   const stageRef = useRef<Konva.Stage>(null);
+
+  const selectRectRef = useRef<Konva.Rect>(null);
 
   useEffect(() => {
     if (selected.length === 1) {
@@ -80,6 +81,15 @@ const App = () => {
           setDraftNode(null);
           setSelected([]);
           break;
+        case KEYS.H:
+          setToolType('hand');
+          setDraftNode(null);
+          setSelected([]);
+          break;
+        case KEYS.V:
+          setToolType('select');
+          setDraftNode(null);
+          setSelected([]);
       }
     };
     window.addEventListener('keyup', handleKeyDown);
@@ -108,7 +118,9 @@ const App = () => {
 
     const stage = e.target.getStage();
 
-    const position = stage && stage.getRelativePointerPosition();
+    if (!stage) return;
+
+    const position = stage.getRelativePointerPosition();
 
     if (!position) return;
 
@@ -142,14 +154,10 @@ const App = () => {
     }
   };
 
-  const setCursorStyle = (
-    e: KonvaEventObject<MouseEvent | TouchEvent | DragEvent>,
-  ) => {
-    const stage = e.target.getStage();
+  const setCursorStyle = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    const stage = e.target.getStage() as Konva.Stage;
 
-    if (!stage) return;
-
-    if (drawing) {
+    if (drawing && toolType !== 'select') {
       stage.container().style.cursor = CURSOR.CROSSHAIR;
       return;
     }
@@ -159,44 +167,32 @@ const App = () => {
       return;
     }
 
-    if (toolType === 'select') {
-      const isOverNode = e.target !== stage;
+    const isOverNode = e.target !== stage;
 
-      if (isOverNode && !drawing) {
-        stage.container().style.cursor =
-          e.target.attrs?.cursorType || CURSOR.ALL_SCROLL;
-        return;
-      }
-
-      stage.container().style.cursor = CURSOR.DEFAULT;
+    if (isOverNode && !drawing) {
+      stage.container().style.cursor = CURSOR.ALL_SCROLL;
+      return;
     }
+
+    stage.container().style.cursor = CURSOR.DEFAULT;
   };
 
-  function haveIntersection(p1: Point, p2: Point, nodeRect: IRect) {
-    return Konva.Util.haveIntersection(
-      { x: p1[0], y: p1[1], width: p2[0] - p1[0], height: p2[1] - p1[1] },
-      nodeRect,
-    );
-  }
-
-  const setIntersectingNodes = (stage: Konva.Stage) => {
+  const setIntersectingNodes = (stage: Konva.Stage, selectRect: IRect) => {
     if (!selectBoxSize) return;
 
     const layer = stage.getChildren((child) => child.nodeType === 'Layer')[0];
     const otherChildren = layer.getChildren((child) => child.attrs.id);
-
-    const [p1, p2] = normalizePoints(selectBoxSize[0], selectBoxSize[1]);
 
     const intersectedChildren = otherChildren.filter((child) => {
       if (child.hasChildren()) {
         const group = child as Konva.Group;
 
         return group.getChildren().some((c) => {
-          return haveIntersection(p1, p2, c.getClientRect());
+          return Konva.Util.haveIntersection(selectRect, c.getClientRect());
         });
       }
 
-      return haveIntersection(p1, p2, child.getClientRect());
+      return Konva.Util.haveIntersection(selectRect, child.getClientRect());
     });
 
     const childrenIds = new Set<string>(
@@ -256,7 +252,10 @@ const App = () => {
       case 'hand':
         break;
       case 'select':
-        setSelectBoxSize([posStart.current, [position.x, position.y]]);
+        setSelectBoxSize(
+          drawRectangle([posStart.current, [position.x, position.y]]),
+        );
+        setDrawing(true);
         break;
       default:
         if (!draftNode) {
@@ -280,13 +279,17 @@ const App = () => {
       case 'hand':
         break;
       case 'select':
-        setSelectBoxSize((prevSize) => {
-          if (!prevSize) return prevSize;
+        if (!drawing) return;
 
-          return [prevSize[0], [position.x, position.y]];
-        });
-        if (stageRef.current) {
-          setIntersectingNodes(stageRef.current);
+        setSelectBoxSize(
+          drawRectangle([posStart.current, [position.x, position.y]]),
+        );
+
+        if (stageRef.current && selectRectRef.current) {
+          setIntersectingNodes(
+            stageRef.current,
+            selectRectRef.current.getClientRect(),
+          );
         }
         break;
       case 'text':
@@ -314,6 +317,13 @@ const App = () => {
         break;
       case 'select':
         setSelectBoxSize(null);
+        setDrawing(false);
+        break;
+      case 'draw':
+        if (!draftNode) return;
+        dispatch(nodesActions.add([draftNode]));
+        setDraftNode(null);
+        setDrawing(false);
         break;
       default: {
         if (!drawing) {
@@ -322,10 +332,10 @@ const App = () => {
         }
         if (draftNode) {
           dispatch(nodesActions.add([draftNode]));
-          setDraftNode(null);
-          setDrawing(false);
-          setToolType('select');
         }
+        setDraftNode(null);
+        setToolType('select');
+        setDrawing(false);
       }
     }
   };
@@ -349,13 +359,12 @@ const App = () => {
 
     if (!sanitizeStageZoom([newScale, newScale])) return;
 
-    stage.scale({ x: newScale, y: newScale });
-
     const newPos = {
       x: pointer.x - mousePointTo.x * newScale,
       y: pointer.y - mousePointTo.y * newScale,
     };
 
+    stage.scale({ x: newScale, y: newScale });
     stage.position(newPos);
 
     setStageScale(Math.round(newScale * 100));
@@ -365,7 +374,7 @@ const App = () => {
     if (zoom[0] < 0.1 || zoom[1] < 0.1) {
       return false;
     }
-    if (zoom[0] > 2 || zoom[1] > 2) {
+    if (zoom[0] > 2.5 || zoom[1] > 2.5) {
       return false;
     }
 
@@ -416,19 +425,21 @@ const App = () => {
 
   return (
     <>
-      <ToolsDock onToolSelect={onNodeTypeChange} />
-      <StylesDock
-        style={styleMenu}
-        onStyleChange={(updatedStyle) => setStyleMenu(updatedStyle)}
-      />
-      <ControlDock
-        onHistoryControl={(type) => dispatch({ type })}
-        onNodesControl={dispatch}
-        undoDisabled={!past.length}
-        redoDisabled={!future.length}
-      />
-      <div>
-        <span>Zoom: {stageScale}%</span>
+      <div style={{ position: 'absolute', zIndex: 1 }}>
+        <ToolsDock onToolSelect={onNodeTypeChange} />
+        <StylesDock
+          style={styleMenu}
+          onStyleChange={(updatedStyle) => setStyleMenu(updatedStyle)}
+        />
+        <ControlDock
+          onHistoryControl={(type) => dispatch({ type })}
+          onNodesControl={dispatch}
+          undoDisabled={!past.length}
+          redoDisabled={!future.length}
+        />
+        <div>
+          <span>Zoom: {stageScale}%</span>
+        </div>
       </div>
       <Stage
         ref={stageRef}
@@ -441,52 +452,6 @@ const App = () => {
         onWheel={onWheel}
         style={{ backgroundColor: '#fafafa' }}
         draggable={toolType === 'hand'}
-        onDragEnd={(event) => {
-          if (event.target.getStage() !== event.target) return;
-
-          const stage = event.target as Konva.Stage;
-
-          const nodesMap = new Map(
-            nodes.map((node) => [node.nodeProps.id, node]),
-          );
-
-          const shapes = stage
-            .getChildren()[0]
-            .getChildren((child) => child.attrs.id);
-
-          const updatedNodes = shapes
-            .map((child) => {
-              const node = nodesMap.get(child.attrs.id);
-
-              if (!node) return;
-
-              if (node.nodeProps.points) {
-                const points = [node.nodeProps.point, ...node.nodeProps.points];
-
-                const [firstPoint, ...restPoints] = getPointsAbsolutePosition(
-                  points,
-                  child,
-                );
-
-                return {
-                  ...node,
-                  nodeProps: {
-                    ...node.nodeProps,
-                    point: firstPoint,
-                    points: restPoints,
-                  },
-                };
-              }
-
-              const { x, y } = child.getAbsolutePosition();
-
-              return {
-                ...node,
-                nodeProps: { ...node.nodeProps, point: [x, y] },
-              };
-            })
-            .filter(Boolean) as NodeType[];
-        }}
       >
         <Layer>
           {[...nodes, draftNode].map((node) => {
@@ -500,7 +465,9 @@ const App = () => {
               onNodeChange: handleNodeChange,
             } as NodeComponentProps);
           })}
-          {selectBoxSize ? <SelectTool points={selectBoxSize} /> : null}
+          {selectBoxSize ? (
+            <SelectTool rect={selectBoxSize} ref={selectRectRef} />
+          ) : null}
           {selectedNodes.length ? (
             <NodeGroupTransformer
               selectedNodes={selectedNodes}

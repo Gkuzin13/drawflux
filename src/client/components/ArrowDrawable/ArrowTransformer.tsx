@@ -21,9 +21,8 @@ const ArrowTransformer = ({
   const [start, control, end] = points;
 
   const onAnchorDragMove = (event: KonvaEventObject<DragEvent>) => {
-    if (!event.target) return;
-
     const node = event.target as Konva.Circle;
+
     const draggedIndex = +node.name().split('-')[1];
 
     const updatedPoints = [...points];
@@ -39,6 +38,7 @@ const ArrowTransformer = ({
         ),
       );
     }
+
     onTransform(updatedPoints);
   };
 

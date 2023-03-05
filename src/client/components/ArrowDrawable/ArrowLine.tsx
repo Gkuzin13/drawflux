@@ -16,9 +16,9 @@ const ArrowLine = forwardRef(
     return (
       <Line
         ref={ref}
+        {...config}
         dash={dash}
         points={[...points.flat()]}
-        {...config}
         sceneFunc={(ctx, shape) => {
           ctx.beginPath();
           ctx.moveTo(start[0], start[1]);

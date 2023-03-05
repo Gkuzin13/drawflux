@@ -1,3 +1,4 @@
+import { IRect } from 'konva/lib/types';
 import { Point } from '../element';
 
 export function normalizePoints(p1: Point, p2: Point): Point[] {
@@ -23,4 +24,15 @@ export function normalizePoints(p1: Point, p2: Point): Point[] {
     [p1x, p1y],
     [p2x, p2y],
   ];
+}
+
+export function drawRectangle(points: [Point, Point]): IRect {
+  const [p1, p2] = normalizePoints(points[0], points[1]);
+
+  return {
+    x: p1[0],
+    y: p1[1],
+    width: p2[0] - p1[0],
+    height: p2[1] - p1[1],
+  };
 }

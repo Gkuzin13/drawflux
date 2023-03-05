@@ -1,24 +1,28 @@
-import { normalizePoints } from '@/client/shared/utils/draw';
+import Konva from 'konva';
+import { IRect } from 'konva/lib/types';
+import { ForwardedRef, forwardRef } from 'react';
 import { Rect } from 'react-konva';
-import { Point } from '../shared/element';
 
 type Props = {
-  points: Point[];
+  rect: IRect;
 };
 
-const SelectTool = ({ points }: Props) => {
-  const [p1, p2] = normalizePoints(points[0], points[1]);
+const SelectTool = forwardRef(
+  ({ rect }: Props, ref: ForwardedRef<Konva.Rect>) => {
+    return (
+      <Rect
+        ref={ref}
+        stroke="gray"
+        fill="rgba(0,0,0, 0.1)"
+        width={rect.width}
+        height={rect.height}
+        x={rect.x}
+        y={rect.y}
+      />
+    );
+  },
+);
 
-  return (
-    <Rect
-      stroke="gray"
-      fill="rgba(0,0,0, 0.1)"
-      width={p2[0] - p1[0]}
-      height={p2[1] - p1[1]}
-      x={p1[0]}
-      y={p1[1]}
-    />
-  );
-};
+SelectTool.displayName = 'SelectTool';
 
 export default SelectTool;
