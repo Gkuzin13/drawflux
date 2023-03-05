@@ -14,7 +14,7 @@ const CircleDrawable = ({
   selected,
   draggable,
   onNodeChange,
-  onSelect,
+  onPress,
 }: NodeComponentProps) => {
   const { dash, strokeWidth } = getStyleValues(node.style);
 
@@ -49,7 +49,7 @@ const CircleDrawable = ({
         x={node.nodeProps.point[0]}
         y={node.nodeProps.point[1]}
         {...config}
-        onDragStart={onSelect}
+        onDragStart={onPress}
         onDragEnd={(event) => {
           onNodeChange({
             ...node,
@@ -77,8 +77,8 @@ const CircleDrawable = ({
 
           ellipse.scale({ x: 1, y: 1 });
         }}
-        onTap={onSelect}
-        onClick={onSelect}
+        onTap={onPress}
+        onClick={onPress}
       />
       {selected && <NodeTransformer ref={transformerRef} />}
     </>

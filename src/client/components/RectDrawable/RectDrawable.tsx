@@ -14,7 +14,7 @@ const RectDrawable = ({
   selected,
   draggable,
   onNodeChange,
-  onSelect,
+  onPress,
 }: Omit<NodeComponentProps, 'text'>) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
 
@@ -50,7 +50,7 @@ const RectDrawable = ({
         height={nodeProps.height}
         cornerRadius={8}
         {...config}
-        onDragStart={onSelect}
+        onDragStart={onPress}
         onDragEnd={(event) => {
           onNodeChange({
             ...node,
@@ -81,8 +81,8 @@ const RectDrawable = ({
             },
           });
         }}
-        onTap={onSelect}
-        onClick={onSelect}
+        onTap={onPress}
+        onClick={onPress}
       />
       {selected && <NodeTransformer ref={transformerRef} />}
     </>

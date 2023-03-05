@@ -17,7 +17,7 @@ const ArrowDrawable = ({
   node,
   selected,
   draggable,
-  onSelect,
+  onPress,
   onNodeChange,
 }: NodeComponentProps) => {
   const [points, setPoints] = useState<Point[]>([
@@ -88,8 +88,8 @@ const ArrowDrawable = ({
 
           setDragging(false);
         }}
-        onTap={onSelect}
-        onClick={onSelect}
+        onTap={onPress}
+        onClick={onPress}
       >
         <ArrowHead control={control} end={end} config={config} />
         <ArrowLine ref={lineRef} points={points} dash={dash} config={config} />

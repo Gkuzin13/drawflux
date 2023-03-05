@@ -14,7 +14,7 @@ const ResizableText = ({
   draggable,
   selected,
   onNodeChange,
-  onSelect,
+  onPress,
   onDoubleClick,
 }: Props) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Text>([selected]);
@@ -74,8 +74,8 @@ const ResizableText = ({
 
           textNode.scale({ x: 1, y: 1 });
         }}
-        onTap={onSelect}
-        onClick={onSelect}
+        onTap={onPress}
+        onClick={onPress}
       />
       {selected && (
         <NodeTransformer

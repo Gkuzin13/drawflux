@@ -9,7 +9,7 @@ const EditableText = ({
   selected,
   draggable,
   onNodeChange,
-  onSelect,
+  onPress,
 }: NodeComponentProps) => {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(node.text || '');
@@ -25,14 +25,10 @@ const EditableText = ({
   }, [node.text]);
 
   const handleTextSave = () => {
-    if (!value) {
-      onNodeChange(null);
-    } else {
-      onNodeChange({
-        ...node,
-        text: value,
-      });
-    }
+    onNodeChange({
+      ...node,
+      text: value.length ? value : null,
+    });
 
     setEditing(false);
   };
@@ -70,7 +66,7 @@ const EditableText = ({
       selected={selected}
       draggable={draggable}
       onNodeChange={onNodeChange}
-      onSelect={onSelect}
+      onPress={onPress}
       onDoubleClick={() => setEditing(true)}
     />
   );
