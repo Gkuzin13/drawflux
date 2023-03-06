@@ -7,7 +7,6 @@ import { Circle } from 'react-konva';
 export type TransformerAnchorProps = {
   active?: boolean;
   draggable: boolean;
-  visible: boolean;
   x: number;
   y: number;
   onDragMove: (e: KonvaEventObject<DragEvent>) => void;
@@ -17,7 +16,6 @@ export type TransformerAnchorProps = {
 
 const TransformerAnchor = ({
   active = true,
-  visible,
   draggable,
   x,
   y,
@@ -30,8 +28,6 @@ const TransformerAnchor = ({
     <Circle
       x={x}
       y={y}
-      visible={visible}
-      cursorType={CURSOR.POINTER}
       stroke="rgba(0, 81, 255, 0.4)"
       fillAfterStrokeEnabled={true}
       fill={active ? 'white' : 'rgba(0, 81, 255, 0.4)'}
@@ -44,6 +40,8 @@ const TransformerAnchor = ({
       onMouseOver={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
       dragBoundFunc={dragBoundFunc as any}
+      perfectDrawEnabled={false}
+      shadowForStrokeEnabled={false}
     />
   );
 };

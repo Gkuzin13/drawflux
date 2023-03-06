@@ -5,6 +5,7 @@ import { NodeColor } from './element';
 export const MENU_ACTIONS = {
   DELETE_NODE: 'delete-node',
   SELECT_ALL: 'select-all',
+  LOCK_CONTROL_ANCHOR: 'lock-control-anchor',
 } as const;
 
 export type MenuItem = {

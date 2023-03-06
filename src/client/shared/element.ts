@@ -81,6 +81,7 @@ export const createDefaultNodeConfig = ({
     perfectDrawEnabled: false,
     hitStrokeWidth: 12,
     fillEnabled: false,
+    shadowForStrokeEnabled: false,
     opacity: 1,
     visible,
     strokeWidth,
@@ -110,6 +111,7 @@ export type NodeProps = {
   height?: number;
   rotation: number;
   visible: boolean;
+  bend?: number;
 };
 
 export type NodeStyle = {

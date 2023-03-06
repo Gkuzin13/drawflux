@@ -5,16 +5,11 @@ export const getDefaultControlPoint = (start: Point, end: Point): Point => {
 };
 
 export const drawArrow = (node: NodeType, position: Point) => {
-  const defaultControlPoint = getDefaultControlPoint(
-    node.nodeProps.point,
-    position,
-  );
-
   return {
     ...node,
     nodeProps: {
       ...node.nodeProps,
-      points: [defaultControlPoint, position],
+      points: [position],
     },
   };
 };

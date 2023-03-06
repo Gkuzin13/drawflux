@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Konva from 'konva';
 import ArrowTransformer from './ArrowTransformer';
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
@@ -12,6 +12,7 @@ import { Group } from 'react-konva';
 import { getPointsAbsolutePosition } from '@/client/shared/utils/position';
 import ArrowHead from './ArrowHead';
 import ArrowLine from './ArrowLine';
+import { getValueFromRatio } from '@/client/shared/utils/math';
 
 const ArrowDrawable = ({
   node,
@@ -22,25 +23,30 @@ const ArrowDrawable = ({
 }: NodeComponentProps) => {
   const [points, setPoints] = useState<Point[]>([
     node.nodeProps.point,
-    ...(node.nodeProps?.points || [node.nodeProps.point, node.nodeProps.point]),
+    ...(node.nodeProps?.points || [node.nodeProps.point]),
   ]);
+  const [bendValue, setBendValue] = useState<number>(
+    node.nodeProps.bend || 0.5,
+  );
+
   const [dragging, setDragging] = useState(false);
 
   useLayoutEffect(() => {
     setPoints([
       node.nodeProps.point,
-      ...(node.nodeProps?.points || [
-        node.nodeProps.point,
-        node.nodeProps.point,
-      ]),
+      ...(node.nodeProps?.points || [node.nodeProps.point]),
     ]);
   }, [node.nodeProps.point, node.nodeProps.points]);
 
   const lineRef = useRef<Konva.Line>(null);
 
+  useEffect(() => {
+    console.log(lineRef.current);
+  }, [lineRef.current]);
+
   const { dash, strokeWidth } = getStyleValues(node.style);
 
-  const [start, control, end] = points;
+  const [start, end] = points;
 
   useAnimatedLine(
     lineRef.current,
@@ -54,6 +60,41 @@ const ArrowDrawable = ({
     strokeWidth,
     visible: node.nodeProps.visible,
   });
+
+  function calculateMinMaxMovementPoints(startPos: Point, endPos: Point) {
+    const dx = endPos[0] - startPos[0];
+    const dy = endPos[1] - startPos[1];
+
+    const length = Math.sqrt(dx ** 2 + dy ** 2);
+
+    const mid = {
+      x: (startPos[0] + endPos[0]) / 2,
+      y: (startPos[1] + endPos[1]) / 2,
+    };
+
+    const perp = {
+      x: dy / length,
+      y: -dx / length,
+    };
+
+    const maxDist = length / 2;
+
+    const minPoint = {
+      x: mid.x - perp.x * maxDist,
+      y: mid.y - perp.y * maxDist,
+    };
+
+    const maxPoint = {
+      x: mid.x + perp.x * maxDist,
+      y: mid.y + perp.y * maxDist,
+    };
+
+    return { minPoint, maxPoint };
+  }
+  const { minPoint, maxPoint } = calculateMinMaxMovementPoints(start, end);
+
+  const controlX = getValueFromRatio(bendValue, minPoint.x, maxPoint.x);
+  const controlY = getValueFromRatio(bendValue, minPoint.y, maxPoint.y);
 
   return (
     <>
@@ -91,24 +132,35 @@ const ArrowDrawable = ({
         onTap={onPress}
         onClick={onPress}
       >
-        <ArrowHead control={control} end={end} config={config} />
-        <ArrowLine ref={lineRef} points={points} dash={dash} config={config} />
+        <ArrowHead control={[controlX, controlY]} end={end} config={config} />
+        <ArrowLine
+          ref={lineRef}
+          points={[start, end]}
+          control={[controlX, controlY]}
+          dash={dash}
+          config={config}
+        />
       </Group>
-      {selected && (
+      {selected && !dragging && (
         <ArrowTransformer
-          points={[start, control, end]}
-          visible={!dragging}
+          points={[start, end]}
+          control={[controlX, controlY]}
+          bend={bendValue}
           draggable
-          onTransform={(updatedPoints) => setPoints(updatedPoints)}
-          onTransformEnd={(updatedPoints) => {
+          onTransform={(updatedPoints, bend) => {
+            setPoints(updatedPoints);
+            setBendValue(bend);
+          }}
+          onTransformEnd={(updatedPoints, bend) => {
             setPoints(updatedPoints);
 
             onNodeChange({
               ...node,
               nodeProps: {
                 ...node.nodeProps,
+                bend,
                 point: updatedPoints[0],
-                points: [updatedPoints[1], updatedPoints[2]],
+                points: [updatedPoints[1]],
               },
             });
           }}

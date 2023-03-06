@@ -6,13 +6,15 @@ import { Line } from 'react-konva';
 
 type Props = {
   points: Point[];
+  control: Point;
   dash: number[];
   config: LineConfig;
 };
 
 const ArrowLine = forwardRef(
-  ({ dash, points, config }: Props, ref: ForwardedRef<Konva.Line>) => {
-    const [start, control, end] = points;
+  ({ dash, points, control, config }: Props, ref: ForwardedRef<Konva.Line>) => {
+    const [start, end] = points;
+
     return (
       <Line
         ref={ref}
@@ -22,6 +24,7 @@ const ArrowLine = forwardRef(
         sceneFunc={(ctx, shape) => {
           ctx.beginPath();
           ctx.moveTo(start[0], start[1]);
+
           ctx.quadraticCurveTo(control[0], control[1], end[0], end[1]);
 
           ctx.fillStrokeShape(shape);

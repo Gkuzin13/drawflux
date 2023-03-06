@@ -128,7 +128,6 @@ const ShapesStage = ({
     const intersectedIds = new Set<string>(
       intersectedChildren.map(({ attrs }) => attrs.id),
     );
-
     setNodesInStaging(
       nodes.filter((node) => intersectedIds.has(node.nodeProps.id)),
     );
@@ -186,7 +185,7 @@ const ShapesStage = ({
   };
 
   const onMoveStart = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
-    if ((e.evt as MouseEvent).button !== 0) return;
+    if (e.type === 'mousedown' && (e.evt as MouseEvent).button !== 0) return;
 
     const stage = e.target.getStage();
 
@@ -228,7 +227,6 @@ const ShapesStage = ({
 
   const onMove = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
     const stage = e.target.getStage();
-
     if (!stage) return;
 
     const { x, y } = stage.getRelativePointerPosition();
@@ -246,7 +244,7 @@ const ShapesStage = ({
     });
   };
 
-  const onMoveEnd = () => {
+  const onMoveEnd = (event: KonvaEventObject<TouchEvent | MouseEvent>) => {
     switch (toolType) {
       case 'select':
         setSelectRect(null);
@@ -364,6 +362,9 @@ const ShapesStage = ({
       onMouseDown={onMoveStart}
       onMouseMove={onMove}
       onMouseUp={onMoveEnd}
+      onTouchStart={onMoveStart}
+      onTouchMove={onMove}
+      onTouchEnd={onMoveEnd}
       onContextMenu={handleOnContextMenu}
       onWheel={handleStageOnWheel}
       onDragStart={handleStageDragEvent}
