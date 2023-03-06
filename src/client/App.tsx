@@ -80,7 +80,7 @@ const App = () => {
         nodes={nodes}
         toolType={toolType}
         styleMenu={styleMenu}
-        onZoom={handleStageZoom}
+        onStageZoomChange={handleStageZoom}
         onDraftEnd={() => setToolType('select')}
         onNodeSelect={(node) => setStyleMenu(node.style)}
       />

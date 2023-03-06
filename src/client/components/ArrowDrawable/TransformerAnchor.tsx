@@ -10,7 +10,6 @@ export type TransformerAnchorProps = {
   visible: boolean;
   x: number;
   y: number;
-  name: string;
   onDragMove: (e: KonvaEventObject<DragEvent>) => void;
   onDragEnd: (e: KonvaEventObject<DragEvent>) => void;
   dragBoundFunc?: (position: Vector2d) => void;

@@ -43,55 +43,10 @@ const ArrowTransformer = ({
     onTransformEnd(points);
   };
 
-  function getControlPointAfterDrag(
-    newPos: Point,
-    prevPos: Point,
-    controlPoint: Point,
-  ): Point {
-    // Calculate the displacement of the dragged point from its original position
-    const displacement = {
-      x: newPos[0] - prevPos[0],
-      y: newPos[1] - prevPos[1],
-    };
-
-    // If the dragged point is not the middle point, move the middle point with it
-    return [controlPoint[0] + displacement.x, controlPoint[1] + displacement.y];
-  }
-
-  function clampAnchorPoint(
-    position: Point,
-    startPos: Point,
-    endPos: Point,
-  ): Point {
-    const dx = endPos[0] - startPos[0];
-    const dy = endPos[1] - startPos[1];
-
-    const length = Math.sqrt(dx ** 2 + dy ** 2);
-
-    // Calculate the midpoint between the two points
-    const mid = {
-      x: (startPos[0] + endPos[0]) / 2,
-      y: (startPos[1] + endPos[1]) / 2,
-    };
-
-    // Calculate a perpendicular vector to the line connecting the two points
-    const perp = {
-      x: dy / length,
-      y: -dx / length,
-    };
-
-    // Calculate the distance of the drag from the midpoint along the perpendicular vector
-    let dragDist =
-      (position[0] - mid.x) * perp.x + (position[1] - mid.y) * perp.y;
-    dragDist = Math.max(Math.min(dragDist, length / 2), -length / 2);
-
-    return [mid.x + perp.x * dragDist, mid.y + perp.y * dragDist];
-  }
   return (
     <>
       <TransformerAnchor
-        key={`anchor-0`}
-        name={`anchor-0`}
+        key={0}
         x={start[0]}
         y={start[1]}
         onDragMove={(event) => onAnchorDragMove(event, ANCHOR_INDEX.START)}
@@ -100,8 +55,7 @@ const ArrowTransformer = ({
         visible={visible}
       />
       <TransformerAnchor
-        key={`anchor-1`}
-        name={`anchor-1`}
+        key={1}
         active={true}
         x={control[0]}
         y={control[1]}
@@ -111,8 +65,7 @@ const ArrowTransformer = ({
         draggable={draggable}
       />
       <TransformerAnchor
-        key={`anchor-2`}
-        name={`anchor-2`}
+        key={2}
         x={end[0]}
         y={end[1]}
         onDragMove={(event) => onAnchorDragMove(event, ANCHOR_INDEX.END)}
