@@ -1,4 +1,3 @@
-import { CURSOR } from '@/client/shared/cursor';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Vector2d } from 'konva/lib/types';
 import { useState } from 'react';
@@ -21,7 +20,6 @@ const TransformerAnchor = ({
   y,
   onDragMove,
   onDragEnd,
-  dragBoundFunc,
 }: TransformerAnchorProps) => {
   const [hovering, setHovering] = useState(false);
   return (
@@ -39,7 +37,6 @@ const TransformerAnchor = ({
       onDragEnd={onDragEnd}
       onMouseOver={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
-      dragBoundFunc={dragBoundFunc as any}
       perfectDrawEnabled={false}
       shadowForStrokeEnabled={false}
     />

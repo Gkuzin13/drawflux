@@ -1,10 +1,8 @@
 import { Point } from '@/client/shared/element';
-import {
-  getRatioFromValue,
-  getValueFromRatio,
-} from '@/client/shared/utils/math';
+import { getRatioFromValue } from '@/client/shared/utils/math';
 import Konva from 'konva';
 import { KonvaEventObject } from 'konva/lib/Node';
+import { calcMidPointAndPerp, calcMinMaxMovementPoints } from './helpers/calc';
 import TransformerAnchor from './TransformerAnchor';
 
 type Props = {
@@ -32,7 +30,7 @@ const ArrowTransformer = ({
 }: Props) => {
   const [start, end] = points;
 
-  const { minPoint, maxPoint } = calculateMinMaxMovementPoints(start, end);
+  const { minPoint, maxPoint } = calcMinMaxMovementPoints(start, end);
 
   const onAnchorDragMove = (
     event: KonvaEventObject<DragEvent>,
@@ -64,65 +62,19 @@ const ArrowTransformer = ({
     onTransformEnd(points, bend);
   };
 
-  function calculateMinMaxMovementPoints(startPos: Point, endPos: Point) {
-    const dx = endPos[0] - startPos[0];
-    const dy = endPos[1] - startPos[1];
-
-    const length = Math.sqrt(dx ** 2 + dy ** 2);
-
-    const mid = {
-      x: (startPos[0] + endPos[0]) / 2,
-      y: (startPos[1] + endPos[1]) / 2,
-    };
-
-    const perp = {
-      x: dy / length,
-      y: -dx / length,
-    };
-
-    const maxDist = length / 2;
-
-    const minPoint = {
-      x: mid.x - perp.x * maxDist,
-      y: mid.y - perp.y * maxDist,
-    };
-
-    const maxPoint = {
-      x: mid.x + perp.x * maxDist,
-      y: mid.y + perp.y * maxDist,
-    };
-
-    return { minPoint, maxPoint };
-  }
-
-  function clampAnchorPoint(
-    position: Point,
-    startPos: Point,
-    endPos: Point,
-  ): Point {
-    const dx = endPos[0] - startPos[0];
-    const dy = endPos[1] - startPos[1];
-
-    const length = Math.sqrt(dx ** 2 + dy ** 2);
-
-    // Calculate the midpoint between the two points
-    const mid = {
-      x: (startPos[0] + endPos[0]) / 2,
-      y: (startPos[1] + endPos[1]) / 2,
-    };
-
-    // Calculate a perpendicular vector to the line connecting the two points
-    const perp = {
-      x: dy / length,
-      y: -dx / length,
-    };
+  function clampAnchorPoint(position: Point, startPos: Point, endPos: Point) {
+    const { mid, perp, length } = calcMidPointAndPerp(startPos, endPos);
 
     // Calculate the distance of the drag from the midpoint along the perpendicular vector
     let dragDist =
       (position[0] - mid.x) * perp.x + (position[1] - mid.y) * perp.y;
+
     dragDist = Math.max(Math.min(dragDist, length / 2), -length / 2);
 
-    return [mid.x + perp.x * dragDist, mid.y + perp.y * dragDist];
+    return {
+      x: mid.x + dragDist * perp.x,
+      y: mid.y + dragDist * perp.y,
+    };
   }
 
   return (
@@ -148,14 +100,23 @@ const ArrowTransformer = ({
         key={2}
         x={control[0]}
         y={control[1]}
-        onDragMove={(event) => onAnchorDragMove(event, ANCHOR_INDEX.CONTROL)}
+        onDragMove={(event) => {
+          const anchor = event.target as Konva.Circle;
+          const stage = anchor.getStage() as Konva.Stage;
+          const position = anchor.getAbsolutePosition(stage);
+
+          const { x, y } = clampAnchorPoint(
+            [position.x, position.y],
+            start,
+            end,
+          );
+
+          anchor.position({ x, y });
+
+          onAnchorDragMove(event, ANCHOR_INDEX.CONTROL);
+        }}
         onDragEnd={onAnchorDragEnd}
         draggable={draggable}
-        dragBoundFunc={(position) => {
-          const [x, y] = clampAnchorPoint([position.x, position.y], start, end);
-
-          return { x, y };
-        }}
       />
     </>
   );

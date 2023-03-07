@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import Konva from 'konva';
 import ArrowTransformer from './ArrowTransformer';
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
@@ -13,6 +13,7 @@ import { getPointsAbsolutePosition } from '@/client/shared/utils/position';
 import ArrowHead from './ArrowHead';
 import ArrowLine from './ArrowLine';
 import { getValueFromRatio } from '@/client/shared/utils/math';
+import { calcMinMaxMovementPoints } from './helpers/calc';
 
 const ArrowDrawable = ({
   node,
@@ -40,10 +41,6 @@ const ArrowDrawable = ({
 
   const lineRef = useRef<Konva.Line>(null);
 
-  useEffect(() => {
-    console.log(lineRef.current);
-  }, [lineRef.current]);
-
   const { dash, strokeWidth } = getStyleValues(node.style);
 
   const [start, end] = points;
@@ -61,40 +58,12 @@ const ArrowDrawable = ({
     visible: node.nodeProps.visible,
   });
 
-  function calculateMinMaxMovementPoints(startPos: Point, endPos: Point) {
-    const dx = endPos[0] - startPos[0];
-    const dy = endPos[1] - startPos[1];
+  const { minPoint, maxPoint } = calcMinMaxMovementPoints(start, end);
 
-    const length = Math.sqrt(dx ** 2 + dy ** 2);
-
-    const mid = {
-      x: (startPos[0] + endPos[0]) / 2,
-      y: (startPos[1] + endPos[1]) / 2,
-    };
-
-    const perp = {
-      x: dy / length,
-      y: -dx / length,
-    };
-
-    const maxDist = length / 2;
-
-    const minPoint = {
-      x: mid.x - perp.x * maxDist,
-      y: mid.y - perp.y * maxDist,
-    };
-
-    const maxPoint = {
-      x: mid.x + perp.x * maxDist,
-      y: mid.y + perp.y * maxDist,
-    };
-
-    return { minPoint, maxPoint };
-  }
-  const { minPoint, maxPoint } = calculateMinMaxMovementPoints(start, end);
-
-  const controlX = getValueFromRatio(bendValue, minPoint.x, maxPoint.x);
-  const controlY = getValueFromRatio(bendValue, minPoint.y, maxPoint.y);
+  const control = {
+    x: getValueFromRatio(bendValue, minPoint.x, maxPoint.x),
+    y: getValueFromRatio(bendValue, minPoint.y, maxPoint.y),
+  };
 
   return (
     <>
@@ -132,11 +101,11 @@ const ArrowDrawable = ({
         onTap={onPress}
         onClick={onPress}
       >
-        <ArrowHead control={[controlX, controlY]} end={end} config={config} />
+        <ArrowHead control={[control.x, control.y]} end={end} config={config} />
         <ArrowLine
           ref={lineRef}
           points={[start, end]}
-          control={[controlX, controlY]}
+          control={[control.x, control.y]}
           dash={dash}
           config={config}
         />
@@ -144,7 +113,7 @@ const ArrowDrawable = ({
       {selected && !dragging && (
         <ArrowTransformer
           points={[start, end]}
-          control={[controlX, controlY]}
+          control={[control.x, control.y]}
           bend={bendValue}
           draggable
           onTransform={(updatedPoints, bend) => {
