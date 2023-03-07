@@ -49,7 +49,7 @@ const CircleDrawable = ({
         x={node.nodeProps.point[0]}
         y={node.nodeProps.point[1]}
         {...config}
-        onDragStart={onPress}
+        onDragStart={() => onPress(node.nodeProps.id)}
         onDragEnd={(event) => {
           onNodeChange({
             ...node,
@@ -77,8 +77,8 @@ const CircleDrawable = ({
 
           ellipse.scale({ x: 1, y: 1 });
         }}
-        onTap={onPress}
-        onClick={onPress}
+        onTap={() => onPress(node.nodeProps.id)}
+        onClick={() => onPress(node.nodeProps.id)}
       />
       {selected && <NodeTransformer ref={transformerRef} />}
     </>

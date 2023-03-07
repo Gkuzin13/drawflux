@@ -33,7 +33,7 @@ const getStyle = (width: string, fontSize: number): React.CSSProperties => {
 
   return {
     ...baseStyle,
-    marginTop: '-1px',
+    marginTop: '-2px',
   };
 };
 const EditableTextInput = ({

@@ -4,6 +4,6 @@ export type NodeComponentProps = {
   node: NodeType;
   selected: boolean;
   draggable: boolean;
-  onPress: () => void;
+  onPress: (nodeId: string) => void;
   onNodeChange: (node: NodeType) => void;
 };

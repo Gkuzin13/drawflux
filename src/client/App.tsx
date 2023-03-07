@@ -7,7 +7,7 @@ import StylesDock from './components/StylesDock/StylesDock';
 import ToolsDock from './components/ToolsDock';
 import { Tool } from './shared/tool';
 import ControlDock from './components/ControlDock';
-import ShapesStage from './components/Stage/Stage';
+import DrawingCanvas from './components/Stage/DrawingCanvas';
 import { controlActions, selectControl } from './stores/slices/controlSlice';
 import {
   selectStageConfig,
@@ -94,7 +94,7 @@ const App = () => {
             </button>
             <button
               onClick={() =>
-                dispatch(stageConfigActions.changeScale('descrease'))
+                dispatch(stageConfigActions.changeScale('decrease'))
               }
             >
               -
@@ -102,7 +102,7 @@ const App = () => {
           </div>
         </div>
       </div>
-      <ShapesStage
+      <DrawingCanvas
         config={{
           width: window.innerWidth,
           height: window.innerHeight,

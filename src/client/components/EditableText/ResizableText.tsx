@@ -45,6 +45,7 @@ const ResizableText = ({
         fontSize={style.fontSize || 16}
         text={node.text || ''}
         {...config}
+        onDragStart={() => onPress(node.nodeProps.id)}
         onDragEnd={(event) => {
           onNodeChange({
             ...node,
@@ -74,8 +75,8 @@ const ResizableText = ({
 
           textNode.scale({ x: 1, y: 1 });
         }}
-        onTap={onPress}
-        onClick={onPress}
+        onTap={() => onPress(node.nodeProps.id)}
+        onClick={() => onPress(node.nodeProps.id)}
       />
       {selected && (
         <NodeTransformer

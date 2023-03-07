@@ -50,7 +50,7 @@ const RectDrawable = ({
         height={nodeProps.height}
         cornerRadius={8}
         {...config}
-        onDragStart={onPress}
+        onDragStart={() => onPress(node.nodeProps.id)}
         onDragEnd={(event) => {
           onNodeChange({
             ...node,
@@ -81,8 +81,8 @@ const RectDrawable = ({
             },
           });
         }}
-        onTap={onPress}
-        onClick={onPress}
+        onTap={() => onPress(node.nodeProps.id)}
+        onClick={() => onPress(node.nodeProps.id)}
       />
       {selected && <NodeTransformer ref={transformerRef} />}
     </>

@@ -93,13 +93,12 @@ const ArrowDrawable = ({
               points: restPoints,
             },
           });
-
           group.position({ x: 0, y: 0 });
 
           setDragging(false);
         }}
-        onTap={onPress}
-        onClick={onPress}
+        onTap={() => onPress(node.nodeProps.id)}
+        onClick={() => onPress(node.nodeProps.id)}
       >
         <ArrowHead control={[control.x, control.y]} end={end} config={config} />
         <ArrowLine

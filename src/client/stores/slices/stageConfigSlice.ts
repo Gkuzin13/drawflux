@@ -20,7 +20,7 @@ export const stageConfigSlice = createSlice({
     set: (state, action: PayloadAction<Partial<StageConfigState>>) => {
       return { ...state, ...action.payload };
     },
-    changeScale: (state, action: PayloadAction<'increase' | 'descrease'>) => {
+    changeScale: (state, action: PayloadAction<'increase' | 'decrease'>) => {
       const updatedScale =
         action.payload === 'increase' ? state.scale + 0.1 : state.scale - 0.1;
 

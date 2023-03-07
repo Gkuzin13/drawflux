@@ -122,7 +122,7 @@ const NodeGroupTransformer = ({
       </Group>
       <NodeTransformer
         ref={transformerRef}
-        transformerConfig={{ enabledAnchors: [] }}
+        transformerConfig={{ enabledAnchors: [], rotateEnabled: false }}
       />
     </>
   );

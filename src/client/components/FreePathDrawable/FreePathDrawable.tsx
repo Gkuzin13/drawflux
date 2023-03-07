@@ -49,7 +49,7 @@ const FreePathDrawable = ({
         ref={nodeRef}
         points={flattenedPoints}
         {...config}
-        onDragStart={onPress}
+        onDragStart={() => onPress(node.nodeProps.id)}
         onDragEnd={(event) => {
           const line = event.target as Konva.Line;
           const stage = line.getStage() as Konva.Stage;
@@ -88,8 +88,8 @@ const FreePathDrawable = ({
           line.scale({ x: 1, y: 1 });
           line.position({ x: 0, y: 0 });
         }}
-        onTap={onPress}
-        onClick={onPress}
+        onTap={() => onPress(node.nodeProps.id)}
+        onClick={() => onPress(node.nodeProps.id)}
       />
       {selected && <NodeTransformer ref={transformerRef} />}
     </>

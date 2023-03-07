@@ -1,17 +1,14 @@
-import { NodeType } from '@/client/shared/element';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Tool } from '../../shared/tool';
 import { RootState } from '../store';
 
 export type ControlState = {
   selectedNodeId: string | null;
-  nodesInStaging: NodeType[];
   toolType: Tool['value'];
 };
 
 const initialState: ControlState = {
   selectedNodeId: null,
-  nodesInStaging: [],
   toolType: 'arrow',
 };
 
@@ -24,9 +21,6 @@ export const controlSlice = createSlice({
     },
     unsetSelectedNode: (state) => {
       state.selectedNodeId = null;
-    },
-    setNodesInStaging: (state, action: PayloadAction<NodeType[]>) => {
-      state.nodesInStaging = action.payload;
     },
     setToolType: (state, action: PayloadAction<Tool['value']>) => {
       state.toolType = action.payload;
