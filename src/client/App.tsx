@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { selectNodes } from './stores/nodesSlice';
+import { useEffect, useMemo } from 'react';
+import { nodesActions, selectNodes } from './stores/slices/nodesSlice';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
 import { KEYS } from './shared/keys';
 import { NodeStyle } from './shared/element';
@@ -7,8 +7,12 @@ import StylesDock from './components/StylesDock/StylesDock';
 import ToolsDock from './components/ToolsDock';
 import { Tool } from './shared/tool';
 import ControlDock from './components/ControlDock';
-
-import ShapesStage from './components/Stage';
+import ShapesStage from './components/Stage/Stage';
+import { controlActions, selectControl } from './stores/slices/controlSlice';
+import {
+  selectStageConfig,
+  stageConfigActions,
+} from './stores/slices/stageConfigSlice';
 
 const defaultStyle: NodeStyle = {
   line: 'solid',
@@ -17,9 +21,8 @@ const defaultStyle: NodeStyle = {
 };
 
 const App = () => {
-  const [toolType, setToolType] = useState<Tool['value']>('arrow');
-  const [stageScale, setStageScale] = useState(100);
-  const [styleMenu, setStyleMenu] = useState<NodeStyle>(defaultStyle);
+  const { selectedNodeId, toolType } = useAppSelector(selectControl);
+  const stageConfig = useAppSelector(selectStageConfig);
 
   const { past, present, future } = useAppSelector(selectNodes);
 
@@ -27,14 +30,20 @@ const App = () => {
 
   const dispatch = useAppDispatch();
 
+  const selectedNode = nodes.find((n) => n.nodeProps.id === selectedNodeId);
+
+  const stageScalePercent = useMemo(() => {
+    return `${Math.round(stageConfig.scale * 100)}%`;
+  }, [stageConfig.scale]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
         case KEYS.H:
-          setToolType('hand');
+          dispatch(controlActions.setToolType('hand'));
           break;
         case KEYS.V:
-          setToolType('select');
+          dispatch(controlActions.setToolType('select'));
       }
     };
 
@@ -48,11 +57,15 @@ const App = () => {
   }, [toolType]);
 
   const onNodeTypeChange = (type: Tool['value']) => {
-    setToolType(type);
+    dispatch(controlActions.setToolType(type));
   };
 
-  const handleStageZoom = (scale: number) => {
-    setStageScale(Math.round(scale * 100));
+  const handleStyleChange = (style: NodeStyle) => {
+    if (!selectedNode) return;
+
+    const updatedNode = { ...selectedNode, style };
+
+    dispatch(nodesActions.update([updatedNode]));
   };
 
   return (
@@ -60,8 +73,8 @@ const App = () => {
       <div style={{ position: 'absolute', zIndex: 1 }}>
         <ToolsDock onToolSelect={onNodeTypeChange} />
         <StylesDock
-          style={styleMenu}
-          onStyleChange={(updatedStyle) => setStyleMenu(updatedStyle)}
+          style={selectedNode?.style || defaultStyle}
+          onStyleChange={handleStyleChange}
         />
         <ControlDock
           onHistoryControl={(type) => dispatch({ type })}
@@ -70,19 +83,35 @@ const App = () => {
           redoDisabled={!future.length}
         />
         <div>
-          <span>Zoom: {stageScale}%</span>
+          <span>Zoom: {stageScalePercent}</span>
+          <div>
+            <button
+              onClick={() =>
+                dispatch(stageConfigActions.changeScale('increase'))
+              }
+            >
+              +
+            </button>
+            <button
+              onClick={() =>
+                dispatch(stageConfigActions.changeScale('descrease'))
+              }
+            >
+              -
+            </button>
+          </div>
         </div>
       </div>
-
       <ShapesStage
-        width={window.innerWidth}
-        height={window.innerHeight}
-        nodes={nodes}
-        toolType={toolType}
-        styleMenu={styleMenu}
-        onStageZoomChange={handleStageZoom}
-        onDraftEnd={() => setToolType('select')}
-        onNodeSelect={(node) => setStyleMenu(node.style)}
+        config={{
+          width: window.innerWidth,
+          height: window.innerHeight,
+          scale: { x: stageConfig.scale, y: stageConfig.scale },
+          x: stageConfig.position.x,
+          y: stageConfig.position.y,
+        }}
+        containerStyle={{ backgroundColor: 'fafafa' }}
+        onConfigChange={(config) => dispatch(stageConfigActions.set(config))}
       />
     </>
   );

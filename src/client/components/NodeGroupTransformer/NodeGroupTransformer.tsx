@@ -115,7 +115,7 @@ const NodeGroupTransformer = ({
             },
             selected: false,
             draggable: false,
-            onSelect: () => null,
+            onPress: () => null,
             onNodeChange: () => null,
           } as NodeComponentProps);
         })}

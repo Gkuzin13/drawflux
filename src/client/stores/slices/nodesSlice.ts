@@ -1,6 +1,6 @@
 import { NodeType } from '@/client/shared/element';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from './store';
+import { RootState } from '../store';
 
 export type NodesState = {
   nodes: NodeType[];
@@ -47,7 +47,7 @@ export const nodesSlice = createSlice({
   },
 });
 
-export const selectNodes = (state: RootState) => state;
+export const selectNodes = (state: RootState) => state.undoableNodes;
 
 export const nodesActions = nodesSlice.actions;
 export default nodesSlice.reducer;

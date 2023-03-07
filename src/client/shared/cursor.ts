@@ -5,4 +5,4 @@ export const CURSOR = {
   GRAB: 'grab',
   GRABBING: 'grabbing',
   CROSSHAIR: 'crosshair',
-};
+} as const;

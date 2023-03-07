@@ -1,6 +1,6 @@
 import { NodeType } from '@/client/shared/element';
 import { Action, Reducer } from '@reduxjs/toolkit';
-import { ActionType, ACTION_TYPES } from './actions';
+import { ActionType, ACTION_TYPES } from '../actions';
 
 export type HistoryState<T> = {
   past: NodeType[];

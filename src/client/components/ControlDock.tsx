@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 import { HISTORY } from '../shared/history';
 import { ActionType } from '../stores/actions';
-import { nodesActions } from '../stores/nodesSlice';
+import { nodesActions } from '../stores/slices/nodesSlice';
 
 type Props = {
   onHistoryControl: (type: ActionType) => void;

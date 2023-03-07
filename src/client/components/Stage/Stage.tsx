@@ -1,41 +1,44 @@
-import { NodeStyle, NodeType, Point } from '../shared/element';
+import { NodeType, Point } from '../../shared/element';
 import { Layer, Stage } from 'react-konva';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Konva from 'konva';
-import { useAppDispatch } from '../stores/hooks';
-import { Tool } from '../shared/tool';
-import { KonvaEventObject } from 'konva/lib/Node';
+import { useAppDispatch, useAppSelector } from '../../stores/hooks';
+import { KonvaEventObject, NodeConfig } from 'konva/lib/Node';
 import {
   DEFAULT_MENU,
   DEFAULT_NODE_MENU,
   MenuItem,
   MENU_ACTIONS,
-} from '../shared/menu';
+} from '../../shared/menu';
 import { IRect } from 'konva/lib/types';
-import { createNode } from '../shared/utils/createNode';
-import { drawRectangle } from '../shared/utils/draw';
-import { CURSOR } from '../shared/cursor';
-import { drawFreePath } from './FreePathDrawable/helpers/drawFreePath';
-import { drawArrow } from './ArrowDrawable/helpers/drawArrow';
-import { drawRect } from './RectDrawable/helpers/drawRect';
-import { drawEllipse } from './EllipseDrawable/helpers/drawEllipse';
-import { nodesActions } from '../stores/nodesSlice';
-import Node from './Node/Node';
-import SelectTool from './SelectTool';
-import NodeGroupTransformer from './NodeGroupTransformer/NodeGroupTransformer';
+import { createNode } from '../../shared/utils/createNode';
+import { drawRectangle } from '../../shared/utils/draw';
+import { CURSOR } from '../../shared/cursor';
+import { drawFreePath } from '../FreePathDrawable/helpers/drawFreePath';
+import { drawArrow } from '../ArrowDrawable/helpers/drawArrow';
+import { drawRect } from '../RectDrawable/helpers/drawRect';
+import { drawEllipse } from '../EllipseDrawable/helpers/drawEllipse';
+import { nodesActions, selectNodes } from '@/client/stores/slices/nodesSlice';
+import Node from '../Node/Node';
+import SelectTool from '../SelectTool';
+import NodeGroupTransformer from '../NodeGroupTransformer/NodeGroupTransformer';
 import { Html } from 'react-konva-utils';
-import ContextMenu from './ContextMenu/ContextMenu';
-import DraftNode from './Node/DraftNode';
+import ContextMenu from '../ContextMenu/ContextMenu';
+import DraftNode from '../Node/DraftNode';
+import {
+  controlActions,
+  selectControl,
+} from '@/client/stores/slices/controlSlice';
+import {
+  calcNewStagePositionAndScale,
+  hasStageScaleReachedLimit,
+} from './helpers/zoom';
+import { StageConfigState } from '@/client/stores/slices/stageConfigSlice';
 
 type Props = {
-  nodes: NodeType[];
-  width: number;
-  height: number;
-  toolType: Tool['value'];
-  styleMenu: NodeStyle;
-  onDraftEnd: () => void;
-  onStageZoomChange: (scale: number) => void;
-  onNodeSelect: (node: NodeType) => void;
+  config: NodeConfig;
+  containerStyle: React.CSSProperties;
+  onConfigChange: (config: Partial<StageConfigState>) => void;
 };
 
 type ContextMenuState = {
@@ -43,35 +46,23 @@ type ContextMenuState = {
   position: Point;
 };
 
-const ShapesStage = ({
-  nodes,
-  width,
-  height,
-  toolType,
-  styleMenu,
-  onStageZoomChange,
-  onDraftEnd,
-  onNodeSelect,
-}: Props) => {
+const ShapesStage = ({ config, containerStyle, onConfigChange }: Props) => {
   const [draftNode, setDraftNode] = useState<NodeType | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [selectRect, setSelectRect] = useState<IRect | null>(null);
-  const [selectedNode, setSelectedNode] = useState<NodeType | null>(null);
-  const [nodesInStaging, setNodesInStaging] = useState<NodeType[]>([]);
   const [drawing, setDrawing] = useState(false);
+
+  const { selectedNodeId, nodesInStaging, toolType } =
+    useAppSelector(selectControl);
+
+  const nodes = useAppSelector(selectNodes).present.nodes;
+
+  const dispatch = useAppDispatch();
 
   const moveStartPosition = useRef<Point>([0, 0]);
 
   const stageRef = useRef<Konva.Stage>(null);
   const selectRectRef = useRef<Konva.Rect>(null);
-
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (selectedNode) {
-      dispatch(nodesActions.update([{ ...selectedNode, style: styleMenu }]));
-    }
-  }, [styleMenu]);
 
   useEffect(() => {
     if (!stageRef.current) return;
@@ -97,15 +88,15 @@ const ShapesStage = ({
   const onNodeMenuAction = (key: MenuItem['key']) => {
     switch (key) {
       case MENU_ACTIONS.DELETE_NODE:
-        if (!selectedNode) return;
-        dispatch(nodesActions.delete([selectedNode.nodeProps.id]));
+        if (!selectedNodeId) return;
+        dispatch(nodesActions.delete([selectedNodeId]));
         break;
       case MENU_ACTIONS.SELECT_ALL:
-        setNodesInStaging(nodes);
+        dispatch(controlActions.setNodesInStaging(nodes));
         break;
     }
 
-    setSelectedNode(null);
+    dispatch(controlActions.unsetSelectedNode());
     setContextMenu(null);
   };
 
@@ -126,11 +117,14 @@ const ShapesStage = ({
     });
 
     const intersectedIds = new Set<string>(
-      intersectedChildren.map(({ attrs }) => attrs.id),
+      intersectedChildren.map((child) => child.attrs.id),
     );
-    setNodesInStaging(
-      nodes.filter((node) => intersectedIds.has(node.nodeProps.id)),
+
+    const intersectedNodes = nodes.filter((node) =>
+      intersectedIds.has(node.nodeProps.id),
     );
+
+    dispatch(controlActions.setNodesInStaging(intersectedNodes));
   };
 
   const handleOnContextMenu = (e: KonvaEventObject<PointerEvent>) => {
@@ -150,13 +144,12 @@ const ShapesStage = ({
     }
 
     const isGroup = e.target.parent?.nodeType === 'Group';
-
     const shape = isGroup ? e.target.parent : e.target;
 
     const node = nodes.find((node) => node.nodeProps.id === shape?.attrs.id);
 
     if (node) {
-      setSelectedNode(node);
+      dispatch(controlActions.setSelectedNode(node.nodeProps.id));
       setContextMenu({
         items: DEFAULT_NODE_MENU,
         position: [position.x, position.y],
@@ -184,12 +177,14 @@ const ShapesStage = ({
     }
   };
 
-  const onMoveStart = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
-    if (e.type === 'mousedown' && (e.evt as MouseEvent).button !== 0) return;
+  const onMoveStart = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    if (event.type === 'mousedown' && (event.evt as MouseEvent).button !== 0) {
+      return;
+    }
 
-    const stage = e.target.getStage();
+    const stage = event.target.getStage();
 
-    const clickedOnEmpty = e.target === stage;
+    const clickedOnEmpty = event.target === stage;
 
     if (!clickedOnEmpty) {
       return;
@@ -220,18 +215,17 @@ const ShapesStage = ({
         break;
     }
 
-    setSelectedNode(null);
-    setNodesInStaging([]);
+    dispatch(controlActions.unsetSelectedNode());
+    dispatch(controlActions.setNodesInStaging([]));
     setContextMenu(null);
   };
 
-  const onMove = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
-    const stage = e.target.getStage();
-    if (!stage) return;
+  const onMove = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    const stage = event.target.getStage();
+
+    if (!stage || !drawing) return;
 
     const { x, y } = stage.getRelativePointerPosition();
-
-    if (!drawing) return;
 
     if (toolType === 'select' && selectRectRef.current) {
       setSelectRect(drawRectangle([moveStartPosition.current, [x, y]]));
@@ -244,7 +238,7 @@ const ShapesStage = ({
     });
   };
 
-  const onMoveEnd = (event: KonvaEventObject<TouchEvent | MouseEvent>) => {
+  const onMoveEnd = () => {
     switch (toolType) {
       case 'select':
         setSelectRect(null);
@@ -252,68 +246,41 @@ const ShapesStage = ({
         break;
       case 'draw':
         if (!draftNode) return;
-        dispatch(nodesActions.add([draftNode]));
-        setDrawing(false);
+        handleDraftEnd(draftNode, false);
         break;
       case 'text':
         break;
-      default: {
-        if (!draftNode) return;
+      case 'arrow':
+        if (!draftNode || !drawing) return;
 
-        dispatch(nodesActions.add([draftNode]));
-        onDraftEnd();
-        setDrawing(false);
+        if (!draftNode.nodeProps.points) {
+          setDrawing(false);
+          setDraftNode(null);
+          break;
+        }
+        handleDraftEnd(draftNode);
+        break;
+      default: {
+        if (!draftNode || !drawing) return;
+        handleDraftEnd(draftNode);
       }
     }
-
-    if (draftNode) {
-      setDraftNode(null);
-    }
-  };
-
-  const handleNodeChange = (node: NodeType) => {
-    dispatch(nodesActions.update([node]));
   };
 
   const zoomStageRelativeToPointerPosition = (
     stage: Konva.Stage,
     event: WheelEvent,
   ) => {
-    const oldScale = stage.scaleX();
-    const pointer = stage.getRelativePointerPosition();
-    const scaleBy = 1.1;
+    const { position, scale } = calcNewStagePositionAndScale(
+      stage.scaleX(),
+      stage.getRelativePointerPosition(),
+      stage.getPosition(),
+      event.deltaY,
+    );
 
-    const mousePointTo = {
-      x: (pointer.x - stage.x()) / oldScale,
-      y: (pointer.y - stage.y()) / oldScale,
-    };
-
-    const direction = event.deltaY > 0 ? -1 : 1;
-
-    const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-
-    if (!sanitizeStageZoom([newScale, newScale])) return;
-
-    const newPos = {
-      x: pointer.x - mousePointTo.x * newScale,
-      y: pointer.y - mousePointTo.y * newScale,
-    };
-
-    stage.scale({ x: newScale, y: newScale });
-    stage.position(newPos);
-
-    onStageZoomChange(newScale);
-  };
-
-  const sanitizeStageZoom = (zoom: Point) => {
-    if (zoom[0] < 0.1 || zoom[1] < 0.1) {
-      return false;
+    if (!hasStageScaleReachedLimit(scale)) {
+      onConfigChange({ scale, position });
     }
-    if (zoom[0] > 2.5 || zoom[1] > 2.5) {
-      return false;
-    }
-
-    return true;
   };
 
   const handleStageOnWheel = (e: KonvaEventObject<WheelEvent>) => {
@@ -337,27 +304,29 @@ const ShapesStage = ({
     }
   };
 
-  const handleNodeGroupDrag = (updatedNodes: NodeType[]) => {
-    dispatch(nodesActions.update(updatedNodes));
+  const handleNodeChange = (nodes: NodeType[]) => {
+    dispatch(nodesActions.update(nodes));
   };
 
-  const handleDraftEnd = (node: NodeType) => {
+  const handleDraftEnd = (node: NodeType, clearDraftNode = true) => {
     dispatch(nodesActions.add([node]));
-    setDraftNode(null);
-    onDraftEnd();
+    setDrawing(false);
+
+    if (clearDraftNode) {
+      setDraftNode(null);
+      dispatch(controlActions.setToolType('select'));
+    }
   };
 
   const handleNodePress = (node: NodeType) => {
-    setSelectedNode(node);
-    onNodeSelect(node);
+    dispatch(controlActions.setSelectedNode(node.nodeProps.id));
   };
 
   return (
     <Stage
       ref={stageRef}
-      width={width}
-      height={height}
-      style={{ backgroundColor: '#fafafa' }}
+      {...config}
+      style={containerStyle}
       draggable={toolType === 'hand'}
       onMouseDown={onMoveStart}
       onMouseMove={onMove}
@@ -376,10 +345,10 @@ const ShapesStage = ({
             <Node
               key={node.nodeProps.id}
               node={node}
-              selected={selectedNode?.nodeProps.id === node.nodeProps.id}
+              selected={selectedNodeId === node.nodeProps.id}
               draggable={toolType !== 'hand'}
               onPress={() => handleNodePress(node)}
-              onNodeChange={handleNodeChange}
+              onNodeChange={() => handleNodeChange([node])}
             />
           );
         })}
@@ -392,8 +361,8 @@ const ShapesStage = ({
         {nodesInStaging.length ? (
           <NodeGroupTransformer
             selectedNodes={nodesInStaging}
-            onDragStart={handleNodeGroupDrag}
-            onDragEnd={handleNodeGroupDrag}
+            onDragStart={handleNodeChange}
+            onDragEnd={handleNodeChange}
           />
         ) : null}
         <Html
