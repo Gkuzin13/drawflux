@@ -6,7 +6,7 @@ import {
   ColorPicker,
   DockContainer,
   StyleButton,
-} from './StylesDockStyled';
+} from './StylePanelStyled';
 
 type Props = {
   style: NodeStyle;

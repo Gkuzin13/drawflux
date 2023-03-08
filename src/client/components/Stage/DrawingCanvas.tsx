@@ -1,6 +1,6 @@
 import { NodeType, Point } from '../../shared/element';
-import { Layer, Stage } from 'react-konva';
-import { useEffect, useRef, useState } from 'react';
+import { Stage } from 'react-konva';
+import { useMemo, useRef, useState } from 'react';
 import Konva from 'konva';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import { KonvaEventObject, NodeConfig } from 'konva/lib/Node';
@@ -49,10 +49,11 @@ const ShapesStage = ({ config, containerStyle, onConfigChange }: Props) => {
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [selectRect, setSelectRect] = useState<IRect | null>(null);
   const [drawing, setDrawing] = useState(false);
+  const [draggingStage, setDraggingStage] = useState(false);
   const [intersectedNodes, setIntersectedNodes] = useState<NodeType[]>([]);
 
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
-  const nodes = useAppSelector(selectNodes).present.nodes;
+  const { nodes } = useAppSelector(selectNodes).present;
 
   const dispatch = useAppDispatch();
 
@@ -61,26 +62,20 @@ const ShapesStage = ({ config, containerStyle, onConfigChange }: Props) => {
   const stageRef = useRef<Konva.Stage>(null);
   const selectRectRef = useRef<Konva.Rect>(null);
 
-  useEffect(() => {
-    if (!stageRef.current) return;
-
-    const stage = stageRef.current;
-
+  const cursorStyle = useMemo(() => {
     switch (toolType) {
       case 'hand':
-        stage.container().style.cursor = CURSOR.GRAB;
-        break;
+        return draggingStage ? CURSOR.GRABBING : CURSOR.GRAB;
       case 'select':
-        stage.container().style.cursor = CURSOR.DEFAULT;
-        break;
+        return CURSOR.DEFAULT;
       default:
         if (drawing) {
-          stage.container().style.cursor = CURSOR.CROSSHAIR;
+          return CURSOR.CROSSHAIR;
         } else {
-          stage.container().style.cursor = CURSOR.DEFAULT;
+          return CURSOR.DEFAULT;
         }
     }
-  }, [toolType, drawing, stageRef.current]);
+  }, [drawing, stageRef, toolType, draggingStage]);
 
   const onNodeMenuAction = (key: MenuItem['key']) => {
     switch (key) {
@@ -172,7 +167,7 @@ const ShapesStage = ({ config, containerStyle, onConfigChange }: Props) => {
     }
   };
 
-  const onMoveStart = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
+  const onStagePress = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
     if (event.type === 'mousedown' && (event.evt as MouseEvent).button !== 0) {
       return;
     }
@@ -215,7 +210,7 @@ const ShapesStage = ({ config, containerStyle, onConfigChange }: Props) => {
     setContextMenu(null);
   };
 
-  const onMove = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
+  const onStageMove = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
     if (!drawing) return;
 
     const stage = event.target.getStage();
@@ -235,7 +230,7 @@ const ShapesStage = ({ config, containerStyle, onConfigChange }: Props) => {
     });
   };
 
-  const onMoveEnd = () => {
+  const onStageMoveEnd = () => {
     switch (toolType) {
       case 'select':
         setSelectRect(null);
@@ -289,22 +284,15 @@ const ShapesStage = ({ config, containerStyle, onConfigChange }: Props) => {
     }
   };
 
-  const setCursorByStageDragEvent = (event: KonvaEventObject<DragEvent>) => {
-    const stage = event.target as Konva.Stage;
-
-    if (stage !== event.target.getStage()) return;
-
-    if (event.type === 'dragstart') {
-      stage.container().style.cursor = CURSOR.GRABBING;
-    } else {
-      stage.container().style.cursor = CURSOR.GRAB;
-    }
-  };
-
   const handleDraftEnd = (node: NodeType, resetToolType = true) => {
+    setDraftNode(null);
+
+    if (node.type === 'text' && !node.text) {
+      return;
+    }
+
     dispatch(nodesActions.add([node]));
     setDrawing(false);
-    setDraftNode(null);
 
     if (resetToolType) {
       dispatch(controlActions.setToolType('select'));
@@ -315,18 +303,18 @@ const ShapesStage = ({ config, containerStyle, onConfigChange }: Props) => {
     <Stage
       ref={stageRef}
       {...config}
-      style={containerStyle}
+      style={{ ...containerStyle, cursor: cursorStyle }}
       draggable={toolType === 'hand'}
-      onMouseDown={onMoveStart}
-      onMouseMove={onMove}
-      onMouseUp={onMoveEnd}
-      onTouchStart={onMoveStart}
-      onTouchMove={onMove}
-      onTouchEnd={onMoveEnd}
+      onMouseDown={onStagePress}
+      onMouseMove={onStageMove}
+      onMouseUp={onStageMoveEnd}
+      onTouchStart={onStagePress}
+      onTouchMove={onStageMove}
+      onTouchEnd={onStageMoveEnd}
       onContextMenu={handleOnContextMenu}
       onWheel={handleStageOnWheel}
-      onDragStart={setCursorByStageDragEvent}
-      onDragEnd={setCursorByStageDragEvent}
+      onDragStart={() => setDraggingStage(true)}
+      onDragEnd={() => setDraggingStage(false)}
     >
       <NodesLayer
         nodes={nodes}
@@ -336,8 +324,7 @@ const ShapesStage = ({ config, containerStyle, onConfigChange }: Props) => {
         intersectedNodes={intersectedNodes}
         config={{ listening: !drawing }}
         handleDraftEnd={handleDraftEnd}
-      />
-      <Layer>
+      >
         {selectRect && <SelectTool rect={selectRect} ref={selectRectRef} />}
         <Html
           groupProps={{
@@ -352,7 +339,7 @@ const ShapesStage = ({ config, containerStyle, onConfigChange }: Props) => {
             />
           )}
         </Html>
-      </Layer>
+      </NodesLayer>
     </Stage>
   );
 };

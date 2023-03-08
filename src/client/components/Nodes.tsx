@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { NodeType } from '../shared/element';
 import { Tool } from '../shared/tool';
 import Node from './Node/Node';
@@ -36,4 +35,4 @@ const Nodes = ({
   );
 };
 
-export default memo(Nodes);
+export default Nodes;

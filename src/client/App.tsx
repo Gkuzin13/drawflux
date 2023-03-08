@@ -1,24 +1,19 @@
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { nodesActions, selectNodes } from './stores/slices/nodesSlice';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
-import { KEYS } from './shared/keys';
+import { Key, KEYS } from './shared/keys';
 import { NodeStyle } from './shared/element';
-import StylesDock from './components/StylesDock/StylesDock';
-import ToolsDock from './components/ToolsDock';
+import StylesDock from './components/StylePanel/StylePanel';
+import ToolsDock from './components/ToolsDock/ToolsDock';
 import { Tool } from './shared/tool';
-import ControlDock from './components/ControlDock';
+import ControlPanel from './components/ControlPanel/ControlPanel';
 import DrawingCanvas from './components/Stage/DrawingCanvas';
 import { controlActions, selectControl } from './stores/slices/controlSlice';
 import {
   selectStageConfig,
   stageConfigActions,
 } from './stores/slices/stageConfigSlice';
-
-const defaultStyle: NodeStyle = {
-  line: 'solid',
-  color: 'black',
-  size: 'medium',
-};
+import ZoomPanel from './components/ZoomPanel/ZoomPanel';
 
 const App = () => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
@@ -30,29 +25,43 @@ const App = () => {
 
   const dispatch = useAppDispatch();
 
-  const selectedNode = nodes.find((n) => n.nodeProps.id === selectedNodeId);
+  const selectedNode = useMemo(() => {
+    return nodes.find((n) => n.nodeProps.id === selectedNodeId);
+  }, [selectedNodeId, nodes]);
 
-  const stageScalePercent = useMemo(() => {
-    return `${Math.round(stageConfig.scale * 100)}%`;
-  }, [stageConfig.scale]);
+  const getToolTypeByKey = useCallback((key: Key) => {
+    switch (key) {
+      case KEYS.H:
+        return 'hand';
+      case KEYS.D:
+        return 'draw';
+      case KEYS.A:
+        return 'arrow';
+      case KEYS.R:
+        return 'rectangle';
+      case KEYS.O:
+        return 'ellipse';
+      case KEYS.T:
+        return 'text';
+      case KEYS.V:
+        return 'select';
+      default:
+        return 'select';
+    }
+  }, []);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case KEYS.H:
-          dispatch(controlActions.setToolType('hand'));
-          break;
-        case KEYS.V:
-          dispatch(controlActions.setToolType('select'));
+    const handleKeyUp = (event: KeyboardEvent) => {
+      dispatch(controlActions.setToolType(getToolTypeByKey(event.key as Key)));
+      if (event.key === KEYS.T) {
+        window.removeEventListener('keyup', handleKeyUp);
       }
     };
 
-    if (toolType !== 'text') {
-      window.addEventListener('keyup', handleKeyDown);
-    }
+    window.addEventListener('keyup', handleKeyUp);
 
     return () => {
-      window.removeEventListener('keyup', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
   }, [toolType]);
 
@@ -70,38 +79,28 @@ const App = () => {
 
   return (
     <>
-      <div style={{ position: 'absolute', zIndex: 1 }}>
-        <ToolsDock onToolSelect={onNodeTypeChange} />
+      <ToolsDock onToolSelect={onNodeTypeChange} />
+      {selectedNode && (
         <StylesDock
-          style={selectedNode?.style || defaultStyle}
+          style={selectedNode.style}
           onStyleChange={handleStyleChange}
         />
-        <ControlDock
-          onHistoryControl={(type) => dispatch({ type })}
-          onNodesControl={dispatch}
-          undoDisabled={!past.length}
-          redoDisabled={!future.length}
-        />
-        <div>
-          <span>Zoom: {stageScalePercent}</span>
-          <div>
-            <button
-              onClick={() =>
-                dispatch(stageConfigActions.changeScale('increase'))
-              }
-            >
-              +
-            </button>
-            <button
-              onClick={() =>
-                dispatch(stageConfigActions.changeScale('decrease'))
-              }
-            >
-              -
-            </button>
-          </div>
-        </div>
-      </div>
+      )}
+      <ControlPanel
+        onHistoryControl={(type) => dispatch({ type })}
+        onNodesControl={dispatch}
+        undoDisabled={!past.length}
+        redoDisabled={!future.length}
+      />
+      <ZoomPanel
+        value={stageConfig.scale}
+        onZoomIncrease={() =>
+          dispatch(stageConfigActions.changeScale('increase'))
+        }
+        onZoomDecrease={() =>
+          dispatch(stageConfigActions.changeScale('decrease'))
+        }
+      />
       <DrawingCanvas
         config={{
           width: window.innerWidth,

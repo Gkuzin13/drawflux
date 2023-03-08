@@ -1,3 +1,7 @@
+import { Tool } from './tool';
+
+export type Key = (typeof KEYS)[keyof typeof KEYS];
+
 export const KEYS = {
   ENTER: 'Enter',
   ESCAPE: 'Escape',
@@ -6,6 +10,7 @@ export const KEYS = {
   SHIFT: 'shiftKey',
   H: 'h',
   R: 'r',
+  D: 'd',
   O: 'o',
   A: 'a',
   P: 'p',

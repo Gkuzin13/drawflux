@@ -1,5 +1,6 @@
 import { createElement } from 'react';
-import { TOOLS, Tool } from '../shared/tool';
+import { TOOLS, Tool } from '../../shared/tool';
+import { ToolsDockContriner } from './ToolsDockStyled';
 
 type Props = {
   onToolSelect: (type: Tool['value']) => void;
@@ -7,16 +8,15 @@ type Props = {
 
 const ToolsDock = ({ onToolSelect }: Props) => {
   return (
-    <div>
+    <ToolsDockContriner>
       {Object.values(TOOLS).map((shape, i) => {
         return (
           <button key={i} onClick={() => onToolSelect(shape.value)}>
-            <span>{shape.value}</span>
             {createElement(shape.icon)}
           </button>
         );
       })}
-    </div>
+    </ToolsDockContriner>
   );
 };
 

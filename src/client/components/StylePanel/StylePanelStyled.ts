@@ -2,7 +2,8 @@ import { styled } from '@stitches/react';
 
 export const DockContainer = styled('div', {
   position: 'fixed',
-  right: '1rem',
+  right: '0.5rem',
+  top: '0.5rem',
   maxWidth: '150px',
   zIndex: 999,
   backgroundColor: 'white',

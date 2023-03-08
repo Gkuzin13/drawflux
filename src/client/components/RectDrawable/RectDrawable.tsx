@@ -39,7 +39,7 @@ const RectDrawable = ({
     draggable,
     dash,
   });
-
+  console.log('rect render');
   return (
     <>
       <Rect

@@ -1,4 +1,4 @@
-import { KEYS } from './keys';
+import { Key, KEYS } from './keys';
 import {
   IoEllipseOutline,
   IoSquareOutline,
@@ -18,6 +18,16 @@ export type Tool = {
 };
 
 export const TOOLS: Tool[] = [
+  {
+    icon: RxCursorArrow,
+    value: 'select',
+    key: KEYS.V,
+  },
+  {
+    icon: IoHandRightOutline,
+    value: 'hand',
+    key: KEYS.H,
+  },
   {
     icon: IoEllipseOutline,
     value: 'ellipse',
@@ -42,15 +52,5 @@ export const TOOLS: Tool[] = [
     icon: IoTextOutline,
     value: 'text',
     key: KEYS.T,
-  },
-  {
-    icon: IoHandRightOutline,
-    value: 'hand',
-    key: KEYS.H,
-  },
-  {
-    icon: RxCursorArrow,
-    value: 'select',
-    key: KEYS.V,
   },
 ];
