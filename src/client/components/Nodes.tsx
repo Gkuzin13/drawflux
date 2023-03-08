@@ -1,5 +1,5 @@
-import { NodeType } from '../shared/element';
-import { Tool } from '../shared/tool';
+import { NodeType } from '../shared/constants/element';
+import { Tool } from '../shared/constants/tool';
 import Node from './Node/Node';
 
 type Props = {

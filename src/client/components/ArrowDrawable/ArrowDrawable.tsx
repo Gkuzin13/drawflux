@@ -2,11 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import Konva from 'konva';
 import ArrowTransformer from './ArrowTransformer';
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
-import {
-  createDefaultNodeConfig,
-  getStyleValues,
-  Point,
-} from '../../shared/element';
+import { createDefaultNodeConfig, Point } from '../../shared/constants/element';
 import type { NodeComponentProps } from '../types';
 import { Group } from 'react-konva';
 import { getPointsAbsolutePosition } from '@/client/shared/utils/position';
@@ -41,20 +37,18 @@ const ArrowDrawable = ({
 
   const lineRef = useRef<Konva.Line>(null);
 
-  const { dash, strokeWidth } = getStyleValues(node.style);
-
   const [start, end] = points;
 
   useAnimatedLine(
     lineRef.current,
-    dash[0] + dash[1],
+    node.style.line[0] + node.style.line[1],
     node.style.animated,
     node.style.line,
   );
 
   const config = createDefaultNodeConfig({
     stroke: node.style.color,
-    strokeWidth,
+    strokeWidth: node.style.size,
     visible: node.nodeProps.visible,
   });
 
@@ -105,7 +99,7 @@ const ArrowDrawable = ({
           ref={lineRef}
           points={[start, end]}
           control={[control.x, control.y]}
-          dash={dash}
+          dash={node.style.line}
           config={config}
         />
       </Group>

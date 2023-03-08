@@ -3,7 +3,7 @@ import { Ellipse } from 'konva/lib/shapes/Ellipse';
 import { Line } from 'konva/lib/shapes/Line';
 import { Rect } from 'konva/lib/shapes/Rect';
 import { useEffect, useState } from 'react';
-import { NodeStyle } from '../element';
+import { NodeStyle } from '../constants/element';
 
 const useAnimatedLine = (
   element: Shape | Rect | Ellipse | Line | null,

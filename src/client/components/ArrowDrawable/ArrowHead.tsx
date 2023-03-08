@@ -1,4 +1,4 @@
-import { Point } from '@/client/shared/element';
+import { Point } from '@/client/shared/constants/element';
 import { NodeConfig } from 'konva/lib/Node';
 import { Shape } from 'react-konva';
 

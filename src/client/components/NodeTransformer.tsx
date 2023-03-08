@@ -1,4 +1,3 @@
-import { CURSOR } from '@/client/shared/cursor';
 import Konva from 'konva';
 import { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import { ForwardedRef, forwardRef } from 'react';
@@ -23,7 +22,6 @@ const NodeTransformer = forwardRef(
         anchorSize={8}
         name="test"
         anchorCornerRadius={6}
-        cursorType={CURSOR.ALL_SCROLL}
         borderStroke="gray"
         padding={6}
         rotateAnchorOffset={14}

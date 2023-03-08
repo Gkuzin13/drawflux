@@ -8,4 +8,5 @@ export const ToolsDockContriner = styled('div', {
   alignItems: 'center',
   width: '100%',
   zIndex: 1,
+  textTransform: 'capitalize',
 });

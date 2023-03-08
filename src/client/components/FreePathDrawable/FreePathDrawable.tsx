@@ -1,7 +1,4 @@
-import {
-  createDefaultNodeConfig,
-  getStyleValues,
-} from '@/client/shared/element';
+import { createDefaultNodeConfig } from '@/client/shared/constants/element';
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
 import useTransformer from '@/client/shared/hooks/useTransformer';
 import { getPointsAbsolutePosition } from '@/client/shared/utils/position';
@@ -17,13 +14,11 @@ const FreePathDrawable = ({
   onNodeChange,
   onPress,
 }: NodeComponentProps) => {
-  const { dash, strokeWidth } = getStyleValues(node.style);
-
   const { nodeRef, transformerRef } = useTransformer<Konva.Line>([selected]);
 
   useAnimatedLine(
     nodeRef.current,
-    dash[0] + dash[1],
+    node.style.line[0] + node.style.line[1],
     node.style.animated,
     node.style.line,
   );
@@ -34,13 +29,13 @@ const FreePathDrawable = ({
 
   const config = createDefaultNodeConfig({
     visible: nodeProps.visible,
-    strokeWidth,
+    strokeWidth: node.style.size,
     stroke: style.color,
     id: nodeProps.id,
     rotation: nodeProps.rotation,
     opacity: style.opacity,
     draggable,
-    dash,
+    dash: node.style.line,
   });
 
   return (

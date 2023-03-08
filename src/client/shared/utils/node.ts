@@ -1,13 +1,14 @@
-import type { NodeType, Point } from '../element';
+import type { NodeType, Point } from '../constants/element';
+import { LINE, SIZE } from '../constants/style';
 
 export const createNode = (type: NodeType['type'], point: Point): NodeType => {
   return {
     type,
     text: null,
     style: {
-      line: 'solid',
+      line: LINE[0].value,
       color: 'black',
-      size: 'medium',
+      size: SIZE[1].value,
       animated: false,
     },
     nodeProps: {

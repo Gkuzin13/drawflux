@@ -1,7 +1,4 @@
-import {
-  createDefaultNodeConfig,
-  getStyleValues,
-} from '@/client/shared/element';
+import { createDefaultNodeConfig } from '@/client/shared/constants/element';
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
 import useTransformer from '@/client/shared/hooks/useTransformer';
 import Konva from 'konva';
@@ -18,11 +15,9 @@ const RectDrawable = ({
 }: Omit<NodeComponentProps, 'text'>) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
 
-  const { dash, strokeWidth } = getStyleValues(node.style);
-
   useAnimatedLine(
     nodeRef.current,
-    dash[0] + dash[1],
+    node.style.line[0] + node.style.line[1],
     node.style.animated,
     node.style.line,
   );
@@ -31,15 +26,15 @@ const RectDrawable = ({
 
   const config = createDefaultNodeConfig({
     visible: nodeProps.visible,
-    strokeWidth,
+    strokeWidth: node.style.size,
     stroke: style.color,
     id: nodeProps.id,
     rotation: nodeProps.rotation,
     opacity: style.opacity,
     draggable,
-    dash,
+    dash: node.style.line,
   });
-  console.log('rect render');
+
   return (
     <>
       <Rect

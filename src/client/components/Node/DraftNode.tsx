@@ -1,4 +1,4 @@
-import { NodeType } from '../../shared/element';
+import { NodeType } from '../../shared/constants/element';
 import Node from '../Node/Node';
 
 type Props = {

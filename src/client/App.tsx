@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { nodesActions, selectNodes } from './stores/slices/nodesSlice';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
-import { Key, KEYS } from './shared/keys';
-import { NodeStyle } from './shared/element';
+import { Key, KEYS } from './shared/constants/keys';
+import { NodeStyle } from './shared/constants/element';
 import StylesDock from './components/StylePanel/StylePanel';
 import ToolsDock from './components/ToolsDock/ToolsDock';
-import { Tool } from './shared/tool';
+import { Tool } from './shared/constants/tool';
 import ControlPanel from './components/ControlPanel/ControlPanel';
 import DrawingCanvas from './components/Stage/DrawingCanvas';
 import { controlActions, selectControl } from './stores/slices/controlSlice';
+import ZoomPanel from './components/ZoomPanel/ZoomPanel';
 import {
   selectStageConfig,
   stageConfigActions,
 } from './stores/slices/stageConfigSlice';
-import ZoomPanel from './components/ZoomPanel/ZoomPanel';
 
 const App = () => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);

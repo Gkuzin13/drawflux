@@ -1,15 +1,13 @@
-import { Key, KEYS } from './keys';
+import { KEYS } from './keys';
 import {
   IoEllipseOutline,
   IoSquareOutline,
-  IoReturnUpForwardOutline,
-  IoPencilOutline,
-  IoTextOutline,
   IoHandRightOutline,
 } from 'react-icons/io5';
 import { RxCursorArrow } from 'react-icons/rx';
 import { IconType } from 'react-icons';
 import { ELEMENTS } from './element';
+import { TbArrowUpRight, TbScribble, TbTypography } from 'react-icons/tb';
 
 export type Tool = {
   icon: IconType;
@@ -39,17 +37,17 @@ export const TOOLS: Tool[] = [
     key: KEYS.R,
   },
   {
-    icon: IoReturnUpForwardOutline,
+    icon: TbArrowUpRight,
     value: 'arrow',
     key: KEYS.A,
   },
   {
-    icon: IoPencilOutline,
+    icon: TbScribble,
     value: 'draw',
     key: KEYS.P,
   },
   {
-    icon: IoTextOutline,
+    icon: TbTypography,
     value: 'text',
     key: KEYS.T,
   },

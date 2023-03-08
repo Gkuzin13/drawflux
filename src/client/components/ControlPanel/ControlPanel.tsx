@@ -1,5 +1,5 @@
 import { createElement } from 'react';
-import { HISTORY } from '../../shared/history';
+import { HISTORY } from '../../shared/constants/history';
 import { ActionType } from '../../stores/actions';
 import { nodesActions } from '../../stores/slices/nodesSlice';
 import { ControlPanelContainer } from './ControlPanelStyled';

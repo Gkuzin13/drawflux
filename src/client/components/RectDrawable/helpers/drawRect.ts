@@ -1,4 +1,4 @@
-import { NodeType, Point } from '@/client/shared/element';
+import { NodeType, Point } from '@/client/shared/constants/element';
 import { normalizePoints } from '@/client/shared/utils/draw';
 
 export const drawRect = (

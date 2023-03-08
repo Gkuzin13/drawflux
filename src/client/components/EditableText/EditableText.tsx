@@ -2,7 +2,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { NodeComponentProps } from '../types';
 import EditableTextInput from '../EditableText/EditableTextInput';
 import ResizableText from '../EditableText/ResizableText';
-import { KEYS } from '@/client/shared/keys';
+import { KEYS } from '@/client/shared/constants/keys';
 
 const EditableText = ({
   node,

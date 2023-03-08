@@ -1,4 +1,4 @@
-import { getElement, NodeType } from '@/client/shared/element';
+import { getElement, NodeType } from '@/client/shared/constants/element';
 import useTransformer from '@/client/shared/hooks/useTransformer';
 import { getPointsAbsolutePosition } from '@/client/shared/utils/position';
 import Konva from 'konva';

@@ -1,6 +1,6 @@
 import { createElement } from 'react';
-import { NodeStyle } from '../../shared/element';
-import { ANIMATED, COLOR, LINE, SIZE } from '../../shared/style';
+import { NodeStyle } from '../../shared/constants/element';
+import { ANIMATED, COLOR, LINE, SIZE } from '../../shared/constants/style';
 import {
   ColorCircle,
   ColorPicker,
@@ -19,7 +19,7 @@ const StyleMenu = ({ style, onStyleChange }: Props) => {
   return (
     <DockContainer>
       <ColorPicker>
-        {Object.values(COLOR).map((color) => {
+        {COLOR.map((color) => {
           return (
             <ColorCircle
               key={color}
@@ -33,13 +33,13 @@ const StyleMenu = ({ style, onStyleChange }: Props) => {
           );
         })}
       </ColorPicker>
-      {Object.values(LINE).map((line) => {
+      {LINE.map((line) => {
         return (
           <StyleButton
-            key={line.value}
+            key={line.name}
             onClick={() => onStyleChange({ ...style, line: line.value })}
           >
-            {createElement(line.icon, { title: line.value, size: ICON_SIZE })}
+            {createElement(line.icon, { title: line.name, size: ICON_SIZE })}
           </StyleButton>
         );
       })}
@@ -52,13 +52,13 @@ const StyleMenu = ({ style, onStyleChange }: Props) => {
           size: ICON_SIZE,
         })}
       </StyleButton>
-      {Object.values(SIZE).map((size) => {
+      {SIZE.map((size) => {
         return (
           <StyleButton
-            key={size}
-            onClick={() => onStyleChange({ ...style, size })}
+            key={size.name}
+            onClick={() => onStyleChange({ ...style, size: size.value })}
           >
-            {size}
+            {createElement(size.icon, { title: size.name, size: ICON_SIZE })}
           </StyleButton>
         );
       })}

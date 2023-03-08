@@ -1,4 +1,4 @@
-import { MenuItem } from '@/client/shared/menu';
+import { MenuItem } from '@/client/shared/constants/menu';
 import { createElement } from 'react';
 import { ContextMenuButton, ContextMenuContainer } from './ContextMenuStyled';
 

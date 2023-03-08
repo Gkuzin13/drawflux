@@ -1,4 +1,4 @@
-import { Point } from '@/client/shared/element';
+import { NodeLIne, Point } from '@/client/shared/constants/element';
 import Konva from 'konva';
 import { LineConfig } from 'konva/lib/shapes/Line';
 import { ForwardedRef, forwardRef } from 'react';
@@ -7,7 +7,7 @@ import { Line } from 'react-konva';
 type Props = {
   points: Point[];
   control: Point;
-  dash: number[];
+  dash: NodeLIne;
   config: LineConfig;
 };
 

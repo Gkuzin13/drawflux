@@ -1,4 +1,4 @@
-import { Point } from '@/client/shared/element';
+import { Point } from '@/client/shared/constants/element';
 
 export function calcMidPointAndPerp(start: Point, end: Point) {
   const dx = end[0] - start[0];

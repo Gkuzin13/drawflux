@@ -1,5 +1,5 @@
 import { createElement, memo } from 'react';
-import { getElement } from '../../shared/element';
+import { getElement } from '../../shared/constants/element';
 import { NodeComponentProps } from '../types';
 
 const Node = memo(({ node, ...restProps }: NodeComponentProps) => {

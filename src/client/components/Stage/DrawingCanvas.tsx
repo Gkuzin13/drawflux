@@ -1,4 +1,4 @@
-import { NodeType, Point } from '../../shared/element';
+import { NodeType, Point } from '../../shared/constants/element';
 import { Stage } from 'react-konva';
 import { useMemo, useRef, useState } from 'react';
 import Konva from 'konva';
@@ -9,11 +9,11 @@ import {
   DEFAULT_NODE_MENU,
   MenuItem,
   MENU_ACTIONS,
-} from '../../shared/menu';
+} from '../../shared/constants/menu';
 import { IRect } from 'konva/lib/types';
-import { createNode } from '../../shared/utils/createNode';
+import { createNode } from '../../shared/utils/node';
 import { drawRectangle } from '../../shared/utils/draw';
-import { CURSOR } from '../../shared/cursor';
+import { CURSOR } from '../../shared/constants/cursor';
 import { drawFreePath } from '../FreePathDrawable/helpers/drawFreePath';
 import { drawArrow } from '../ArrowDrawable/helpers/drawArrow';
 import { drawRect } from '../RectDrawable/helpers/drawRect';

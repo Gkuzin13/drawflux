@@ -1,5 +1,5 @@
 import Konva from 'konva';
-import { Point } from '../element';
+import { Point } from '../constants/element';
 
 export function getPointsAbsolutePosition<T extends Konva.Node>(
   points: Point[],

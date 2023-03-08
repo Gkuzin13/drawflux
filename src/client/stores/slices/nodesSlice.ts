@@ -1,4 +1,4 @@
-import { NodeType } from '@/client/shared/element';
+import { NodeType } from '@/client/shared/constants/element';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 

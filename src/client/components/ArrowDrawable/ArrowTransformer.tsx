@@ -1,4 +1,4 @@
-import { Point } from '@/client/shared/element';
+import { Point } from '@/client/shared/constants/element';
 import { getRatioFromValue } from '@/client/shared/utils/math';
 import Konva from 'konva';
 import { KonvaEventObject } from 'konva/lib/Node';

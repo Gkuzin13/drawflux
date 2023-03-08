@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Tool } from '../../shared/tool';
+import { Tool } from '../../shared/constants/tool';
 import { RootState } from '../store';
 
 export type ControlState = {

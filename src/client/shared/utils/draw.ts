@@ -1,5 +1,5 @@
 import { IRect } from 'konva/lib/types';
-import { Point } from '../element';
+import { Point } from '../constants/element';
 
 export function normalizePoints(p1: Point, p2: Point): Point[] {
   let p1x = p1[0],

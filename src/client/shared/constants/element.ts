@@ -30,41 +30,6 @@ export const getElement = (element: NodeType['type']) => {
   }
 };
 
-export const getSizeValue = (size: NodeSize) => {
-  switch (size) {
-    case 'small':
-      return 2;
-    case 'medium':
-      return 4;
-    case 'large':
-      return 6;
-    case 'extra large':
-      return 8;
-    default:
-      return 2;
-  }
-};
-
-export const getLineValue = (size: NodeLIne) => {
-  switch (size) {
-    case 'solid':
-      return [];
-    case 'dotted':
-      return [1, 12];
-    case 'dashed':
-      return [16, 12];
-    default:
-      return [];
-  }
-};
-
-export const getStyleValues = (style: NodeStyle) => {
-  const dash = getLineValue(style.line);
-  const strokeWidth = getSizeValue(style.size);
-
-  return { dash, strokeWidth };
-};
-
 export const createDefaultNodeConfig = ({
   visible,
   strokeWidth,
@@ -123,8 +88,8 @@ export type NodeStyle = {
   opacity?: number;
 };
 
-export type NodeLIne = (typeof LINE)[keyof typeof LINE]['value'];
+export type NodeLIne = (typeof LINE)[number]['value'];
+export type NodeSize = (typeof SIZE)[number]['value'];
 export type NodeColor = (typeof COLOR)[number];
-export type NodeSize = (typeof SIZE)[keyof typeof SIZE];
 
 export type Point = [number, number];
