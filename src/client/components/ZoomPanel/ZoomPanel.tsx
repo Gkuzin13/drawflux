@@ -1,5 +1,4 @@
-import { IoAdd, IoRemove, IoRemoveOutline } from 'react-icons/io5';
-import { Button } from '../Button/ButtonStyled';
+import { IoAdd, IoRemove } from 'react-icons/io5';
 import {
   ZoomPanelButton,
   ZoomPanelContainer,

@@ -1,8 +1,8 @@
+import { capitalizeFirstLetter } from '@/client/shared/utils/string';
 import { createElement } from 'react';
-import { HISTORY } from '../../shared/constants/history';
+import { CONTROL } from '../../shared/constants/control';
 import { ActionType } from '../../stores/actions';
-import { nodesActions } from '../../stores/slices/nodesSlice';
-import { Button } from '../Button/ButtonStyled';
+import { Button } from '../Button/Button';
 import { ControlPanelContainer, ControlPanelRow } from './ControlPanelStyled';
 
 type Props = {
@@ -13,6 +13,8 @@ type Props = {
   clearDisabled: boolean;
 };
 
+type ControlValue = (typeof CONTROL)[number]['value'];
+
 const ControlPanel = ({
   onHistoryControl,
   onNodesControl,
@@ -20,38 +22,44 @@ const ControlPanel = ({
   redoDisabled,
   clearDisabled,
 }: Props) => {
+  const dispatchActionByControlValue = (value: ControlValue) => {
+    if (value === 'clear') {
+      onNodesControl(value);
+      return;
+    }
+    onHistoryControl(value);
+  };
+
+  const getDisabledByControlValue = (value: ControlValue) => {
+    switch (value) {
+      case 'undo':
+        return undoDisabled;
+      case 'redo':
+        return redoDisabled;
+      case 'clear':
+        return clearDisabled;
+      default:
+        return false;
+    }
+  };
   return (
     <ControlPanelContainer>
       <ControlPanelRow>
-        <Button
-          color="secondary"
-          size="small"
-          title="Undo"
-          squared={true}
-          disabled={undoDisabled}
-          onClick={() => onHistoryControl('undo')}
-        >
-          {createElement(HISTORY[0].icon)}
-        </Button>
-        <Button
-          color="secondary"
-          size="small"
-          title="Redo"
-          squared={true}
-          disabled={redoDisabled}
-          onClick={() => onHistoryControl('redo')}
-        >
-          {createElement(HISTORY[1].icon)}
-        </Button>
-        <Button
-          color="secondary"
-          size="small"
-          title="Clear All"
-          disabled={clearDisabled}
-          onClick={() => onNodesControl(nodesActions.deleteAll())}
-        >
-          Clear
-        </Button>
+        {CONTROL.map((control) => {
+          return (
+            <Button
+              key={control.value}
+              color="secondary"
+              size="small"
+              title={capitalizeFirstLetter(control.value)}
+              squared={true}
+              disabled={getDisabledByControlValue(control.value)}
+              onClick={() => dispatchActionByControlValue(control.value)}
+            >
+              {createElement(control.icon)}
+            </Button>
+          );
+        })}
       </ControlPanelRow>
     </ControlPanelContainer>
   );

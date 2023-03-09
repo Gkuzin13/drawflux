@@ -1,5 +1,6 @@
 import { IconType } from 'react-icons';
 import { IoTrashOutline } from 'react-icons/io5';
+import { themeColors } from '../styles/theme';
 import { NodeColor } from './element';
 
 export const MENU_ACTIONS = {
@@ -21,7 +22,7 @@ export const DEFAULT_NODE_MENU: MenuItem[] = [
     key: MENU_ACTIONS.DELETE_NODE,
     name: 'Delete',
     icon: IoTrashOutline,
-    color: 'red',
+    color: themeColors.red600,
   },
 ];
 

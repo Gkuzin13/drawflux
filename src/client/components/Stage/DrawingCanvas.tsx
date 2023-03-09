@@ -69,13 +69,9 @@ const ShapesStage = ({ config, containerStyle, onConfigChange }: Props) => {
       case 'select':
         return CURSOR.DEFAULT;
       default:
-        if (drawing) {
-          return CURSOR.CROSSHAIR;
-        } else {
-          return CURSOR.DEFAULT;
-        }
+        return drawing ? CURSOR.CROSSHAIR : CURSOR.DEFAULT;
     }
-  }, [drawing, stageRef, toolType, draggingStage]);
+  }, [drawing, toolType, draggingStage]);
 
   const onNodeMenuAction = (key: MenuItem['key']) => {
     switch (key) {

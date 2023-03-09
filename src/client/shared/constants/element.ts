@@ -81,12 +81,14 @@ export type NodeProps = {
 
 export type NodeStyle = {
   color: NodeColor;
-  line: NodeLIne;
+  line: Writeable<NodeLIne>;
   size: NodeSize;
   animated?: boolean;
   fontSize?: number;
   opacity?: number;
 };
+
+type Writeable<T> = { -readonly [P in keyof T]: T[P] }; // temporary fix
 
 export type NodeLIne = (typeof LINE)[number]['value'];
 export type NodeSize = (typeof SIZE)[number]['value'];

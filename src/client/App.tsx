@@ -7,17 +7,18 @@ import {
   selectStageConfig,
   stageConfigActions,
 } from './stores/slices/stageConfigSlice';
-import { globalStyle } from './shared/styles/global';
 import Panels from './components/Panels/Panels';
+import { nodesActions } from './stores/slices/nodesSlice';
+import { historyActions } from './stores/slices/historySlice';
 
 const App = () => {
-  const { toolType } = useAppSelector(selectControl);
+  const { selectedNodeId, toolType } = useAppSelector(selectControl);
   const stageConfig = useAppSelector(selectStageConfig);
 
   const dispatch = useAppDispatch();
 
   const getToolTypeByKey = useCallback((key: Key) => {
-    switch (key) {
+    switch (key.toLowerCase()) {
       case KEYS.H:
         return 'hand';
       case KEYS.D:
@@ -37,22 +38,47 @@ const App = () => {
     }
   }, []);
 
+  const getActionWhenCtrlKeyPressed = useCallback((event: KeyboardEvent) => {
+    const shiftPressed = event.shiftKey;
+    const key = event.key.toLowerCase();
+
+    switch (key) {
+      case KEYS.Z:
+        return shiftPressed ? historyActions.redo() : historyActions.undo();
+      case KEYS.C:
+        return nodesActions.deleteAll();
+      default:
+        return { type: '' }; // Temporary workaround
+    }
+  }, []);
+
   useEffect(() => {
     const handleKeyUp = (event: KeyboardEvent) => {
-      dispatch(controlActions.setToolType(getToolTypeByKey(event.key as Key)));
+      const key = event.key as Key;
+
+      if (event.ctrlKey) {
+        dispatch(getActionWhenCtrlKeyPressed(event));
+        return;
+      }
+
+      if (selectedNodeId && key === KEYS.DELETE) {
+        dispatch(nodesActions.delete([selectedNodeId]));
+        return;
+      }
+
+      dispatch(controlActions.setToolType(getToolTypeByKey(key)));
+
       if (event.key === KEYS.T) {
-        window.removeEventListener('keyup', handleKeyUp);
+        window.removeEventListener('keydown', handleKeyUp);
       }
     };
 
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('keydown', handleKeyUp);
 
     return () => {
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('keydown', handleKeyUp);
     };
-  }, [toolType]);
-
-  globalStyle();
+  }, [toolType, selectedNodeId]);
 
   return (
     <>

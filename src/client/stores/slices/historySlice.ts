@@ -1,26 +1,40 @@
 import { NodeType } from '@/client/shared/constants/element';
-import { Action, Reducer } from '@reduxjs/toolkit';
-import { ActionType, ACTION_TYPES } from '../actions';
+import { Action, createAction, Reducer } from '@reduxjs/toolkit';
+import { ActionType } from '../actions';
+import { NodesState } from './nodesSlice';
 
-export type HistoryState<T> = {
+export type HistoryState = {
   past: NodeType[];
-  present: T;
+  present: NodesState;
   future: NodeType[];
 };
 
-function undoable<T>(reducer: Reducer<T, Action<ActionType | undefined>>) {
-  const initialState = {
-    past: [] as NodeType[],
-    present: reducer(undefined, { type: undefined }),
-    future: [] as NodeType[],
+export type HistoryActionType =
+  (typeof historyActions)[keyof typeof historyActions]['type'];
+
+export const historyActions = {
+  undo: createAction('undo'),
+  redo: createAction('redo'),
+};
+
+function undoable(
+  reducer: Reducer<NodesState, Action<ActionType | undefined>>,
+) {
+  const initialState: HistoryState = {
+    past: [],
+    present: reducer({ nodes: [] }, { type: undefined }),
+    future: [],
   };
 
-  return function (state = initialState, action: { type: ActionType }) {
+  return function (state = initialState, action: Action<HistoryActionType>) {
     const { past, present, future } = state;
 
     switch (action.type) {
-      case ACTION_TYPES.UNDO:
+      case 'undo':
         const previous = past[past.length - 1];
+
+        if (!previous) return state;
+
         const newPast = past.slice(0, past.length - 1);
 
         return {
@@ -28,8 +42,11 @@ function undoable<T>(reducer: Reducer<T, Action<ActionType | undefined>>) {
           present: previous,
           future: [present, ...future],
         };
-      case ACTION_TYPES.REDO:
+      case 'redo':
         const next = future[0];
+
+        if (!next) return state;
+
         const newFuture = future.slice(1);
 
         return {

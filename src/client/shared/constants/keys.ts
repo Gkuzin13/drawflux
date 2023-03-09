@@ -8,6 +8,7 @@ export const KEYS = {
   DELETE: 'Delete',
   CTRL: 'ctrlKey',
   SHIFT: 'shiftKey',
+  C: 'c',
   H: 'h',
   R: 'r',
   D: 'd',
