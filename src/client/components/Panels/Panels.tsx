@@ -15,6 +15,8 @@ import {
 import { Tool } from '../../shared/constants/tool';
 import { useMemo } from 'react';
 import { NodeStyle } from '../../shared/constants/element';
+import { ControlValue } from '@/client/shared/constants/control';
+import { historyActions } from '@/client/stores/slices/historySlice';
 
 const Panels = () => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
@@ -42,6 +44,19 @@ const Panels = () => {
     dispatch(nodesActions.update([updatedNode]));
   };
 
+  const dispatchActionByControlType = (type: ControlValue) => {
+    switch (type) {
+      case 'history/undo':
+        dispatch(historyActions.undo());
+        break;
+      case 'history/redo':
+        dispatch(historyActions.redo());
+        break;
+      case 'nodes/deleteAll':
+        dispatch(nodesActions.deleteAll());
+    }
+  };
+
   return (
     <>
       <ToolsDock activeTool={toolType} onToolSelect={onToolTypeChange} />
@@ -52,8 +67,7 @@ const Panels = () => {
         />
       )}
       <ControlPanel
-        onHistoryControl={(type) => dispatch({ type })}
-        onNodesControl={dispatch}
+        onControl={dispatchActionByControlType}
         undoDisabled={!past.length}
         redoDisabled={!future.length}
         clearDisabled={!nodes.length}

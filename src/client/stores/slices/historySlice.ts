@@ -1,6 +1,5 @@
 import { NodeType } from '@/client/shared/constants/element';
 import { Action, createAction, Reducer } from '@reduxjs/toolkit';
-import { ActionType } from '../actions';
 import { NodesState } from './nodesSlice';
 
 export type HistoryState = {
@@ -13,12 +12,12 @@ export type HistoryActionType =
   (typeof historyActions)[keyof typeof historyActions]['type'];
 
 export const historyActions = {
-  undo: createAction('undo'),
-  redo: createAction('redo'),
+  undo: createAction('history/undo'),
+  redo: createAction('history/redo'),
 };
 
 function undoable(
-  reducer: Reducer<NodesState, Action<ActionType | undefined>>,
+  reducer: Reducer<NodesState, Action<HistoryActionType | undefined>>,
 ) {
   const initialState: HistoryState = {
     past: [],
@@ -30,7 +29,7 @@ function undoable(
     const { past, present, future } = state;
 
     switch (action.type) {
-      case 'undo':
+      case 'history/undo':
         const previous = past[past.length - 1];
 
         if (!previous) return state;
@@ -42,7 +41,7 @@ function undoable(
           present: previous,
           future: [present, ...future],
         };
-      case 'redo':
+      case 'history/redo':
         const next = future[0];
 
         if (!next) return state;

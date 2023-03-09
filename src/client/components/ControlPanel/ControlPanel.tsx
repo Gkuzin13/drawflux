@@ -1,42 +1,28 @@
-import { capitalizeFirstLetter } from '@/client/shared/utils/string';
 import { createElement } from 'react';
-import { CONTROL } from '../../shared/constants/control';
-import { ActionType } from '../../stores/actions';
+import { CONTROL, ControlValue } from '../../shared/constants/control';
 import { Button } from '../Button/Button';
 import { ControlPanelContainer, ControlPanelRow } from './ControlPanelStyled';
 
 type Props = {
-  onHistoryControl: (type: ActionType) => void;
-  onNodesControl: (action: any) => void;
+  onControl: (type: ControlValue) => void;
   undoDisabled: boolean;
   redoDisabled: boolean;
   clearDisabled: boolean;
 };
 
-type ControlValue = (typeof CONTROL)[number]['value'];
-
 const ControlPanel = ({
-  onHistoryControl,
-  onNodesControl,
   undoDisabled,
   redoDisabled,
   clearDisabled,
+  onControl,
 }: Props) => {
-  const dispatchActionByControlValue = (value: ControlValue) => {
-    if (value === 'clear') {
-      onNodesControl(value);
-      return;
-    }
-    onHistoryControl(value);
-  };
-
   const getDisabledByControlValue = (value: ControlValue) => {
     switch (value) {
-      case 'undo':
+      case 'history/undo':
         return undoDisabled;
-      case 'redo':
+      case 'history/redo':
         return redoDisabled;
-      case 'clear':
+      case 'nodes/deleteAll':
         return clearDisabled;
       default:
         return false;
@@ -51,10 +37,10 @@ const ControlPanel = ({
               key={control.value}
               color="secondary"
               size="small"
-              title={capitalizeFirstLetter(control.value)}
+              title={control.name}
               squared={true}
               disabled={getDisabledByControlValue(control.value)}
-              onClick={() => dispatchActionByControlValue(control.value)}
+              onClick={() => onControl(control.value)}
             >
               {createElement(control.icon)}
             </Button>

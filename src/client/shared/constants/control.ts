@@ -1,4 +1,5 @@
-import { ACTION_TYPES } from '@/client/stores/actions';
+import { historyActions } from '@/client/stores/slices/historySlice';
+import { nodesActions } from '@/client/stores/slices/nodesSlice';
 import {
   IoArrowUndoOutline,
   IoArrowRedoOutline,
@@ -6,21 +7,26 @@ import {
 } from 'react-icons/io5';
 import { KEYS } from './keys';
 
+export type ControlValue = (typeof CONTROL)[number]['value'];
+
 export const CONTROL = [
   {
-    value: ACTION_TYPES.UNDO,
+    name: 'Undo',
+    value: historyActions.undo.type,
     icon: IoArrowUndoOutline,
     key: KEYS.Z,
     KeyCombo: [KEYS.CTRL],
   },
   {
-    value: ACTION_TYPES.REDO,
+    name: 'Redo',
+    value: historyActions.redo.type,
     icon: IoArrowRedoOutline,
     key: KEYS.Z,
     KeyCombo: [KEYS.CTRL, KEYS.SHIFT],
   },
   {
-    value: 'clear',
+    name: 'Clear',
+    value: nodesActions.deleteAll().type,
     icon: IoTrash,
     key: KEYS.C,
     KeyCombo: [KEYS.CTRL],

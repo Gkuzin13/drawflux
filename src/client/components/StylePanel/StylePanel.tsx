@@ -1,7 +1,7 @@
 import { ICON_SIZES } from '@/client/shared/styles/theme';
 import { capitalizeFirstLetter } from '@/client/shared/utils/string';
 import { createElement } from 'react';
-import { NodeStyle } from '../../shared/constants/element';
+import { NodeLIne, NodeStyle } from '../../shared/constants/element';
 import { ANIMATED, COLOR, LINE, SIZE } from '../../shared/constants/style';
 import { Button } from '../Button/Button';
 import { Divider } from '../Divider';
@@ -50,9 +50,12 @@ const StylePanel = ({ style, onStyleChange }: Props) => {
               }
               key={line.name}
               onClick={() => {
-                const animated =
-                  style.animated && line.name !== 'solid' ? true : false;
-                onStyleChange({ ...style, animated, line: line.value });
+                onStyleChange({
+                  ...style,
+                  animated:
+                    style.animated && line.name !== 'solid' ? true : false,
+                  line: line.value as NodeLIne,
+                });
               }}
             >
               {createElement(line.icon, {

@@ -1,5 +1,3 @@
-import { Tool } from './tool';
-
 export type Key = (typeof KEYS)[keyof typeof KEYS];
 
 export const KEYS = {
