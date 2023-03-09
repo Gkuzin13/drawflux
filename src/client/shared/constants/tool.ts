@@ -27,6 +27,11 @@ export const TOOLS: Tool[] = [
     key: KEYS.H,
   },
   {
+    icon: TbArrowUpRight,
+    value: 'arrow',
+    key: KEYS.A,
+  },
+  {
     icon: IoEllipseOutline,
     value: 'ellipse',
     key: KEYS.O,
@@ -35,11 +40,6 @@ export const TOOLS: Tool[] = [
     icon: IoSquareOutline,
     value: 'rectangle',
     key: KEYS.R,
-  },
-  {
-    icon: TbArrowUpRight,
-    value: 'arrow',
-    key: KEYS.A,
   },
   {
     icon: TbScribble,

@@ -1,4 +1,10 @@
-import { ZoomPanelContainer, ZoomPanelValue } from './ZoomPanelStyled';
+import { IoAdd, IoRemove, IoRemoveOutline } from 'react-icons/io5';
+import { Button } from '../Button/ButtonStyled';
+import {
+  ZoomPanelButton,
+  ZoomPanelContainer,
+  ZoomPanelValue,
+} from './ZoomPanelStyled';
 
 type Props = {
   value: number;
@@ -12,10 +18,12 @@ const ZoomPanel = ({ value, onZoomIncrease, onZoomDecrease }: Props) => {
   return (
     <ZoomPanelContainer>
       <ZoomPanelValue>{stageScalePercent}</ZoomPanelValue>
-      <div>
-        <button onClick={onZoomIncrease}>+</button>
-        <button onClick={onZoomDecrease}>-</button>
-      </div>
+      <ZoomPanelButton onClick={onZoomIncrease}>
+        <IoAdd />
+      </ZoomPanelButton>
+      <ZoomPanelButton onClick={onZoomDecrease}>
+        <IoRemove />
+      </ZoomPanelButton>
     </ZoomPanelContainer>
   );
 };

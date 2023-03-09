@@ -1,32 +1,33 @@
-import { styled } from '@stitches/react';
+import { styled } from '@/client/shared/styles/theme';
 
-export const DockContainer = styled('div', {
+export const StylePanelContainer = styled('div', {
   position: 'fixed',
-  right: '0.5rem',
-  top: '0.5rem',
-  maxWidth: '150px',
-  zIndex: 999,
-  backgroundColor: 'white',
-  boxShadow: '0px 1px 1px black',
-  borderRadius: '16px',
+  right: '$2',
+  top: '$2',
+  zIndex: 1,
+  boxShadow: '$small',
+  borderRadius: '$1',
+  padding: '$1',
 });
 
-export const StyleButton = styled('button', {
-  padding: '0.25rem',
+export const StylePanelRow = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  padding: '$1 0',
+  gap: '$1',
 });
 
 export const ColorPicker = styled('div', {
   display: 'grid',
-  gridTemplateColumns: 'repeat(3, 1fr)',
-  gridTemplateRows: 'repeat(4, 1fr)',
-  gap: '0.5rem',
-  padding: '0.5rem',
   placeItems: 'center',
+  gridTemplateColumns: 'repeat(4, 1fr)',
+  gridTemplateRows: 'repeat(3, 1fr)',
+  gap: '$2',
+  padding: '$1 0',
 });
 
-export const ColorCircle = styled('button', {
-  borderRadius: '500px',
-  width: '24px',
-  height: '24px',
-  padding: 0,
+export const ColorCircle = styled('div', {
+  borderRadius: '$round',
+  width: '$3',
+  height: '$3',
 });

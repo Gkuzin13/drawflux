@@ -1,11 +1,15 @@
+import { ICON_SIZES } from '@/client/shared/styles/theme';
+import { capitalizeFirstLetter } from '@/client/shared/utils/string';
 import { createElement } from 'react';
 import { NodeStyle } from '../../shared/constants/element';
 import { ANIMATED, COLOR, LINE, SIZE } from '../../shared/constants/style';
+import { Button } from '../Button/ButtonStyled';
+import { Divider } from '../Divider';
 import {
   ColorCircle,
   ColorPicker,
-  DockContainer,
-  StyleButton,
+  StylePanelContainer,
+  StylePanelRow,
 } from './StylePanelStyled';
 
 type Props = {
@@ -13,57 +17,86 @@ type Props = {
   onStyleChange: (updatedStyle: NodeStyle) => void;
 };
 
-const ICON_SIZE = 24;
-
-const StyleMenu = ({ style, onStyleChange }: Props) => {
+const StylePanel = ({ style, onStyleChange }: Props) => {
   return (
-    <DockContainer>
+    <StylePanelContainer>
       <ColorPicker>
         {COLOR.map((color) => {
           return (
-            <ColorCircle
-              key={color}
-              disabled={color === style?.color}
-              style={{
-                backgroundColor: color,
-                opacity: color === style?.color ? 1 : 0.5,
-              }}
-              onClick={() => onStyleChange({ ...style, color })}
-            />
+            <Button
+              key={color.name}
+              size="small"
+              squared={true}
+              color={
+                color.value === style.color ? 'secondary' : 'secondary-light'
+              }
+              title={capitalizeFirstLetter(color.name)}
+              onClick={() => onStyleChange({ ...style, color: color.value })}
+            >
+              <ColorCircle style={{ backgroundColor: color.value }} />
+            </Button>
           );
         })}
       </ColorPicker>
-      {LINE.map((line) => {
-        return (
-          <StyleButton
-            key={line.name}
-            onClick={() => onStyleChange({ ...style, line: line.value })}
-          >
-            {createElement(line.icon, { title: line.name, size: ICON_SIZE })}
-          </StyleButton>
-        );
-      })}
-      <StyleButton
-        onClick={() => onStyleChange({ ...style, animated: !style.animated })}
-      >
-        {ANIMATED.value}{' '}
-        {createElement(ANIMATED.icon, {
-          title: ANIMATED.value,
-          size: ICON_SIZE,
+      <Divider type="horizontal" />
+      <StylePanelRow>
+        {LINE.map((line) => {
+          return (
+            <Button
+              size="small"
+              squared={true}
+              color={
+                line.value === style?.line ? 'secondary' : 'secondary-light'
+              }
+              key={line.name}
+              onClick={() => {
+                const animated =
+                  style.animated && line.name !== 'solid' ? true : false;
+                onStyleChange({ ...style, animated, line: line.value });
+              }}
+            >
+              {createElement(line.icon, {
+                title: capitalizeFirstLetter(line.name),
+                size: ICON_SIZES.MEDIUM,
+              })}
+            </Button>
+          );
         })}
-      </StyleButton>
-      {SIZE.map((size) => {
-        return (
-          <StyleButton
-            key={size.name}
-            onClick={() => onStyleChange({ ...style, size: size.value })}
-          >
-            {createElement(size.icon, { title: size.name, size: ICON_SIZE })}
-          </StyleButton>
-        );
-      })}
-    </DockContainer>
+        <Button
+          size="small"
+          squared={true}
+          color={style.animated ? 'primary' : 'secondary-light'}
+          disabled={[...style.line].every((l) => l === 0)}
+          onClick={() => onStyleChange({ ...style, animated: !style.animated })}
+        >
+          {createElement(ANIMATED.icon, {
+            title: capitalizeFirstLetter(ANIMATED.value),
+            size: ICON_SIZES.MEDIUM,
+          })}
+        </Button>
+      </StylePanelRow>
+      <StylePanelRow>
+        {SIZE.map((size) => {
+          return (
+            <Button
+              key={size.name}
+              size="small"
+              squared={true}
+              color={
+                size.value === style?.size ? 'secondary' : 'secondary-light'
+              }
+              onClick={() => onStyleChange({ ...style, size: size.value })}
+            >
+              {createElement(size.icon, {
+                title: capitalizeFirstLetter(size.name),
+                size: ICON_SIZES.MEDIUM,
+              })}
+            </Button>
+          );
+        })}
+      </StylePanelRow>
+    </StylePanelContainer>
   );
 };
 
-export default StyleMenu;
+export default StylePanel;

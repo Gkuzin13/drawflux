@@ -90,6 +90,6 @@ export type NodeStyle = {
 
 export type NodeLIne = (typeof LINE)[number]['value'];
 export type NodeSize = (typeof SIZE)[number]['value'];
-export type NodeColor = (typeof COLOR)[number];
+export type NodeColor = (typeof COLOR)[number]['value'];
 
 export type Point = [number, number];

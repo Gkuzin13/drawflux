@@ -24,6 +24,6 @@
   "ts-node": {
     "esm": true
   },
-  "include": ["src"],
+  "include": ["src", "src/client/shared/.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

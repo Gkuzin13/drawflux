@@ -9,6 +9,7 @@ import {
 } from 'react-icons/tb';
 import { HiOutlineFilm } from 'react-icons/hi2';
 import { IconType } from 'react-icons';
+import { themeColors } from '../styles/theme';
 
 export type StyleObj<T> = {
   value: T;
@@ -16,10 +17,10 @@ export type StyleObj<T> = {
   icon: IconType;
 };
 
-const LINE: StyleObj<number[]>[] = [
+const LINE = [
   {
     value: [0, 0],
-    name: 'Solid',
+    name: 'solid',
     icon: TbMinus,
   },
   {
@@ -32,7 +33,7 @@ const LINE: StyleObj<number[]>[] = [
     name: 'dotted',
     icon: TbLineDotted,
   },
-];
+] as const;
 
 const ANIMATED: StyleObj<string> = {
   name: 'animated',
@@ -64,18 +65,51 @@ const SIZE: StyleObj<number>[] = [
 ];
 
 const COLOR = [
-  'red',
-  'orange',
-  'yellow',
-  'green',
-  'blue',
-  'purple',
-  'pink',
-  'brown',
-  'gray',
-  'black',
-  'white',
-  'teal',
+  {
+    name: 'red',
+    value: themeColors.red600,
+  },
+  {
+    name: 'pink',
+    value: themeColors.pink600,
+  },
+  {
+    name: 'deep orange',
+    value: themeColors['deep-orange600'],
+  },
+  {
+    name: 'yellow',
+    value: themeColors.yellow600,
+  },
+  { name: 'green', value: themeColors.green600 },
+  {
+    name: 'teal',
+    value: themeColors.teal600,
+  },
+  {
+    name: 'light blue',
+    value: themeColors['light-blue600'],
+  },
+  {
+    name: 'blue',
+    value: themeColors.blue600,
+  },
+  {
+    name: 'deep purple',
+    value: themeColors['deep-purple600'],
+  },
+  {
+    name: 'indigo',
+    value: themeColors.indigo600,
+  },
+  {
+    name: 'black',
+    value: themeColors.black,
+  },
+  {
+    name: 'gray',
+    value: themeColors.gray600,
+  },
 ] as const;
 
 export { LINE, SIZE, COLOR, ANIMATED };

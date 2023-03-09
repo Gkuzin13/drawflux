@@ -1,33 +1,20 @@
-import { useCallback, useEffect, useMemo } from 'react';
-import { nodesActions, selectNodes } from './stores/slices/nodesSlice';
+import { useCallback, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
 import { Key, KEYS } from './shared/constants/keys';
-import { NodeStyle } from './shared/constants/element';
-import StylesDock from './components/StylePanel/StylePanel';
-import ToolsDock from './components/ToolsDock/ToolsDock';
-import { Tool } from './shared/constants/tool';
-import ControlPanel from './components/ControlPanel/ControlPanel';
 import DrawingCanvas from './components/Stage/DrawingCanvas';
 import { controlActions, selectControl } from './stores/slices/controlSlice';
-import ZoomPanel from './components/ZoomPanel/ZoomPanel';
 import {
   selectStageConfig,
   stageConfigActions,
 } from './stores/slices/stageConfigSlice';
+import { globalStyle } from './shared/styles/global';
+import Panels from './components/Panels/Panels';
 
 const App = () => {
-  const { selectedNodeId, toolType } = useAppSelector(selectControl);
+  const { toolType } = useAppSelector(selectControl);
   const stageConfig = useAppSelector(selectStageConfig);
 
-  const { past, present, future } = useAppSelector(selectNodes);
-
-  const nodes = present.nodes;
-
   const dispatch = useAppDispatch();
-
-  const selectedNode = useMemo(() => {
-    return nodes.find((n) => n.nodeProps.id === selectedNodeId);
-  }, [selectedNodeId, nodes]);
 
   const getToolTypeByKey = useCallback((key: Key) => {
     switch (key) {
@@ -65,42 +52,11 @@ const App = () => {
     };
   }, [toolType]);
 
-  const onNodeTypeChange = (type: Tool['value']) => {
-    dispatch(controlActions.setToolType(type));
-  };
-
-  const handleStyleChange = (style: NodeStyle) => {
-    if (!selectedNode) return;
-
-    const updatedNode = { ...selectedNode, style };
-
-    dispatch(nodesActions.update([updatedNode]));
-  };
+  globalStyle();
 
   return (
     <>
-      <ToolsDock onToolSelect={onNodeTypeChange} />
-      {selectedNode && (
-        <StylesDock
-          style={selectedNode.style}
-          onStyleChange={handleStyleChange}
-        />
-      )}
-      <ControlPanel
-        onHistoryControl={(type) => dispatch({ type })}
-        onNodesControl={dispatch}
-        undoDisabled={!past.length}
-        redoDisabled={!future.length}
-      />
-      <ZoomPanel
-        value={stageConfig.scale}
-        onZoomIncrease={() =>
-          dispatch(stageConfigActions.changeScale('increase'))
-        }
-        onZoomDecrease={() =>
-          dispatch(stageConfigActions.changeScale('decrease'))
-        }
-      />
+      <Panels />
       <DrawingCanvas
         config={{
           width: window.innerWidth,
