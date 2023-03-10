@@ -2,7 +2,7 @@ import { ICON_SIZES } from '@/client/shared/styles/theme';
 import { capitalizeFirstLetter } from '@/client/shared/utils/string';
 import { createElement, Fragment } from 'react';
 import { TOOLS, Tool } from '../../shared/constants/tool';
-import { Button } from '../Button/Button';
+import Button from '../Button/Button';
 import { Divider } from '../Divider';
 import { ToolsPanelContainer, ToolsPanelRow } from './ToolsPanelStyled';
 

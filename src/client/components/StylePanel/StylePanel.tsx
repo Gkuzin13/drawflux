@@ -3,7 +3,7 @@ import { capitalizeFirstLetter } from '@/client/shared/utils/string';
 import { createElement } from 'react';
 import { NodeLIne, NodeStyle } from '../../shared/constants/element';
 import { ANIMATED, COLOR, LINE, SIZE } from '../../shared/constants/style';
-import { Button } from '../Button/Button';
+import Button from '../Button/Button';
 import { Divider } from '../Divider';
 import {
   ColorCircle,

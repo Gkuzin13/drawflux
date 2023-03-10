@@ -12,12 +12,15 @@ const NodeMenu = ({ menuItems, onAction }: Props) => {
     <ContextMenuContainer>
       {menuItems.map((item) => {
         return (
-          <div key={item.key}>
-            <ContextMenuButton type="button" onClick={() => onAction(item.key)}>
-              {item.name}
-              {item.icon && createElement(item.icon)}
-            </ContextMenuButton>
-          </div>
+          <ContextMenuButton
+            key={item.key}
+            size="small"
+            color="secondary-light"
+            onClick={() => onAction(item.key)}
+          >
+            {item.name}
+            {item.icon && createElement(item.icon)}
+          </ContextMenuButton>
         );
       })}
     </ContextMenuContainer>

@@ -3,7 +3,7 @@ import { nodesActions } from '@/client/stores/slices/nodesSlice';
 import {
   IoArrowUndoOutline,
   IoArrowRedoOutline,
-  IoTrash,
+  IoTrashOutline,
 } from 'react-icons/io5';
 import { KEYS } from './keys';
 
@@ -27,7 +27,7 @@ export const CONTROL = [
   {
     name: 'Clear',
     value: nodesActions.deleteAll().type,
-    icon: IoTrash,
+    icon: IoTrashOutline,
     key: KEYS.C,
     KeyCombo: [KEYS.CTRL],
   },

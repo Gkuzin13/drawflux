@@ -1,6 +1,6 @@
 import { styled } from '@/client/shared/styles/theme';
 
-export const Button = styled('button', {
+export const ButtonStyled = styled('button', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -12,6 +12,10 @@ export const Button = styled('button', {
   '&[disabled]': {
     opacity: 0.5,
     cursor: 'revert',
+    backgroundColor: '$gray100',
+    '&:hover': {
+      backgroundColor: '$gray100',
+    },
   },
   variants: {
     color: {

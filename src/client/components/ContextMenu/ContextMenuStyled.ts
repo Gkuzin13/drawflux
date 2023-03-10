@@ -1,15 +1,15 @@
-import { styled } from '@stitches/react';
+import { styled } from '@/client/shared/styles/theme';
+import Button from '../Button/Button';
 
 export const ContextMenuContainer = styled('div', {
-  width: '200px',
-  zIndex: 999,
-  backgroundColor: 'white',
-  boxShadow: '0px 1px 1px black',
-  borderRadius: '16px',
+  width: '150px',
+  zIndex: 1,
+  backgroundColor: '$white',
+  boxShadow: '$small',
+  borderRadius: '$1',
 });
 
-export const ContextMenuButton = styled('button', {
-  display: 'flex',
+export const ContextMenuButton = styled(Button, {
   justifyContent: 'space-between',
   width: '100%',
 });

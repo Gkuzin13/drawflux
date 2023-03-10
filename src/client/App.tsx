@@ -67,13 +67,13 @@ const App = () => {
       }
 
       dispatch(controlActions.setToolType(getToolTypeByKey(key)));
-
-      if (event.key === KEYS.T) {
-        window.removeEventListener('keydown', handleKeyUp);
-      }
     };
 
-    window.addEventListener('keydown', handleKeyUp);
+    if (toolType === 'text') {
+      window.removeEventListener('keydown', handleKeyUp);
+    } else {
+      window.addEventListener('keydown', handleKeyUp);
+    }
 
     return () => {
       window.removeEventListener('keydown', handleKeyUp);
