@@ -22,7 +22,7 @@ export const DEFAULT_NODE_MENU: MenuItem[] = [
     key: MENU_ACTIONS.DELETE_NODE,
     name: 'Delete',
     icon: IoTrashOutline,
-    color: theme.colors.red600,
+    color: theme.colors.red600.value,
   },
 ];
 

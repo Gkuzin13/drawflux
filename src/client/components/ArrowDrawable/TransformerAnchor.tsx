@@ -1,10 +1,10 @@
+import { theme } from '@/client/shared/styles/theme';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Vector2d } from 'konva/lib/types';
 import { useState } from 'react';
 import { Circle } from 'react-konva';
 
 export type TransformerAnchorProps = {
-  active?: boolean;
   draggable: boolean;
   x: number;
   y: number;
@@ -14,7 +14,6 @@ export type TransformerAnchorProps = {
 };
 
 const TransformerAnchor = ({
-  active = true,
   draggable,
   x,
   y,
@@ -26,12 +25,12 @@ const TransformerAnchor = ({
     <Circle
       x={x}
       y={y}
-      stroke="rgba(0, 81, 255, 0.4)"
+      stroke={theme.colors.green300.value}
+      fill={theme.colors.white.value}
       fillAfterStrokeEnabled={true}
-      fill={active ? 'white' : 'rgba(0, 81, 255, 0.4)'}
-      strokeWidth={hovering ? 12 : 1}
+      strokeWidth={hovering ? 12 : 3}
       hitStrokeWidth={16}
-      radius={5}
+      radius={4}
       draggable={draggable}
       onDragMove={onDragMove}
       onDragEnd={onDragEnd}

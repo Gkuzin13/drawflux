@@ -2,6 +2,7 @@ import Konva from 'konva';
 import { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import { ForwardedRef, forwardRef } from 'react';
 import { KonvaNodeEvents, Transformer } from 'react-konva';
+import { theme } from '../shared/styles/theme';
 
 type Props = {
   transformerConfig?: TransformerConfig;
@@ -17,12 +18,12 @@ const NodeTransformer = forwardRef(
       <Transformer
         ref={ref}
         ignoreStroke={true}
-        anchorFill="white"
-        anchorStroke="gray"
-        anchorSize={8}
-        name="test"
-        anchorCornerRadius={6}
-        borderStroke="gray"
+        anchorFill={theme.colors.white.value}
+        anchorStroke={theme.colors.green300.value}
+        borderStroke={theme.colors.gray400.value}
+        anchorStrokeWidth={1.5}
+        anchorSize={9}
+        anchorCornerRadius={5}
         padding={6}
         rotateAnchorOffset={14}
         rotationSnaps={[0, 90, 180, 270]}

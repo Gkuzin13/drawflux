@@ -8,7 +8,7 @@ export const createNode = (type: NodeType['type'], point: Point): NodeType => {
     text: null,
     style: {
       line: LINE[0].value as NodeLIne,
-      color: theme.colors.black,
+      color: theme.colors.black.value,
       size: SIZE[1].value,
       animated: false,
     },

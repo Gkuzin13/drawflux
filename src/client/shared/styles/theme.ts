@@ -13,6 +13,7 @@ export const { theme, styled, css } = createStitches({
       gray500: '#9E9E9E',
       gray600: '#757575',
       gray900: '#212121',
+      green300: '#81C784',
       green400: '#66BB6A',
       green500: '#4CAF50',
       green600: '#43A047',

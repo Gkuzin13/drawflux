@@ -65,51 +65,18 @@ const SIZE: StyleObj<number>[] = [
 ];
 
 const COLOR = [
-  {
-    name: 'red',
-    value: theme.colors.red600,
-  },
-  {
-    name: 'pink',
-    value: theme.colors.pink600,
-  },
-  {
-    name: 'deep orange',
-    value: theme.colors['deep-orange600'],
-  },
-  {
-    name: 'yellow',
-    value: theme.colors.yellow600,
-  },
-  { name: 'green', value: theme.colors.green600 },
-  {
-    name: 'teal',
-    value: theme.colors.teal600,
-  },
-  {
-    name: 'light blue',
-    value: theme.colors['light-blue600'],
-  },
-  {
-    name: 'blue',
-    value: theme.colors.blue600,
-  },
-  {
-    name: 'deep purple',
-    value: theme.colors['deep-purple600'],
-  },
-  {
-    name: 'indigo',
-    value: theme.colors.indigo600,
-  },
-  {
-    name: 'black',
-    value: theme.colors.black,
-  },
-  {
-    name: 'gray',
-    value: theme.colors.gray600,
-  },
+  { name: 'red', value: theme.colors.red600.value },
+  { name: 'pink', value: theme.colors.pink600.value },
+  { name: 'deep orange', value: theme.colors['deep-orange600'].value },
+  { name: 'yellow', value: theme.colors.yellow600.value },
+  { name: 'green', value: theme.colors.green600.value },
+  { name: 'teal', value: theme.colors.teal600.value },
+  { name: 'light blue', value: theme.colors['light-blue600'].value },
+  { name: 'blue', value: theme.colors.blue600.value },
+  { name: 'deep purple', value: theme.colors['deep-purple600'].value },
+  { name: 'indigo', value: theme.colors.indigo600.value },
+  { name: 'black', value: theme.colors.black.value },
+  { name: 'gray', value: theme.colors.gray600.value },
 ] as const;
 
 export { LINE, SIZE, COLOR, ANIMATED };

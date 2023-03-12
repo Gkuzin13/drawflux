@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import ControlPanel from '../ControlPanel/ControlPanel';
 import ToolsDock from '../ToolsPanel/ToolsPanel';
 import ZoomPanel from '../ZoomPanel/ZoomPanel';
@@ -13,7 +14,6 @@ import {
   selectControl,
 } from '../../stores/slices/controlSlice';
 import { Tool } from '../../shared/constants/tool';
-import { useCallback, useMemo } from 'react';
 import { NodeStyle } from '../../shared/constants/element';
 import { ControlValue } from '@/client/shared/constants/control';
 import { historyActions } from '@/client/stores/slices/historySlice';
