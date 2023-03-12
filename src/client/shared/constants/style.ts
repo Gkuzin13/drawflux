@@ -9,7 +9,7 @@ import {
 } from 'react-icons/tb';
 import { HiOutlineFilm } from 'react-icons/hi2';
 import { IconType } from 'react-icons';
-import { themeColors } from '../styles/theme';
+import { theme } from '../styles/theme';
 
 export type StyleObj<T> = {
   value: T;
@@ -67,48 +67,48 @@ const SIZE: StyleObj<number>[] = [
 const COLOR = [
   {
     name: 'red',
-    value: themeColors.red600,
+    value: theme.colors.red600,
   },
   {
     name: 'pink',
-    value: themeColors.pink600,
+    value: theme.colors.pink600,
   },
   {
     name: 'deep orange',
-    value: themeColors['deep-orange600'],
+    value: theme.colors['deep-orange600'],
   },
   {
     name: 'yellow',
-    value: themeColors.yellow600,
+    value: theme.colors.yellow600,
   },
-  { name: 'green', value: themeColors.green600 },
+  { name: 'green', value: theme.colors.green600 },
   {
     name: 'teal',
-    value: themeColors.teal600,
+    value: theme.colors.teal600,
   },
   {
     name: 'light blue',
-    value: themeColors['light-blue600'],
+    value: theme.colors['light-blue600'],
   },
   {
     name: 'blue',
-    value: themeColors.blue600,
+    value: theme.colors.blue600,
   },
   {
     name: 'deep purple',
-    value: themeColors['deep-purple600'],
+    value: theme.colors['deep-purple600'],
   },
   {
     name: 'indigo',
-    value: themeColors.indigo600,
+    value: theme.colors.indigo600,
   },
   {
     name: 'black',
-    value: themeColors.black,
+    value: theme.colors.black,
   },
   {
     name: 'gray',
-    value: themeColors.gray600,
+    value: theme.colors.gray600,
   },
 ] as const;
 

@@ -1,6 +1,6 @@
 import type { NodeLIne, NodeType, Point } from '../constants/element';
 import { LINE, SIZE } from '../constants/style';
-import { themeColors } from '../styles/theme';
+import { theme } from '../styles/theme';
 
 export const createNode = (type: NodeType['type'], point: Point): NodeType => {
   return {
@@ -8,7 +8,7 @@ export const createNode = (type: NodeType['type'], point: Point): NodeType => {
     text: null,
     style: {
       line: LINE[0].value as NodeLIne,
-      color: themeColors.black,
+      color: theme.colors.black,
       size: SIZE[1].value,
       animated: false,
     },

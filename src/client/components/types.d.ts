@@ -1,4 +1,4 @@
-import { NodeType } from '@/client/shared/element';
+import { NodeType } from '@/client/shared/constants/element';
 
 export type NodeComponentProps = {
   node: NodeType;

@@ -2,6 +2,7 @@ import { NodeType } from '@/client/shared/constants/element';
 import { useClickAway } from '@/client/shared/hooks/useClickAway';
 import { ChangeEvent, useEffect, useRef } from 'react';
 import { Html } from 'react-konva-utils';
+import type { NodeColor } from '@/client/shared/constants/element';
 
 type Props = {
   node: NodeType;
@@ -11,20 +12,26 @@ type Props = {
   onClickAway: () => void;
 };
 
-const getStyle = (width: string, fontSize: number): React.CSSProperties => {
+const getStyle = (
+  width: string,
+  fontSize: number,
+  color: NodeColor,
+): React.CSSProperties => {
   const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
   const baseStyle: React.CSSProperties = {
     width,
+    color,
     border: 'none',
     padding: '0px',
     margin: '0px',
     background: 'none',
+    lineHeight: 1.5,
+    overflow: 'hidden',
     outline: 'none',
     resize: 'none',
-    color: 'black',
     fontFamily: 'sans-serif',
-    fontSize: `${fontSize}px`,
+    fontSize: `${fontSize * 8}px`,
   };
 
   if (isFirefox) {
@@ -33,7 +40,7 @@ const getStyle = (width: string, fontSize: number): React.CSSProperties => {
 
   return {
     ...baseStyle,
-    marginTop: '-2px',
+    marginTop: `-${fontSize / 2}px`,
   };
 };
 const EditableTextInput = ({
@@ -57,8 +64,9 @@ const EditableTextInput = ({
   const { nodeProps } = node;
 
   const style = getStyle(
-    nodeProps.width ? `${nodeProps.width}px` : 'auto',
-    node.style.fontSize || 16,
+    nodeProps.width ? `${nodeProps.width}px` : `${Math.max(value.length, 1)}ch`,
+    node.style.size,
+    node.style.color,
   );
 
   return (

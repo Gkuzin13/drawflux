@@ -3,6 +3,8 @@ import { globalCss } from '@stitches/react';
 export const globalStyle = globalCss({
   body: {
     fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
+    fontSmooth: 'antialiased',
+    overflow: 'hidden',
   },
   '*:where(:not(html, iframe, canvas, img, svg, video, audio):not(svg *, symbol *))':
     {

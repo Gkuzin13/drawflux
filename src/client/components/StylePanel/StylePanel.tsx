@@ -1,6 +1,7 @@
 import { ICON_SIZES } from '@/client/shared/styles/theme';
 import { capitalizeFirstLetter } from '@/client/shared/utils/string';
 import { createElement } from 'react';
+import { s } from 'vitest/dist/env-afee91f0';
 import { NodeLIne, NodeStyle } from '../../shared/constants/element';
 import { ANIMATED, COLOR, LINE, SIZE } from '../../shared/constants/style';
 import Button from '../Button/Button';
@@ -12,12 +13,20 @@ import {
   StylePanelRow,
 } from './StylePanelStyled';
 
-type Props = {
+export type StylePanelProps = {
   style: NodeStyle;
+  enabledOptions: {
+    line: boolean;
+    size: boolean;
+  };
   onStyleChange: (updatedStyle: NodeStyle) => void;
 };
 
-const StylePanel = ({ style, onStyleChange }: Props) => {
+const StylePanel = ({
+  style,
+  enabledOptions,
+  onStyleChange,
+}: StylePanelProps) => {
   return (
     <StylePanelContainer>
       <ColorPicker>
@@ -39,65 +48,71 @@ const StylePanel = ({ style, onStyleChange }: Props) => {
         })}
       </ColorPicker>
       <Divider type="horizontal" />
-      <StylePanelRow>
-        {LINE.map((line) => {
-          return (
-            <Button
-              size="small"
-              squared={true}
-              color={
-                line.value === style?.line ? 'secondary' : 'secondary-light'
-              }
-              key={line.name}
-              onClick={() => {
-                onStyleChange({
-                  ...style,
-                  animated:
-                    style.animated && line.name !== 'solid' ? true : false,
-                  line: line.value as NodeLIne,
-                });
-              }}
-            >
-              {createElement(line.icon, {
-                title: capitalizeFirstLetter(line.name),
-                size: ICON_SIZES.MEDIUM,
-              })}
-            </Button>
-          );
-        })}
-        <Button
-          size="small"
-          squared={true}
-          color={style.animated ? 'primary' : 'secondary-light'}
-          disabled={[...style.line].every((l) => l === 0)}
-          onClick={() => onStyleChange({ ...style, animated: !style.animated })}
-        >
-          {createElement(ANIMATED.icon, {
-            title: capitalizeFirstLetter(ANIMATED.value),
-            size: ICON_SIZES.MEDIUM,
+      {enabledOptions.line && (
+        <StylePanelRow>
+          {LINE.map((line) => {
+            return (
+              <Button
+                size="small"
+                squared={true}
+                color={
+                  line.value === style?.line ? 'secondary' : 'secondary-light'
+                }
+                key={line.name}
+                onClick={() => {
+                  onStyleChange({
+                    ...style,
+                    animated:
+                      style.animated && line.name !== 'solid' ? true : false,
+                    line: line.value as NodeLIne,
+                  });
+                }}
+              >
+                {createElement(line.icon, {
+                  title: capitalizeFirstLetter(line.name),
+                  size: ICON_SIZES.MEDIUM,
+                })}
+              </Button>
+            );
           })}
-        </Button>
-      </StylePanelRow>
-      <StylePanelRow>
-        {SIZE.map((size) => {
-          return (
-            <Button
-              key={size.name}
-              size="small"
-              squared={true}
-              color={
-                size.value === style?.size ? 'secondary' : 'secondary-light'
-              }
-              onClick={() => onStyleChange({ ...style, size: size.value })}
-            >
-              {createElement(size.icon, {
-                title: capitalizeFirstLetter(size.name),
-                size: ICON_SIZES.MEDIUM,
-              })}
-            </Button>
-          );
-        })}
-      </StylePanelRow>
+          <Button
+            size="small"
+            squared={true}
+            color={style.animated ? 'primary' : 'secondary-light'}
+            disabled={[...style.line].every((l) => l === 0)}
+            onClick={() =>
+              onStyleChange({ ...style, animated: !style.animated })
+            }
+          >
+            {createElement(ANIMATED.icon, {
+              title: capitalizeFirstLetter(ANIMATED.value),
+              size: ICON_SIZES.MEDIUM,
+            })}
+          </Button>
+        </StylePanelRow>
+      )}
+      {enabledOptions.size && (
+        <StylePanelRow>
+          {SIZE.map((size) => {
+            return (
+              <Button
+                key={size.name}
+                size="small"
+                squared={true}
+                color={
+                  size.value === style?.size ? 'secondary' : 'secondary-light'
+                }
+                onClick={() => onStyleChange({ ...style, size: size.value })}
+              >
+                {createElement(size.icon, {
+                  title: capitalizeFirstLetter(size.name),
+                  size: ICON_SIZES.MEDIUM,
+                })}
+              </Button>
+            );
+          })}
+        </StylePanelRow>
+      )}
     </StylePanelContainer>
   );
 };

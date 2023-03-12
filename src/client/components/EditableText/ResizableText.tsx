@@ -30,10 +30,13 @@ const ResizableText = ({
     opacity: style.opacity,
     strokeWidth: 0,
     draggable,
+    fontSize: style.size * 8,
+    height: nodeProps.height,
+    width: nodeProps.width,
   });
 
-  function getNodeWidth(width: number, scale: number) {
-    return Math.max(width * scale, 20);
+  function getNodeSize(width: number, scale: number, min = 20) {
+    return Math.max(width * scale, min);
   }
 
   return (
@@ -42,8 +45,8 @@ const ResizableText = ({
         ref={nodeRef}
         x={nodeProps.point[0]}
         y={nodeProps.point[1]}
-        fontSize={style.fontSize || 16}
         text={node.text || ''}
+        lineHeight={1.5}
         {...config}
         onDragStart={() => onPress(node.nodeProps.id)}
         onDragEnd={(event) => {
@@ -58,7 +61,7 @@ const ResizableText = ({
         onTransform={(event) => {
           const textNode = event.target as Konva.Text;
 
-          textNode.width(getNodeWidth(textNode.width(), textNode.scaleX()));
+          textNode.width(getNodeSize(textNode.width(), textNode.scaleX()));
           textNode.scale({ x: 1, y: 1 });
         }}
         onTransformEnd={(event) => {
@@ -68,7 +71,8 @@ const ResizableText = ({
             ...node,
             nodeProps: {
               ...nodeProps,
-              width: getNodeWidth(textNode.width(), textNode.scaleX()),
+              point: [textNode.x(), textNode.y()],
+              width: getNodeSize(textNode.width(), textNode.scaleX()),
               rotation: textNode.rotation(),
             },
           });

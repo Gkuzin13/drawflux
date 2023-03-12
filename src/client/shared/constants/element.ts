@@ -84,7 +84,6 @@ export type NodeStyle = {
   line: NodeLIne;
   size: NodeSize;
   animated?: boolean;
-  fontSize?: number;
   opacity?: number;
 };
 

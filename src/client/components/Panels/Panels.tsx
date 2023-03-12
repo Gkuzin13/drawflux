@@ -1,7 +1,7 @@
 import ControlPanel from '../ControlPanel/ControlPanel';
 import ToolsDock from '../ToolsPanel/ToolsPanel';
 import ZoomPanel from '../ZoomPanel/ZoomPanel';
-import StylePanel from '../StylePanel/StylePanel';
+import StylePanel, { StylePanelProps } from '../StylePanel/StylePanel';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import {
   selectStageConfig,
@@ -13,7 +13,7 @@ import {
   selectControl,
 } from '../../stores/slices/controlSlice';
 import { Tool } from '../../shared/constants/tool';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { NodeStyle } from '../../shared/constants/element';
 import { ControlValue } from '@/client/shared/constants/control';
 import { historyActions } from '@/client/stores/slices/historySlice';
@@ -29,6 +29,17 @@ const Panels = () => {
   const selectedNode = useMemo(() => {
     return nodes.find((n) => n.nodeProps.id === selectedNodeId);
   }, [selectedNodeId, nodes]);
+
+  const stylePanelEnabledOptions = useMemo<
+    StylePanelProps['enabledOptions']
+  >(() => {
+    switch (selectedNode?.type) {
+      case 'text':
+        return { line: false, size: true };
+      default:
+        return { line: true, size: true };
+    }
+  }, [selectedNode]);
 
   const dispatch = useAppDispatch();
 
@@ -63,6 +74,7 @@ const Panels = () => {
       {selectedNode && (
         <StylePanel
           style={selectedNode.style}
+          enabledOptions={stylePanelEnabledOptions}
           onStyleChange={handleStyleChange}
         />
       )}
