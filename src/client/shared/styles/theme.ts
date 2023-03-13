@@ -42,7 +42,7 @@ export const { theme, styled, css } = createStitches({
       3: '16px',
       4: '24px',
       5: '32px',
-      6: '48px',
+      6: '36px',
     },
     fontSizes: {
       1: '12px',
@@ -71,4 +71,5 @@ export const ICON_SIZES = {
   SMALL: 16,
   MEDIUM: 18,
   LARGE: 20,
+  EXTRA_LARGE: 24,
 } as const;

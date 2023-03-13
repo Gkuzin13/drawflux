@@ -1,11 +1,11 @@
-import ArrowDrawable from '@/client/components/ArrowDrawable/ArrowDrawable';
-import EllipseDrawable from '@/client/components/EllipseDrawable/EllipseDrawable';
-import RectDrawable from '@/client/components/RectDrawable/RectDrawable';
-import FreePathDrawable from '@/client/components/FreePathDrawable/FreePathDrawable';
-import EditableText from '@/client/components/EditableText/EditableText';
-import { COLOR, LINE, SIZE } from './style';
+import ArrowDrawable from '@/client/components/shapes/ArrowDrawable/ArrowDrawable';
+import EditableText from '@/client/components/shapes/EditableText/EditableText';
+import EllipseDrawable from '@/client/components/shapes/EllipseDrawable/EllipseDrawable';
+import FreePathDrawable from '@/client/components/shapes/FreePathDrawable/FreePathDrawable';
+import RectDrawable from '@/client/components/shapes/RectDrawable/RectDrawable';
 import { NodeConfig } from 'konva/lib/Node';
 import { ShapeConfig } from 'konva/lib/Shape';
+import { COLOR, LINE, SIZE } from './style';
 
 export const ELEMENTS = {
   ARROW: 'arrow',

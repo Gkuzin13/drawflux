@@ -1,6 +1,6 @@
 import { createElement } from 'react';
-import { CONTROL, ControlValue } from '../../shared/constants/control';
-import Button from '../Button/Button';
+import { CONTROL, ControlValue } from '@/client/shared/constants/control';
+import Button from '@/client/components/Button/Button';
 import { ControlPanelContainer, ControlPanelRow } from './ControlPanelStyled';
 
 type Props = {

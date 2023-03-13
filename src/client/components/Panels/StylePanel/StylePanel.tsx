@@ -1,14 +1,12 @@
 import { ICON_SIZES } from '@/client/shared/styles/theme';
 import { capitalizeFirstLetter } from '@/client/shared/utils/string';
-import { createElement } from 'react';
-import { s } from 'vitest/dist/env-afee91f0';
-import { NodeLIne, NodeStyle } from '../../shared/constants/element';
-import { ANIMATED, COLOR, LINE, SIZE } from '../../shared/constants/style';
-import Button from '../Button/Button';
-import { Divider } from '../Divider';
+import { NodeLIne, NodeStyle } from '@/client/shared/constants/element';
+import { ANIMATED, COLOR, LINE, SIZE } from '@/client/shared/constants/style';
+import { Divider } from '@/client/components/Divider/Divider';
 import {
   ColorCircle,
   ColorPicker,
+  StyleButton,
   StylePanelContainer,
   StylePanelRow,
 } from './StylePanelStyled';
@@ -32,7 +30,7 @@ const StylePanel = ({
       <ColorPicker>
         {COLOR.map((color) => {
           return (
-            <Button
+            <StyleButton
               key={color.name}
               size="small"
               squared={true}
@@ -43,7 +41,7 @@ const StylePanel = ({
               onClick={() => onStyleChange({ ...style, color: color.value })}
             >
               <ColorCircle style={{ backgroundColor: color.value }} />
-            </Button>
+            </StyleButton>
           );
         })}
       </ColorPicker>
@@ -52,7 +50,7 @@ const StylePanel = ({
         <StylePanelRow>
           {LINE.map((line) => {
             return (
-              <Button
+              <StyleButton
                 size="small"
                 squared={true}
                 color={
@@ -68,14 +66,14 @@ const StylePanel = ({
                   });
                 }}
               >
-                {createElement(line.icon, {
+                {line.icon({
                   title: capitalizeFirstLetter(line.name),
                   size: ICON_SIZES.MEDIUM,
                 })}
-              </Button>
+              </StyleButton>
             );
           })}
-          <Button
+          <StyleButton
             size="small"
             squared={true}
             color={style.animated ? 'primary' : 'secondary-light'}
@@ -84,31 +82,32 @@ const StylePanel = ({
               onStyleChange({ ...style, animated: !style.animated })
             }
           >
-            {createElement(ANIMATED.icon, {
+            {ANIMATED.icon({
               title: capitalizeFirstLetter(ANIMATED.value),
-              size: ICON_SIZES.MEDIUM,
+              size: ICON_SIZES.LARGE,
             })}
-          </Button>
+          </StyleButton>
         </StylePanelRow>
       )}
       {enabledOptions.size && (
         <StylePanelRow>
           {SIZE.map((size) => {
             return (
-              <Button
+              <StyleButton
                 key={size.name}
-                size="small"
+                size="normal"
                 squared={true}
                 color={
                   size.value === style?.size ? 'secondary' : 'secondary-light'
                 }
                 onClick={() => onStyleChange({ ...style, size: size.value })}
               >
-                {createElement(size.icon, {
+                {size.icon({
                   title: capitalizeFirstLetter(size.name),
-                  size: ICON_SIZES.MEDIUM,
+                  size: ICON_SIZES.LARGE,
+                  lineSize: size.value,
                 })}
-              </Button>
+              </StyleButton>
             );
           })}
         </StylePanelRow>

@@ -6,7 +6,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { createElement, useState } from 'react';
 import { Group } from 'react-konva';
 import NodeTransformer from '../NodeTransformer';
-import { NodeComponentProps } from '../types';
+import type { NodeComponentProps } from '@/client/components/Node/Node';
 
 type Props = {
   selectedNodes: NodeType[];

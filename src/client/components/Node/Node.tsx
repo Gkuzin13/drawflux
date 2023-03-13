@@ -1,14 +1,17 @@
-import { createElement, memo } from 'react';
-import { getElement } from '../../shared/constants/element';
-import { NodeComponentProps } from '../types';
+import { getElement, NodeType } from '@/client/shared/constants/element';
 
-const Node = memo(({ node, ...restProps }: NodeComponentProps) => {
-  return createElement(getElement(node.type), {
-    node,
-    ...restProps,
-  } as NodeComponentProps);
-});
+export type NodeComponentProps = {
+  node: NodeType;
+  selected: boolean;
+  draggable: boolean;
+  onPress: (nodeId: string) => void;
+  onNodeChange: (node: NodeType) => void;
+};
 
-Node.displayName = 'Node';
+const Node = ({ node, ...restProps }: NodeComponentProps) => {
+  const Element = getElement(node.type);
+
+  return <Element node={node} {...restProps} />;
+};
 
 export default Node;

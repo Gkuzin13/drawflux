@@ -3,8 +3,8 @@ import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
 import useTransformer from '@/client/shared/hooks/useTransformer';
 import Konva from 'konva';
 import { Rect } from 'react-konva';
-import NodeTransformer from '../NodeTransformer';
-import type { NodeComponentProps } from '../types';
+import NodeTransformer from '../../NodeTransformer';
+import type { NodeComponentProps } from '@/client/components/Node/Node';
 
 const RectDrawable = ({
   node,

@@ -1,4 +1,4 @@
-import { styled } from '../shared/styles/theme';
+import { styled } from '@/client/shared/styles/theme';
 
 export const Divider = styled('div', {
   backgroundColor: '$gray300',

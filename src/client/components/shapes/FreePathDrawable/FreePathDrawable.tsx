@@ -4,8 +4,8 @@ import useTransformer from '@/client/shared/hooks/useTransformer';
 import { getPointsAbsolutePosition } from '@/client/shared/utils/position';
 import Konva from 'konva';
 import { Line } from 'react-konva';
-import NodeTransformer from '../NodeTransformer';
-import type { NodeComponentProps } from '../types';
+import NodeTransformer from '../../NodeTransformer';
+import type { NodeComponentProps } from '@/client/components/Node/Node';
 
 const FreePathDrawable = ({
   node,

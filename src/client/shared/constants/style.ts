@@ -1,70 +1,58 @@
-import {
-  TbLineDashed,
-  TbMinus,
-  TbLineDotted,
-  TbLetterS,
-  TbLetterM,
-  TbLetterL,
-  TbLetterX,
-} from 'react-icons/tb';
-import { HiOutlineFilm } from 'react-icons/hi2';
-import { IconType } from 'react-icons';
 import { theme } from '../styles/theme';
+import IconSizeStyle from '@/client/components/icons/IconSizeStyle';
+import IconAnimatedStyle from '@/client/components/icons/IconAnimatedStyle';
+import IconLineSolid from '@/client/components/icons/IconLineSolid';
+import IconLineDashed from '@/client/components/icons/IconLineDashed';
+import IconLineDotted from '@/client/components/icons/IconLineDotted';
 
-export type StyleObj<T> = {
-  value: T;
-  name: string;
-  icon: IconType;
-};
-
-const LINE = [
+export const LINE = [
   {
     value: [0, 0],
     name: 'solid',
-    icon: TbMinus,
+    icon: IconLineSolid,
   },
   {
     value: [16, 12],
     name: 'dashed',
-    icon: TbLineDashed,
+    icon: IconLineDashed,
   },
   {
     value: [1, 12],
     name: 'dotted',
-    icon: TbLineDotted,
+    icon: IconLineDotted,
   },
 ] as const;
 
-const ANIMATED: StyleObj<string> = {
+export const ANIMATED = {
   name: 'animated',
   value: 'animated',
-  icon: HiOutlineFilm,
+  icon: IconAnimatedStyle,
 };
 
-const SIZE: StyleObj<number>[] = [
+export const SIZE = [
   {
     value: 2,
     name: 'small',
-    icon: TbLetterS,
+    icon: IconSizeStyle,
   },
   {
     value: 4,
     name: 'medium',
-    icon: TbLetterM,
+    icon: IconSizeStyle,
   },
   {
     value: 6,
     name: 'large',
-    icon: TbLetterL,
+    icon: IconSizeStyle,
   },
   {
     value: 8,
     name: 'extra large',
-    icon: TbLetterX,
+    icon: IconSizeStyle,
   },
-];
+] as const;
 
-const COLOR = [
+export const COLOR = [
   { name: 'red', value: theme.colors.red600.value },
   { name: 'pink', value: theme.colors.pink600.value },
   { name: 'deep orange', value: theme.colors['deep-orange600'].value },
@@ -78,5 +66,3 @@ const COLOR = [
   { name: 'black', value: theme.colors.black.value },
   { name: 'gray', value: theme.colors.gray600.value },
 ] as const;
-
-export { LINE, SIZE, COLOR, ANIMATED };

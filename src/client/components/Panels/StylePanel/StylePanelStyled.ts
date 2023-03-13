@@ -1,4 +1,5 @@
 import { styled } from '@/client/shared/styles/theme';
+import Button from '../../Button/Button';
 
 export const StylePanelContainer = styled('div', {
   position: 'fixed',
@@ -12,7 +13,6 @@ export const StylePanelContainer = styled('div', {
 
 export const StylePanelRow = styled('div', {
   display: 'flex',
-  alignItems: 'center',
   padding: '$1 0',
   gap: '$1',
 });
@@ -30,4 +30,8 @@ export const ColorCircle = styled('div', {
   borderRadius: '$round',
   width: '$3',
   height: '$3',
+});
+
+export const StyleButton = styled(Button, {
+  width: '100%',
 });

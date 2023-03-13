@@ -2,14 +2,17 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import Konva from 'konva';
 import ArrowTransformer from './ArrowTransformer';
 import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
-import { createDefaultNodeConfig, Point } from '../../shared/constants/element';
-import type { NodeComponentProps } from '../types';
+import {
+  createDefaultNodeConfig,
+  Point,
+} from '@/client/shared/constants/element';
 import { Group } from 'react-konva';
 import { getPointsAbsolutePosition } from '@/client/shared/utils/position';
 import ArrowHead from './ArrowHead';
 import ArrowLine from './ArrowLine';
 import { getValueFromRatio } from '@/client/shared/utils/math';
 import { calcMinMaxMovementPoints } from './helpers/calc';
+import type { NodeComponentProps } from '@/client/components/Node/Node';
 
 const ArrowDrawable = ({
   node,

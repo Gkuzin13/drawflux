@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import ControlPanel from '../ControlPanel/ControlPanel';
-import ToolsDock from '../ToolsPanel/ToolsPanel';
-import ZoomPanel from '../ZoomPanel/ZoomPanel';
-import StylePanel, { StylePanelProps } from '../StylePanel/StylePanel';
+import ControlPanel from './ControlPanel/ControlPanel';
+import ToolsDock from './ToolsPanel/ToolsPanel';
+import ZoomPanel from './ZoomPanel/ZoomPanel';
+import StylePanel, { StylePanelProps } from './StylePanel/StylePanel';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
 import {
   selectStageConfig,
