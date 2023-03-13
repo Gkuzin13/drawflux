@@ -43,6 +43,12 @@ export const { theme, styled, css } = createStitches({
       4: '24px',
       5: '32px',
       6: '36px',
+      7: '48px',
+      8: '64px',
+      9: '96px',
+      10: '128px',
+      11: '192px',
+      12: '250px',
     },
     fontSizes: {
       1: '12px',

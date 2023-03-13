@@ -33,5 +33,5 @@ export const ColorCircle = styled('div', {
 });
 
 export const StyleButton = styled(Button, {
-  width: '100%',
+  maxWidth: '$6',
 });

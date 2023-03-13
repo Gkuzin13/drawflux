@@ -68,7 +68,7 @@ const StylePanel = ({
               >
                 {line.icon({
                   title: capitalizeFirstLetter(line.name),
-                  size: ICON_SIZES.MEDIUM,
+                  size: ICON_SIZES.LARGE,
                 })}
               </StyleButton>
             );
@@ -95,7 +95,7 @@ const StylePanel = ({
             return (
               <StyleButton
                 key={size.name}
-                size="normal"
+                size="small"
                 squared={true}
                 color={
                   size.value === style?.size ? 'secondary' : 'secondary-light'
