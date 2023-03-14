@@ -3,7 +3,6 @@ import { styled } from '@/client/shared/styles/theme';
 export const ButtonStyled = styled('button', {
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
   borderRadius: '$1',
   border: '1px solid transparent',
   transitionProperty: 'background-color, color',
@@ -42,16 +41,20 @@ export const ButtonStyled = styled('button', {
     size: {
       'extra-small': {
         fontSize: '$1',
+        gap: '$1',
         padding: '$1',
       },
       small: {
         fontSize: '$2',
+        gap: '$2',
         padding: '$1 $2',
       },
       normal: {
+        gap: '$3',
         padding: '$2 $3',
       },
       large: {
+        gap: '$4',
         padding: '$3 $4',
       },
     },
