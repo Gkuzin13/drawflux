@@ -22,6 +22,7 @@ export const stageConfigSlice = createSlice({
     },
     scaleIncrease: (state) => {
       const updatedScale = state.scale + 0.1;
+
       if (hasStageScaleReachedLimit(updatedScale)) {
         return state;
       }
@@ -30,6 +31,7 @@ export const stageConfigSlice = createSlice({
     },
     scaleDecrease: (state) => {
       const updatedScale = state.scale - 0.1;
+
       if (hasStageScaleReachedLimit(updatedScale)) {
         return state;
       }
