@@ -1,23 +1,19 @@
-import {
-  createDefaultNodeConfig,
-  NodeType,
-  Point,
-} from '../../shared/constants/element';
-import { Layer, Rect, Stage } from 'react-konva';
+import { NodeType, Point } from '@/client/shared/constants/element';
+import { Stage } from 'react-konva';
 import { ForwardedRef, forwardRef, useMemo, useRef, useState } from 'react';
 import Konva from 'konva';
-import { useAppDispatch, useAppSelector } from '../../stores/hooks';
+import { useAppDispatch, useAppSelector } from '@/client/stores/hooks';
 import { KonvaEventObject, NodeConfig } from 'konva/lib/Node';
 import {
   DEFAULT_MENU,
   DEFAULT_NODE_MENU,
   MenuItem,
   MENU_ACTIONS,
-} from '../../shared/constants/menu';
+} from '@/client/shared/constants/menu';
 import { IRect } from 'konva/lib/types';
-import { createNode } from '../../shared/utils/node';
-import { drawRectangle } from '../../shared/utils/draw';
-import { CURSOR } from '../../shared/constants/cursor';
+import { createNode } from '@/client/shared/utils/node';
+import { drawRectangle } from '@/client/shared/utils/draw';
+import { CURSOR } from '@/client/shared/constants/cursor';
 import { drawFreePath } from '../shapes/FreePathDrawable/helpers/drawFreePath';
 import { drawArrow } from '../shapes/ArrowDrawable/helpers/drawArrow';
 import { drawRect } from '../shapes/RectDrawable/helpers/drawRect';

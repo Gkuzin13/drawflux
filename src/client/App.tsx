@@ -86,10 +86,13 @@ const App = () => {
   }, [toolType, selectedNodeId]);
 
   const handleOnExport = (type: ExportType) => {
-    const dataUrl = stageRef.current?.toDataURL();
-
-    if (dataUrl) {
-      downloadDataUrlAsImage(dataUrl, 'sketch-' + Date.now());
+    switch (type) {
+      case 'image/png':
+        const dataUrl = stageRef.current?.toDataURL();
+        dataUrl && downloadDataUrlAsImage(dataUrl, 'canvas');
+        break;
+      default:
+        break;
     }
   };
   return (
