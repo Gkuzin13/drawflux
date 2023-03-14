@@ -3,8 +3,8 @@ import Button from '../../Button/Button';
 
 export const StylePanelContainer = styled('div', {
   position: 'fixed',
-  right: '$2',
-  top: '$2',
+  left: '$2',
+  top: '$12',
   zIndex: 1,
   boxShadow: '$small',
   borderRadius: '$1',

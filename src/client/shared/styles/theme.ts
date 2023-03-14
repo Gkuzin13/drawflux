@@ -5,6 +5,7 @@ export const { theme, styled, css } = createStitches({
     colors: {
       black: '#000000',
       white: '#FFFFFF',
+      white50: '#FDFDFD',
       gray50: '#FAFAFA',
       gray100: '#F5F5F5',
       gray200: '#EEEEEE',
@@ -35,6 +36,12 @@ export const { theme, styled, css } = createStitches({
       4: '16px',
       5: '20px',
       6: '24px',
+      7: '28px',
+      8: '32px',
+      9: '36px',
+      10: '40px',
+      11: '44px',
+      12: '60px',
     },
     sizes: {
       1: '4px',

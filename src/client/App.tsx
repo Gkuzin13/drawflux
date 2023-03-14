@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
 import { Key, KEYS } from './shared/constants/keys';
 import DrawingCanvas from './components/Stage/DrawingCanvas';
@@ -10,10 +10,15 @@ import {
 import Panels from './components/Panels/Panels';
 import { nodesActions } from './stores/slices/nodesSlice';
 import { historyActions } from './stores/slices/historySlice';
+import Konva from 'konva';
+import { ExportType } from './components/Panels/MenuPanel/MenuPanel';
+import { downloadDataUrlAsImage } from './shared/utils/file';
 
 const App = () => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
   const stageConfig = useAppSelector(selectStageConfig);
+
+  const stageRef = useRef<Konva.Stage>(null);
 
   const dispatch = useAppDispatch();
 
@@ -80,10 +85,18 @@ const App = () => {
     };
   }, [toolType, selectedNodeId]);
 
+  const handleOnExport = (type: ExportType) => {
+    const dataUrl = stageRef.current?.toDataURL();
+
+    if (dataUrl) {
+      downloadDataUrlAsImage(dataUrl, 'sketch-' + Date.now());
+    }
+  };
   return (
     <>
-      <Panels />
+      <Panels onExport={handleOnExport} />
       <DrawingCanvas
+        ref={stageRef}
         config={{
           width: window.innerWidth,
           height: window.innerHeight,
@@ -91,7 +104,6 @@ const App = () => {
           x: stageConfig.position.x,
           y: stageConfig.position.y,
         }}
-        containerStyle={{ backgroundColor: 'fafafa' }}
         onConfigChange={(config) => dispatch(stageConfigActions.set(config))}
       />
     </>

@@ -3,8 +3,8 @@ import { styled } from '@/client/shared/styles/theme';
 export const ButtonStyled = styled('button', {
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
-  borderRadius: '8px',
+  justifyContent: 'space-between',
+  borderRadius: '$1',
   border: '1px solid transparent',
   transitionProperty: 'background-color, color',
   transition: '$fast',
@@ -58,6 +58,11 @@ export const ButtonStyled = styled('button', {
     squared: {
       true: {
         aspectRatio: 1 / 1,
+      },
+    },
+    fullWidth: {
+      true: {
+        width: '100%',
       },
     },
   },

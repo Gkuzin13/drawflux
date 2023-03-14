@@ -18,4 +18,4 @@ export const ZOOM = {
     name: 'Reset Zoom',
     value: stageConfigActions.scaleReset(),
   },
-};
+} as const;

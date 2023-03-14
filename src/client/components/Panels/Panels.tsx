@@ -4,10 +4,7 @@ import ToolsDock from './ToolsPanel/ToolsPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
 import StylePanel, { StylePanelProps } from './StylePanel/StylePanel';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import {
-  selectStageConfig,
-  stageConfigActions,
-} from '../../stores/slices/stageConfigSlice';
+import { selectStageConfig } from '../../stores/slices/stageConfigSlice';
 import { nodesActions, selectNodes } from '../../stores/slices/nodesSlice';
 import {
   controlActions,
@@ -15,11 +12,13 @@ import {
 } from '../../stores/slices/controlSlice';
 import { Tool } from '../../shared/constants/tool';
 import { NodeStyle } from '../../shared/constants/element';
-import { ControlValue } from '@/client/shared/constants/control';
-import { historyActions } from '@/client/stores/slices/historySlice';
-import { ZoomValue } from '@/client/shared/constants/zoom';
+import MenuPanel, { ExportType } from './MenuPanel/MenuPanel';
 
-const Panels = () => {
+type Props = {
+  onExport: (type: ExportType) => void;
+};
+
+const Panels = ({ onExport }: Props) => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
   const stageConfig = useAppSelector(selectStageConfig);
 
@@ -58,6 +57,7 @@ const Panels = () => {
 
   return (
     <>
+      <MenuPanel onExport={onExport} />
       <ToolsDock activeTool={toolType} onToolSelect={onToolTypeChange} />
       {selectedNode && (
         <StylePanel
