@@ -73,6 +73,7 @@ const RectDrawable = ({
               point: [rect.x(), rect.y()],
               width: Math.max(5, rect.width() * scaleX),
               height: Math.max(rect.height() * scaleY),
+              rotation: rect.rotation(),
             },
           });
         }}

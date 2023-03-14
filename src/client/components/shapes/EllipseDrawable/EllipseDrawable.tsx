@@ -67,6 +67,7 @@ const CircleDrawable = ({
               point: [ellipse.x(), ellipse.y()],
               width: radiusX,
               height: radiusY,
+              rotation: ellipse.rotation(),
             },
           });
 
