@@ -16,6 +16,9 @@ export const MenuPanelToggle = styled(Button, {
 });
 
 export const MenuPanelContent = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '$1',
   boxShadow: '$small',
   backgroundColor: '$white',
   padding: '$1',

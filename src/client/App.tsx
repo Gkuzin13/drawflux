@@ -13,6 +13,7 @@ import { historyActions } from './stores/slices/historySlice';
 import Konva from 'konva';
 import { ExportType } from './components/Panels/MenuPanel/MenuPanel';
 import { downloadDataUrlAsImage } from './shared/utils/file';
+import { store } from './stores/store';
 
 const App = () => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
@@ -89,7 +90,19 @@ const App = () => {
     switch (type) {
       case 'image/png':
         const dataUrl = stageRef.current?.toDataURL();
-        dataUrl && downloadDataUrlAsImage(dataUrl, 'canvas');
+
+        if (dataUrl) {
+          downloadDataUrlAsImage(dataUrl, 'canvas');
+        }
+        break;
+      case 'drawing':
+        const state = store.getState();
+
+        const stateToExport = {
+          stageConfig: state.stageConfig,
+          nodes: state.undoableNodes.present.nodes,
+        };
+        console.log(stateToExport);
         break;
       default:
         break;
