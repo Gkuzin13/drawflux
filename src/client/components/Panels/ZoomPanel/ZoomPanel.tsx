@@ -1,27 +1,33 @@
-import { IoAdd, IoRemove } from 'react-icons/io5';
-import {
-  ZoomPanelButton,
-  ZoomPanelContainer,
-  ZoomPanelValue,
-} from './ZoomPanelStyled';
+import { ZOOM, ZoomValue } from '@/client/shared/constants/zoom';
+import { ZoomPanelButton, ZoomPanelContainer } from './ZoomPanelStyled';
 
 type Props = {
   value: number;
-  onZoomIncrease: () => void;
-  onZoomDecrease: () => void;
+  onZoomChange: (action: ZoomValue) => void;
 };
 
-const ZoomPanel = ({ value, onZoomIncrease, onZoomDecrease }: Props) => {
+const ZoomPanel = ({ value, onZoomChange }: Props) => {
   const stageScalePercent = `${Math.round(value * 100)}%`;
 
   return (
     <ZoomPanelContainer>
-      <ZoomPanelValue>{stageScalePercent}</ZoomPanelValue>
-      <ZoomPanelButton onClick={onZoomIncrease}>
-        <IoAdd />
+      <ZoomPanelButton
+        title={ZOOM.RESET.name}
+        onClick={() => onZoomChange(ZOOM.RESET.value)}
+      >
+        {stageScalePercent}
       </ZoomPanelButton>
-      <ZoomPanelButton onClick={onZoomDecrease}>
-        <IoRemove />
+      <ZoomPanelButton
+        title={ZOOM.IN.name}
+        onClick={() => onZoomChange(ZOOM.IN.value)}
+      >
+        {ZOOM.IN.icon({})}
+      </ZoomPanelButton>
+      <ZoomPanelButton
+        title={ZOOM.OUT.name}
+        onClick={() => onZoomChange(ZOOM.OUT.value)}
+      >
+        {ZOOM.OUT.icon({})}
       </ZoomPanelButton>
     </ZoomPanelContainer>
   );

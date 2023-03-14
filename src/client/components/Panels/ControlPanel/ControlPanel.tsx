@@ -1,7 +1,7 @@
-import { createElement } from 'react';
 import { CONTROL, ControlValue } from '@/client/shared/constants/control';
 import Button from '@/client/components/Button/Button';
 import { ControlPanelContainer, ControlPanelRow } from './ControlPanelStyled';
+import { getKeyTitle } from '@/client/shared/utils/string';
 
 type Props = {
   onControl: (type: ControlValue) => void;
@@ -16,7 +16,7 @@ const ControlPanel = ({
   clearDisabled,
   onControl,
 }: Props) => {
-  const getDisabledByControlValue = (value: ControlValue) => {
+  const getDisabledByControlValue = (value: ControlValue['type']) => {
     switch (value) {
       case 'history/undo':
         return undoDisabled;
@@ -28,21 +28,25 @@ const ControlPanel = ({
         return false;
     }
   };
+
   return (
     <ControlPanelContainer>
       <ControlPanelRow>
         {CONTROL.map((control) => {
           return (
             <Button
-              key={control.value}
+              key={control.name}
               color="secondary"
               size="small"
-              title={control.name}
+              title={getKeyTitle(control.name, [
+                ...control.modifierKeys,
+                control.key,
+              ])}
               squared={true}
-              disabled={getDisabledByControlValue(control.value)}
+              disabled={getDisabledByControlValue(control.value.type)}
               onClick={() => onControl(control.value)}
             >
-              {createElement(control.icon)}
+              {control.icon({})}
             </Button>
           );
         })}

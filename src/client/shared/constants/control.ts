@@ -12,23 +12,23 @@ export type ControlValue = (typeof CONTROL)[number]['value'];
 export const CONTROL = [
   {
     name: 'Undo',
-    value: historyActions.undo.type,
+    value: historyActions.undo(),
     icon: IoArrowUndoOutline,
     key: KEYS.Z,
-    KeyCombo: [KEYS.CTRL],
+    modifierKeys: [KEYS.CTRL],
   },
   {
     name: 'Redo',
-    value: historyActions.redo.type,
+    value: historyActions.redo(),
     icon: IoArrowRedoOutline,
     key: KEYS.Z,
-    KeyCombo: [KEYS.CTRL, KEYS.SHIFT],
+    modifierKeys: [KEYS.CTRL, KEYS.SHIFT],
   },
   {
     name: 'Clear',
-    value: nodesActions.deleteAll().type,
+    value: nodesActions.deleteAll(),
     icon: IoTrashOutline,
     key: KEYS.C,
-    KeyCombo: [KEYS.CTRL],
+    modifierKeys: [KEYS.CTRL],
   },
 ] as const;

@@ -17,6 +17,7 @@ import { Tool } from '../../shared/constants/tool';
 import { NodeStyle } from '../../shared/constants/element';
 import { ControlValue } from '@/client/shared/constants/control';
 import { historyActions } from '@/client/stores/slices/historySlice';
+import { ZoomValue } from '@/client/shared/constants/zoom';
 
 const Panels = () => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
@@ -55,19 +56,6 @@ const Panels = () => {
     dispatch(nodesActions.update([updatedNode]));
   };
 
-  const dispatchActionByControlType = (type: ControlValue) => {
-    switch (type) {
-      case 'history/undo':
-        dispatch(historyActions.undo());
-        break;
-      case 'history/redo':
-        dispatch(historyActions.redo());
-        break;
-      case 'nodes/deleteAll':
-        dispatch(nodesActions.deleteAll());
-    }
-  };
-
   return (
     <>
       <ToolsDock activeTool={toolType} onToolSelect={onToolTypeChange} />
@@ -79,20 +67,12 @@ const Panels = () => {
         />
       )}
       <ControlPanel
-        onControl={dispatchActionByControlType}
+        onControl={dispatch}
         undoDisabled={!past.length}
         redoDisabled={!future.length}
         clearDisabled={!nodes.length}
       />
-      <ZoomPanel
-        value={stageConfig.scale}
-        onZoomIncrease={() =>
-          dispatch(stageConfigActions.changeScale('increase'))
-        }
-        onZoomDecrease={() =>
-          dispatch(stageConfigActions.changeScale('decrease'))
-        }
-      />
+      <ZoomPanel value={stageConfig.scale} onZoomChange={dispatch} />
     </>
   );
 };

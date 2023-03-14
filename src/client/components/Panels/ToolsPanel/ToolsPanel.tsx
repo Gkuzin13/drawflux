@@ -1,10 +1,10 @@
 import { ICON_SIZES } from '@/client/shared/styles/theme';
-import { capitalizeFirstLetter } from '@/client/shared/utils/string';
 import { createElement, Fragment } from 'react';
 import { TOOLS, Tool } from '@/client/shared/constants/tool';
 import Button from '@/client/components/Button/Button';
 import { Divider } from '@/client/components/Divider/Divider';
 import { ToolsPanelContainer, ToolsPanelRow } from './ToolsPanelStyled';
+import { getKeyTitle } from '@/client/shared/utils/string';
 
 type Props = {
   activeTool: Tool['value'];
@@ -12,10 +12,6 @@ type Props = {
 };
 
 const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
-  const getToolTitle = (tool: Tool) => {
-    return `${capitalizeFirstLetter(tool.value)} — ${tool.key.toUpperCase()}`;
-  };
-
   return (
     <ToolsPanelContainer>
       <ToolsPanelRow>
@@ -26,7 +22,7 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
                 color={activeTool === tool.value ? 'primary' : 'secondary'}
                 size="small"
                 squared={true}
-                title={getToolTitle(tool)}
+                title={getKeyTitle(tool.value, [tool.key])}
                 onClick={() => onToolSelect(tool.value)}
               >
                 {createElement(tool.icon, { size: ICON_SIZES.MEDIUM })}
