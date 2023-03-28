@@ -1,25 +1,25 @@
-import { MenuItem } from '@/client/shared/constants/menu';
-import { createElement } from 'react';
+import { ContextMenuItem } from '@/client/shared/constants/menu';
 import { ContextMenuButton, ContextMenuContainer } from './ContextMenuStyled';
 
 type Props = {
-  menuItems: MenuItem[];
-  onAction: (key: MenuItem['key']) => void;
+  items: ContextMenuItem[];
+  onAction: (key: ContextMenuItem['key']) => void;
 };
 
-const NodeMenu = ({ menuItems, onAction }: Props) => {
+const NodeMenu = ({ items, onAction }: Props) => {
   return (
     <ContextMenuContainer>
-      {menuItems.map((item) => {
+      {items.map((item) => {
         return (
           <ContextMenuButton
             key={item.key}
+            title={item.name}
             size="small"
             color="secondary-light"
             onClick={() => onAction(item.key)}
           >
             {item.name}
-            {item.icon && createElement(item.icon)}
+            {item.icon && item.icon({})}
           </ContextMenuButton>
         );
       })}

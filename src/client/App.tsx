@@ -11,8 +11,8 @@ import Panels from './components/Panels/Panels';
 import { nodesActions } from './stores/slices/nodesSlice';
 import { historyActions } from './stores/slices/historySlice';
 import Konva from 'konva';
-import { ExportType } from './components/Panels/MenuPanel/MenuPanel';
-import { downloadDataUrlAsImage } from './shared/utils/file';
+import { MenuPanelActionType } from './components/Panels/MenuPanel/MenuPanel';
+import { downloadDataUrlAsFile } from './shared/utils/file';
 import { store } from './stores/store';
 
 const App = () => {
@@ -86,24 +86,34 @@ const App = () => {
     };
   }, [toolType, selectedNodeId]);
 
-  const handleOnExport = (type: ExportType) => {
+  const handleOnExport = (type: MenuPanelActionType) => {
     switch (type) {
-      case 'image/png':
+      case 'export-as-image': {
         const dataUrl = stageRef.current?.toDataURL();
 
         if (dataUrl) {
-          downloadDataUrlAsImage(dataUrl, 'canvas');
+          downloadDataUrlAsFile(dataUrl, 'export-image');
         }
         break;
-      case 'drawing':
+      }
+      case 'export-as-json': {
         const state = store.getState();
 
         const stateToExport = {
           stageConfig: state.stageConfig,
           nodes: state.undoableNodes.present.nodes,
         };
-        console.log(stateToExport);
+
+        const dataUrl = URL.createObjectURL(
+          new Blob([JSON.stringify(stateToExport)], {
+            type: 'application/json',
+          }),
+        );
+
+        downloadDataUrlAsFile(dataUrl, 'export-json');
+
         break;
+      }
       default:
         break;
     }

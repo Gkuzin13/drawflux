@@ -1,19 +1,19 @@
+import { MENU_PANEL_ACTIONS } from '@/client/shared/constants/menu';
 import { useClickAway } from '@/client/shared/hooks/useClickAway';
 import { ICON_SIZES } from '@/client/shared/styles/theme';
 import { useRef, useState } from 'react';
 import { IoEllipsisHorizontal } from 'react-icons/io5';
-import { TbFileDownload, TbPhotoDown } from 'react-icons/tb';
-import Button from '../../Button/Button';
+import Button from '@/client/components/Button/Button';
 import {
   MenuPanelToggle,
   MenuPanelContent,
   MenuPanelContainer,
 } from './MenuPanelStyled';
 
-export type ExportType = 'image/png' | 'drawing';
+export type MenuPanelActionType = (typeof MENU_PANEL_ACTIONS)[number]['key'];
 
 type Props = {
-  onExport: (type: ExportType) => void;
+  onExport: (type: MenuPanelActionType) => void;
 };
 
 const MenuPanel = ({ onExport }: Props) => {
@@ -27,7 +27,7 @@ const MenuPanel = ({ onExport }: Props) => {
     setOpen((prevState) => !prevState);
   };
 
-  const handleOnClick = (type: ExportType) => {
+  const handleOnClick = (type: MenuPanelActionType) => {
     onExport(type);
     setOpen(false);
   };
@@ -39,24 +39,21 @@ const MenuPanel = ({ onExport }: Props) => {
       </MenuPanelToggle>
       {open && (
         <MenuPanelContent>
-          <Button
-            fullWidth={true}
-            size="small"
-            color="secondary-light"
-            onClick={() => handleOnClick('image/png')}
-          >
-            <TbPhotoDown size={ICON_SIZES.LARGE} />
-            Save As Image
-          </Button>
-          <Button
-            fullWidth={true}
-            size="small"
-            color="secondary-light"
-            onClick={() => handleOnClick('drawing')}
-          >
-            <TbFileDownload size={ICON_SIZES.LARGE} />
-            Save Drawing
-          </Button>
+          {MENU_PANEL_ACTIONS.map((action) => {
+            return (
+              <Button
+                key={action.key}
+                fullWidth={true}
+                size="small"
+                color="secondary-light"
+                onClick={() => handleOnClick(action.key)}
+              >
+                {action.icon({ title: action.name, size: ICON_SIZES.LARGE })}
+                {action.name}
+              </Button>
+            );
+          })}
+          <input type="file" style={{ display: 'none' }} />
         </MenuPanelContent>
       )}
     </MenuPanelContainer>

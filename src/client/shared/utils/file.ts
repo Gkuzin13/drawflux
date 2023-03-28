@@ -1,4 +1,4 @@
-export function downloadDataUrlAsImage(dataUrl: string, fileName: string) {
+export function downloadDataUrlAsFile(dataUrl: string, fileName: string) {
   const link = document.createElement('a');
 
   link.setAttribute('href', dataUrl);

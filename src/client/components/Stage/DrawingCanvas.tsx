@@ -5,10 +5,9 @@ import Konva from 'konva';
 import { useAppDispatch, useAppSelector } from '@/client/stores/hooks';
 import { KonvaEventObject, NodeConfig } from 'konva/lib/Node';
 import {
-  DEFAULT_MENU,
-  DEFAULT_NODE_MENU,
-  MenuItem,
-  MENU_ACTIONS,
+  STAGE_CONTEXT_MENU_ACTIONS,
+  NODE_CONTEXT_MENU_ACTIONS,
+  ContextMenuItem,
 } from '@/client/shared/constants/menu';
 import { IRect } from 'konva/lib/types';
 import { createNode } from '@/client/shared/utils/node';
@@ -41,7 +40,7 @@ type Props = {
 };
 
 type ContextMenuState = {
-  items: MenuItem[];
+  items: ContextMenuItem[];
   position: Point;
 };
 
@@ -79,13 +78,13 @@ const DrawingCanvas = forwardRef(
       }
     }, [drawing, toolType, draggingStage]);
 
-    const onNodeMenuAction = (key: MenuItem['key']) => {
+    const onNodeMenuAction = (key: ContextMenuItem['key']) => {
       switch (key) {
-        case MENU_ACTIONS.DELETE_NODE:
+        case 'delete-node':
           if (!selectedNodeId) return;
           dispatch(nodesActions.delete([selectedNodeId]));
           break;
-        case MENU_ACTIONS.SELECT_ALL:
+        case 'select-all':
           setIntersectedNodes(nodes);
           break;
       }
@@ -129,7 +128,7 @@ const DrawingCanvas = forwardRef(
 
       if (clickedOnEmpty) {
         setContextMenu({
-          items: DEFAULT_MENU,
+          items: STAGE_CONTEXT_MENU_ACTIONS,
           position: [position.x, position.y],
         });
         return;
@@ -143,7 +142,7 @@ const DrawingCanvas = forwardRef(
       if (node) {
         dispatch(controlActions.setSelectedNode(node.nodeProps.id));
         setContextMenu({
-          items: DEFAULT_NODE_MENU,
+          items: NODE_CONTEXT_MENU_ACTIONS,
           position: [position.x, position.y],
         });
       }
@@ -340,7 +339,7 @@ const DrawingCanvas = forwardRef(
           >
             {contextMenu && (
               <ContextMenu
-                menuItems={contextMenu.items}
+                items={contextMenu.items}
                 onAction={onNodeMenuAction}
               />
             )}
