@@ -8,10 +8,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@/': new URL('./src/', import.meta.url).pathname,
+      '@/types/': new URL('./types/', import.meta.url).pathname,
     },
   },
   test: {
     globals: true,
-    setupFiles: ['./src/tests/setup.ts'],
+    setupFiles: ['./src/client/test/setup.ts'],
+    environment: 'jsdom',
   },
 });

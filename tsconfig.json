@@ -15,7 +15,8 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/types/*": ["./types/*"]
     }
   },
   "watchOptions": {
@@ -24,6 +25,6 @@
   "ts-node": {
     "esm": true
   },
-  "include": ["src", "src/client/shared/.ts"],
+  "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
