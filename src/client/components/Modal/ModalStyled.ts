@@ -19,6 +19,7 @@ export const ModalDialog = styled('div', {
   borderRadius: '$1',
   backgroundColor: '$white',
   minWidth: '40vw',
+  zIndex: 1,
 });
 
 export const ModalDialogTitle = styled('div', {
@@ -31,6 +32,6 @@ export const ModalDialogContent = styled('div', {
 
 export const ModalCloseButton = styled(Button, {
   position: 'absolute',
-  top: '$2',
-  right: '$2',
+  top: '$4',
+  right: '$4',
 });

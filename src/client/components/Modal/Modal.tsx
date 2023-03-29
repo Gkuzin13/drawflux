@@ -1,4 +1,6 @@
+import { useClickAway } from '@/client/shared/hooks/useClickAway';
 import { ICON_SIZES } from '@/client/shared/styles/theme';
+import { useRef } from 'react';
 import { IoCloseOutline } from 'react-icons/io5';
 import { Divider } from '../Divider/Divider';
 import {
@@ -16,10 +18,14 @@ type Props = {
 };
 
 const Modal = ({ title, message, onClose }: Props) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useClickAway(dialogRef, onClose);
+
   return (
     <ModalContainer>
-      <ModalDialog>
-        <ModalCloseButton size="large" onClick={onClose}>
+      <ModalDialog ref={dialogRef}>
+        <ModalCloseButton onClick={onClose}>
           <IoCloseOutline size={ICON_SIZES.EXTRA_LARGE} />
         </ModalCloseButton>
         <ModalDialogTitle>{title}</ModalDialogTitle>
