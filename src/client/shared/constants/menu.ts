@@ -25,6 +25,11 @@ export const STAGE_CONTEXT_MENU_ACTIONS = [
 
 export const MENU_PANEL_ACTIONS = [
   {
+    key: 'import-json',
+    name: 'Open',
+    icon: TbFileUpload,
+  },
+  {
     key: 'export-as-image',
     name: 'Export As Image',
     icon: TbPhotoDown,
@@ -33,10 +38,5 @@ export const MENU_PANEL_ACTIONS = [
     key: 'export-as-json',
     name: 'Export As JSON',
     icon: TbFileDownload,
-  },
-  {
-    key: 'import-json',
-    name: 'Import JSON',
-    icon: TbFileUpload,
   },
 ] as const;

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
 import { Key, KEYS } from './shared/constants/keys';
 import DrawingCanvas from './components/Stage/DrawingCanvas';

@@ -42,6 +42,8 @@ const Panels = ({ stageRef }: Props) => {
 
   const nodes = present.nodes;
 
+  const dispatch = useAppDispatch();
+
   const selectedNode = useMemo(() => {
     return nodes.find((n) => n.nodeProps.id === selectedNodeId);
   }, [selectedNodeId, nodes]);
@@ -56,8 +58,6 @@ const Panels = ({ stageRef }: Props) => {
         return { line: true, size: true };
     }
   }, [selectedNode]);
-
-  const dispatch = useAppDispatch();
 
   const onToolTypeChange = (type: Tool['value']) => {
     dispatch(controlActions.setToolType(type));
@@ -96,7 +96,6 @@ const Panels = ({ stageRef }: Props) => {
         );
 
         downloadDataUrlAsFile(dataUrl, 'export-json');
-
         break;
       }
       case 'import-json': {
@@ -122,8 +121,6 @@ const Panels = ({ stageRef }: Props) => {
         });
         break;
       }
-      default:
-        break;
     }
   };
 
