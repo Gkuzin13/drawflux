@@ -6,8 +6,7 @@ import FreePathDrawable from '@/client/components/shapes/FreePathDrawable/FreePa
 import RectDrawable from '@/client/components/shapes/RectDrawable/RectDrawable';
 import { NodeConfig } from 'konva/lib/Node';
 import { ShapeConfig } from 'konva/lib/Shape';
-import { COLOR, LINE, SIZE } from './style';
-import { Writeable } from '@/client/types';
+import { COLOR, SIZE } from './style';
 import { createUnionSchema } from '../lib/zod';
 
 export const getElement = (element: NodeType['type']) => {
@@ -62,7 +61,7 @@ export const ElementTypeSchema = z.union([
   z.literal('text'),
 ]);
 
-export const PointSchema = z.number().array().length(2);
+export const PointSchema = z.tuple([z.number(), z.number()]);
 
 export const NodePropsSchema = z.object({
   id: z.string(),
@@ -77,7 +76,7 @@ export const NodePropsSchema = z.object({
 
 export const NodeStyleSchema = z.object({
   color: createUnionSchema(COLOR.map((color) => color.value)),
-  line: z.number().array().length(2),
+  line: z.tuple([z.number(), z.number()]),
   size: createUnionSchema(SIZE.map((size) => size.value)),
   animated: z.boolean().optional(),
   opacity: z.number().optional(),
@@ -95,8 +94,8 @@ export type ElementType = z.infer<typeof ElementTypeSchema>;
 export type NodeProps = z.infer<typeof NodePropsSchema>;
 export type NodeStyle = z.infer<typeof NodeStyleSchema>;
 
-export type NodeLIne = Writeable<(typeof LINE)[number]['value']>;
-export type NodeSize = (typeof SIZE)[number]['value'];
-export type NodeColor = (typeof COLOR)[number]['value'];
+export type NodeLIne = NodeStyle['line'];
+export type NodeSize = NodeStyle['size'];
+export type NodeColor = NodeStyle['color'];
 
 export type Point = z.infer<typeof PointSchema>;

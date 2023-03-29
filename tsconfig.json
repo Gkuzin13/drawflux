@@ -14,6 +14,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+    "typeRoots": ["./types/*"],
+    "types": ["vitest/globals"],
     "paths": {
       "@/*": ["./src/*"],
       "@/types/*": ["./types/*"]

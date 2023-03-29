@@ -137,9 +137,11 @@ const Panels = ({ stageRef }: Props) => {
       )}
       <ControlPanel
         onControl={dispatch}
-        undoDisabled={!past.length}
-        redoDisabled={!future.length}
-        clearDisabled={!nodes.length}
+        enabledControls={{
+          undo: Boolean(past.length),
+          redo: Boolean(future.length),
+          clear: Boolean(nodes.length),
+        }}
       />
       <ZoomPanel value={stageConfig.scale} onZoomChange={dispatch} />
     </>

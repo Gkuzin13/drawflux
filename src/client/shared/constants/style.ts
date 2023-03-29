@@ -27,7 +27,7 @@ export const ANIMATED = {
   name: 'animated',
   value: 'animated',
   icon: IconAnimatedStyle,
-};
+} as const;
 
 export const SIZE = [
   {

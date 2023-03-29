@@ -32,12 +32,12 @@ const StylePanel = ({
           return (
             <StyleButton
               key={color.name}
+              title={capitalizeFirstLetter(color.name)}
               size="small"
               squared={true}
               color={
                 color.value === style.color ? 'secondary' : 'secondary-light'
               }
-              title={capitalizeFirstLetter(color.name)}
               onClick={() => onStyleChange({ ...style, color: color.value })}
             >
               <ColorCircle style={{ backgroundColor: color.value }} />
@@ -51,12 +51,13 @@ const StylePanel = ({
           {LINE.map((line) => {
             return (
               <StyleButton
+                key={line.name}
+                title={capitalizeFirstLetter(line.name)}
                 size="small"
                 squared={true}
                 color={
                   line.value === style?.line ? 'secondary' : 'secondary-light'
                 }
-                key={line.name}
                 onClick={() => {
                   onStyleChange({
                     ...style,
@@ -66,26 +67,22 @@ const StylePanel = ({
                   });
                 }}
               >
-                {line.icon({
-                  title: capitalizeFirstLetter(line.name),
-                  size: ICON_SIZES.LARGE,
-                })}
+                {line.icon({ size: ICON_SIZES.LARGE })}
               </StyleButton>
             );
           })}
           <StyleButton
+            key={ANIMATED.value}
+            title={capitalizeFirstLetter(ANIMATED.value)}
             size="small"
             squared={true}
             color={style.animated ? 'primary' : 'secondary-light'}
-            disabled={[...style.line].every((l) => l === 0)}
+            disabled={style.line.every((l) => l === 0)}
             onClick={() =>
               onStyleChange({ ...style, animated: !style.animated })
             }
           >
-            {ANIMATED.icon({
-              title: capitalizeFirstLetter(ANIMATED.value),
-              size: ICON_SIZES.LARGE,
-            })}
+            {ANIMATED.icon({ size: ICON_SIZES.LARGE })}
           </StyleButton>
         </StylePanelRow>
       )}
@@ -95,6 +92,7 @@ const StylePanel = ({
             return (
               <StyleButton
                 key={size.name}
+                title={capitalizeFirstLetter(size.name)}
                 size="small"
                 squared={true}
                 color={
@@ -102,11 +100,7 @@ const StylePanel = ({
                 }
                 onClick={() => onStyleChange({ ...style, size: size.value })}
               >
-                {size.icon({
-                  title: capitalizeFirstLetter(size.name),
-                  size: ICON_SIZES.LARGE,
-                  lineSize: size.value,
-                })}
+                {size.icon({ size: ICON_SIZES.LARGE, lineSize: size.value })}
               </StyleButton>
             );
           })}

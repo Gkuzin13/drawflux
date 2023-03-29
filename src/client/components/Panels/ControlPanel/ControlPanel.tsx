@@ -5,25 +5,22 @@ import { getKeyTitle } from '@/client/shared/utils/string';
 
 type Props = {
   onControl: (type: ControlValue) => void;
-  undoDisabled: boolean;
-  redoDisabled: boolean;
-  clearDisabled: boolean;
+  enabledControls: {
+    undo: boolean;
+    redo: boolean;
+    clear: boolean;
+  };
 };
 
-const ControlPanel = ({
-  undoDisabled,
-  redoDisabled,
-  clearDisabled,
-  onControl,
-}: Props) => {
+const ControlPanel = ({ enabledControls, onControl }: Props) => {
   const getDisabledByControlValue = (value: ControlValue['type']) => {
     switch (value) {
       case 'history/undo':
-        return undoDisabled;
+        return !enabledControls.undo;
       case 'history/redo':
-        return redoDisabled;
+        return !enabledControls.redo;
       case 'nodes/deleteAll':
-        return clearDisabled;
+        return !enabledControls.clear;
       default:
         return false;
     }
