@@ -14,6 +14,9 @@ export const nodesSlice = createSlice({
   name: 'nodes',
   initialState,
   reducers: {
+    set: (state, action: PayloadAction<NodeType[]>) => {
+      state.nodes = action.payload;
+    },
     add: (state, action: PayloadAction<NodeType[]>) => {
       state.nodes = [...state.nodes, ...action.payload];
     },

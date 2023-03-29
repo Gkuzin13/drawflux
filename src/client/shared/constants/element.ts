@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import ArrowDrawable from '@/client/components/shapes/ArrowDrawable/ArrowDrawable';
 import EditableText from '@/client/components/shapes/EditableText/EditableText';
 import EllipseDrawable from '@/client/components/shapes/EllipseDrawable/EllipseDrawable';
@@ -6,14 +7,8 @@ import RectDrawable from '@/client/components/shapes/RectDrawable/RectDrawable';
 import { NodeConfig } from 'konva/lib/Node';
 import { ShapeConfig } from 'konva/lib/Shape';
 import { COLOR, LINE, SIZE } from './style';
-
-export const ELEMENTS = {
-  ARROW: 'arrow',
-  RECTANGLE: 'rectangle',
-  ELLIPSE: 'ellipse',
-  DRAW: 'draw',
-  TEXT: 'text',
-} as const;
+import { Writeable } from '@/client/types';
+import { createUnionSchema } from '../lib/zod';
 
 export const getElement = (element: NodeType['type']) => {
   switch (element) {
@@ -59,38 +54,49 @@ export const createDefaultNodeConfig = ({
   };
 };
 
-export type ElementType = (typeof ELEMENTS)[keyof typeof ELEMENTS];
+export const ElementTypeSchema = z.union([
+  z.literal('arrow'),
+  z.literal('rectangle'),
+  z.literal('ellipse'),
+  z.literal('draw'),
+  z.literal('text'),
+]);
 
-export type NodeType = {
-  type: ElementType;
-  nodeProps: NodeProps;
-  text: string | null;
-  style: NodeStyle;
-};
+export const PointSchema = z.number().array().length(2);
 
-export type NodeProps = {
-  id: string;
-  point: Point;
-  points?: Point[];
-  width?: number;
-  height?: number;
-  rotation: number;
-  visible: boolean;
-  bend?: number;
-};
+export const NodePropsSchema = z.object({
+  id: z.string(),
+  point: PointSchema,
+  points: PointSchema.array().optional(),
+  width: z.number().optional(),
+  height: z.number().optional(),
+  rotation: z.number(),
+  visible: z.boolean(),
+  bend: z.number().optional(),
+});
 
-export type NodeStyle = {
-  color: NodeColor;
-  line: NodeLIne;
-  size: NodeSize;
-  animated?: boolean;
-  opacity?: number;
-};
+export const NodeStyleSchema = z.object({
+  color: createUnionSchema(COLOR.map((color) => color.value)),
+  line: z.number().array().length(2),
+  size: createUnionSchema(SIZE.map((size) => size.value)),
+  animated: z.boolean().optional(),
+  opacity: z.number().optional(),
+});
 
-export type Writeable<T> = { -readonly [P in keyof T]: T[P] }; // temporary fix
+export const NodeTypeSchema = z.object({
+  type: ElementTypeSchema,
+  nodeProps: NodePropsSchema,
+  text: z.string().nullable(),
+  style: NodeStyleSchema,
+});
+
+export type NodeType = z.infer<typeof NodeTypeSchema>;
+export type ElementType = z.infer<typeof ElementTypeSchema>;
+export type NodeProps = z.infer<typeof NodePropsSchema>;
+export type NodeStyle = z.infer<typeof NodeStyleSchema>;
 
 export type NodeLIne = Writeable<(typeof LINE)[number]['value']>;
 export type NodeSize = (typeof SIZE)[number]['value'];
 export type NodeColor = (typeof COLOR)[number]['value'];
 
-export type Point = [number, number];
+export type Point = z.infer<typeof PointSchema>;

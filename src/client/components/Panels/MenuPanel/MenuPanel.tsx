@@ -13,10 +13,10 @@ import {
 export type MenuPanelActionType = (typeof MENU_PANEL_ACTIONS)[number]['key'];
 
 type Props = {
-  onExport: (type: MenuPanelActionType) => void;
+  onAction: (type: MenuPanelActionType) => void;
 };
 
-const MenuPanel = ({ onExport }: Props) => {
+const MenuPanel = ({ onAction }: Props) => {
   const [open, setOpen] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -28,7 +28,7 @@ const MenuPanel = ({ onExport }: Props) => {
   };
 
   const handleOnClick = (type: MenuPanelActionType) => {
-    onExport(type);
+    onAction(type);
     setOpen(false);
   };
 
@@ -53,7 +53,6 @@ const MenuPanel = ({ onExport }: Props) => {
               </Button>
             );
           })}
-          <input type="file" style={{ display: 'none' }} />
         </MenuPanelContent>
       )}
     </MenuPanelContainer>

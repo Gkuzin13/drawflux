@@ -6,12 +6,12 @@ import {
 } from 'react-icons/io5';
 import { RxCursorArrow } from 'react-icons/rx';
 import { IconType } from 'react-icons';
-import { ELEMENTS } from './element';
+import { ElementType } from './element';
 import { TbArrowUpRight, TbScribble, TbTypography } from 'react-icons/tb';
 
 export type Tool = {
   icon: IconType;
-  value: (typeof ELEMENTS)[keyof typeof ELEMENTS] | 'hand' | 'select';
+  value: ElementType | 'hand' | 'select';
   key: (typeof KEYS)[keyof typeof KEYS];
 };
 

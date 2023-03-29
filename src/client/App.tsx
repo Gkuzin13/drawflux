@@ -11,9 +11,6 @@ import Panels from './components/Panels/Panels';
 import { nodesActions } from './stores/slices/nodesSlice';
 import { historyActions } from './stores/slices/historySlice';
 import Konva from 'konva';
-import { MenuPanelActionType } from './components/Panels/MenuPanel/MenuPanel';
-import { downloadDataUrlAsFile } from './shared/utils/file';
-import { store } from './stores/store';
 
 const App = () => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
@@ -86,41 +83,9 @@ const App = () => {
     };
   }, [toolType, selectedNodeId]);
 
-  const handleOnExport = (type: MenuPanelActionType) => {
-    switch (type) {
-      case 'export-as-image': {
-        const dataUrl = stageRef.current?.toDataURL();
-
-        if (dataUrl) {
-          downloadDataUrlAsFile(dataUrl, 'export-image');
-        }
-        break;
-      }
-      case 'export-as-json': {
-        const state = store.getState();
-
-        const stateToExport = {
-          stageConfig: state.stageConfig,
-          nodes: state.undoableNodes.present.nodes,
-        };
-
-        const dataUrl = URL.createObjectURL(
-          new Blob([JSON.stringify(stateToExport)], {
-            type: 'application/json',
-          }),
-        );
-
-        downloadDataUrlAsFile(dataUrl, 'export-json');
-
-        break;
-      }
-      default:
-        break;
-    }
-  };
   return (
     <>
-      <Panels onExport={handleOnExport} />
+      <Panels stageRef={stageRef} />
       <DrawingCanvas
         ref={stageRef}
         config={{

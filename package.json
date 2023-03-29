@@ -27,7 +27,8 @@
     "react-icons": "^4.8.0",
     "react-konva": "^18.2.5",
     "react-konva-utils": "^0.3.2",
-    "react-redux": "^8.0.5"
+    "react-redux": "^8.0.5",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",

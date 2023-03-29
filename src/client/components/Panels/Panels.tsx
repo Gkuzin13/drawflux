@@ -1,24 +1,39 @@
-import { useMemo } from 'react';
+import { RefObject, useMemo } from 'react';
 import ControlPanel from './ControlPanel/ControlPanel';
 import ToolsDock from './ToolsPanel/ToolsPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
 import StylePanel, { StylePanelProps } from './StylePanel/StylePanel';
 import { useAppDispatch, useAppSelector } from '../../stores/hooks';
-import { selectStageConfig } from '../../stores/slices/stageConfigSlice';
+import {
+  selectStageConfig,
+  stageConfigActions,
+  StageConfigState,
+} from '../../stores/slices/stageConfigSlice';
 import { nodesActions, selectNodes } from '../../stores/slices/nodesSlice';
 import {
   controlActions,
   selectControl,
 } from '../../stores/slices/controlSlice';
 import { Tool } from '../../shared/constants/tool';
-import { NodeStyle } from '../../shared/constants/element';
-import MenuPanel, { ExportType } from './MenuPanel/MenuPanel';
-
+import {
+  NodeStyle,
+  NodeType,
+  NodeTypeSchema,
+} from '../../shared/constants/element';
+import MenuPanel, { MenuPanelActionType } from './MenuPanel/MenuPanel';
+import {
+  downloadDataUrlAsFile,
+  loadJsonFile,
+} from '@/client/shared/utils/file';
+import Konva from 'konva';
+import { store } from '@/client/stores/store';
+import { z } from 'zod';
+import { StageConfig } from 'konva/lib/Stage';
 type Props = {
-  onExport: (type: ExportType) => void;
+  stageRef: RefObject<Konva.Stage>;
 };
 
-const Panels = ({ onExport }: Props) => {
+const Panels = ({ stageRef }: Props) => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
   const stageConfig = useAppSelector(selectStageConfig);
 
@@ -55,9 +70,56 @@ const Panels = ({ onExport }: Props) => {
     dispatch(nodesActions.update([updatedNode]));
   };
 
+  const handleMenuAction = (type: MenuPanelActionType) => {
+    switch (type) {
+      case 'export-as-image': {
+        const dataUrl = stageRef.current?.toDataURL();
+
+        if (dataUrl) {
+          downloadDataUrlAsFile(dataUrl, 'export-image');
+        }
+        break;
+      }
+      case 'export-as-json': {
+        const state = store.getState();
+
+        const stateToExport = {
+          stageConfig: state.stageConfig,
+          nodes: state.undoableNodes.present.nodes,
+        };
+
+        const dataUrl = URL.createObjectURL(
+          new Blob([JSON.stringify(stateToExport)], {
+            type: 'application/json',
+          }),
+        );
+
+        downloadDataUrlAsFile(dataUrl, 'export-json');
+
+        break;
+      }
+      case 'import-json': {
+        const schema = z.object({
+          nodes: NodeTypeSchema.array(),
+          stageConfig: z.unknown(),
+        });
+        loadJsonFile<{ nodes: NodeType[]; stageConfig: StageConfigState }>(
+          schema,
+        ).then((state) => {
+          if (!state) return;
+          dispatch(nodesActions.set(state.nodes));
+          dispatch(stageConfigActions.set(state.stageConfig));
+        });
+        break;
+      }
+      default:
+        break;
+    }
+  };
+
   return (
     <>
-      <MenuPanel onExport={onExport} />
+      <MenuPanel onAction={handleMenuAction} />
       <ToolsDock activeTool={toolType} onToolSelect={onToolTypeChange} />
       {selectedNode && (
         <StylePanel

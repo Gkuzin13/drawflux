@@ -1,4 +1,4 @@
-import { theme } from '../styles/theme';
+import { colors } from '../styles/theme';
 import IconSizeStyle from '@/client/components/icons/IconSizeStyle';
 import IconAnimatedStyle from '@/client/components/icons/IconAnimatedStyle';
 import IconLineSolid from '@/client/components/icons/IconLineSolid';
@@ -53,16 +53,16 @@ export const SIZE = [
 ] as const;
 
 export const COLOR = [
-  { name: 'red', value: theme.colors.red600.value },
-  { name: 'pink', value: theme.colors.pink600.value },
-  { name: 'deep orange', value: theme.colors['deep-orange600'].value },
-  { name: 'yellow', value: theme.colors.yellow600.value },
-  { name: 'green', value: theme.colors.green600.value },
-  { name: 'teal', value: theme.colors.teal600.value },
-  { name: 'light blue', value: theme.colors['light-blue600'].value },
-  { name: 'blue', value: theme.colors.blue600.value },
-  { name: 'deep purple', value: theme.colors['deep-purple600'].value },
-  { name: 'indigo', value: theme.colors.indigo600.value },
-  { name: 'black', value: theme.colors.black.value },
-  { name: 'gray', value: theme.colors.gray600.value },
+  { name: 'red', value: colors.red600 },
+  { name: 'pink', value: colors.pink600 },
+  { name: 'deep orange', value: colors['deep-orange600'] },
+  { name: 'yellow', value: colors.yellow600 },
+  { name: 'green', value: colors.green600 },
+  { name: 'teal', value: colors.teal600 },
+  { name: 'light blue', value: colors['light-blue600'] },
+  { name: 'blue', value: colors.blue600 },
+  { name: 'deep purple', value: colors['deep-purple600'] },
+  { name: 'indigo', value: colors.indigo600 },
+  { name: 'black', value: colors.black },
+  { name: 'gray', value: colors.gray600 },
 ] as const;
