@@ -30,11 +30,12 @@ export function getUserSelectedFile(type: ImportFileType) {
 export function readUserSelectedFileAsText(file: File) {
   return new Promise((resolve: (contents: string | null) => void) => {
     const reader = new FileReader();
-    reader.readAsText(file);
 
     reader.addEventListener('load', () => {
       return resolve(typeof reader.result === 'string' ? reader.result : null);
     });
+
+    reader.readAsText(file);
   });
 }
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from './stores/hooks';
 import { Key, KEYS } from './shared/constants/keys';
 import DrawingCanvas from './components/Stage/DrawingCanvas';
@@ -11,11 +11,13 @@ import Panels from './components/Panels/Panels';
 import { nodesActions } from './stores/slices/nodesSlice';
 import { historyActions } from './stores/slices/historySlice';
 import Konva from 'konva';
+import Modal from './components/Modal/Modal';
+import { modalActions, selectModal } from './stores/slices/modalSlice';
 
 const App = () => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
   const stageConfig = useAppSelector(selectStageConfig);
-
+  const modal = useAppSelector(selectModal);
   const stageRef = useRef<Konva.Stage>(null);
 
   const dispatch = useAppDispatch();
@@ -97,6 +99,13 @@ const App = () => {
         }}
         onConfigChange={(config) => dispatch(stageConfigActions.set(config))}
       />
+      {modal.open && (
+        <Modal
+          title={modal.title}
+          message={modal.message}
+          onClose={() => dispatch(modalActions.close())}
+        />
+      )}
     </>
   );
 };

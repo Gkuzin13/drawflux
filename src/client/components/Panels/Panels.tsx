@@ -28,7 +28,8 @@ import {
 import Konva from 'konva';
 import { store } from '@/client/stores/store';
 import { z } from 'zod';
-import { StageConfig } from 'konva/lib/Stage';
+import { modalActions } from '@/client/stores/slices/modalSlice';
+
 type Props = {
   stageRef: RefObject<Konva.Stage>;
 };
@@ -103,10 +104,19 @@ const Panels = ({ stageRef }: Props) => {
           nodes: NodeTypeSchema.array(),
           stageConfig: z.unknown(),
         });
+
         loadJsonFile<{ nodes: NodeType[]; stageConfig: StageConfigState }>(
           schema,
         ).then((state) => {
-          if (!state) return;
+          if (!state) {
+            dispatch(
+              modalActions.open({
+                title: 'Error',
+                message: 'Could not load file',
+              }),
+            );
+            return;
+          }
           dispatch(nodesActions.set(state.nodes));
           dispatch(stageConfigActions.set(state.stageConfig));
         });

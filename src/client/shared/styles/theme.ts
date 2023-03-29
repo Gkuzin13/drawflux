@@ -63,6 +63,9 @@ export const { theme, styled, css } = createStitches({
       1: '12px',
       2: '14px',
       3: '16px',
+      4: '24px',
+      5: '32px',
+      6: '36px',
     },
     radii: {
       1: '8px',

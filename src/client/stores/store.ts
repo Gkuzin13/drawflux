@@ -1,10 +1,4 @@
-import {
-  Action,
-  configureStore,
-  createAction,
-  createReducer,
-  Reducer,
-} from '@reduxjs/toolkit';
+import { Action, configureStore, Reducer } from '@reduxjs/toolkit';
 import nodesReducer from './slices/nodesSlice';
 import historyReducer, {
   HistoryActionType,
@@ -12,6 +6,7 @@ import historyReducer, {
 } from './slices/historySlice';
 import stageConfig from './slices/stageConfigSlice';
 import control from './slices/controlSlice';
+import modal from './slices/modalSlice';
 
 const undoableNodes = historyReducer(nodesReducer) as Reducer<
   HistoryState,
@@ -19,7 +14,7 @@ const undoableNodes = historyReducer(nodesReducer) as Reducer<
 >;
 
 export const store = configureStore({
-  reducer: { undoableNodes, control, stageConfig },
+  reducer: { undoableNodes, control, stageConfig, modal },
 });
 
 export type AppDispatch = typeof store.dispatch;
