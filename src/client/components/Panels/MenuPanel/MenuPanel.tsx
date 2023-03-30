@@ -13,11 +13,12 @@ import {
 export type MenuPanelActionType = (typeof MENU_PANEL_ACTIONS)[number]['key'];
 
 type Props = {
+  initiallyOpen?: boolean;
   onAction: (type: MenuPanelActionType) => void;
 };
 
-const MenuPanel = ({ onAction }: Props) => {
-  const [open, setOpen] = useState(false);
+const MenuPanel = ({ initiallyOpen, onAction }: Props) => {
+  const [open, setOpen] = useState(Boolean(initiallyOpen));
 
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -43,12 +44,13 @@ const MenuPanel = ({ onAction }: Props) => {
             return (
               <Button
                 key={action.key}
+                title={action.name}
                 fullWidth={true}
                 size="small"
                 color="secondary-light"
                 onClick={() => handleOnClick(action.key)}
               >
-                {action.icon({ title: action.name, size: ICON_SIZES.LARGE })}
+                {action.icon({ size: ICON_SIZES.LARGE })}
                 {action.name}
               </Button>
             );

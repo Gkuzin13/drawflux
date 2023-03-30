@@ -1,3 +1,4 @@
+import { NodeStyle } from '@/client/shared/constants/element';
 import { COLOR, LINE, SIZE, ANIMATED } from '@/client/shared/constants/style';
 import { createNode } from '@/client/shared/utils/node';
 import { fireEvent, render, screen } from '@testing-library/react';
@@ -21,7 +22,7 @@ describe('StylePanel', () => {
   });
 
   it('animated button is disabled when line is not solid', () => {
-    const style = { ...mockNode.style, line: [16, 8] };
+    const style: NodeStyle = { ...mockNode.style, line: [16, 8] };
 
     render(
       <StylePanel
@@ -39,7 +40,7 @@ describe('StylePanel', () => {
   it('calls handleStyleChange when clicked', () => {
     const handleStyleChange = vi.fn();
 
-    const style = { ...mockNode.style, line: [16, 8] };
+    const style: NodeStyle = { ...mockNode.style, line: [16, 8] };
 
     render(
       <StylePanel
