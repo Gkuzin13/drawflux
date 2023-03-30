@@ -10,7 +10,7 @@ const useAnimatedLine = (
   maxOffset: number,
   animated: NodeStyle['animated'],
   lineStyle: NodeStyle['line'],
-  speed = 1.25,
+  speed = 1.2,
 ) => {
   const [animating, setAnimating] = useState(false);
 
@@ -34,7 +34,7 @@ const useAnimatedLine = (
   const { start, stop } = animate(() => {
     if (!element) return;
 
-    offset = offset + normalizeSpeed(speed);
+    offset = offset + speed;
 
     if (offset > maxOffset) {
       offset = 0;
@@ -55,6 +55,7 @@ const useAnimatedLine = (
         requestId = requestAnimationFrame(animateLoop);
 
         const delta = now - then;
+
         if (delta >= interval - tolerance) {
           then = now - (delta % interval);
           callback();
@@ -68,18 +69,6 @@ const useAnimatedLine = (
     }
 
     return { start, stop };
-  }
-
-  function normalizeSpeed(value: number) {
-    if (value < 0) {
-      return 0.1;
-    }
-
-    if (value > 2) {
-      return 2;
-    }
-
-    return value;
   }
 
   return { animating };
