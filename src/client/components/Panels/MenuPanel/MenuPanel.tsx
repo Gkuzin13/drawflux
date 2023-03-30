@@ -13,12 +13,11 @@ import {
 export type MenuPanelActionType = (typeof MENU_PANEL_ACTIONS)[number]['key'];
 
 type Props = {
-  initiallyOpen?: boolean;
   onAction: (type: MenuPanelActionType) => void;
 };
 
-const MenuPanel = ({ initiallyOpen, onAction }: Props) => {
-  const [open, setOpen] = useState(Boolean(initiallyOpen));
+const MenuPanel = ({ onAction }: Props) => {
+  const [open, setOpen] = useState(Boolean(false));
 
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -35,11 +34,16 @@ const MenuPanel = ({ initiallyOpen, onAction }: Props) => {
 
   return (
     <MenuPanelContainer ref={menuRef}>
-      <MenuPanelToggle size="small" squared={true} onClick={handleOnToggle}>
+      <MenuPanelToggle
+        title="Toggle Menu"
+        size="small"
+        squared={true}
+        onClick={handleOnToggle}
+      >
         <IoEllipsisHorizontal size={ICON_SIZES.LARGE} />
       </MenuPanelToggle>
       {open && (
-        <MenuPanelContent>
+        <MenuPanelContent data-testid="menu-panel-content">
           {MENU_PANEL_ACTIONS.map((action) => {
             return (
               <Button
