@@ -22,7 +22,7 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
                 color={activeTool === tool.value ? 'primary' : 'secondary'}
                 size="small"
                 squared={true}
-                title={getKeyTitle(tool.value, [tool.key])}
+                title={getKeyTitle(tool.value, [tool.key.replace(/Key/i, '')])}
                 onClick={() => onToolSelect(tool.value)}
               >
                 {createElement(tool.icon, { size: ICON_SIZES.MEDIUM })}

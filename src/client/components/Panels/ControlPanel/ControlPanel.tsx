@@ -36,7 +36,7 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
               color="secondary"
               size="small"
               title={getKeyTitle(control.name, [
-                ...control.modifierKeys,
+                ...control.modifierKeys.map((key) => key.replace(/key/i, '')),
                 control.key,
               ])}
               squared={true}

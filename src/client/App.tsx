@@ -18,9 +18,10 @@ const App = () => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
   const stageConfig = useAppSelector(selectStageConfig);
   const modal = useAppSelector(selectModal);
-  const stageRef = useRef<Konva.Stage>(null);
 
   const dispatch = useAppDispatch();
+
+  const stageRef = useRef<Konva.Stage>(null);
 
   const getToolTypeByKey = useCallback((key: Key) => {
     switch (key.toLowerCase()) {
