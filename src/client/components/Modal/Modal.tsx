@@ -25,7 +25,7 @@ const Modal = ({ title, message, onClose }: Props) => {
   return (
     <ModalContainer>
       <ModalDialog ref={dialogRef}>
-        <ModalCloseButton onClick={onClose}>
+        <ModalCloseButton title="Close" onClick={onClose}>
           <IoCloseOutline size={ICON_SIZES.EXTRA_LARGE} />
         </ModalCloseButton>
         <ModalDialogTitle>{title}</ModalDialogTitle>
