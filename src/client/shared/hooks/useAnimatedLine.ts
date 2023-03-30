@@ -1,8 +1,9 @@
+import Konva from 'konva';
 import { Shape } from 'konva/lib/Shape';
 import { Ellipse } from 'konva/lib/shapes/Ellipse';
 import { Line } from 'konva/lib/shapes/Line';
 import { Rect } from 'konva/lib/shapes/Rect';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { NodeStyle } from '../constants/element';
 
 const useAnimatedLine = (
@@ -10,68 +11,30 @@ const useAnimatedLine = (
   maxOffset: number,
   animated: NodeStyle['animated'],
   lineStyle: NodeStyle['line'],
-  speed = 1.2,
 ) => {
-  const [animating, setAnimating] = useState(false);
+  const animateDashOffset = useCallback(() => {
+    return new Konva.Animation((frame) => {
+      if (!frame) return;
+
+      const time = frame.time / 600;
+      const offset = maxOffset * ((time * 2) % 2);
+
+      element?.dashOffset(-offset);
+    }, element?.getLayer());
+  }, [element, animated, maxOffset, lineStyle]);
 
   useEffect(() => {
+    const anim = animateDashOffset();
+
     if (animated) {
-      start();
-      setAnimating(true);
+      anim.start();
     } else {
-      stop();
-      setAnimating(false);
+      anim.stop();
     }
-
     return () => {
-      stop();
-      setAnimating(false);
+      anim.stop();
     };
-  }, [animated, lineStyle, element]);
-
-  let offset = 0;
-
-  const { start, stop } = animate(() => {
-    if (!element) return;
-
-    offset = offset + speed;
-
-    if (offset > maxOffset) {
-      offset = 0;
-    }
-
-    element.dashOffset(-offset);
-  }, 60);
-
-  function animate(callback: () => void, frameRate = 60) {
-    let requestId = 0;
-
-    function start() {
-      let then = performance.now();
-      const interval = 1000 / frameRate;
-      const tolerance = 0.1;
-
-      const animateLoop = (now: number) => {
-        requestId = requestAnimationFrame(animateLoop);
-
-        const delta = now - then;
-
-        if (delta >= interval - tolerance) {
-          then = now - (delta % interval);
-          callback();
-        }
-      };
-      requestId = requestAnimationFrame(animateLoop);
-    }
-
-    function stop() {
-      cancelAnimationFrame(requestId);
-    }
-
-    return { start, stop };
-  }
-
-  return { animating };
+  }, [element, maxOffset, animated, lineStyle]);
 };
 
 export default useAnimatedLine;
