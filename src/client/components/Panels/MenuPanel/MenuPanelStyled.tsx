@@ -13,6 +13,7 @@ export const MenuPanelContainer = styled('div', {
 
 export const MenuPanelToggle = styled(Button, {
   boxShadow: '$small',
+  backgroundColor: '$white',
 });
 
 export const MenuPanelContent = styled('div', {

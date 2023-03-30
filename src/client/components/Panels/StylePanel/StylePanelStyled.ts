@@ -6,6 +6,7 @@ export const StylePanelContainer = styled('div', {
   left: '$2',
   top: '$12',
   zIndex: 1,
+  backgroundColor: '$white',
   boxShadow: '$small',
   borderRadius: '$1',
   padding: '$1',
