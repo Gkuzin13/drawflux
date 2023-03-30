@@ -1,5 +1,6 @@
 import { Point } from '@/client/shared/constants/element';
 import { NodeConfig } from 'konva/lib/Node';
+import { memo } from 'react';
 import { Shape } from 'react-konva';
 
 type Props = {
@@ -8,7 +9,7 @@ type Props = {
   config: NodeConfig;
 };
 
-const ArrowHead = ({ control, end, config }: Props) => {
+const ArrowHead = memo(({ control, end, config }: Props) => {
   return (
     <Shape
       {...config}
@@ -39,6 +40,8 @@ const ArrowHead = ({ control, end, config }: Props) => {
       }}
     />
   );
-};
+});
+
+ArrowHead.displayName = 'ArrowHead';
 
 export default ArrowHead;

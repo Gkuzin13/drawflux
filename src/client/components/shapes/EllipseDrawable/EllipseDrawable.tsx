@@ -1,84 +1,104 @@
-import { createDefaultNodeConfig } from '@/client/shared/constants/element';
-import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
-import useTransformer from '@/client/shared/hooks/useTransformer';
+import { memo, useCallback, useMemo } from 'react';
 import Konva from 'konva';
 import { Ellipse } from 'react-konva';
-import NodeTransformer from '../../NodeTransformer';
+import useAnimatedLine from '@/client/shared/hooks/useAnimatedLine';
+import useTransformer from '@/client/shared/hooks/useTransformer';
+import NodeTransformer from '@/client/components/NodeTransformer';
+import { createDefaultNodeConfig } from '@/client/shared/constants/element';
+import type { KonvaEventObject } from 'konva/lib/Node';
 import type { NodeComponentProps } from '@/client/components/Node/Node';
 
-const CircleDrawable = ({
-  node,
-  selected,
-  draggable,
-  onNodeChange,
-  onPress,
-}: NodeComponentProps) => {
-  const { nodeRef, transformerRef } = useTransformer<Konva.Ellipse>([selected]);
-
-  useAnimatedLine(
-    nodeRef.current,
-    node.style.line[0] + node.style.line[1],
-    node.style.animated,
-    node.style.line,
-  );
-
-  const { nodeProps, style } = node;
-
-  const config = createDefaultNodeConfig({
-    visible: nodeProps.visible,
-    strokeWidth: node.style.size,
-    stroke: style.color,
-    id: nodeProps.id,
-    rotation: nodeProps.rotation,
-    opacity: style.opacity,
+const EllipseDrawable = memo(
+  ({
+    node,
+    selected,
     draggable,
-    dash: node.style.line,
-  });
+    onNodeChange,
+    onPress,
+  }: NodeComponentProps) => {
+    const { nodeRef, transformerRef } = useTransformer<Konva.Ellipse>([
+      selected,
+    ]);
 
-  return (
-    <>
-      <Ellipse
-        ref={nodeRef}
-        radiusX={node.nodeProps.width || 0}
-        radiusY={node.nodeProps.height || 0}
-        x={node.nodeProps.point[0]}
-        y={node.nodeProps.point[1]}
-        {...config}
-        onDragStart={() => onPress(node.nodeProps.id)}
-        onDragEnd={(event) => {
-          onNodeChange({
-            ...node,
-            nodeProps: {
-              ...node.nodeProps,
-              point: [event.target.x(), event.target.y()],
-            },
-          });
-        }}
-        onTransformEnd={(event) => {
-          const ellipse = event.target as Konva.Ellipse;
+    useAnimatedLine(
+      nodeRef.current,
+      node.style.line[0] + node.style.line[1],
+      node.style.animated,
+      node.style.line,
+    );
 
-          const radiusX = (ellipse.width() * ellipse.scaleX()) / 2;
-          const radiusY = (ellipse.height() * ellipse.scaleY()) / 2;
+    const { nodeProps, style } = node;
 
-          onNodeChange({
-            ...node,
-            nodeProps: {
-              ...node.nodeProps,
-              point: [ellipse.x(), ellipse.y()],
-              width: radiusX,
-              height: radiusY,
-              rotation: ellipse.rotation(),
-            },
-          });
+    const config = useMemo(() => {
+      return createDefaultNodeConfig({
+        visible: nodeProps.visible,
+        id: nodeProps.id,
+        rotation: nodeProps.rotation,
+        stroke: style.color,
+        strokeWidth: style.size,
+        opacity: style.opacity,
+        dash: style.line,
+        draggable,
+      });
+    }, [nodeProps.visible, nodeProps.id, nodeProps.rotation, style, draggable]);
 
-          ellipse.scale({ x: 1, y: 1 });
-        }}
-        onTap={() => onPress(node.nodeProps.id)}
-        onClick={() => onPress(node.nodeProps.id)}
-      />
-      {selected && <NodeTransformer ref={transformerRef} />}
-    </>
-  );
-};
+    const handleDragEnd = useCallback(
+      (event: KonvaEventObject<DragEvent>) => {
+        onNodeChange({
+          ...node,
+          nodeProps: {
+            ...node.nodeProps,
+            point: [event.target.x(), event.target.y()],
+          },
+        });
+      },
+      [node, onNodeChange],
+    );
 
-export default CircleDrawable;
+    const handleTransformEnd = useCallback(
+      (event: KonvaEventObject<Event>) => {
+        const ellipse = event.target as Konva.Ellipse;
+
+        const radiusX = (ellipse.width() * ellipse.scaleX()) / 2;
+        const radiusY = (ellipse.height() * ellipse.scaleY()) / 2;
+
+        onNodeChange({
+          ...node,
+          nodeProps: {
+            ...node.nodeProps,
+            point: [ellipse.x(), ellipse.y()],
+            width: radiusX,
+            height: radiusY,
+            rotation: ellipse.rotation(),
+          },
+        });
+
+        ellipse.scale({ x: 1, y: 1 });
+      },
+      [onNodeChange],
+    );
+
+    return (
+      <>
+        <Ellipse
+          ref={nodeRef}
+          radiusX={node.nodeProps.width || 0}
+          radiusY={node.nodeProps.height || 0}
+          x={node.nodeProps.point[0]}
+          y={node.nodeProps.point[1]}
+          {...config}
+          onDragStart={() => onPress(node.nodeProps.id)}
+          onDragEnd={handleDragEnd}
+          onTransformEnd={handleTransformEnd}
+          onTap={() => onPress(node.nodeProps.id)}
+          onClick={() => onPress(node.nodeProps.id)}
+        />
+        {selected && <NodeTransformer ref={transformerRef} />}
+      </>
+    );
+  },
+);
+
+EllipseDrawable.displayName = 'EllipseDrawable';
+
+export default EllipseDrawable;
