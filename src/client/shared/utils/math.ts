@@ -1,5 +1,5 @@
-export function getRatioFromValue(current: number, min: number, max: number) {
-  return (current - min) / (max - min);
+export function getRatioFromValue(value: number, min: number, max: number) {
+  return max === min ? 1 : (value - min) / (max - min);
 }
 
 export function getValueFromRatio(ratio: number, min: number, max: number) {

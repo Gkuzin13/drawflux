@@ -1,5 +1,5 @@
 import { NodeType, Point } from '@/client/shared/constants/element';
-import { Stage } from 'react-konva';
+import { Layer, Stage } from 'react-konva';
 import { ForwardedRef, forwardRef, useMemo, useRef, useState } from 'react';
 import Konva from 'konva';
 import { useAppDispatch, useAppSelector } from '@/client/stores/hooks';
@@ -330,7 +330,6 @@ const DrawingCanvas = forwardRef(
           config={{ listening: !drawing }}
           handleDraftEnd={handleDraftEnd}
         >
-          {selectRect && <SelectTool rect={selectRect} ref={selectRectRef} />}
           <Html
             groupProps={{
               x: contextMenu?.position[0],
@@ -345,6 +344,11 @@ const DrawingCanvas = forwardRef(
             )}
           </Html>
         </NodesLayer>
+        {selectRect && (
+          <Layer listening={!drawing}>
+            <SelectTool rect={selectRect} ref={selectRectRef} />
+          </Layer>
+        )}
       </Stage>
     );
   },
