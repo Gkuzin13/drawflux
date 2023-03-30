@@ -1,4 +1,7 @@
-import { MENU_PANEL_ACTIONS } from '@/client/shared/constants/menu';
+import {
+  MenuPanelActionType,
+  MENU_PANEL_ACTIONS,
+} from '@/client/shared/constants/menu';
 import { useClickAway } from '@/client/shared/hooks/useClickAway';
 import { ICON_SIZES } from '@/client/shared/styles/theme';
 import { useRef, useState } from 'react';
@@ -9,8 +12,6 @@ import {
   MenuPanelContent,
   MenuPanelContainer,
 } from './MenuPanelStyled';
-
-export type MenuPanelActionType = (typeof MENU_PANEL_ACTIONS)[number]['key'];
 
 type Props = {
   onAction: (type: MenuPanelActionType) => void;

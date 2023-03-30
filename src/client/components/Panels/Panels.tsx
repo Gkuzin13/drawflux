@@ -3,24 +3,24 @@ import ControlPanel from './ControlPanel/ControlPanel';
 import ToolsDock from './ToolsPanel/ToolsPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
 import StylePanel, { StylePanelProps } from './StylePanel/StylePanel';
-import { useAppDispatch, useAppSelector } from '../../stores/hooks';
+import { useAppDispatch, useAppSelector } from '@/client/stores/hooks';
 import {
   selectStageConfig,
   stageConfigActions,
   StageConfigState,
-} from '../../stores/slices/stageConfigSlice';
-import { nodesActions, selectNodes } from '../../stores/slices/nodesSlice';
+} from '@/client/stores/slices/stageConfigSlice';
+import { nodesActions, selectNodes } from '@/client/stores/slices/nodesSlice';
 import {
   controlActions,
   selectControl,
-} from '../../stores/slices/controlSlice';
-import { Tool } from '../../shared/constants/tool';
+} from '@/client/stores/slices/controlSlice';
+import { Tool } from '@/client/shared/constants/tool';
 import {
   NodeStyle,
   NodeType,
   NodeTypeSchema,
-} from '../../shared/constants/element';
-import MenuPanel, { MenuPanelActionType } from './MenuPanel/MenuPanel';
+} from '@/client/shared/constants/element';
+import MenuPanel from './MenuPanel/MenuPanel';
 import {
   downloadDataUrlAsFile,
   loadJsonFile,
@@ -29,6 +29,7 @@ import Konva from 'konva';
 import { store } from '@/client/stores/store';
 import { z } from 'zod';
 import { modalActions } from '@/client/stores/slices/modalSlice';
+import { MenuPanelActionType } from '@/client/shared/constants/menu';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;

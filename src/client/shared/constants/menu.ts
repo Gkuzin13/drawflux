@@ -8,6 +8,8 @@ export type ContextMenuItem = {
   icon?: IconType;
 };
 
+export type MenuPanelActionType = (typeof MENU_PANEL_ACTIONS)[number]['key'];
+
 export const NODE_CONTEXT_MENU_ACTIONS = [
   {
     key: 'delete-node',
