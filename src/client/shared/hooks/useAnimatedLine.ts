@@ -3,7 +3,7 @@ import { Shape } from 'konva/lib/Shape';
 import { Ellipse } from 'konva/lib/shapes/Ellipse';
 import { Line } from 'konva/lib/shapes/Line';
 import { Rect } from 'konva/lib/shapes/Rect';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { NodeStyle } from '../constants/element';
 
 const useAnimatedLine = (
@@ -12,18 +12,18 @@ const useAnimatedLine = (
   animated: NodeStyle['animated'],
   lineStyle: NodeStyle['line'],
 ) => {
-  const animateDashOffset = useCallback(() => {
-    return new Konva.Animation((frame) => {
-      if (!frame) return;
-
-      const time = frame.time / 600;
-      const offset = maxOffset * ((time * 2) % 2);
-
-      element?.dashOffset(-offset);
-    }, element?.getLayer());
-  }, [element, animated, maxOffset, lineStyle]);
-
   useEffect(() => {
+    function animateDashOffset() {
+      return new Konva.Animation((frame) => {
+        if (!frame) return;
+
+        const time = frame.time / 600;
+        const offset = maxOffset * ((time * 2) % 2);
+
+        element?.dashOffset(-offset);
+      }, element?.getLayer());
+    }
+
     const anim = animateDashOffset();
 
     if (animated) {
@@ -31,6 +31,7 @@ const useAnimatedLine = (
     } else {
       anim.stop();
     }
+
     return () => {
       anim.stop();
     };
