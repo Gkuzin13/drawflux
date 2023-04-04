@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS page (
+  id SERIAL PRIMARY KEY
+  stage_config JSONB NOT NULL,
+  nodes JSONB NOT NULL
+);

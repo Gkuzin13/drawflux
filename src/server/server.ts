@@ -9,8 +9,8 @@ if (process.env.NODE_ENV === 'production') {
   app.use(compression());
 }
 
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 mountRoutes(app);
 

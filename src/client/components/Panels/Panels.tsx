@@ -15,11 +15,7 @@ import {
   selectControl,
 } from '@/client/stores/slices/controlSlice';
 import { Tool } from '@/client/shared/constants/tool';
-import {
-  NodeStyle,
-  NodeType,
-  NodeTypeSchema,
-} from '@/client/shared/constants/element';
+import { NodeStyle, NodeType } from '@/client/shared/constants/element';
 import MenuPanel from './MenuPanel/MenuPanel';
 import {
   downloadDataUrlAsFile,
@@ -30,6 +26,7 @@ import { store } from '@/client/stores/store';
 import { z } from 'zod';
 import { modalActions } from '@/client/stores/slices/modalSlice';
 import { MenuPanelActionType } from '@/client/shared/constants/menu';
+import { NodeTypeSchema } from '../../../../schemas/nodeSchema'; // Temporary namespace
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;
