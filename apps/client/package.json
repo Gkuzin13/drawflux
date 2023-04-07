@@ -6,7 +6,7 @@
   "sideEffects": false,
   "scripts": {
     "dev": "vite",
-    "build": "vite build && tsc && tsc-alias",
+    "build": "vite build && tsc",
     "preview": "vite preview",
     "test:watch": "vitest",
     "test": "vitest run",
@@ -37,6 +37,6 @@
     "@types/testing-library__jest-dom": "^5.14.5",
     "@vitejs/plugin-react": "^3.1.0",
     "babel-loader": "^9.1.2",
-    "tsc-alias": "^1.8.5"
+    "jsdom": "^21.1.1"
   }
 }

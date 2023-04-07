@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "module": "NodeNext"
-  },
-  "extends": "./tsconfig.base.json",
-  "watchOptions": {
-    "excludeDirectories": ["**/node_modules"]
-  }
-}

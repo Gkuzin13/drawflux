@@ -16,11 +16,6 @@ module.exports = {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
-        project: [
-          'packages/shared/tsconfig.json',
-          'packages/client/tsconfig.json',
-          'packages/server/tsconfig.json',
-        ],
       },
     },
   },

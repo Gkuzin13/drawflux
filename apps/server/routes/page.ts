@@ -1,7 +1,7 @@
 import Router from 'express-promise-router';
 import { loadRoute, getQuery } from '../utils/string.js';
 import * as db from '../db/index.js';
-import { Schemas } from '../../shared/dist/index.js';
+import { Schemas } from '../../../packages/shared/dist/index.js';
 
 const queries = {
   getPage: getQuery('get-page'),
