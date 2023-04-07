@@ -1,5 +1,5 @@
 import type { NodeObject } from '@shared';
-import Node from '../Node/Node';
+import Node from './Node';
 
 type Props = {
   node: NodeObject;
