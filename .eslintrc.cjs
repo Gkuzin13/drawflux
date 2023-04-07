@@ -9,23 +9,23 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'eslint-config-prettier',
   ],
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
   settings: {
-    react: {
-      version: 'detect',
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
     'import/resolver': {
-      typescript: {},
-      alias: {
-        map: ['@', './src'],
-      },
-      node: {
-        paths: ['src'],
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      typescript: {
+        alwaysTryTypes: true,
+        project: [
+          'packages/shared/tsconfig.json',
+          'packages/client/tsconfig.json',
+          'packages/server/tsconfig.json',
+        ],
       },
     },
   },
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint', 'import'],
   root: true,
   rules: {
     'no-console': 'warn',

@@ -1,32 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "allowJs": false,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "typeRoots": ["./types/*"],
-    "types": ["vitest/globals"],
-    "paths": {
-      "@/*": ["./src/*"],
-      "@/types/*": ["./types/*"]
-    }
+    "module": "NodeNext"
   },
+  "extends": "./tsconfig.base.json",
   "watchOptions": {
     "excludeDirectories": ["**/node_modules"]
-  },
-  "ts-node": {
-    "esm": true
-  },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  }
 }

@@ -1,0 +1,21 @@
+{
+  "name": "shared",
+  "description": "Shared modules",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/types.d.ts",
+  "private": true,
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc"
+  },
+  "dependencies": {
+    "zod": "^3.21.4"
+  }
+}
