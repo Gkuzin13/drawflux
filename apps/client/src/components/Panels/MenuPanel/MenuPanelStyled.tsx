@@ -1,5 +1,5 @@
 import { styled } from '@shared';
-import Button from '../../Button/Button';
+import Menu from '@/components/core/Menu/Menu';
 
 export const MenuPanelContainer = styled('div', {
   position: 'fixed',
@@ -11,19 +11,11 @@ export const MenuPanelContainer = styled('div', {
   zIndex: 1,
 });
 
-export const MenuPanelToggle = styled(Button, {
+export const MenuPanelToggle = styled(Menu.Toggle, {
   boxShadow: '$small',
   backgroundColor: '$white',
 });
 
-export const MenuPanelContent = styled('div', {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '$1',
-  boxShadow: '$small',
+export const MenuPanelDropdown = styled(Menu.Dropdown, {
   backgroundColor: '$white',
-  padding: '$1',
-  borderRadius: '$1',
-  marginTop: '$2',
-  width: '$11',
 });

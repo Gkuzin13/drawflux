@@ -11,7 +11,7 @@ import Panels from './components/Panels/Panels';
 import { nodesActions } from './stores/slices/nodesSlice';
 import { historyActions } from './stores/slices/historySlice';
 import Konva from 'konva';
-import Modal from './components/Modal/Modal';
+import Modal from '@/components/core/Modal/Modal';
 import { modalActions, selectModal } from './stores/slices/modalSlice';
 
 const App = () => {

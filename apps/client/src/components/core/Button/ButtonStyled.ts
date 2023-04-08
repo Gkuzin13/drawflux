@@ -68,5 +68,10 @@ export const ButtonStyled = styled('button', {
         width: '100%',
       },
     },
+    spanned: {
+      true: {
+        justifyContent: 'space-between',
+      },
+    },
   },
 });

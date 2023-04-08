@@ -2,7 +2,7 @@ import { ICON_SIZES } from '@/constants/icon';
 import { capitalizeFirstLetter } from '@/utils/string';
 import { NodeLIne, NodeStyle } from '@shared/types';
 import { ANIMATED, COLOR, LINE, SIZE } from '@/constants/style';
-import { Divider } from '@/components/Divider/Divider';
+import { Divider } from '@/components/core/Divider/Divider';
 import {
   ColorCircle,
   ColorPicker,

@@ -1,5 +1,5 @@
 import { styled } from '@shared';
-import Button from '@/components/Button/Button';
+import Button from '@/components/core/Button/Button';
 
 export const ZoomPanelContainer = styled('div', {
   display: 'flex',

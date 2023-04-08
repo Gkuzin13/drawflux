@@ -1,5 +1,5 @@
 import { CONTROL, ControlValue } from '@/constants/control';
-import Button from '@/components/Button/Button';
+import Button from '@/components/core/Button/Button';
 import { ControlPanelContainer, ControlPanelRow } from './ControlPanelStyled';
 import { getKeyTitle } from '@/utils/string';
 

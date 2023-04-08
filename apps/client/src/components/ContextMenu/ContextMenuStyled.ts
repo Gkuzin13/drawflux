@@ -1,5 +1,5 @@
 import { styled } from '@shared';
-import Button from '../Button/Button';
+import Button from '../core/Button/Button';
 
 export const ContextMenuContainer = styled('div', {
   width: '150px',

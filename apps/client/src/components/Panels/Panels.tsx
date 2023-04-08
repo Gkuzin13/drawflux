@@ -21,8 +21,8 @@ import { modalActions } from '@/stores/slices/modalSlice';
 import { MenuPanelActionType } from '@/constants/menu';
 import { Schemas } from '@shared';
 import type { NodeStyle, NodeObject } from '@shared';
-import Button from '../Button/Button';
 import { useSharePageMutation } from '@/services/api';
+import SharePanel from './SharePanel/SharePanel';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;
@@ -36,7 +36,7 @@ const Panels = ({ stageRef }: Props) => {
 
   const nodes = present.nodes;
 
-  const [sharePage, result] = useSharePageMutation();
+  const [sharePage] = useSharePageMutation();
 
   const dispatch = useAppDispatch();
 
@@ -128,12 +128,7 @@ const Panels = ({ stageRef }: Props) => {
 
   return (
     <>
-      <Button
-        onClick={handlePageShare}
-        css={{ zIndex: 1, position: 'fixed', top: '$2', right: '$12' }}
-      >
-        Share
-      </Button>
+      <SharePanel onShare={handlePageShare}></SharePanel>
       <MenuPanel onAction={handleMenuAction} />
       <ToolsDock activeTool={toolType} onToolSelect={onToolTypeChange} />
       {selectedNode && (

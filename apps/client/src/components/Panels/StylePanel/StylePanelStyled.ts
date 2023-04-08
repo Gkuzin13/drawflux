@@ -1,5 +1,5 @@
 import { styled } from '@shared';
-import Button from '../../Button/Button';
+import Button from '../../core/Button/Button';
 
 export const StylePanelContainer = styled('div', {
   position: 'fixed',
