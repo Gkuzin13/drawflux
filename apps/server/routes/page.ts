@@ -3,25 +3,34 @@ import { loadRoute } from '../utils/string.js';
 import * as db from '../db/index.js';
 import { Schemas, SharePageParams } from '@shared/dist/index.js';
 import { QueryResult } from 'pg';
-import queries, { PageRowObject, SharePageArgs } from '../db/queries/index.js';
+import queries from '../db/queries/index.js';
+import { PageRowObject, SharePageArgs, GetPageArgs } from '../db/queries/types';
 
 const pageRouter = Router();
 
 pageRouter.get(
   '/:id',
   loadRoute(async (req) => {
-    const { id } = req.params;
-    const { rows }: QueryResult<PageRowObject> = await db.query(
-      queries.getPage,
-      [id],
-    );
+    const client = await db.getClient();
 
-    const { stage_config, nodes } = rows[0];
+    try {
+      const { id } = req.params;
+      const { rows }: QueryResult<PageRowObject> = await db.query<GetPageArgs>(
+        queries.getPage,
+        [id],
+      );
 
-    return {
-      stageConfig: stage_config,
-      nodes,
-    };
+      const { stage_config, nodes } = rows[0];
+
+      return {
+        stageConfig: stage_config,
+        nodes,
+      };
+    } catch (error) {
+      console.log(error);
+    } finally {
+      client.release();
+    }
   }),
 );
 
