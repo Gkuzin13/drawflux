@@ -20,7 +20,9 @@ import { z } from 'zod';
 import { modalActions } from '@/stores/slices/modalSlice';
 import { MenuPanelActionType } from '@/constants/menu';
 import { Schemas } from '@shared';
-import type { NodeStyle, NodeObject } from '@shared/types';
+import type { NodeStyle, NodeObject } from '@shared';
+import Button from '../Button/Button';
+import { useSharePageMutation } from '@/services/api';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;
@@ -33,6 +35,8 @@ const Panels = ({ stageRef }: Props) => {
   const { past, present, future } = useAppSelector(selectNodes);
 
   const nodes = present.nodes;
+
+  const [sharePage, result] = useSharePageMutation();
 
   const dispatch = useAppDispatch();
 
@@ -116,8 +120,20 @@ const Panels = ({ stageRef }: Props) => {
     }
   };
 
+  const handlePageShare = async () => {
+    const res = await sharePage({ page: { nodes, stageConfig } });
+
+    console.log(res);
+  };
+
   return (
     <>
+      <Button
+        onClick={handlePageShare}
+        css={{ zIndex: 1, position: 'fixed', top: '$2', right: '$12' }}
+      >
+        Share
+      </Button>
       <MenuPanel onAction={handleMenuAction} />
       <ToolsDock activeTool={toolType} onToolSelect={onToolTypeChange} />
       {selectedNode && (

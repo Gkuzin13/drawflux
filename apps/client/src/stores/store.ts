@@ -7,6 +7,7 @@ import historyReducer, {
 import stageConfig from './slices/stageConfigSlice';
 import control from './slices/controlSlice';
 import modal from './slices/modalSlice';
+import { api } from '@/services/api';
 
 const undoableNodes = historyReducer(nodesReducer) as Reducer<
   HistoryState,
@@ -14,7 +15,15 @@ const undoableNodes = historyReducer(nodesReducer) as Reducer<
 >;
 
 export const store = configureStore({
-  reducer: { undoableNodes, control, stageConfig, modal },
+  reducer: {
+    undoableNodes,
+    control,
+    stageConfig,
+    modal,
+    [api.reducerPath]: api.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }).concat(api.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

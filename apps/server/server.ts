@@ -4,6 +4,7 @@ import compression from 'compression';
 import { mountRoutes } from './routes/index.js';
 import { getClient, query } from './db/index.js';
 import queries from './db/queries/index.js';
+import cors from 'cors';
 
 const app = express();
 
@@ -11,6 +12,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(compression());
 }
 
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
