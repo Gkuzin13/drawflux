@@ -18,10 +18,10 @@ mountRoutes(app);
 
 const port = process.env.PORT || 7456;
 
-(async () => {
+await (async () => {
   const client = await getClient();
   try {
-    await query(queries.createPageTable, []);
+    await query(queries.createPageTable);
   } catch (err: any) {
     console.log(err?.stack);
   } finally {

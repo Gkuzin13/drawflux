@@ -9,7 +9,7 @@ const poolClient = new pg.Pool({
   idleTimeoutMillis: 30000,
 });
 
-export async function query(text: string, params: any[]) {
+export async function query<T extends [...T]>(text: string, params?: T) {
   const start = new Date().getTime();
   const res = await poolClient.query(text, params);
   const duration = new Date().getTime() - start;
