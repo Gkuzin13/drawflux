@@ -2,6 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import { mountRoutes } from './routes/index.js';
+import { getClient, query } from './db/index.js';
+import queries from './db/queries/index.js';
 
 const app = express();
 
@@ -15,6 +17,17 @@ app.use(bodyParser.json());
 mountRoutes(app);
 
 const port = process.env.PORT || 7456;
+
+(async () => {
+  const client = await getClient();
+  try {
+    await query(queries.createPageTable, []);
+  } catch (err: any) {
+    console.log(err?.stack);
+  } finally {
+    client.release();
+  }
+})();
 
 app.listen(Number(port), '0.0.0.0', () => {
   // eslint-disable-next-line no-console

@@ -4,7 +4,7 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "dev": "nodemon --watch './**' --ext 'ts,json' --exec 'ts-node server.ts'",
+    "dev": "nodemon --watch './**' --ext 'ts,json,sql' --exec 'ts-node server.ts'",
     "test:watch": "vitest",
     "test": "vitest run",
     "lint": "eslint . --ext .ts,.tsx",

@@ -10,17 +10,19 @@ module.exports = {
     'eslint-config-prettier',
   ],
   settings: {
-    'import/parsers': {
-      '@typescript-eslint/parser': ['.ts', '.tsx'],
-    },
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
+        project: [
+          'packages/shared/tsconfig.json',
+          'apps/client/tsconfig.json',
+          'apps/server/tsconfig.json',
+        ],
       },
     },
   },
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'import'],
+  plugins: ['@typescript-eslint'],
   root: true,
   rules: {
     'no-console': 'warn',
