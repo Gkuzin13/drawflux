@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import DrawingCanvas from '@/components/Stage/DrawingCanvas';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
@@ -15,10 +15,10 @@ import { useGetPageQuery } from '@/services/api';
 
 const SharedPage = () => {
   const { id } = useParams();
-  const { isLoading, isError } = useGetPageQuery(
-    { id: id ?? '' },
-    { skip: !id },
-  );
+  const { isLoading, isError, isSuccess } = useGetPageQuery({
+    // Temporary workaround
+    id: id as string,
+  });
 
   const stageConfig = useAppSelector(selectStageConfig);
   const modal = useAppSelector(selectModal);
@@ -29,9 +29,13 @@ const SharedPage = () => {
 
   useKeydownListener();
 
-  if (isError) {
-    return <>Error</>;
-  }
+  useEffect(() => {
+    if (isError) {
+      dispatch(
+        modalActions.open({ title: 'Error', message: 'Error loading page' }),
+      );
+    }
+  }, [isError]);
 
   if (isLoading) {
     return <>Loading...</>;
@@ -39,7 +43,7 @@ const SharedPage = () => {
 
   return (
     <>
-      <Panels stageRef={stageRef} />
+      <Panels isPageShared={isSuccess} stageRef={stageRef} />
       <DrawingCanvas
         ref={stageRef}
         config={{

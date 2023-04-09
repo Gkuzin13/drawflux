@@ -6,13 +6,20 @@ import Menu from '@/components/core/Menu/Menu';
 
 type Props = {
   pageState: SharePageParams;
+  isPageShared: boolean;
 };
 
-const SharePanel = ({ pageState }: Props) => {
+const PAGE_SHARE_INFO = {
+  ACTIVE:
+    'Anyone with the link has access to this page for 24 hours since sharing.',
+  CTA: 'Sharing this project will make it available for 24 hours publicly to anyone who has access to the provided URL.',
+};
+
+const SharePanel = ({ pageState, isPageShared }: Props) => {
   const [sharePage, { isLoading, isSuccess }] = useSharePageMutation();
 
   const handlePageShare = async () => {
-    const { data, error } = await sharePage(pageState).unwrap();
+    const { data } = await sharePage(pageState).unwrap();
 
     if (data?.id) {
       window.history.pushState({}, '', `/p/${data.id}`);
@@ -28,20 +35,21 @@ const SharePanel = ({ pageState }: Props) => {
           Share
         </Menu.Toggle>
         <Menu.Dropdown>
-          <Menu.Item
-            fullWidth={true}
-            size="small"
-            color="secondary-light"
-            closeOnItemClick={false}
-            onItemClick={handlePageShare}
-          >
-            {!isLoading || (!isSuccess && <TbLink />)}
-            {isLoading || isSuccess ? TbLoader({}) : 'Share this page'}
-          </Menu.Item>
+          {!isPageShared && (
+            <Menu.Item
+              fullWidth={true}
+              size="small"
+              color="secondary-light"
+              closeOnItemClick={false}
+              onItemClick={handlePageShare}
+            >
+              {!isLoading || (!isSuccess && <TbLink />)}
+              {isLoading || isSuccess ? TbLoader({}) : 'Share this page'}
+            </Menu.Item>
+          )}
           <Menu.Divider type="horizontal" />
           <SharePanelDisclamer>
-            Sharing this project will make it available for 24 hours publicly to
-            anyone who has access to the provided URL.
+            {isPageShared ? PAGE_SHARE_INFO.ACTIVE : PAGE_SHARE_INFO.CTA}
           </SharePanelDisclamer>
         </Menu.Dropdown>
       </Menu>
