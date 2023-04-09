@@ -1,9 +1,14 @@
 import Router from 'express-promise-router';
+import pg, { QueryResult } from 'pg';
+import { ZodError } from 'zod';
 import { loadRoute } from '../utils/string.js';
 import * as db from '../db/index.js';
 import queries from '../db/queries/index.js';
-import { QueryResult } from 'pg';
-import { Schemas, SharePageParams } from '@shared/dist/index.js';
+import {
+  Schemas,
+  SharePageParams,
+  BadRequestError,
+} from '@shared/dist/index.js';
 import { PageRowObject, SharePageArgs, GetPageArgs } from '../db/queries/types';
 
 const pageRouter = Router();
@@ -27,7 +32,9 @@ pageRouter.get(
         nodes,
       };
     } catch (error) {
-      console.log(error);
+      if (error instanceof pg.DatabaseError) {
+        throw new BadRequestError('Entry not found', 404);
+      }
     } finally {
       client.release();
     }
@@ -42,6 +49,7 @@ pageRouter.post(
     try {
       const { page }: SharePageParams = req.body;
 
+      Schemas.StageConfig.parse(page.stageConfig);
       Schemas.Node.array().parse(page.nodes);
 
       const { rows }: QueryResult<PageRowObject> =
@@ -52,7 +60,9 @@ pageRouter.post(
 
       return rows[0];
     } catch (error) {
-      console.log(error);
+      if (error instanceof pg.DatabaseError || error instanceof ZodError) {
+        throw new BadRequestError('Invalid request body', 400);
+      }
     } finally {
       client.release();
     }

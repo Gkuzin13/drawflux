@@ -8,7 +8,7 @@ export const api = createApi({
     sharePage: builder.mutation<SharePageParams['page'], SharePageParams>({
       query(body) {
         return {
-          url: `pages/`,
+          url: 'pages/',
           method: 'POST',
           body,
         };

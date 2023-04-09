@@ -1,6 +1,4 @@
-import { Vector2d } from 'konva/lib/types';
+import { z } from 'zod';
+import { StageConfig } from '../schemas/konva';
 
-export type StageConfig = {
-  scale: number;
-  position: Vector2d;
-};
+export type StageConfig = z.infer<typeof StageConfig>;

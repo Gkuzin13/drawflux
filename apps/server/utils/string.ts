@@ -10,25 +10,21 @@ export function getQuery(filename: string) {
   );
 }
 
-type LoadRouteHandler<T> = (
+type LoadRouteHandler = (
   req: Request,
   res: Response,
   next: NextFunction,
-) => Promise<T>;
+) => Promise<any>;
 
-export const loadRoute = <T>(handler: LoadRouteHandler<T>) => {
+export const loadRoute = (handler: LoadRouteHandler) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const response = await handler(req, res, next);
 
-      res.json({ data: response });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return res.json({ data: response });
     } catch (error: any) {
-      // eslint-disable-next-line no-console
-      console.error(error);
-
-      res.status(error.status || 500).json({ error });
+      console.error(error.message, error.statusCode);
+      return res.status(error.statusCode || 500).json({ error });
     }
   };
 };
