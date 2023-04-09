@@ -28,7 +28,9 @@ const Toggle = ({ children, ...props }: PopoverToggleProps) => {
 const Dropdown = ({ children }: PropsWithChildren) => {
   const ctx = useContext(PopoverContext);
 
-  return ctx?.opened ? <PopoverDropdown>{children}</PopoverDropdown> : null;
+  return ctx?.opened ? (
+    <PopoverDropdown data-testid="popover-dropdown">{children}</PopoverDropdown>
+  ) : null;
 };
 
 const Popover = ({
