@@ -8,7 +8,7 @@ export const SharePanelContainer = styled('div', {
 });
 
 export const SharePanelDisclamer = styled('p', {
-  padding: '$2',
+  padding: '$1 $2 $2 $2',
   fontSize: '$2',
   color: '$gray600',
 });

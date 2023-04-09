@@ -7,7 +7,7 @@ export const Divider = styled('div', {
       horizontal: {
         height: '1px',
         width: '100%',
-        margin: '0 auto',
+        margin: '$1 auto',
       },
       vertical: {
         width: '1px',
