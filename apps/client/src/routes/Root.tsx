@@ -1,17 +1,17 @@
 import { useRef } from 'react';
-import { useAppDispatch, useAppSelector } from './stores/hooks';
-import DrawingCanvas from './components/Stage/DrawingCanvas';
+import DrawingCanvas from '@/components/Stage/DrawingCanvas';
+import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
   selectStageConfig,
   stageConfigActions,
-} from './stores/slices/stageConfigSlice';
-import Panels from './components/Panels/Panels';
+} from '@/stores/slices/stageConfigSlice';
+import Panels from '@/components/Panels/Panels';
 import Konva from 'konva';
 import Modal from '@/components/core/Modal/Modal';
-import { modalActions, selectModal } from './stores/slices/modalSlice';
-import useKeydownListener from './hooks/useKeyListener';
+import { modalActions, selectModal } from '@/stores/slices/modalSlice';
+import useKeydownListener from '@/hooks/useKeyListener';
 
-const App = () => {
+const Root = () => {
   const stageConfig = useAppSelector(selectStageConfig);
   const modal = useAppSelector(selectModal);
 
@@ -46,4 +46,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Root;

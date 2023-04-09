@@ -1,6 +1,7 @@
 import type { NodeObject } from '@shared';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
+import { api } from '@/services/api';
 
 export type NodesState = {
   nodes: NodeObject[];
@@ -47,6 +48,16 @@ export const nodesSlice = createSlice({
     deleteAll: (state) => {
       state.nodes = [];
     },
+  },
+  extraReducers(builder) {
+    builder.addMatcher(
+      api.endpoints.getPage.matchFulfilled,
+      (state, { payload }) => {
+        if (payload.data) {
+          state.nodes = payload.data.page.nodes;
+        }
+      },
+    );
   },
 });
 

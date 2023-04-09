@@ -36,8 +36,6 @@ const Panels = ({ stageRef }: Props) => {
 
   const nodes = present.nodes;
 
-  const [sharePage] = useSharePageMutation();
-
   const dispatch = useAppDispatch();
 
   const selectedNode = useMemo(() => {
@@ -120,15 +118,9 @@ const Panels = ({ stageRef }: Props) => {
     }
   };
 
-  const handlePageShare = async () => {
-    const res = await sharePage({ page: { nodes, stageConfig } });
-
-    console.log(res);
-  };
-
   return (
     <>
-      <SharePanel onShare={handlePageShare}></SharePanel>
+      <SharePanel pageState={{ page: { nodes, stageConfig } }} />
       <MenuPanel onAction={handleMenuAction} />
       <ToolsDock activeTool={toolType} onToolSelect={onToolTypeChange} />
       {selectedNode && (

@@ -1,14 +1,24 @@
-import { TbLink } from 'react-icons/tb';
+import { TbLink, TbLoader } from 'react-icons/tb';
 import { SharePanelContainer, SharePanelDisclamer } from './SharePanelStyled';
+import { SharePageParams } from '@shared';
+import { useSharePageMutation } from '@/services/api';
 import Menu from '@/components/core/Menu/Menu';
 
 type Props = {
-  onShare: () => void;
+  pageState: SharePageParams;
 };
 
-const SharePanel = ({ onShare }: Props) => {
-  const handleActionClick = () => {
-    onShare();
+const SharePanel = ({ pageState }: Props) => {
+  const [sharePage, { isLoading, isSuccess }] = useSharePageMutation();
+
+  const handlePageShare = async () => {
+    const { data, error } = await sharePage(pageState).unwrap();
+
+    if (data?.id) {
+      window.history.pushState({}, '', `/p/${data.id}`);
+      window.location.reload();
+      return;
+    }
   };
 
   return (
@@ -23,10 +33,10 @@ const SharePanel = ({ onShare }: Props) => {
             size="small"
             color="secondary-light"
             closeOnItemClick={false}
-            onItemClick={handleActionClick}
+            onItemClick={handlePageShare}
           >
-            <TbLink />
-            Share this page
+            {!isLoading || (!isSuccess && <TbLink />)}
+            {isLoading || isSuccess ? TbLoader({}) : 'Share this page'}
           </Menu.Item>
           <Menu.Divider type="horizontal" />
           <SharePanelDisclamer>

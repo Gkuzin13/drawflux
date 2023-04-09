@@ -1,11 +1,28 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { SharePageParams } from '@shared';
+import {
+  GetPageParams,
+  SharePageParams,
+  ServerResponse,
+  SharedPage,
+  SharePageResponse,
+} from '@shared';
 
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:7456/' }),
   endpoints: (builder) => ({
-    sharePage: builder.mutation<SharePageParams['page'], SharePageParams>({
+    getPage: builder.query<ServerResponse<SharedPage>, GetPageParams>({
+      query(params) {
+        return {
+          url: `p/${params.id}`,
+          method: 'GET',
+        };
+      },
+    }),
+    sharePage: builder.mutation<
+      ServerResponse<SharePageResponse>,
+      SharePageParams
+    >({
       query(body) {
         return {
           url: 'p/',
@@ -17,4 +34,4 @@ export const api = createApi({
   }),
 });
 
-export const { useSharePageMutation } = api;
+export const { useSharePageMutation, useGetPageQuery } = api;

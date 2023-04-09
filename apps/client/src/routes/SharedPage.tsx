@@ -1,17 +1,25 @@
 import { useRef } from 'react';
-import { useAppDispatch, useAppSelector } from './stores/hooks';
-import DrawingCanvas from './components/Stage/DrawingCanvas';
+import { useParams } from 'react-router-dom';
+import DrawingCanvas from '@/components/Stage/DrawingCanvas';
+import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
   selectStageConfig,
   stageConfigActions,
-} from './stores/slices/stageConfigSlice';
-import Panels from './components/Panels/Panels';
+} from '@/stores/slices/stageConfigSlice';
+import Panels from '@/components/Panels/Panels';
 import Konva from 'konva';
 import Modal from '@/components/core/Modal/Modal';
-import { modalActions, selectModal } from './stores/slices/modalSlice';
-import useKeydownListener from './hooks/useKeyListener';
+import { modalActions, selectModal } from '@/stores/slices/modalSlice';
+import useKeydownListener from '@/hooks/useKeyListener';
+import { useGetPageQuery } from '@/services/api';
 
-const App = () => {
+const SharedPage = () => {
+  const { id } = useParams();
+  const { isLoading, isError } = useGetPageQuery(
+    { id: id ?? '' },
+    { skip: !id },
+  );
+
   const stageConfig = useAppSelector(selectStageConfig);
   const modal = useAppSelector(selectModal);
 
@@ -20,6 +28,14 @@ const App = () => {
   const stageRef = useRef<Konva.Stage>(null);
 
   useKeydownListener();
+
+  if (isError) {
+    return <>Error</>;
+  }
+
+  if (isLoading) {
+    return <>Loading...</>;
+  }
 
   return (
     <>
@@ -46,4 +62,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default SharedPage;

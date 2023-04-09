@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.3",
+    "@shared": "workspace:shared@1.0.1",
     "@stitches/react": "^1.2.8",
     "konva": "^8.4.3",
     "react": "^18.2.0",
@@ -23,7 +24,7 @@
     "react-konva": "^18.2.5",
     "react-konva-utils": "^0.3.2",
     "react-redux": "^8.0.5",
-    "@shared": "workspace:shared@1.0.1"
+    "react-router-dom": "^6.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.21.3",

@@ -7,3 +7,7 @@ export type SharePageParams = {
     nodes: NodeObject[];
   };
 };
+
+export type GetPageParams = {
+  id: string;
+};

@@ -8,8 +8,10 @@ import {
   Schemas,
   SharePageParams,
   BadRequestError,
+  SharePageResponse,
+  SharedPage,
 } from '@shared/dist/index.js';
-import { PageRowObject, SharePageArgs, GetPageArgs } from '../db/queries/types';
+import { SharePageArgs, GetPageArgs, PageRowObject } from '../db/queries/types';
 
 const pageRouter = Router();
 
@@ -25,16 +27,24 @@ pageRouter.get(
         [id],
       );
 
+      if (!rows.length) {
+        throw new BadRequestError('Entry not found', 404);
+      }
+
       const { stage_config, nodes } = rows[0];
 
       return {
-        stageConfig: stage_config,
-        nodes,
-      };
+        page: {
+          stageConfig: stage_config,
+          nodes,
+        },
+      } as SharePageParams;
     } catch (error) {
       if (error instanceof pg.DatabaseError) {
         throw new BadRequestError('Entry not found', 404);
       }
+
+      throw error;
     } finally {
       client.release();
     }
@@ -52,13 +62,13 @@ pageRouter.post(
       Schemas.StageConfig.parse(page.stageConfig);
       Schemas.Node.array().parse(page.nodes);
 
-      const { rows }: QueryResult<PageRowObject> =
+      const { rows }: QueryResult<SharePageResponse> =
         await db.query<SharePageArgs>(queries.sharePage, [
           JSON.stringify(page.stageConfig),
           JSON.stringify(page.nodes),
         ]);
 
-      return rows[0];
+      return { id: rows[0].id };
     } catch (error) {
       if (error instanceof pg.DatabaseError || error instanceof ZodError) {
         throw new BadRequestError('Invalid request body', 400);
