@@ -13,10 +13,9 @@ import { modalActions, selectModal } from '@/stores/slices/modalSlice';
 import useKeydownListener from '@/hooks/useKeyListener';
 import { useGetPageQuery } from '@/services/api';
 import { getFromStorage } from '@/utils/storage';
-import { LOCAL_STORAGE, PageState } from '@/constants/app';
+import { LOCAL_STORAGE, PageState, PageStateType } from '@/constants/app';
 import { controlActions } from '@/stores/slices/controlSlice';
 import { nodesActions } from '@/stores/slices/nodesSlice';
-import { Schemas } from '@shared';
 
 const Root = () => {
   const { id } = useParams();
@@ -41,21 +40,26 @@ const Root = () => {
       return;
     }
 
-    const stateFromStorage = getFromStorage<PageState>(LOCAL_STORAGE.KEY);
+    const stateFromStorage = getFromStorage<PageStateType>(LOCAL_STORAGE.KEY);
 
     if (stateFromStorage) {
-      const { control, nodes, stageConfig } = stateFromStorage.page;
-
       try {
-        Schemas.Node.array().parse(nodes);
-        Schemas.StageConfig.parse(stageConfig);
+        PageState.parse(stateFromStorage);
       } catch (error) {
         return;
       }
 
-      dispatch(controlActions.set(control));
-      dispatch(nodesActions.set(nodes));
-      dispatch(stageConfigActions.set(stageConfig));
+      const batchDispatchPageState = (state: PageStateType) => {
+        const { control, nodes, stageConfig } = state.page;
+
+        // Order of dispatch is important in dev mode
+        // Cause is unknown, needs investigation
+        dispatch(controlActions.set(control));
+        dispatch(nodesActions.set(nodes));
+        dispatch(stageConfigActions.set(stageConfig));
+      };
+
+      batchDispatchPageState(stateFromStorage);
     }
   }, [id]);
 

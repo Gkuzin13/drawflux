@@ -3,14 +3,14 @@ import { Tool } from '@/constants/tool';
 import { RootState } from '../store';
 import { ControlState } from '@/constants/app';
 
-export const controlInitialState: ControlState = {
+const initialState: ControlState = {
   selectedNodeId: null,
   toolType: 'arrow',
 };
 
 export const controlSlice = createSlice({
   name: 'control',
-  initialState: controlInitialState,
+  initialState,
   reducers: {
     setSelectedNode: (
       state,
@@ -22,7 +22,7 @@ export const controlSlice = createSlice({
       state.toolType = action.payload;
     },
     set: (state, action: PayloadAction<ControlState>) => {
-      state = action.payload;
+      return (state = action.payload);
     },
   },
 });

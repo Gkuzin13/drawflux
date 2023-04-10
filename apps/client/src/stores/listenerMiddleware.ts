@@ -9,7 +9,7 @@ import { controlActions } from './slices/controlSlice';
 import { historyActions } from './slices/historySlice';
 import { stageConfigActions } from './slices/stageConfigSlice';
 import { setToStorage } from '@/utils/storage';
-import { LOCAL_STORAGE, PageState } from '@/constants/app';
+import { LOCAL_STORAGE, PageStateType } from '@/constants/app';
 
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
 
@@ -40,7 +40,7 @@ startAppListening({
   effect: (action, listenerApi) => {
     const { stageConfig, nodesHistory, control } = listenerApi.getState();
 
-    setToStorage<PageState>(LOCAL_STORAGE.KEY, {
+    setToStorage<PageStateType>(LOCAL_STORAGE.KEY, {
       page: { stageConfig, nodes: nodesHistory.present.nodes, control },
     });
   },

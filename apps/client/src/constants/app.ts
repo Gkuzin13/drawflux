@@ -19,5 +19,5 @@ export const PageState = z.object({
 
 const { control } = PageState.shape.page.shape;
 
-export type PageState = z.infer<typeof PageState>;
+export type PageStateType = z.infer<typeof PageState>;
 export type ControlState = z.infer<typeof control>;

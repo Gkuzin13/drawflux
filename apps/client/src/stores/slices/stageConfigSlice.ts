@@ -5,14 +5,14 @@ import { api } from '@/services/api';
 
 export type StageConfigState = StageConfig;
 
-export const stageConfigInitialState: StageConfigState = {
+export const initialState: StageConfigState = {
   scale: 1,
   position: { x: 0, y: 0 },
 };
 
 export const stageConfigSlice = createSlice({
   name: 'stage-config',
-  initialState: stageConfigInitialState,
+  initialState,
   reducers: {
     set: (state, action: PayloadAction<Partial<StageConfigState>>) => {
       return { ...state, ...action.payload };

@@ -16,18 +16,13 @@ export const historyActions = {
   redo: createAction('history/redo'),
 };
 
-export const nodesHistoryInitialState: NodesHistoryState = {
-  past: [],
-  present: { nodes: [] },
-  future: [],
-};
-
 function undoable(
   reducer: Reducer<NodesState, Action<HistoryActionType | undefined>>,
 ) {
   const initialState: NodesHistoryState = {
-    ...nodesHistoryInitialState,
+    past: [],
     present: reducer({ nodes: [] }, { type: undefined }),
+    future: [],
   };
 
   return function (state = initialState, action: Action<HistoryActionType>) {
