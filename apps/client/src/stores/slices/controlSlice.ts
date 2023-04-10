@@ -1,11 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Tool } from '@/constants/tool';
 import { RootState } from '../store';
-
-export type ControlState = {
-  selectedNodeId: string | null;
-  toolType: Tool['value'];
-};
+import { ControlState } from '@/constants/app';
 
 export const controlInitialState: ControlState = {
   selectedNodeId: null,
@@ -16,14 +12,17 @@ export const controlSlice = createSlice({
   name: 'control',
   initialState: controlInitialState,
   reducers: {
-    setSelectedNode: (state, action: PayloadAction<string>) => {
+    setSelectedNode: (
+      state,
+      action: PayloadAction<ControlState['selectedNodeId']>,
+    ) => {
       state.selectedNodeId = action.payload;
-    },
-    unsetSelectedNode: (state) => {
-      state.selectedNodeId = null;
     },
     setToolType: (state, action: PayloadAction<Tool['value']>) => {
       state.toolType = action.payload;
+    },
+    set: (state, action: PayloadAction<ControlState>) => {
+      state = action.payload;
     },
   },
 });

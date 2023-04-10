@@ -12,6 +12,11 @@ import Modal from '@/components/core/Modal/Modal';
 import { modalActions, selectModal } from '@/stores/slices/modalSlice';
 import useKeydownListener from '@/hooks/useKeyListener';
 import { useGetPageQuery } from '@/services/api';
+import { getFromStorage } from '@/utils/storage';
+import { LOCAL_STORAGE, PageState } from '@/constants/app';
+import { controlActions } from '@/stores/slices/controlSlice';
+import { nodesActions } from '@/stores/slices/nodesSlice';
+import { Schemas } from '@shared';
 
 const Root = () => {
   const { id } = useParams();
@@ -30,6 +35,29 @@ const Root = () => {
   const stageRef = useRef<Konva.Stage>(null);
 
   useKeydownListener();
+
+  useEffect(() => {
+    if (id) {
+      return;
+    }
+
+    const stateFromStorage = getFromStorage<PageState>(LOCAL_STORAGE.KEY);
+
+    if (stateFromStorage) {
+      const { control, nodes, stageConfig } = stateFromStorage.page;
+
+      try {
+        Schemas.Node.array().parse(nodes);
+        Schemas.StageConfig.parse(stageConfig);
+      } catch (error) {
+        return;
+      }
+
+      dispatch(controlActions.set(control));
+      dispatch(nodesActions.set(nodes));
+      dispatch(stageConfigActions.set(stageConfig));
+    }
+  }, [id]);
 
   useEffect(() => {
     if (isError) {

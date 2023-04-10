@@ -86,7 +86,7 @@ const DrawingCanvas = forwardRef(
           break;
       }
 
-      dispatch(controlActions.unsetSelectedNode());
+      dispatch(controlActions.setSelectedNode(null));
       setContextMenu(null);
     };
 
@@ -206,7 +206,7 @@ const DrawingCanvas = forwardRef(
           break;
       }
 
-      dispatch(controlActions.unsetSelectedNode());
+      dispatch(controlActions.setSelectedNode(null));
       setIntersectedNodes([]);
       setContextMenu(null);
     };

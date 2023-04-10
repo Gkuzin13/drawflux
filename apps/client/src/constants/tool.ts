@@ -7,13 +7,22 @@ import {
 import { RxCursorArrow } from 'react-icons/rx';
 import { IconType } from 'react-icons';
 import { TbArrowUpRight, TbScribble, TbTypography } from 'react-icons/tb';
-import type { NodeType } from '@shared/types';
+import { Schemas } from '@shared';
+import { z } from 'zod';
 
 export type Tool = {
   icon: IconType;
-  value: NodeType | 'hand' | 'select';
+  value: z.infer<typeof ToolType>;
   key: (typeof KEYS)[keyof typeof KEYS];
 };
+
+const NodeType = Schemas.Node.shape.type.options;
+
+export const ToolType = z.union([
+  ...NodeType,
+  z.literal('hand'),
+  z.literal('select'),
+]);
 
 export const TOOLS: Tool[] = [
   {
