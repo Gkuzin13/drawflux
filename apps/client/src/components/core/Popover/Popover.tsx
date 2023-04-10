@@ -2,7 +2,7 @@ import { PropsWithChildren, ReactNode, useContext, useRef } from 'react';
 import { ButtonStyled } from '../Button/ButtonStyled';
 import { PopoverDropdown, PopoverContainer } from './PopoverStyled';
 import { useClickAway } from '@/hooks/useClickAway';
-import useDisclosure from '@/hooks/useDisclosure';
+import useDisclosure from '@/hooks/useDisclosure/useDisclosure';
 import Button from '../Button/Button';
 import { PopoverContext } from './PopoverContext';
 

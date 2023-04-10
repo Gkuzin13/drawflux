@@ -25,10 +25,10 @@ import SharePanel from './SharePanel/SharePanel';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;
-  isPageShared: boolean;
+  isPageShared?: boolean;
 };
 
-const Panels = ({ stageRef, isPageShared }: Props) => {
+const Panels = ({ stageRef, isPageShared = false }: Props) => {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
   const stageConfig = useAppSelector(selectStageConfig);
 

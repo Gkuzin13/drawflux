@@ -5,7 +5,6 @@ import { globalStyle } from './styles/global';
 import { store } from './stores/store';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Root from './routes/Root';
-import SharedPage from './routes/SharedPage';
 
 const router = createBrowserRouter([
   {
@@ -14,7 +13,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/p/:id',
-    element: <SharedPage />,
+    element: <Root />,
   },
 ]);
 

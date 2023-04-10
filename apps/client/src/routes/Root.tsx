@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import DrawingCanvas from '@/components/Stage/DrawingCanvas';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
@@ -10,8 +11,17 @@ import Konva from 'konva';
 import Modal from '@/components/core/Modal/Modal';
 import { modalActions, selectModal } from '@/stores/slices/modalSlice';
 import useKeydownListener from '@/hooks/useKeyListener';
+import { useGetPageQuery } from '@/services/api';
 
 const Root = () => {
+  const { id } = useParams();
+  const { isLoading, isError, isSuccess } = useGetPageQuery(
+    {
+      id: id as string, // Temporary workaround
+    },
+    { skip: !id },
+  );
+
   const stageConfig = useAppSelector(selectStageConfig);
   const modal = useAppSelector(selectModal);
 
@@ -21,9 +31,21 @@ const Root = () => {
 
   useKeydownListener();
 
+  useEffect(() => {
+    if (isError) {
+      dispatch(
+        modalActions.open({ title: 'Error', message: 'Error loading page' }),
+      );
+    }
+  }, [isError]);
+
+  if (isLoading) {
+    return <>Loading...</>;
+  }
+
   return (
     <>
-      <Panels stageRef={stageRef} />
+      <Panels isPageShared={isSuccess} stageRef={stageRef} />
       <DrawingCanvas
         ref={stageRef}
         config={{

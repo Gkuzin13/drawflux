@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { UseDisclosureReturn } from '@/hooks/useDisclosure';
+import { UseDisclosureReturn } from '@/hooks/useDisclosure/useDisclosure';
 
 export type PopoverContextObject = {
   opened: boolean;

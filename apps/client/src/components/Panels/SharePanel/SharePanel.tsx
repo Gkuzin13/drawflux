@@ -36,18 +36,20 @@ const SharePanel = ({ pageState, isPageShared }: Props) => {
         </Menu.Toggle>
         <Menu.Dropdown>
           {!isPageShared && (
-            <Menu.Item
-              fullWidth={true}
-              size="small"
-              color="secondary-light"
-              closeOnItemClick={false}
-              onItemClick={handlePageShare}
-            >
-              {!isLoading || (!isSuccess && <TbLink />)}
-              {isLoading || isSuccess ? TbLoader({}) : 'Share this page'}
-            </Menu.Item>
+            <>
+              <Menu.Item
+                fullWidth={true}
+                size="small"
+                color="secondary-light"
+                closeOnItemClick={false}
+                onItemClick={handlePageShare}
+              >
+                {!isLoading && <TbLink />}
+                {isLoading || isSuccess ? TbLoader({}) : 'Share this page'}
+              </Menu.Item>
+              <Menu.Divider type="horizontal" />
+            </>
           )}
-          <Menu.Divider type="horizontal" />
           <SharePanelDisclamer>
             {isPageShared ? PAGE_SHARE_INFO.ACTIVE : PAGE_SHARE_INFO.CTA}
           </SharePanelDisclamer>
