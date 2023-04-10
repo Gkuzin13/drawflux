@@ -61,7 +61,7 @@ export const nodesSlice = createSlice({
   },
 });
 
-export const selectNodes = (state: RootState) => state.undoableNodes;
+export const selectNodes = (state: RootState) => state.nodesHistory;
 
 export const nodesActions = nodesSlice.actions;
 export default nodesSlice.reducer;

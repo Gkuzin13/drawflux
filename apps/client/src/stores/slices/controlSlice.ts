@@ -7,14 +7,14 @@ export type ControlState = {
   toolType: Tool['value'];
 };
 
-const initialState: ControlState = {
+export const controlInitialState: ControlState = {
   selectedNodeId: null,
   toolType: 'arrow',
 };
 
 export const controlSlice = createSlice({
   name: 'control',
-  initialState,
+  initialState: controlInitialState,
   reducers: {
     setSelectedNode: (state, action: PayloadAction<string>) => {
       state.selectedNodeId = action.payload;

@@ -1,46 +1,32 @@
-import { hasStageScaleReachedLimit } from '@/components/Stage/helpers/zoom';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Vector2d } from 'konva/lib/types';
 import { RootState } from '../store';
+import { StageConfig } from '@shared';
+import { api } from '@/services/api';
 
-export type StageConfigState = {
-  scale: number;
-  position: Vector2d;
-};
+export type StageConfigState = StageConfig;
 
-const initialState: StageConfigState = {
+export const stageConfigInitialState: StageConfigState = {
   scale: 1,
   position: { x: 0, y: 0 },
 };
 
 export const stageConfigSlice = createSlice({
   name: 'stage-config',
-  initialState,
+  initialState: stageConfigInitialState,
   reducers: {
     set: (state, action: PayloadAction<Partial<StageConfigState>>) => {
       return { ...state, ...action.payload };
     },
-    scaleIncrease: (state) => {
-      const updatedScale = state.scale + 0.1;
-
-      if (hasStageScaleReachedLimit(updatedScale)) {
-        return state;
-      }
-
-      return { ...state, scale: updatedScale };
-    },
-    scaleDecrease: (state) => {
-      const updatedScale = state.scale - 0.1;
-
-      if (hasStageScaleReachedLimit(updatedScale)) {
-        return state;
-      }
-
-      return { ...state, scale: updatedScale };
-    },
-    scaleReset: (state) => {
-      return { ...state, scale: initialState.scale };
-    },
+  },
+  extraReducers(builder) {
+    builder.addMatcher(
+      api.endpoints.getPage.matchFulfilled,
+      (state, { payload }) => {
+        if (payload.data) {
+          state = payload.data.page.stageConfig;
+        }
+      },
+    );
   },
 });
 

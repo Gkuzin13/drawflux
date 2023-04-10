@@ -2,7 +2,7 @@ import { Action, createAction, Reducer } from '@reduxjs/toolkit';
 import { NodesState } from './nodesSlice';
 import type { NodeObject } from '@shared';
 
-export type HistoryState = {
+export type NodesHistoryState = {
   past: NodeObject[];
   present: NodesState;
   future: NodeObject[];
@@ -16,13 +16,18 @@ export const historyActions = {
   redo: createAction('history/redo'),
 };
 
+export const nodesHistoryInitialState: NodesHistoryState = {
+  past: [],
+  present: { nodes: [] },
+  future: [],
+};
+
 function undoable(
   reducer: Reducer<NodesState, Action<HistoryActionType | undefined>>,
 ) {
-  const initialState: HistoryState = {
-    past: [],
+  const initialState: NodesHistoryState = {
+    ...nodesHistoryInitialState,
     present: reducer({ nodes: [] }, { type: undefined }),
-    future: [],
   };
 
   return function (state = initialState, action: Action<HistoryActionType>) {

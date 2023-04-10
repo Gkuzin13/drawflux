@@ -80,7 +80,7 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
 
         const stateToExport = {
           stageConfig: state.stageConfig,
-          nodes: state.undoableNodes.present.nodes,
+          nodes: state.nodesHistory.present.nodes,
         };
 
         const dataUrl = URL.createObjectURL(
@@ -118,6 +118,10 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
     }
   };
 
+  const handleZoomChange = (value: number) => {
+    dispatch(stageConfigActions.set({ ...stageConfig, scale: value }));
+  };
+
   return (
     <>
       <SharePanel
@@ -141,7 +145,7 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
           clear: Boolean(nodes.length),
         }}
       />
-      <ZoomPanel value={stageConfig.scale} onZoomChange={dispatch} />
+      <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
     </>
   );
 };
