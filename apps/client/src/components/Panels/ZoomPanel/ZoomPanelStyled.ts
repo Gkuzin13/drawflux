@@ -15,10 +15,9 @@ export const ZoomPanelContainer = styled('div', {
   fontSize: '$2',
 });
 
-export const ZoomPanelValue = styled('span', {});
-
 export const ZoomPanelButton = styled(Button, {
   padding: '$1',
+  textShadow: '$small',
   '&:hover': {
     color: '$gray900',
   },
