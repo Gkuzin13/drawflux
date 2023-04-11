@@ -14,8 +14,7 @@ export const api = createApi({
     getPage: builder.query<ServerResponse<SharedPage>, GetPageParams>({
       query(params) {
         return {
-          url: `p/${params.id}`,
-          method: 'GET',
+          url: `/p/${params.id}`,
         };
       },
     }),
@@ -25,7 +24,7 @@ export const api = createApi({
     >({
       query(body) {
         return {
-          url: 'p/',
+          url: '/p/',
           method: 'POST',
           body,
         };

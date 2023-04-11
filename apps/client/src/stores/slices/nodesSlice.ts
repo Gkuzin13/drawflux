@@ -53,7 +53,7 @@ export const nodesSlice = createSlice({
     builder.addMatcher(
       api.endpoints.getPage.matchFulfilled,
       (state, { payload }) => {
-        if (payload.data) {
+        if (payload.data?.page) {
           state.nodes = payload.data.page.nodes;
         }
       },

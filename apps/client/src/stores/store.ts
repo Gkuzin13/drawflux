@@ -26,7 +26,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(api.middleware)
-      .concat(listenerMiddleware.middleware),
+      .prepend(listenerMiddleware.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;
