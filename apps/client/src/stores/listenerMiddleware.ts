@@ -36,6 +36,10 @@ const actionsToListenTo = [
   historyActions.undo,
   historyActions.redo,
   stageConfigActions.set,
+  nodesActions.add,
+  nodesActions.update,
+  nodesActions.set,
+  nodesActions.delete,
   nodesActions.deleteAll,
   api.endpoints.getPage.matchFulfilled,
 ];
