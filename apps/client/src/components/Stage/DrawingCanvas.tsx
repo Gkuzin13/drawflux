@@ -300,6 +300,21 @@ const DrawingCanvas = forwardRef(
       }
     };
 
+    const getCounteractScale = () => {
+      if (config.scale) {
+        const counteractScale = {
+          x: 1 + 1 - config.scale.x,
+          y: 1 + 1 - config.scale.y,
+        };
+        console.log(counteractScale);
+        return counteractScale;
+      }
+      return {
+        x: 1,
+        y: 1,
+      };
+    };
+
     return (
       <Stage
         ref={ref}
@@ -331,6 +346,9 @@ const DrawingCanvas = forwardRef(
             groupProps={{
               x: contextMenu?.position[0],
               y: contextMenu?.position[1],
+            }}
+            transformFunc={(attrs) => {
+              return { ...attrs, scaleX: 1, scaleY: 1 };
             }}
           >
             {contextMenu && (

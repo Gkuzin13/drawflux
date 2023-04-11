@@ -1,8 +1,9 @@
-import { theme } from '@shared';
+import { useCallback, useRef, useState } from 'react';
+import Konva from 'konva';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { Vector2d } from 'konva/lib/types';
-import { useState } from 'react';
 import { Circle } from 'react-konva';
+import { Vector2d } from 'konva/lib/types';
+import { theme } from '@shared';
 
 export type TransformerAnchorProps = {
   draggable: boolean;
@@ -21,10 +22,28 @@ const TransformerAnchor = ({
   onDragEnd,
 }: TransformerAnchorProps) => {
   const [hovering, setHovering] = useState(false);
+
+  const ref = useRef<Konva.Circle>(null);
+
+  const scale = useCallback(() => {
+    const stage = ref.current?.getStage();
+
+    if (stage) {
+      return {
+        x: 1 / stage.scaleX(),
+        y: 1 / stage.scaleY(),
+      };
+    }
+
+    return { x: 1, y: 1 };
+  }, [ref.current]);
+
   return (
     <Circle
+      ref={ref}
       x={x}
       y={y}
+      scale={scale()}
       stroke={theme.colors.green300.value}
       fill={theme.colors.white.value}
       fillAfterStrokeEnabled={true}
