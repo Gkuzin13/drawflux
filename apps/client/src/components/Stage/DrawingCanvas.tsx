@@ -29,6 +29,7 @@ import { StageConfigState } from '@/stores/slices/stageConfigSlice';
 import NodesLayer from '../NodesLayer';
 import CanvasBackgroundLayer from '../CanvasBackgroundLayer';
 import type { NodeObject, Point } from '@shared';
+import Loader from '../Loader/Loader';
 
 type Props = {
   config: NodeConfig;
@@ -298,21 +299,6 @@ const DrawingCanvas = forwardRef(
       if (resetToolType) {
         dispatch(controlActions.setToolType('select'));
       }
-    };
-
-    const getCounteractScale = () => {
-      if (config.scale) {
-        const counteractScale = {
-          x: 1 + 1 - config.scale.x,
-          y: 1 + 1 - config.scale.y,
-        };
-        console.log(counteractScale);
-        return counteractScale;
-      }
-      return {
-        x: 1,
-        y: 1,
-      };
     };
 
     return (

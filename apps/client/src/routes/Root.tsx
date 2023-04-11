@@ -16,6 +16,7 @@ import { getFromStorage } from '@/utils/storage';
 import { LOCAL_STORAGE, PageState, PageStateType } from '@/constants/app';
 import { controlActions } from '@/stores/slices/controlSlice';
 import { nodesActions } from '@/stores/slices/nodesSlice';
+import Loader from '@/components/Loader/Loader';
 
 const Root = () => {
   const { id } = useParams();
@@ -72,7 +73,7 @@ const Root = () => {
   }, [isError]);
 
   if (isLoading) {
-    return <>Loading...</>;
+    return <Loader fullScreen={true}>Loading</Loader>;
   }
 
   return (
