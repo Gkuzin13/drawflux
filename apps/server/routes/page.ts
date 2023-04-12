@@ -16,7 +16,7 @@ const pageRouter = Router();
 
 pageRouter.get(
   '/:id',
-  loadRoute(async (req) => {
+  loadRoute<SharePageParams>(async (req) => {
     const client = await db.getClient();
 
     try {
@@ -38,7 +38,7 @@ pageRouter.get(
           stageConfig: stage_config,
           nodes,
         },
-      } as SharePageParams;
+      };
     } catch (error) {
       if (error instanceof pg.DatabaseError) {
         throw new BadRequestError('Entry not found', 404);

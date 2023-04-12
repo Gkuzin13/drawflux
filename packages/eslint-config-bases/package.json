@@ -1,0 +1,38 @@
+{
+  "name": "eslint-config-bases",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "private": true,
+  "exports": {
+    ".": {
+      "require": "./src/index.js"
+    },
+    "./helpers": {
+      "require": "./src/helpers/index.js"
+    },
+    "./typescript": {
+      "require": "./src/bases/typescript.js"
+    },
+    "./react": {
+      "require": "./src/bases/react.js"
+    }
+  },
+  "scripts": {
+    "lint": "eslint --ext .ts,.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-import-resolver-typescript": "^3.5.4",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-testing-library": "^5.10.2"
+  },
+  "devDependencies": {
+    "eslint-plugin-react-hooks": "^4.6.0"
+  }
+}

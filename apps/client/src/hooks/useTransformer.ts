@@ -2,7 +2,7 @@ import Konva from 'konva';
 import { Transformer } from 'konva/lib/shapes/Transformer';
 import { useEffect, useRef } from 'react';
 
-const useTransformer = <T extends Konva.Node>(deps: any[]) => {
+const useTransformer = <T extends Konva.Node>(deps: unknown[]) => {
   const nodeRef = useRef<T>(null);
   const transformerRef = useRef<Transformer>(null);
 

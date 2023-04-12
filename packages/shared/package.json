@@ -13,9 +13,8 @@
     }
   },
   "scripts": {
-    "build": "rm -rf dist && tsc"
-  },
-  "dependencies": {
-    "zod": "^3.21.4"
+    "build": "rm -rf dist && tsc",
+    "lint": "eslint --fix . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
   }
 }

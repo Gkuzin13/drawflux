@@ -37,9 +37,10 @@ export async function getClient() {
   }, 5000);
 
   // Temporary fix
-  client.query = (...args: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client.query = (...args: any): any => {
     client.lastQuery = args;
-    return query.apply(client, args) as any;
+    return query.apply(client, args);
   };
 
   client.release = () => {

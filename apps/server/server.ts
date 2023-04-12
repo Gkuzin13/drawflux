@@ -12,7 +12,7 @@ const app = express();
 if (process.env.NODE_ENV === 'production') {
   app.use(compression());
 }
-
+console;
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
