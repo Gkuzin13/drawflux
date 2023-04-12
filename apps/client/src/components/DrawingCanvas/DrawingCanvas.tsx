@@ -1,5 +1,5 @@
 import { Layer, Stage } from 'react-konva';
-import { ForwardedRef, forwardRef, useMemo, useRef, useState } from 'react';
+import { PropsWithRef, forwardRef, useMemo, useRef, useState } from 'react';
 import Konva from 'konva';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { KonvaEventObject, NodeConfig } from 'konva/lib/Node';
@@ -30,22 +30,21 @@ import NodesLayer from '../NodesLayer';
 import CanvasBackgroundLayer from '../CanvasBackgroundLayer';
 import type { NodeObject, Point } from '@shared';
 
-type Props = {
+type Props = PropsWithRef<{
   config: NodeConfig;
   containerStyle?: React.CSSProperties;
   onConfigChange: (config: Partial<StageConfigState>) => void;
-};
+}>;
+
+type Ref = Konva.Stage;
 
 type ContextMenuState = {
   items: ContextMenuItem[];
   position: Point;
 };
 
-const DrawingCanvas = forwardRef(
-  (
-    { config, containerStyle, onConfigChange }: Props,
-    ref: ForwardedRef<Konva.Stage>,
-  ) => {
+const DrawingCanvas = forwardRef<Ref, Props>(
+  ({ config, containerStyle, onConfigChange }, ref) => {
     const [draftNode, setDraftNode] = useState<NodeObject | null>(null);
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(
       null,

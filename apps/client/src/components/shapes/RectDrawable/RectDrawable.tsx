@@ -1,10 +1,10 @@
 import { memo, useCallback, useMemo } from 'react';
+import { Rect } from 'react-konva';
 import Konva from 'konva';
-import { createDefaultNodeConfig } from '@/constants/element';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
 import useTransformer from '@/hooks/useTransformer';
-import { Rect } from 'react-konva';
 import NodeTransformer from '@/components/NodeTransformer';
+import { createDefaultNodeConfig } from '@/constants/element';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import type { KonvaEventObject } from 'konva/lib/Node';
 

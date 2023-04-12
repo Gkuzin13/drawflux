@@ -2,19 +2,21 @@ import Konva from 'konva';
 import { Context } from 'konva/lib/Context';
 import { Shape } from 'konva/lib/Shape';
 import { LineConfig } from 'konva/lib/shapes/Line';
-import { ForwardedRef, forwardRef, useCallback } from 'react';
+import { PropsWithRef, forwardRef, useCallback } from 'react';
 import { Line } from 'react-konva';
 import { NodeLIne, Point } from '@shared/types';
 
-type Props = {
+type Props = PropsWithRef<{
   points: Point[];
   control: Point;
   dash: NodeLIne;
   config: LineConfig;
-};
+}>;
 
-const ArrowLine = forwardRef(
-  ({ dash, points, control, config }: Props, ref: ForwardedRef<Konva.Line>) => {
+type Ref = Konva.Line;
+
+const ArrowLine = forwardRef<Ref, Props>(
+  ({ dash, points, control, config }, ref) => {
     const [start, end] = points;
 
     const drawLine = useCallback(

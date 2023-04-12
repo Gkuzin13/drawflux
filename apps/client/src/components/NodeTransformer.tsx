@@ -1,19 +1,18 @@
+import { PropsWithRef, forwardRef } from 'react';
 import Konva from 'konva';
-import { TransformerConfig } from 'konva/lib/shapes/Transformer';
-import { ForwardedRef, forwardRef } from 'react';
 import { KonvaNodeEvents, Transformer } from 'react-konva';
 import { theme } from '@shared';
+import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
 
-type Props = {
+type Props = PropsWithRef<{
   transformerConfig?: TransformerConfig;
   transformerEvents?: KonvaNodeEvents;
-};
+}>;
 
-const NodeTransformer = forwardRef(
-  (
-    { transformerConfig, transformerEvents }: Props,
-    ref: ForwardedRef<Konva.Transformer>,
-  ) => {
+type Ref = Konva.Transformer;
+
+const NodeTransformer = forwardRef<Ref, Props>(
+  ({ transformerConfig, transformerEvents }, ref) => {
     return (
       <Transformer
         ref={ref}

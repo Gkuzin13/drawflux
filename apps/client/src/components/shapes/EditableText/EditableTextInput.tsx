@@ -1,6 +1,6 @@
-import { useClickAway } from '@/hooks/useClickAway';
 import { ChangeEvent, useEffect, useRef } from 'react';
 import { Html } from 'react-konva-utils';
+import { useClickAway } from '@/hooks/useClickAway';
 import type { NodeColor, NodeObject } from '@shared';
 
 type Props = {
@@ -42,6 +42,7 @@ const getStyle = (
     marginTop: `-${fontSize / 2}px`,
   };
 };
+
 const EditableTextInput = ({
   node,
   value,

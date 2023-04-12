@@ -18,3 +18,8 @@ export const ZOOM = {
     value: 'reset',
   },
 } as const;
+
+export const ZOOM_RANGE = {
+  MIN: 0.1,
+  MAX: 2.5,
+};
