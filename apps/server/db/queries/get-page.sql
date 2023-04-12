@@ -1,1 +1,1 @@
-SELECT * FROM pages WHERE id = $1;
+SELECT id, stage_config "stageConfig", nodes FROM pages WHERE id = $1;

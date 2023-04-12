@@ -1,16 +1,21 @@
+import {
+  Schemas,
+  type SharePageParams,
+  BadRequestError,
+  type SharePageResponse,
+} from '@shared/dist/index.js';
 import Router from 'express-promise-router';
-import pg, { QueryResult } from 'pg';
+import type { QueryResult } from 'pg';
+import pg from 'pg';
 import { ZodError } from 'zod';
-import { loadRoute } from '../utils/string.js';
 import * as db from '../db/index.js';
 import queries from '../db/queries/index.js';
 import {
-  Schemas,
-  SharePageParams,
-  BadRequestError,
-  SharePageResponse,
-} from '@shared/dist/index.js';
-import { SharePageArgs, GetPageArgs, PageRowObject } from '../db/queries/types';
+  type SharePageArgs,
+  type GetPageArgs,
+  type PageRowObject,
+} from '../db/queries/types';
+import { loadRoute } from '../utils/string.js';
 
 const pageRouter = Router();
 
@@ -31,11 +36,11 @@ pageRouter.get(
         throw new BadRequestError('Entry not found', 404);
       }
 
-      const { stage_config, nodes } = rows[0];
+      const { stageConfig, nodes } = rows[0];
 
       return {
         page: {
-          stageConfig: stage_config,
+          stageConfig: stageConfig,
           nodes,
         },
       };

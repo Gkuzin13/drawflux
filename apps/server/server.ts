@@ -1,11 +1,11 @@
-import express from 'express';
 import bodyParser from 'body-parser';
-import cors from 'cors';
 import compression from 'compression';
-import { mountRoutes } from './routes/index.js';
+import cors from 'cors';
+import express from 'express';
 import { getClient, query } from './db/index.js';
-import queries from './db/queries/index.js';
 import jobs from './db/jobs.js';
+import queries from './db/queries/index.js';
+import { mountRoutes } from './routes/index.js';
 
 const app = express();
 

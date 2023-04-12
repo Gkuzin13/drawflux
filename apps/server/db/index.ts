@@ -1,4 +1,5 @@
-import pg, { PoolClient, QueryConfig } from 'pg';
+import pg from 'pg';
+import type { PoolClient, QueryConfig } from 'pg';
 
 const poolClient = new pg.Pool({
   user: 'me',

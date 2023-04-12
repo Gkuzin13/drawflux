@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { __dirname } from '../vars.js';
 import type { NextFunction, Request, Response } from 'express';
+import { __dirname } from '../vars.js';
 
 export function getQuery(filename: string) {
   return fs.readFileSync(

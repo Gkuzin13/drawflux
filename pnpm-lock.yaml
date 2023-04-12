@@ -133,6 +133,9 @@ importers:
         specifier: ^8.10.0
         version: 8.10.0
     devDependencies:
+      '@eslint-config-bases':
+        specifier: workspace:eslint-config-bases@latest
+        version: link:../../packages/eslint-config-bases
       '@types/compression':
         specifier: ^1.7.2
         version: 1.7.2
