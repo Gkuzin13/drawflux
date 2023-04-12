@@ -9,7 +9,6 @@ import {
   SharePageParams,
   BadRequestError,
   SharePageResponse,
-  SharedPage,
 } from '@shared/dist/index.js';
 import { SharePageArgs, GetPageArgs, PageRowObject } from '../db/queries/types';
 
