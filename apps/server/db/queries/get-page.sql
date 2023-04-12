@@ -1,1 +1,1 @@
-SELECT * FROM page WHERE id = $1;
+SELECT * FROM pages WHERE id = $1;

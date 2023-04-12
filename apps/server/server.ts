@@ -1,10 +1,11 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import compression from 'compression';
 import { mountRoutes } from './routes/index.js';
 import { getClient, query } from './db/index.js';
 import queries from './db/queries/index.js';
-import cors from 'cors';
+import jobs from './db/jobs.js';
 
 const app = express();
 
@@ -18,18 +19,21 @@ app.use(bodyParser.json());
 
 mountRoutes(app);
 
-const port = process.env.PORT || 7456;
-
 await (async () => {
   const client = await getClient();
+
   try {
     await query(queries.createPageTable);
-  } catch (err: any) {
-    console.log(err?.stack);
+  } catch (error) {
+    console.log(error);
   } finally {
     client.release();
   }
 })();
+
+jobs.deleteExpiredPages.start();
+
+const port = process.env.PORT || 7456;
 
 app.listen(Number(port), '0.0.0.0', () => {
   // eslint-disable-next-line no-console

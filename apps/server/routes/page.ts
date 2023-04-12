@@ -22,6 +22,7 @@ pageRouter.get(
 
     try {
       const { id } = req.params;
+
       const { rows }: QueryResult<PageRowObject> = await db.query<GetPageArgs>(
         queries.getPage,
         [id],
