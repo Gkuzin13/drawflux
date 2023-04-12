@@ -1,10 +1,10 @@
-import { PropsWithChildren, ReactNode, useContext, useRef } from 'react';
-import { ButtonStyled } from '../Button/ButtonStyled';
-import { PopoverDropdown, PopoverContainer } from './PopoverStyled';
+import { type PropsWithChildren, type ReactNode, useContext, useRef } from 'react';
 import { useClickAway } from '@/hooks/useClickAway';
 import useDisclosure from '@/hooks/useDisclosure/useDisclosure';
 import Button from '../Button/Button';
+import { type ButtonStyled } from '../Button/ButtonStyled';
 import { PopoverContext } from './PopoverContext';
+import { PopoverDropdown, PopoverContainer } from './PopoverStyled';
 
 export type PopoverToggleProps = PropsWithChildren<
   typeof ButtonStyled.defaultProps

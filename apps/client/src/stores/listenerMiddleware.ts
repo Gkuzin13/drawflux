@@ -2,17 +2,16 @@ import {
   createListenerMiddleware,
   addListener,
   isAnyOf,
-  TypedStopListening,
-} from '@reduxjs/toolkit';
-import type { TypedStartListening, TypedAddListener } from '@reduxjs/toolkit';
-import type { RootState, AppDispatch } from './store';
+  type TypedStopListening,
+type  TypedStartListening, type TypedAddListener } from '@reduxjs/toolkit';
+import { LOCAL_STORAGE, type PageStateType } from '@/constants/app';
+import { api } from '@/services/api';
+import { setToStorage } from '@/utils/storage';
 import { controlActions } from './slices/controlSlice';
 import { historyActions } from './slices/historySlice';
-import { stageConfigActions } from './slices/stageConfigSlice';
-import { setToStorage } from '@/utils/storage';
-import { LOCAL_STORAGE, PageStateType } from '@/constants/app';
-import { api } from '@/services/api';
 import { nodesActions } from './slices/nodesSlice';
+import { stageConfigActions } from './slices/stageConfigSlice';
+import type { RootState, AppDispatch } from './store';
 
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
 export type AppStopListening = TypedStopListening<RootState, AppDispatch>;

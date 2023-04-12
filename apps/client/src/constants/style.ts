@@ -1,9 +1,9 @@
 import { colors } from '@shared';
-import IconSizeStyle from '@/components/icons/IconSizeStyle';
 import IconAnimatedStyle from '@/components/icons/IconAnimatedStyle';
-import IconLineSolid from '@/components/icons/IconLineSolid';
 import IconLineDashed from '@/components/icons/IconLineDashed';
 import IconLineDotted from '@/components/icons/IconLineDotted';
+import IconLineSolid from '@/components/icons/IconLineSolid';
+import IconSizeStyle from '@/components/icons/IconSizeStyle';
 
 export const LINE = [
   {

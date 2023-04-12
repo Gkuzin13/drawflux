@@ -1,5 +1,5 @@
-import { ZOOM } from '@/constants/zoom';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { ZOOM } from '@/constants/zoom';
 import ZoomPanel from './ZoomPanel';
 
 describe('ZoomPanel', () => {

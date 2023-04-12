@@ -1,9 +1,9 @@
+import type Konva from 'konva';
+import { Text } from 'react-konva';
+import type { NodeComponentProps } from '@/components/Node/Node';
 import { createDefaultNodeConfig } from '@/constants/element';
 import useTransformer from '@/hooks/useTransformer';
-import Konva from 'konva';
-import { Text } from 'react-konva';
 import NodeTransformer from '../../NodeTransformer';
-import type { NodeComponentProps } from '@/components/Node/Node';
 
 type Props = {
   onDoubleClick: () => void;

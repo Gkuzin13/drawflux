@@ -1,5 +1,5 @@
-import { normalizePoints } from '@/utils/draw';
 import type { NodeObject, Point } from '@shared';
+import { normalizePoints } from '@/utils/draw';
 
 export const drawEllipse = (node: NodeObject, position: Point) => {
   const [p1, p2] = normalizePoints(node.nodeProps.point, [

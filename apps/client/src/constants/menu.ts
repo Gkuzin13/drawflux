@@ -1,4 +1,4 @@
-import { IconType } from 'react-icons';
+import { type IconType } from 'react-icons';
 import { IoTrashOutline } from 'react-icons/io5';
 import { TbFileDownload, TbFileUpload, TbPhotoDown } from 'react-icons/tb';
 

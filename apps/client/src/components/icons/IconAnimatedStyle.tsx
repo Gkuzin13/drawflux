@@ -1,4 +1,4 @@
-import { IconBaseProps } from 'react-icons';
+import { type IconBaseProps } from 'react-icons';
 import { HiOutlineFilm } from 'react-icons/hi2';
 
 const IconAnimatedStyle = ({ ...props }: IconBaseProps) => {

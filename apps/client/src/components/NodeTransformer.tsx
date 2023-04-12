@@ -1,8 +1,8 @@
-import { PropsWithRef, forwardRef } from 'react';
-import Konva from 'konva';
-import { KonvaNodeEvents, Transformer } from 'react-konva';
 import { theme } from '@shared';
+import type Konva from 'konva';
 import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
+import { type PropsWithRef, forwardRef } from 'react';
+import { type KonvaNodeEvents, Transformer } from 'react-konva';
 
 type Props = PropsWithRef<{
   transformerConfig?: TransformerConfig;

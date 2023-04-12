@@ -1,7 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Tool } from '@/constants/tool';
-import { RootState } from '../store';
-import { ControlState } from '@/constants/app';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { type ControlState } from '@/constants/app';
+import { type Tool } from '@/constants/tool';
+import { type RootState } from '../store';
 
 const initialState: ControlState = {
   selectedNodeId: null,

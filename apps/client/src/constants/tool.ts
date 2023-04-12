@@ -1,14 +1,14 @@
-import { KEYS } from './keys';
+import { Schemas } from '@shared';
+import { type IconType } from 'react-icons';
 import {
   IoEllipseOutline,
   IoSquareOutline,
   IoHandRightOutline,
 } from 'react-icons/io5';
 import { RxCursorArrow } from 'react-icons/rx';
-import { IconType } from 'react-icons';
 import { TbArrowUpRight, TbScribble, TbTypography } from 'react-icons/tb';
-import { Schemas } from '@shared';
 import { z } from 'zod';
+import { KEYS } from './keys';
 
 export type Tool = {
   icon: IconType;

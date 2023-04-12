@@ -1,5 +1,5 @@
-import { normalizePoints } from '@/utils/draw';
 import type { NodeObject, Point } from '@shared';
+import { normalizePoints } from '@/utils/draw';
 
 export const drawRect = (
   node: NodeObject,

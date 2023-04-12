@@ -1,13 +1,13 @@
+import type Konva from 'konva';
+import type { KonvaEventObject } from 'konva/lib/Node';
 import { memo, useCallback, useMemo } from 'react';
 import { Line } from 'react-konva';
-import Konva from 'konva';
+import type { NodeComponentProps } from '@/components/Node/Node';
 import { createDefaultNodeConfig } from '@/constants/element';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
 import useTransformer from '@/hooks/useTransformer';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import NodeTransformer from '../../NodeTransformer';
-import type { NodeComponentProps } from '@/components/Node/Node';
-import type { KonvaEventObject } from 'konva/lib/Node';
 
 const FreePathDrawable = memo(
   ({
@@ -64,7 +64,7 @@ const FreePathDrawable = memo(
 
         line.position({ x: 0, y: 0 });
       },
-      [node, onNodeChange],
+      [node, nodeProps.points, onNodeChange],
     );
 
     const handleTransformEnd = useCallback(
@@ -87,7 +87,7 @@ const FreePathDrawable = memo(
         line.scale({ x: 1, y: 1 });
         line.position({ x: 0, y: 0 });
       },
-      [node, onNodeChange],
+      [node, nodeProps.points, onNodeChange],
     );
 
     return (

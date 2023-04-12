@@ -1,6 +1,6 @@
-import { RectConfig } from 'konva/lib/shapes/Rect';
-import { Layer, Rect } from 'react-konva';
 import { theme } from '@shared';
+import { type RectConfig } from 'konva/lib/shapes/Rect';
+import { Layer, Rect } from 'react-konva';
 
 type Props = {
   config: RectConfig;

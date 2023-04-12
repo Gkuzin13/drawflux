@@ -1,12 +1,12 @@
-import { MenuPanelActionType, MENU_PANEL_ACTIONS } from '@/constants/menu';
-import { ICON_SIZES } from '@/constants/icon';
 import { IoEllipsisHorizontal } from 'react-icons/io5';
+import Menu from '@/components/core/Menu/Menu';
+import { ICON_SIZES } from '@/constants/icon';
+import { type MenuPanelActionType, MENU_PANEL_ACTIONS } from '@/constants/menu';
 import {
   MenuPanelContainer,
   MenuPanelDropdown,
   MenuPanelToggle,
 } from './MenuPanelStyled';
-import Menu from '@/components/core/Menu/Menu';
 
 type Props = {
   onAction: (type: MenuPanelActionType) => void;

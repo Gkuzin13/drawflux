@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import { ButtonStyled } from './ButtonStyled';
 
 type Props = typeof ButtonStyled.defaultProps & PropsWithChildren;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { KEYS, Key } from '@/constants/keys';
+import { KEYS, type Key } from '@/constants/keys';
 import { TOOLS } from '@/constants/tool';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { controlActions, selectControl } from '@/stores/slices/controlSlice';

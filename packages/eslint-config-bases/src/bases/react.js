@@ -45,6 +45,14 @@ module.exports = {
             format: ['camelCase', 'PascalCase'],
           },
           {
+            selector: 'variable',
+            format: ['UPPER_CASE'],
+            filter: {
+              regex: '\\.ts$',
+              match: true,
+            },
+          },
+          {
             selector: ['function'],
             format: ['camelCase', 'PascalCase'],
           },

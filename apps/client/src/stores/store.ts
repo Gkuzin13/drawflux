@@ -1,14 +1,14 @@
-import { Action, configureStore, Reducer } from '@reduxjs/toolkit';
-import nodesReducer from './slices/nodesSlice';
-import historyReducer, {
-  HistoryActionType,
-  NodesHistoryState,
-} from './slices/historySlice';
-import stageConfig from './slices/stageConfigSlice';
-import control from './slices/controlSlice';
-import modal from './slices/modalSlice';
+import { type Action, configureStore, type Reducer } from '@reduxjs/toolkit';
 import { api } from '@/services/api';
 import { listenerMiddleware } from './listenerMiddleware';
+import control from './slices/controlSlice';
+import historyReducer, {
+  type HistoryActionType,
+  type NodesHistoryState,
+} from './slices/historySlice';
+import modal from './slices/modalSlice';
+import nodesReducer from './slices/nodesSlice';
+import stageConfig from './slices/stageConfigSlice';
 
 const nodesHistory = historyReducer(nodesReducer) as Reducer<
   NodesHistoryState,

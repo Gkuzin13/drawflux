@@ -1,11 +1,11 @@
+import type { NodeType } from '@shared/types';
+import { type NodeConfig } from 'konva/lib/Node';
+import { type ShapeConfig } from 'konva/lib/Shape';
 import ArrowDrawable from '@/components/shapes/ArrowDrawable/ArrowDrawable';
 import EditableText from '@/components/shapes/EditableText/EditableText';
 import EllipseDrawable from '@/components/shapes/EllipseDrawable/EllipseDrawable';
 import FreePathDrawable from '@/components/shapes/FreePathDrawable/FreePathDrawable';
 import RectDrawable from '@/components/shapes/RectDrawable/RectDrawable';
-import { NodeConfig } from 'konva/lib/Node';
-import { ShapeConfig } from 'konva/lib/Shape';
-import type { NodeType } from '@shared/types';
 
 export const getElement = (element: NodeType) => {
   switch (element) {

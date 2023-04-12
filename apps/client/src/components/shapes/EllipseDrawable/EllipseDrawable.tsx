@@ -1,12 +1,12 @@
+import type Konva from 'konva';
+import type { KonvaEventObject } from 'konva/lib/Node';
 import { memo, useCallback, useMemo } from 'react';
-import Konva from 'konva';
 import { Ellipse } from 'react-konva';
-import useAnimatedLine from '@/hooks/useAnimatedLine';
-import useTransformer from '@/hooks/useTransformer';
+import type { NodeComponentProps } from '@/components/Node/Node';
 import NodeTransformer from '@/components/NodeTransformer';
 import { createDefaultNodeConfig } from '@/constants/element';
-import type { KonvaEventObject } from 'konva/lib/Node';
-import type { NodeComponentProps } from '@/components/Node/Node';
+import useAnimatedLine from '@/hooks/useAnimatedLine';
+import useTransformer from '@/hooks/useTransformer';
 
 const EllipseDrawable = memo(
   ({
@@ -75,7 +75,7 @@ const EllipseDrawable = memo(
 
         ellipse.scale({ x: 1, y: 1 });
       },
-      [onNodeChange],
+      [node, onNodeChange],
     );
 
     return (

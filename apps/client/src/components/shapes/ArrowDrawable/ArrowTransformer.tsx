@@ -1,9 +1,10 @@
-import { getRatioFromValue } from '@/utils/math';
-import Konva from 'konva';
-import { KonvaEventObject } from 'konva/lib/Node';
+import { type Point } from '@shared/types';
+import type Konva from 'konva';
+import { type KonvaEventObject } from 'konva/lib/Node';
 import { useCallback, useMemo } from 'react';
+import { getRatioFromValue } from '@/utils/math';
+import { ANCHOR_INDEX } from './constants';
 import { calcMidPointAndPerp, calcMinMaxMovementPoints } from './helpers/calc';
-import { Point } from '@shared/types';
 import TransformerAnchor from './TransformerAnchor';
 
 type Props = {
@@ -14,12 +15,6 @@ type Props = {
   onTransform: (updatedPoints: Point[], bend: number) => void;
   onTransformEnd: (updatedPoints: Point[], bend: number) => void;
 };
-
-const ANCHOR_INDEX = {
-  START: 0,
-  END: 1,
-  CONTROL: 2,
-} as const;
 
 const ArrowTransformer = ({
   points,
@@ -59,7 +54,7 @@ const ArrowTransformer = ({
 
       onTransform(updatedPoints, bend);
     },
-    [start, end, bend, onTransform],
+    [start, end, bend, maxPoint, minPoint, onTransform],
   );
 
   const onAnchorDragEnd = () => {

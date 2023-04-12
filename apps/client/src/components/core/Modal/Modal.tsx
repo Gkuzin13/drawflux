@@ -1,7 +1,7 @@
-import { useClickAway } from '@/hooks/useClickAway';
-import { ICON_SIZES } from '@/constants/icon';
 import { useRef } from 'react';
 import { IoCloseOutline } from 'react-icons/io5';
+import { ICON_SIZES } from '@/constants/icon';
+import { useClickAway } from '@/hooks/useClickAway';
 import { Divider } from '../Divider/Divider';
 import {
   ModalCloseButton,

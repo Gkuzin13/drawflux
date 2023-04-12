@@ -1,5 +1,5 @@
-import { Point } from '@shared/types';
-import { NodeConfig } from 'konva/lib/Node';
+import { type Point } from '@shared/types';
+import { type NodeConfig } from 'konva/lib/Node';
 import { memo } from 'react';
 import { Shape } from 'react-konva';
 

@@ -1,4 +1,4 @@
-import { IconBaseProps } from 'react-icons';
+import { type IconBaseProps } from 'react-icons';
 import { TbLineDotted } from 'react-icons/tb';
 
 const IconLineDotted = ({ ...props }: IconBaseProps) => {

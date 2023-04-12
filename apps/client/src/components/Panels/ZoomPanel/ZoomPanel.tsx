@@ -1,4 +1,4 @@
-import { ZOOM, ZoomAction } from '@/constants/zoom';
+import { ZOOM, type ZoomAction } from '@/constants/zoom';
 import { ZoomPanelButton, ZoomPanelContainer } from './ZoomPanelStyled';
 
 type Props = {

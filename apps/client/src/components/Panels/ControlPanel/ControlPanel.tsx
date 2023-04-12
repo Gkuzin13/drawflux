@@ -1,7 +1,7 @@
-import { CONTROL, ControlValue } from '@/constants/control';
 import Button from '@/components/core/Button/Button';
-import { ControlPanelContainer, ControlPanelRow } from './ControlPanelStyled';
+import { CONTROL, type ControlValue } from '@/constants/control';
 import { getKeyTitle } from '@/utils/string';
+import { ControlPanelContainer, ControlPanelRow } from './ControlPanelStyled';
 
 type Props = {
   onControl: (type: ControlValue) => void;

@@ -1,5 +1,5 @@
 import { styled } from '@shared';
-import { IconBaseProps } from 'react-icons';
+import { type IconBaseProps } from 'react-icons';
 import { TbMinus } from 'react-icons/tb';
 
 type Props = {

@@ -1,7 +1,7 @@
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { NodeObject } from '@shared';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../store';
 import { api } from '@/services/api';
+import { type RootState } from '../store';
 
 export type NodesState = {
   nodes: NodeObject[];

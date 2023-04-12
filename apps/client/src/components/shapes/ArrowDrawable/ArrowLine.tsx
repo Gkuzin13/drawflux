@@ -1,10 +1,10 @@
-import Konva from 'konva';
-import { Context } from 'konva/lib/Context';
-import { Shape } from 'konva/lib/Shape';
-import { LineConfig } from 'konva/lib/shapes/Line';
-import { PropsWithRef, forwardRef, useCallback } from 'react';
+import { type NodeLIne, type Point } from '@shared/types';
+import type Konva from 'konva';
+import { type Context } from 'konva/lib/Context';
+import { type Shape } from 'konva/lib/Shape';
+import { type LineConfig } from 'konva/lib/shapes/Line';
+import { type PropsWithRef, forwardRef, useCallback } from 'react';
 import { Line } from 'react-konva';
-import { NodeLIne, Point } from '@shared/types';
 
 type Props = PropsWithRef<{
   points: Point[];

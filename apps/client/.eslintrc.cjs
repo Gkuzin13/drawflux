@@ -15,6 +15,9 @@ module.exports = {
   ],
   rules: {
     'jsx-a11y/anchor-is-valid': 'off',
+    'no-console': 'warn',
+    'no-case-declarations': 'off',
+    'jsx-a11y/no-autofocus': 'off',
   },
   overrides: [],
 };

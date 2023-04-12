@@ -1,5 +1,5 @@
-import { getElement } from '@/constants/element';
 import type { NodeObject } from '@shared';
+import { getElement } from '@/constants/element';
 
 export type NodeComponentProps = {
   node: NodeObject;

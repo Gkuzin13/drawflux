@@ -1,10 +1,10 @@
-import { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
+import { ICON_SIZES } from '@/constants/icon';
 import {
   LoaderContainer,
   LoaderInnerContainer,
   LoaderSinner,
 } from './LoaderStyled';
-import { ICON_SIZES } from '@/constants/icon';
 
 type Props = PropsWithChildren<(typeof LoaderContainer)['defaultProps']>;
 

@@ -1,10 +1,10 @@
-import { ICON_SIZES } from '@/constants/icon';
 import { createElement, Fragment } from 'react';
-import { TOOLS, Tool } from '@/constants/tool';
 import Button from '@/components/core/Button/Button';
 import { Divider } from '@/components/core/Divider/Divider';
-import { ToolsPanelContainer, ToolsPanelRow } from './ToolsPanelStyled';
+import { ICON_SIZES } from '@/constants/icon';
+import { TOOLS, type Tool } from '@/constants/tool';
 import { getKeyTitle } from '@/utils/string';
+import { ToolsPanelContainer, ToolsPanelRow } from './ToolsPanelStyled';
 
 type Props = {
   activeTool: Tool['value'];

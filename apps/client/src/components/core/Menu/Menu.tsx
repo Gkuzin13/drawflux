@@ -1,9 +1,9 @@
-import { Attributes, PropsWithChildren, ReactNode, useContext } from 'react';
+import { type Attributes, type PropsWithChildren, type ReactNode, useContext } from 'react';
+import Button from '../Button/Button';
+import { type ButtonStyled } from '../Button/ButtonStyled';
+import { Divider } from '../Divider/Divider';
 import Popover from '../Popover/Popover';
 import { PopoverContext } from '../Popover/PopoverContext';
-import Button from '../Button/Button';
-import { ButtonStyled } from '../Button/ButtonStyled';
-import { Divider } from '../Divider/Divider';
 
 type ItemProps = {
   closeOnItemClick?: boolean;

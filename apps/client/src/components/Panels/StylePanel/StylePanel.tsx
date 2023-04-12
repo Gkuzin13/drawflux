@@ -1,8 +1,8 @@
-import { ICON_SIZES } from '@/constants/icon';
-import { capitalizeFirstLetter } from '@/utils/string';
-import { NodeLIne, NodeStyle } from '@shared/types';
-import { ANIMATED, COLOR, LINE, SIZE } from '@/constants/style';
+import { type NodeLIne, type NodeStyle } from '@shared/types';
 import { Divider } from '@/components/core/Divider/Divider';
+import { ICON_SIZES } from '@/constants/icon';
+import { ANIMATED, COLOR, LINE, SIZE } from '@/constants/style';
+import { capitalizeFirstLetter } from '@/utils/string';
 import {
   ColorCircle,
   ColorPicker,

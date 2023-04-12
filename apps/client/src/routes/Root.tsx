@@ -1,22 +1,22 @@
+import type Konva from 'konva';
 import { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import Loader from '@/components/core/Loader/Loader';
+import Modal from '@/components/core/Modal/Modal';
 import DrawingCanvas from '@/components/DrawingCanvas/DrawingCanvas';
+import Panels from '@/components/Panels/Panels';
+import { LOCAL_STORAGE, PageState, type PageStateType } from '@/constants/app';
+import useKeydownListener from '@/hooks/useKeyListener';
+import { useGetPageQuery } from '@/services/api';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
+import { controlActions } from '@/stores/slices/controlSlice';
+import { modalActions, selectModal } from '@/stores/slices/modalSlice';
+import { nodesActions } from '@/stores/slices/nodesSlice';
 import {
   selectStageConfig,
   stageConfigActions,
 } from '@/stores/slices/stageConfigSlice';
-import Panels from '@/components/Panels/Panels';
-import Konva from 'konva';
-import Modal from '@/components/core/Modal/Modal';
-import { modalActions, selectModal } from '@/stores/slices/modalSlice';
-import useKeydownListener from '@/hooks/useKeyListener';
-import { useGetPageQuery } from '@/services/api';
 import { getFromStorage } from '@/utils/storage';
-import { LOCAL_STORAGE, PageState, PageStateType } from '@/constants/app';
-import { controlActions } from '@/stores/slices/controlSlice';
-import { nodesActions } from '@/stores/slices/nodesSlice';
-import Loader from '@/components/core/Loader/Loader';
 
 const Root = () => {
   const { id } = useParams();
@@ -62,7 +62,7 @@ const Root = () => {
 
       batchDispatchPageState(stateFromStorage);
     }
-  }, [id]);
+  }, [id, dispatch]);
 
   useEffect(() => {
     if (isError) {
@@ -70,7 +70,7 @@ const Root = () => {
         modalActions.open({ title: 'Error', message: 'Error loading page' }),
       );
     }
-  }, [isError]);
+  }, [isError, dispatch]);
 
   if (isLoading) {
     return <Loader fullScreen={true}>Loading</Loader>;

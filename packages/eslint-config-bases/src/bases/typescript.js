@@ -18,9 +18,16 @@ module.exports = {
     project: ['tsconfig.json'],
     sourceType: 'module',
   },
+  plugins: ['import'],
   settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
     'import/resolver': {
-      typescript: {},
+      typescript: {
+        alwaysTryTypes: true,
+        project: 'tsconfig.json',
+      },
     },
   },
   extends: [
@@ -112,7 +119,7 @@ module.exports = {
       },
       {
         selector: 'variable',
-        format: ['camelCase'],
+        format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
         leadingUnderscore: 'allow',
       },
       {
@@ -135,27 +142,13 @@ module.exports = {
       },
       {
         selector: 'objectLiteralProperty',
-        format: [
-          'camelCase',
-          // Some external libraries use snake_case for params
-          'snake_case',
-          // Env variables are generally uppercase
-          'UPPER_CASE',
-          // DB / Graphql might use PascalCase for relationships
-          'PascalCase',
-        ],
+        format: [],
         leadingUnderscore: 'allowSingleOrDouble',
         trailingUnderscore: 'allowSingleOrDouble',
       },
       {
         selector: ['typeAlias', 'interface'],
         format: ['PascalCase'],
-      },
-      {
-        selector: ['typeProperty'],
-        format: ['camelCase'],
-        // For graphql __typename
-        leadingUnderscore: 'allowDouble',
       },
       {
         selector: ['typeParameter'],

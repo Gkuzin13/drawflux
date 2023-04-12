@@ -1,5 +1,5 @@
-import { Point } from '@shared/types';
-import { IRect } from 'konva/lib/types';
+import { type Point } from '@shared/types';
+import { type IRect } from 'konva/lib/types';
 
 export function normalizePoints(p1: Point, p2: Point): Point[] {
   let p1x = p1[0],

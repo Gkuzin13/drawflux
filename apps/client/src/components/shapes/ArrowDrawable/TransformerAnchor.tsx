@@ -1,9 +1,9 @@
-import { useCallback, useRef, useState } from 'react';
-import Konva from 'konva';
-import { KonvaEventObject } from 'konva/lib/Node';
-import { Circle } from 'react-konva';
-import { Vector2d } from 'konva/lib/types';
 import { theme } from '@shared';
+import type Konva from 'konva';
+import { type KonvaEventObject } from 'konva/lib/Node';
+import { type Vector2d } from 'konva/lib/types';
+import { useCallback, useRef, useState } from 'react';
+import { Circle } from 'react-konva';
 
 export type TransformerAnchorProps = {
   draggable: boolean;
@@ -36,7 +36,7 @@ const TransformerAnchor = ({
     }
 
     return { x: 1, y: 1 };
-  }, [ref.current]);
+  }, []);
 
   return (
     <Circle

@@ -1,6 +1,6 @@
-import { Action, createAction, Reducer } from '@reduxjs/toolkit';
-import { NodesState } from './nodesSlice';
+import { type Action, createAction, type Reducer } from '@reduxjs/toolkit';
 import type { NodeObject } from '@shared';
+import { type NodesState } from './nodesSlice';
 
 export type NodesHistoryState = {
   past: NodeObject[];
@@ -29,7 +29,7 @@ function undoable(
     const { past, present, future } = state;
 
     switch (action.type) {
-      case 'history/undo':
+      case 'history/undo': {
         const previous = past[past.length - 1];
 
         if (!previous) return state;
@@ -41,7 +41,8 @@ function undoable(
           present: previous,
           future: [present, ...future],
         };
-      case 'history/redo':
+      }
+      case 'history/redo': {
         const next = future[0];
 
         if (!next) return state;
@@ -53,7 +54,8 @@ function undoable(
           present: next,
           future: newFuture,
         };
-      default:
+      }
+      default: {
         const newPresent = reducer(present, action);
 
         if (present === newPresent) {
@@ -65,6 +67,7 @@ function undoable(
           present: newPresent,
           future: [],
         };
+      }
     }
   };
 }

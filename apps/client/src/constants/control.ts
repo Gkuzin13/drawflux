@@ -1,10 +1,10 @@
-import { historyActions } from '@/stores/slices/historySlice';
-import { nodesActions } from '@/stores/slices/nodesSlice';
 import {
   IoArrowUndoOutline,
   IoArrowRedoOutline,
   IoTrashOutline,
 } from 'react-icons/io5';
+import { historyActions } from '@/stores/slices/historySlice';
+import { nodesActions } from '@/stores/slices/nodesSlice';
 import { KEYS } from './keys.js';
 
 export type ControlValue = (typeof CONTROL)[number]['value'];

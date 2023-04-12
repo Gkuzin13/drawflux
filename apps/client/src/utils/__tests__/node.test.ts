@@ -1,5 +1,5 @@
-import { LINE, SIZE } from '@/constants/style';
 import { colors } from '@shared';
+import { LINE, SIZE } from '@/constants/style';
 import { createNode } from '../node';
 
 describe('createNode', () => {

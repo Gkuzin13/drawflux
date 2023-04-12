@@ -1,8 +1,8 @@
+import { type NodeStyle } from '@shared';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { COLOR, LINE, SIZE, ANIMATED } from '@/constants/style';
 import { createNode } from '@/utils/node';
-import { fireEvent, render, screen } from '@testing-library/react';
 import StylePanel from './StylePanel';
-import { NodeStyle } from '@shared';
 
 describe('StylePanel', () => {
   const mockNode = createNode('rectangle', [0, 0]);

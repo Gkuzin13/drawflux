@@ -1,6 +1,6 @@
+import { fireEvent, render, screen } from '@testing-library/react';
 import { TOOLS } from '@/constants/tool';
 import { capitalizeFirstLetter } from '@/utils/string';
-import { fireEvent, render, screen } from '@testing-library/react';
 import ToolsPanel from './ToolsPanel';
 
 describe('ToolsPanel', () => {

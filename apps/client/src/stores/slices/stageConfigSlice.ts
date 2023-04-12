@@ -1,7 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../store';
-import { StageConfig } from '@shared';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { type StageConfig } from '@shared';
 import { api } from '@/services/api';
+import { type RootState } from '../store';
 
 export type StageConfigState = StageConfig;
 

@@ -1,3 +1,6 @@
+import { type Point, type NodeProps } from '@shared/types';
+import type Konva from 'konva';
+import { type KonvaEventObject } from 'konva/lib/Node';
 import {
   memo,
   useCallback,
@@ -6,21 +9,17 @@ import {
   useRef,
   useState,
 } from 'react';
-import Konva from 'konva';
-import ArrowTransformer from './ArrowTransformer';
-import useAnimatedLine from '@/hooks/useAnimatedLine';
-import { createDefaultNodeConfig } from '@/constants/element';
 import { Group } from 'react-konva';
+import type { NodeComponentProps } from '@/components/Node/Node';
+import { createDefaultNodeConfig } from '@/constants/element';
+import useAnimatedLine from '@/hooks/useAnimatedLine';
+import { getValueFromRatio } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import ArrowHead from './ArrowHead';
 import ArrowLine from './ArrowLine';
-import { getValueFromRatio } from '@/utils/math';
+import ArrowTransformer from './ArrowTransformer';
+import { DEFAULT_BEND } from './constants';
 import { calcMinMaxMovementPoints } from './helpers/calc';
-import type { NodeComponentProps } from '@/components/Node/Node';
-import { KonvaEventObject } from 'konva/lib/Node';
-import { Point, NodeProps } from '@shared/types';
-
-const DEFAULT_BEND = 0.5;
 
 const ArrowDrawable = memo(
   ({
@@ -126,7 +125,7 @@ const ArrowDrawable = memo(
         setPoints(updatedPoints);
         setBendValue(bend ?? DEFAULT_BEND);
       },
-      [node, points],
+      [],
     );
 
     return (

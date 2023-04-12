@@ -1,26 +1,26 @@
-import { RefObject, useMemo } from 'react';
+import { type NodeStyle, type NodeObject, Schemas } from '@shared';
+import type Konva from 'konva';
+import { type RefObject, useMemo } from 'react';
 import { z } from 'zod';
-import Konva from 'konva';
-import ControlPanel from './ControlPanel/ControlPanel';
-import ToolsDock from './ToolsPanel/ToolsPanel';
-import ZoomPanel from './ZoomPanel/ZoomPanel';
-import StylePanel, { StylePanelProps } from './StylePanel/StylePanel';
+import { type MenuPanelActionType } from '@/constants/menu';
+import { type Tool } from '@/constants/tool';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
+import { controlActions, selectControl } from '@/stores/slices/controlSlice';
+import { modalActions } from '@/stores/slices/modalSlice';
+import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
 import {
   selectStageConfig,
   stageConfigActions,
-  StageConfigState,
+  type StageConfigState,
 } from '@/stores/slices/stageConfigSlice';
-import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
-import { controlActions, selectControl } from '@/stores/slices/controlSlice';
-import { Tool } from '@/constants/tool';
-import MenuPanel from './MenuPanel/MenuPanel';
-import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
 import { store } from '@/stores/store';
-import { modalActions } from '@/stores/slices/modalSlice';
-import { MenuPanelActionType } from '@/constants/menu';
-import { NodeStyle, NodeObject, Schemas } from '@shared';
+import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
+import ControlPanel from './ControlPanel/ControlPanel';
+import MenuPanel from './MenuPanel/MenuPanel';
 import SharePanel from './SharePanel/SharePanel';
+import StylePanel, { type StylePanelProps } from './StylePanel/StylePanel';
+import ToolsDock from './ToolsPanel/ToolsPanel';
+import ZoomPanel from './ZoomPanel/ZoomPanel';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;

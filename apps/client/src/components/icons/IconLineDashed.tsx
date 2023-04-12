@@ -1,4 +1,4 @@
-import { IconBaseProps } from 'react-icons';
+import { type IconBaseProps } from 'react-icons';
 import { TbLineDashed } from 'react-icons/tb';
 
 const IconLineDashed = ({ ...props }: IconBaseProps) => {

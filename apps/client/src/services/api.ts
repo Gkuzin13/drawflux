@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import {
-  GetPageParams,
-  SharePageParams,
-  ServerResponse,
-  SharedPage,
-  SharePageResponse,
+  type GetPageParams,
+  type SharePageParams,
+  type ServerResponse,
+  type SharedPage,
+  type SharePageResponse,
 } from '@shared';
 
 export const api = createApi({

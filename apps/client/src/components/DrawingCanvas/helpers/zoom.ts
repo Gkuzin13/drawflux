@@ -1,5 +1,5 @@
+import { type Vector2d } from 'konva/lib/types';
 import { ZOOM_RANGE } from '@/constants/zoom';
-import { Vector2d } from 'konva/lib/types';
 
 export function hasStageScaleReachedLimit(scale: number) {
   if (scale < ZOOM_RANGE.MIN || scale > ZOOM_RANGE.MAX) {

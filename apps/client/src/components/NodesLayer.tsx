@@ -1,14 +1,14 @@
+import type { NodeObject } from '@shared';
+import type { LayerConfig } from 'konva/lib/Layer';
+import type { PropsWithChildren } from 'react';
 import { Layer } from 'react-konva';
+import type { Tool } from '@/constants/tool';
+import { useAppDispatch } from '../stores/hooks';
+import { controlActions } from '../stores/slices/controlSlice';
+import { nodesActions } from '../stores/slices/nodesSlice';
 import DraftNode from './Node/DraftNode';
 import NodeGroupTransformer from './NodeGroupTransformer/NodeGroupTransformer';
 import Nodes from './Nodes';
-import { useAppDispatch } from '../stores/hooks';
-import { nodesActions } from '../stores/slices/nodesSlice';
-import { controlActions } from '../stores/slices/controlSlice';
-import type { Tool } from '@/constants/tool';
-import type { LayerConfig } from 'konva/lib/Layer';
-import type { PropsWithChildren } from 'react';
-import type { NodeObject } from '@shared';
 
 type Props = {
   nodes: NodeObject[];

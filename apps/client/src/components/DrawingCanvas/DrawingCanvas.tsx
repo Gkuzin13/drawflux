@@ -1,34 +1,34 @@
-import { Layer, Stage } from 'react-konva';
-import { PropsWithRef, forwardRef, useMemo, useRef, useState } from 'react';
+import type { NodeObject, Point } from '@shared';
 import Konva from 'konva';
-import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { KonvaEventObject, NodeConfig } from 'konva/lib/Node';
+import { type KonvaEventObject, type NodeConfig } from 'konva/lib/Node';
+import { type IRect } from 'konva/lib/types';
+import { type PropsWithRef, forwardRef, useMemo, useRef, useState } from 'react';
+import { Layer, Stage } from 'react-konva';
+import { Html } from 'react-konva-utils';
+import { CURSOR } from '@/constants/cursor';
 import {
   STAGE_CONTEXT_MENU_ACTIONS,
   NODE_CONTEXT_MENU_ACTIONS,
-  ContextMenuItem,
+  type ContextMenuItem,
 } from '@/constants/menu';
-import { IRect } from 'konva/lib/types';
-import { createNode } from '@/utils/node';
-import { drawRectangle } from '@/utils/draw';
-import { CURSOR } from '@/constants/cursor';
-import { drawFreePath } from '../shapes/FreePathDrawable/helpers/drawFreePath';
-import { drawArrow } from '../shapes/ArrowDrawable/helpers/drawArrow';
-import { drawRect } from '../shapes/RectDrawable/helpers/drawRect';
-import { drawEllipse } from '../shapes/EllipseDrawable/helpers/drawEllipse';
-import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
-import SelectTool from '../SelectTool';
-import { Html } from 'react-konva-utils';
-import ContextMenu from '../ContextMenu/ContextMenu';
+import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { controlActions, selectControl } from '@/stores/slices/controlSlice';
+import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
+import { type StageConfigState } from '@/stores/slices/stageConfigSlice';
+import { drawRectangle } from '@/utils/draw';
+import { createNode } from '@/utils/node';
+import CanvasBackgroundLayer from '../CanvasBackgroundLayer';
+import ContextMenu from '../ContextMenu/ContextMenu';
+import NodesLayer from '../NodesLayer';
+import SelectTool from '../SelectTool';
+import { drawArrow } from '../shapes/ArrowDrawable/helpers/drawArrow';
+import { drawEllipse } from '../shapes/EllipseDrawable/helpers/drawEllipse';
+import { drawFreePath } from '../shapes/FreePathDrawable/helpers/drawFreePath';
+import { drawRect } from '../shapes/RectDrawable/helpers/drawRect';
 import {
   calcNewStagePositionAndScale,
   hasStageScaleReachedLimit,
 } from './helpers/zoom';
-import { StageConfigState } from '@/stores/slices/stageConfigSlice';
-import NodesLayer from '../NodesLayer';
-import CanvasBackgroundLayer from '../CanvasBackgroundLayer';
-import type { NodeObject, Point } from '@shared';
 
 type Props = PropsWithRef<{
   config: NodeConfig;

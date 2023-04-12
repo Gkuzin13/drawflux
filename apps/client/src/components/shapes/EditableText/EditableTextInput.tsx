@@ -1,7 +1,7 @@
-import { ChangeEvent, useEffect, useRef } from 'react';
+import type { NodeColor, NodeObject } from '@shared';
+import { type ChangeEvent, useEffect, useRef } from 'react';
 import { Html } from 'react-konva-utils';
 import { useClickAway } from '@/hooks/useClickAway';
-import type { NodeColor, NodeObject } from '@shared';
 
 type Props = {
   node: NodeObject;
@@ -59,7 +59,7 @@ const EditableTextInput = ({
       const end = ref.current.value.length;
       ref.current.setSelectionRange(end, end);
     }
-  }, [ref.current, value]);
+  }, [value]);
 
   const { nodeProps } = node;
 
