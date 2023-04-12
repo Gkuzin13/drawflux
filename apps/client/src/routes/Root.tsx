@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import DrawingCanvas from '@/components/Stage/DrawingCanvas';
+import DrawingCanvas from '@/components/DrawingCanvas/DrawingCanvas';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
   selectStageConfig,

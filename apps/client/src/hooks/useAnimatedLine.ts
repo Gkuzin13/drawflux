@@ -28,7 +28,9 @@ const useAnimatedLine = (
 
     if (animated) {
       anim.start();
-    } else {
+    }
+
+    if (!animated && anim.isRunning()) {
       anim.stop();
     }
 

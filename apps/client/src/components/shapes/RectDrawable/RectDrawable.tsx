@@ -1,12 +1,12 @@
+import { memo, useCallback, useMemo } from 'react';
+import Konva from 'konva';
 import { createDefaultNodeConfig } from '@/constants/element';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
 import useTransformer from '@/hooks/useTransformer';
-import Konva from 'konva';
 import { Rect } from 'react-konva';
-import NodeTransformer from '../../NodeTransformer';
+import NodeTransformer from '@/components/NodeTransformer';
 import type { NodeComponentProps } from '@/components/Node/Node';
-import { memo, useCallback, useMemo } from 'react';
-import { KonvaEventObject } from 'konva/lib/Node';
+import type { KonvaEventObject } from 'konva/lib/Node';
 
 const RectDrawable = memo(
   ({
@@ -18,14 +18,14 @@ const RectDrawable = memo(
   }: Omit<NodeComponentProps, 'text'>) => {
     const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
 
+    const { nodeProps, style } = node;
+
     useAnimatedLine(
       nodeRef.current,
-      node.style.line[0] + node.style.line[1],
-      node.style.animated,
-      node.style.line,
+      style.line[0] + style.line[1],
+      style.animated,
+      style.line,
     );
-
-    const { nodeProps, style } = node;
 
     const config = useMemo(() => {
       return createDefaultNodeConfig({

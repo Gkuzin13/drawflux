@@ -29,7 +29,6 @@ import { StageConfigState } from '@/stores/slices/stageConfigSlice';
 import NodesLayer from '../NodesLayer';
 import CanvasBackgroundLayer from '../CanvasBackgroundLayer';
 import type { NodeObject, Point } from '@shared';
-import Loader from '../core/Loader/Loader';
 
 type Props = {
   config: NodeConfig;

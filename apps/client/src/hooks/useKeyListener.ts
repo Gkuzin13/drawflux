@@ -1,35 +1,15 @@
+import { useCallback, useEffect } from 'react';
 import { KEYS, Key } from '@/constants/keys';
+import { TOOLS } from '@/constants/tool';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { controlActions, selectControl } from '@/stores/slices/controlSlice';
 import { historyActions } from '@/stores/slices/historySlice';
 import { nodesActions } from '@/stores/slices/nodesSlice';
-import { useCallback, useEffect } from 'react';
 
 function useKeydownListener() {
   const { selectedNodeId, toolType } = useAppSelector(selectControl);
 
   const dispatch = useAppDispatch();
-
-  const getToolTypeByKey = useCallback((key: Key) => {
-    switch (key.toLowerCase()) {
-      case KEYS.H:
-        return 'hand';
-      case KEYS.D:
-        return 'draw';
-      case KEYS.A:
-        return 'arrow';
-      case KEYS.R:
-        return 'rectangle';
-      case KEYS.O:
-        return 'ellipse';
-      case KEYS.T:
-        return 'text';
-      case KEYS.V:
-        return 'select';
-      default:
-        return 'select';
-    }
-  }, []);
 
   const getActionWhenCtrlKeyPressed = useCallback((event: KeyboardEvent) => {
     const shiftPressed = event.shiftKey;
@@ -58,7 +38,11 @@ function useKeydownListener() {
         return;
       }
 
-      dispatch(controlActions.setToolType(getToolTypeByKey(key)));
+      const toolTypeByKey = TOOLS.find(
+        (tool) => tool.key === key.toLowerCase(),
+      );
+
+      dispatch(controlActions.setToolType(toolTypeByKey?.value || 'select'));
     };
 
     if (toolType === 'text') {

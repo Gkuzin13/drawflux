@@ -1,4 +1,6 @@
 import { RefObject, useMemo } from 'react';
+import { z } from 'zod';
+import Konva from 'konva';
 import ControlPanel from './ControlPanel/ControlPanel';
 import ToolsDock from './ToolsPanel/ToolsPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
@@ -14,13 +16,10 @@ import { controlActions, selectControl } from '@/stores/slices/controlSlice';
 import { Tool } from '@/constants/tool';
 import MenuPanel from './MenuPanel/MenuPanel';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
-import Konva from 'konva';
 import { store } from '@/stores/store';
-import { z } from 'zod';
 import { modalActions } from '@/stores/slices/modalSlice';
 import { MenuPanelActionType } from '@/constants/menu';
-import { Schemas } from '@shared';
-import type { NodeStyle, NodeObject } from '@shared';
+import { NodeStyle, NodeObject, Schemas } from '@shared';
 import SharePanel from './SharePanel/SharePanel';
 
 type Props = {
