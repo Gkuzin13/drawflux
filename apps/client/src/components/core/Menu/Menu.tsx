@@ -1,6 +1,7 @@
-import { type Attributes, type PropsWithChildren, type ReactNode, useContext } from 'react';
+import { useContext } from 'react';
+import type { Attributes, PropsWithChildren, ReactNode } from 'react';
 import Button from '../Button/Button';
-import { type ButtonStyled } from '../Button/ButtonStyled';
+import type { ButtonStyled } from '../Button/ButtonStyled';
 import { Divider } from '../Divider/Divider';
 import Popover from '../Popover/Popover';
 import { PopoverContext } from '../Popover/PopoverContext';

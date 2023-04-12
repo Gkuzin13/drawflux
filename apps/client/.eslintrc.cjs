@@ -4,19 +4,14 @@ const {
 
 module.exports = {
   root: true,
-  parserOptions: {
-    tsconfigRootDir: __dirname,
-    project: 'tsconfig.json',
-  },
   ignorePatterns: [...getDefaultIgnorePatterns()],
   extends: [
     '../../packages/eslint-config-bases/src/bases/typescript',
     '../../packages/eslint-config-bases/src/bases/react',
   ],
   rules: {
-    'jsx-a11y/anchor-is-valid': 'off',
     'no-console': 'warn',
-    'no-case-declarations': 'off',
+    'jsx-a11y/anchor-is-valid': 'off',
     'jsx-a11y/no-autofocus': 'off',
   },
   overrides: [],

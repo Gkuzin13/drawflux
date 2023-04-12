@@ -1,4 +1,4 @@
-import { type ContextMenuItem } from '@/constants/menu';
+import type { ContextMenuItem } from '@/constants/menu';
 import { ContextMenuButton, ContextMenuContainer } from './ContextMenuStyled';
 
 type Props = {

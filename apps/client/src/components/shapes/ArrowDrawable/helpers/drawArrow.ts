@@ -1,4 +1,4 @@
-import { type NodeObject, type Point } from '@shared/types';
+import type { NodeObject, Point } from '@shared/types';
 
 export const getDefaultControlPoint = (start: Point, end: Point): Point => {
   return [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];

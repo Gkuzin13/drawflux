@@ -1,4 +1,4 @@
-import { type PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import { ICON_SIZES } from '@/constants/icon';
 import {
   LoaderContainer,

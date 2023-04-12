@@ -5,7 +5,6 @@
 
 module.exports = {
   env: {
-    es6: true,
     node: true,
   },
   parser: '@typescript-eslint/parser',
@@ -15,18 +14,15 @@ module.exports = {
       globalReturn: false,
     },
     ecmaVersion: 2020,
-    project: ['tsconfig.json'],
+    project: ['./**/tsconfig.json'],
     sourceType: 'module',
   },
   plugins: ['import'],
   settings: {
-    'import/parsers': {
-      '@typescript-eslint/parser': ['.ts', '.tsx'],
-    },
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
-        project: 'tsconfig.json',
+        project: ['./**/tsconfig.json'],
       },
     },
   },

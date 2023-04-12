@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
     "jsx": "react-jsx",
     "types": ["vitest/globals"],
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
+  "include": ["**/*.js", "**/*.ts", "**/*.tsx"],
   "extends": "../../tsconfig.base.json",
   "references": [{ "path": "./tsconfig.node.json" }]
 }

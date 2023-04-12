@@ -2,7 +2,13 @@ import type { NodeObject, Point } from '@shared';
 import Konva from 'konva';
 import { type KonvaEventObject, type NodeConfig } from 'konva/lib/Node';
 import { type IRect } from 'konva/lib/types';
-import { type PropsWithRef, forwardRef, useMemo, useRef, useState } from 'react';
+import {
+  type PropsWithRef,
+  forwardRef,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Layer, Stage } from 'react-konva';
 import { Html } from 'react-konva-utils';
 import { CURSOR } from '@/constants/cursor';
@@ -14,7 +20,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { controlActions, selectControl } from '@/stores/slices/controlSlice';
 import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
-import { type StageConfigState } from '@/stores/slices/stageConfigSlice';
+import type { StageConfigState } from '@/stores/slices/stageConfigSlice';
 import { drawRectangle } from '@/utils/draw';
 import { createNode } from '@/utils/node';
 import CanvasBackgroundLayer from '../CanvasBackgroundLayer';
