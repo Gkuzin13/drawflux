@@ -41,13 +41,17 @@ const actionsToListenTo = [
   nodesActions.set,
   nodesActions.delete,
   nodesActions.deleteAll,
+  api.endpoints.getPage.matchRejected,
   api.endpoints.getPage.matchFulfilled,
 ];
 
 startAppListening({
   matcher: isAnyOf(...actionsToListenTo),
   effect: (action, listenerApi) => {
-    if (api.endpoints.getPage.matchFulfilled(action)) {
+    if (
+      api.endpoints.getPage.matchFulfilled(action) ||
+      api.endpoints.getPage.matchRejected(action)
+    ) {
       listenerApi.unsubscribe();
       return;
     }
