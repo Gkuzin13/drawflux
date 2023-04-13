@@ -1,5 +1,5 @@
-import { StageConfig } from './konva';
-import { NodeObject } from './node';
+import { type StageConfig } from './konva';
+import { type NodeObject } from './node';
 
 export type SharePageParams = {
   page: {

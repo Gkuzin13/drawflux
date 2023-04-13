@@ -1,4 +1,4 @@
-import { Primitive, z, ZodLiteral } from 'zod';
+import { type Primitive, z, type ZodLiteral } from 'zod';
 
 type MappedZodLiterals<T extends readonly Primitive[]> = {
   -readonly [K in keyof T]: ZodLiteral<T[K]>;

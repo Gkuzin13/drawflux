@@ -200,7 +200,11 @@ importers:
         specifier: ^5.10.2
         version: 5.10.2(eslint@8.38.0)(typescript@4.9.5)
 
-  packages/shared: {}
+  packages/shared:
+    devDependencies:
+      '@eslint-config-bases':
+        specifier: workspace:eslint-config-bases@latest
+        version: link:../eslint-config-bases
 
 packages:
 

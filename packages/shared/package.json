@@ -14,7 +14,11 @@
   },
   "scripts": {
     "build": "rm -rf dist && tsc",
-    "lint": "eslint --fix . --ext .ts,.tsx",
+    "lint": "eslint . --ext .ts",
+    "fix-all-files": "eslint --fix . --ext .ts",
     "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@eslint-config-bases": "workspace:eslint-config-bases@latest"
   }
 }

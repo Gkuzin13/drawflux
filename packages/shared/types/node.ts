@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { type z } from 'zod';
 import { Node } from '../schemas/node';
 
 const { nodeProps, style, type } = Node.shape;

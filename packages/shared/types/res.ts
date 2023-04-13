@@ -1,6 +1,6 @@
-import { BadRequestError } from '../utils/errors';
-import { StageConfig } from './konva';
-import { NodeObject } from './node';
+import { type BadRequestError } from '../utils/errors';
+import { type StageConfig } from './konva';
+import { type NodeObject } from './node';
 
 export type ServerResponse<T> = {
   error?: typeof BadRequestError;
