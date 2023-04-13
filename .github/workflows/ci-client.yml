@@ -1,0 +1,56 @@
+name: CI-client
+
+on:
+  push:
+    branches: [dev, main]
+    paths:
+      - 'apps/client/**'
+      - 'package.json'
+      - '*.lock'
+      - 'tsconfig.base.json'
+      - '.prettier*'
+      - '.github/**'
+
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'apps/client/**'
+      - 'package.json'
+      - '*.lock'
+      - 'tsconfig.base.json'
+      - '.prettier*'
+      - '.github/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/client
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: 📥 Monorepo install
+        uses: ./.github/actions/pnpm-install
+
+      - name: 🕵️ Typecheck
+        run: pnpm --filter ./apps/client typecheck
+
+      - name: 🔬 Linter
+        run: pnpm --filter ./apps/client lint
+
+      - name: 🧪 Unit tests
+        run: pnpm --filter ./apps/client test
+
+      - name: 🏗 Build client
+        run: pnpm --filter ./apps/client build
