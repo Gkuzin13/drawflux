@@ -19,7 +19,8 @@
     }
   },
   "scripts": {
-    "lint": "eslint --ext .ts,.js",
+    "lint": "eslint . --ext .ts",
+    "fix-all-files": "eslint --fix --ext 'js,ts'",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

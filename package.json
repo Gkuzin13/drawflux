@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "type": "module",
   "sideEffects": false,
+  "scripts": {
+    "packages:lint": "pnpm --filter '{./packages/**}' lint",
+    "packages:fix-all-files": "pnpm --filter '{./packages/**}' fix-all-files",
+    "packages:typecheck": "pnpm --filter '{./packages/**}' typecheck"
+  },
   "dependencies": {
     "zod": "^3.21.4"
   },
