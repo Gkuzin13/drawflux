@@ -1,14 +1,4 @@
-import fs from 'fs';
-import path from 'path';
-import type { NextFunction, Request, Response } from 'express';
-import { __dirname } from '../vars.js';
-
-export function getQuery(filename: string) {
-  return fs.readFileSync(
-    path.join(__dirname, `./db/queries/${filename}.sql`),
-    'utf8',
-  );
-}
+import type { Request, Response, NextFunction } from 'express';
 
 type LoadRouteHandler<T> = (
   req: Request,

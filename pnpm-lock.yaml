@@ -154,9 +154,6 @@ importers:
       '@types/pg':
         specifier: ^8.6.6
         version: 8.6.6
-      eslint:
-        specifier: ^8.0.1
-        version: 8.38.0
       nodemon:
         specifier: ^2.0.22
         version: 2.0.22

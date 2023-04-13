@@ -1,6 +1,6 @@
 import { CronJob } from 'cron';
 import type { QueryResult } from 'pg';
-import { getQuery } from '../utils/string';
+import { getQuery } from '../utils/file';
 import type { PageRowObject } from './queries/types';
 import * as db from './index';
 

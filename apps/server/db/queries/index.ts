@@ -1,4 +1,4 @@
-import { getQuery } from '../../utils/string';
+import { getQuery } from '../../utils/file';
 
 export default {
   getPage: getQuery('get-page'),
