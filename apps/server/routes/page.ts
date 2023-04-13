@@ -9,12 +9,13 @@ import type { QueryResult } from 'pg';
 import pg from 'pg';
 import { ZodError } from 'zod';
 import * as db from '../db/index.js';
-import queries from '../db/queries/index.js';
+import { queriesPaths } from '../db/queries/index.js';
 import {
   type SharePageArgs,
   type GetPageArgs,
   type PageRowObject,
 } from '../db/queries/types';
+import { getQuery } from '../utils/getQuery/getQuery.js';
 import { loadRoute } from '../utils/route.js';
 
 const pageRouter = Router();
@@ -25,25 +26,18 @@ pageRouter.get(
     const client = await db.getClient();
 
     try {
-      const { id } = req.params;
+      const query = await getQuery(queriesPaths.getPage);
 
       const { rows }: QueryResult<PageRowObject> = await db.query<GetPageArgs>(
-        queries.getPage,
-        [id],
+        query,
+        [req.params.id],
       );
 
       if (!rows.length) {
         throw new BadRequestError('Entry not found', 404);
       }
 
-      const { stageConfig, nodes } = rows[0];
-
-      return {
-        page: {
-          stageConfig: stageConfig,
-          nodes,
-        },
-      };
+      return { page: rows[0] };
     } catch (error) {
       if (error instanceof pg.DatabaseError) {
         throw new BadRequestError('Entry not found', 404);
@@ -62,13 +56,15 @@ pageRouter.post(
     const client = await db.getClient();
 
     try {
+      const query = await getQuery(queriesPaths.sharePage);
+
       const { page }: SharePageParams = req.body;
 
-      Schemas.StageConfig.parse(page.stageConfig);
-      Schemas.Node.array().parse(page.nodes);
+      await Schemas.StageConfig.parseAsync(page.stageConfig);
+      await Schemas.Node.array().parseAsync(page.nodes);
 
       const { rows }: QueryResult<SharePageResponse> =
-        await db.query<SharePageArgs>(queries.sharePage, [
+        await db.query<SharePageArgs>(query, [
           JSON.stringify(page.stageConfig),
           JSON.stringify(page.nodes),
         ]);

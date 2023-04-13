@@ -2,10 +2,11 @@ import bodyParser from 'body-parser';
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
-import { getClient, query } from './db/index.js';
+import * as db from './db/index.js';
 import jobs from './db/jobs.js';
-import queries from './db/queries/index.js';
+import { queriesPaths } from './db/queries/index.js';
 import { mountRoutes } from './routes/index.js';
+import { getQuery } from './utils/getQuery/getQuery.js';
 
 const app = express();
 
@@ -20,10 +21,12 @@ app.use(bodyParser.json());
 mountRoutes(app);
 
 await (async () => {
-  const client = await getClient();
+  const client = await db.getClient();
 
   try {
-    await query(queries.createPageTable);
+    const query = await getQuery(queriesPaths.createPageTable);
+
+    await db.query(query);
   } catch (error) {
     console.log(error);
   } finally {
