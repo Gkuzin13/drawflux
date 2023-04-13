@@ -1,4 +1,4 @@
-name: CI-client
+name: CI-app/client
 
 on:
   push:

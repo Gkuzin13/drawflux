@@ -1,4 +1,4 @@
-name: CI-server
+name: CI-apps/server
 
 on:
   push:
