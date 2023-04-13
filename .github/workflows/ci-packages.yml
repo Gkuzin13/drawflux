@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18.x]
     steps:
       - uses: actions/checkout@v3
 
@@ -39,14 +39,13 @@ jobs:
         uses: ./.github/actions/pnpm-install
 
       - name: 🕵️ Typecheck
-        run: pnpm typecheck --filter="./packages/*"
+        run: pnpm --filter ./packages/client typecheck
 
       - name: 🔬 Linter
-        run: |
-          pnpm lint --filter="./packages/*"
+        run: pnpm --filter ./packages/client lint
 
       - name: 🧪 Unit tests
-        run: pnpm test --filter="./packages/*"
+        run: pnpm --filter ./packages/client test
 
-      - name: 🏗 Run build
-        run: pnpm build --filter="./packages/*"
+      - name: 🏗 Build
+        run: pnpm --filter ./packages/client build
