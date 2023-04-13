@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { ToolType } from './tool';
 
 export const LOCAL_STORAGE = {
-  KEY: 'sketch-app',
+  KEY: 'drawflux',
 };
 
 export const PageState = z.object({
