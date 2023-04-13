@@ -4,8 +4,10 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
+    "g:lint": "pnpm -r lint",
+    "g:fix-all-files": "pnpm -r fix-all-files",
+    "g:typecheck": "pnpm -r typecheck",
     "packages:lint": "pnpm --filter '{./packages/**}' lint",
-    "packages:fix-all-files": "pnpm --filter '{./packages/**}' fix-all-files",
     "packages:typecheck": "pnpm --filter '{./packages/**}' typecheck"
   },
   "dependencies": {
