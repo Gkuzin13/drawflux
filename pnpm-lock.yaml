@@ -4,6 +4,9 @@ importers:
 
   .:
     dependencies:
+      '@stitches/react':
+        specifier: ^1.2.8
+        version: 1.2.8(react@18.2.0)
       zod:
         specifier: ^3.21.4
         version: 3.21.4
@@ -35,9 +38,6 @@ importers:
       '@shared':
         specifier: workspace:shared@latest
         version: link:../../packages/shared
-      '@stitches/react':
-        specifier: ^1.2.8
-        version: 1.2.8(react@18.2.0)
       konva:
         specifier: ^8.4.3
         version: 8.4.3

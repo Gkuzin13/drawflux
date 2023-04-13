@@ -12,7 +12,8 @@
     "packages:typecheck": "pnpm --filter '{./packages/**}' typecheck"
   },
   "dependencies": {
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "@stitches/react": "^1.2.8"
   },
   "devDependencies": {
     "@vitest/coverage-c8": "^0.29.8",
