@@ -24,7 +24,7 @@ const Root = () => {
     {
       id: id as string, // Temporary workaround
     },
-    { skip: !id },
+    { skip: true }, // Temporarly disabled page fetching
   );
 
   const stageConfig = useAppSelector(selectStageConfig);
