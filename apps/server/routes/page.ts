@@ -3,7 +3,7 @@ import {
   type SharePageParams,
   BadRequestError,
   type SharePageResponse,
-} from '@shared/dist/index.js';
+} from '@shared';
 import Router from 'express-promise-router';
 import type { QueryResult } from 'pg';
 import pg from 'pg';

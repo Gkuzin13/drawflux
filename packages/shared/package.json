@@ -3,17 +3,14 @@
   "description": "Shared modules",
   "version": "1.0.1",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/types.d.ts",
+  "main": "./index.js",
   "private": true,
   "exports": {
     ".": {
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./index.js"
     }
   },
   "scripts": {
-    "build": "rm -rf dist && tsc",
     "lint": "eslint . --ext .ts",
     "fix-all-files": "eslint --fix . --ext .ts",
     "typecheck": "tsc --noEmit"

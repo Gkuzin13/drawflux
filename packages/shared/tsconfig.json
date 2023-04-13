@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
     "module": "ESNext",
-    "outDir": "./dist",
-    "lib": ["ESNext"],
-    "declaration": true
+    "lib": ["ESNext"]
   },
   "include": ["."],
-  "exclude": ["dist"],
   "extends": "../../tsconfig.base.json"
 }
