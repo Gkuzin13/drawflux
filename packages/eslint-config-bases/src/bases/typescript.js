@@ -14,15 +14,15 @@ module.exports = {
       globalReturn: false,
     },
     ecmaVersion: 2020,
-    project: ['./**/tsconfig.json'],
     sourceType: 'module',
+    project: ['./tsconfig.json'],
   },
   plugins: ['import'],
   settings: {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
-        project: ['./**/tsconfig.json'],
+        project: 'tsconfig.json',
       },
     },
   },
@@ -100,7 +100,7 @@ module.exports = {
       'warn',
       { argsIgnorePattern: '^_', ignoreRestSiblings: true },
     ],
-    '@typescript-eslint/consistent-type-exports': 'error',
+    '@typescript-eslint/consistent-type-exports': ['error'],
     '@typescript-eslint/consistent-type-imports': [
       'error',
       { prefer: 'type-imports', fixStyle: 'inline-type-imports' },

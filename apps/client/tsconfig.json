@@ -5,12 +5,11 @@
     "module": "ESNext",
     "jsx": "react-jsx",
     "types": ["vitest/globals"],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["**/*.js", "**/*.ts", "**/*.tsx"],
+  "include": ["src", "test"],
   "extends": "../../tsconfig.base.json",
   "references": [{ "path": "./tsconfig.node.json" }]
 }

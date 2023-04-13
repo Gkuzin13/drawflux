@@ -19,7 +19,7 @@
     }
   },
   "scripts": {
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint . --ext 'ts,js'",
     "fix-all-files": "eslint --fix --ext 'js,ts'",
     "typecheck": "tsc --noEmit"
   },

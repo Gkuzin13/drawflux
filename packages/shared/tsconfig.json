@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "moduleResolution": "Node",
     "module": "ESNext",
     "outDir": "./dist",
     "declaration": true
   },
-  "extends": "../../tsconfig.base.json",
   "include": ["."],
-  "exclude": ["dist", "node_modules", "**/*.test.ts"]
+  "exclude": ["dist"],
+  "extends": "../../tsconfig.base.json"
 }
