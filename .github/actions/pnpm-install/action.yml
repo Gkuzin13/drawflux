@@ -30,8 +30,8 @@ runs:
           ${{ runner.os }}-pnpm-store-cache-${{ steps.cache-rotation.outputs.YEAR_MONTH }}-
 
     - name: Prune pnpm store
-     shell: bash
-     run: pnpm prune store
+      shell: bash
+      run: pnpm prune store
 
     - name: Install dependencies
       shell: bash
