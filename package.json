@@ -12,9 +12,10 @@
     "packages:typecheck": "pnpm --filter '{./packages/**}' typecheck"
   },
   "dependencies": {
+    "@stitches/react": "^1.2.8",
     "react": "^18.2.0",
-    "zod": "^3.21.4",
-    "@stitches/react": "^1.2.8"
+    "shared": "workspace:^",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@types/react": "^18.0.31",

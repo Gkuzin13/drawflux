@@ -24,7 +24,7 @@
     "react-konva-utils": "^0.3.2",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.10.0",
-    "shared": "workspace:shared@latest"
+    "shared": "workspace:^"
   },
   "devDependencies": {
     "@babel/core": "^7.21.3",
