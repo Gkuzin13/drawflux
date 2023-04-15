@@ -108,9 +108,6 @@ importers:
 
   apps/server:
     dependencies:
-      '@shared':
-        specifier: workspace:shared@1.0.1
-        version: link:../../packages/shared
       body-parser:
         specifier: 1.20.2
         version: 1.20.2
@@ -132,6 +129,9 @@ importers:
       pg:
         specifier: ^8.10.0
         version: 8.10.0
+      shared:
+        specifier: workspace:shared@latest
+        version: link:../../packages/shared
     devDependencies:
       '@eslint-config-bases':
         specifier: workspace:eslint-config-bases@latest
@@ -154,6 +154,9 @@ importers:
       '@types/pg':
         specifier: ^8.6.6
         version: 8.6.6
+      dotenv:
+        specifier: ^16.0.3
+        version: 16.0.3
       nodemon:
         specifier: ^2.0.22
         version: 2.0.22
@@ -2384,6 +2387,11 @@ packages:
     engines: {node: '>=12'}
     dependencies:
       webidl-conversions: 7.0.0
+    dev: true
+
+  /dotenv@16.0.3:
+    resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
+    engines: {node: '>=12'}
     dev: true
 
   /eastasianwidth@0.2.0:
