@@ -52,5 +52,5 @@ jobs:
       - name: 🧪 Unit tests
         run: pnpm --filter ./apps/server test
 
-      - name: 🏗 Run server
-        run: pnpm --filter ./apps/server dev
+      - name: 🏗 Start server
+        run: pnpm --filter ./apps/server start
