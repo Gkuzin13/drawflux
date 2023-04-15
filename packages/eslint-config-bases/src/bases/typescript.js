@@ -6,6 +6,7 @@
 module.exports = {
   env: {
     node: true,
+    es6: true,
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -15,14 +16,14 @@ module.exports = {
     },
     ecmaVersion: 2020,
     sourceType: 'module',
-    project: ['./**/tsconfig.json'],
+    project: './**/tsconfig.json',
   },
   plugins: ['import'],
   settings: {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
-        project: 'tsconfig.json',
+        project: './**/tsconfig.json',
       },
     },
   },
@@ -149,6 +150,16 @@ module.exports = {
       {
         selector: ['typeParameter'],
         format: ['PascalCase'],
+      },
+    ],
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        js: 'never',
+        jsx: 'never',
+        ts: 'never',
+        tsx: 'never',
       },
     ],
   },

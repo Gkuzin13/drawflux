@@ -4,8 +4,10 @@ const {
 
 module.exports = {
   root: true,
+  parserOptions: {
+    tsconfigRootDir: __dirname,
+  },
   ignorePatterns: [...getDefaultIgnorePatterns()],
   extends: ['../../packages/eslint-config-bases/src/bases/typescript'],
-  rules: {},
   overrides: [],
 };

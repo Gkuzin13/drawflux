@@ -3,17 +3,16 @@
   "description": "Shared modules",
   "version": "1.0.1",
   "type": "module",
-  "main": "./index.js",
   "private": true,
-  "exports": {
-    ".": {
-      "import": "./index.js"
-    }
-  },
+  "sideEffects": false,
+  "module": "dist/index.esm.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc --project tsconfig.build.json",
     "lint": "eslint . --ext .ts",
     "fix-all-files": "eslint --fix . --ext .ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --project ./tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@eslint-config-bases": "workspace:eslint-config-bases@latest"

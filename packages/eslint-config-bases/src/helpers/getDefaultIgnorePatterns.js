@@ -4,8 +4,10 @@ const getDefaultIgnorePatterns = () => {
     '**/build',
     '**/dist',
     '**/public',
+    '.eslintrc.cjs',
+    '.eslintrc.js',
+    '*.config.ts',
     'vite-env.d.ts',
-    'vite.config.ts',
   ];
 };
 
