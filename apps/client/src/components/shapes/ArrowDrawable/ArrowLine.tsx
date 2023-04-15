@@ -1,4 +1,4 @@
-import { type NodeLIne, type Point } from '@shared/types';
+import { type NodeLIne, type Point } from '@shared';
 import type Konva from 'konva';
 import { type Context } from 'konva/lib/Context';
 import { type Shape } from 'konva/lib/Shape';

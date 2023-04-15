@@ -1,4 +1,4 @@
-import type { Point } from '@shared/types';
+import type { Point } from '@shared';
 
 export function calcMidPointAndPerp(start: Point, end: Point) {
   const dx = end[0] - start[0];

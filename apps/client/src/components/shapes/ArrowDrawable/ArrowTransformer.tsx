@@ -1,4 +1,4 @@
-import { type Point } from '@shared/types';
+import { type Point } from '@shared';
 import type Konva from 'konva';
 import { type KonvaEventObject } from 'konva/lib/Node';
 import { useCallback, useMemo } from 'react';

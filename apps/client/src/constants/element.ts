@@ -1,4 +1,4 @@
-import type { NodeType } from '@shared/types';
+import type { NodeType } from '@shared';
 import { type NodeConfig } from 'konva/lib/Node';
 import { type ShapeConfig } from 'konva/lib/Shape';
 import ArrowDrawable from '@/components/shapes/ArrowDrawable/ArrowDrawable';
