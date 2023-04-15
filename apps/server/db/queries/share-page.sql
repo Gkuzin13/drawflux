@@ -1,1 +1,0 @@
-INSERT INTO pages (stage_config, nodes) VALUES ($1, $2) RETURNING *;

@@ -5,13 +5,12 @@ import type { SharePageParams, SharePageResponse } from 'shared';
 import { BadRequestError, Schemas } from 'shared';
 import { ZodError } from 'zod';
 import * as db from '../db/index.js';
-import { queriesPaths } from '../db/queries/index.js';
+import { queries } from '../db/queries/index.js';
 import type {
   SharePageArgs,
   GetPageArgs,
   PageRowObject,
-} from '../db/queries/types';
-import { getQuery } from '../utils/getQuery/getQuery.js';
+} from '../db/queries/types.js';
 import { loadRoute } from '../utils/route.js';
 
 const pageRouter = Router();
@@ -22,10 +21,8 @@ pageRouter.get(
     const client = await db.getClient();
 
     try {
-      const query = await getQuery(queriesPaths.getPage);
-
       const { rows }: QueryResult<PageRowObject> = await db.query<GetPageArgs>(
-        query,
+        queries.getPage,
         [req.params.id],
       );
 
@@ -52,15 +49,13 @@ pageRouter.post(
     const client = await db.getClient();
 
     try {
-      const query = await getQuery(queriesPaths.sharePage);
-
       const { page }: SharePageParams = req.body;
 
       await Schemas.StageConfig.parseAsync(page.stageConfig);
       await Schemas.Node.array().parseAsync(page.nodes);
 
       const { rows }: QueryResult<SharePageResponse> =
-        await db.query<SharePageArgs>(query, [
+        await db.query<SharePageArgs>(queries.sharePage, [
           JSON.stringify(page.stageConfig),
           JSON.stringify(page.nodes),
         ]);

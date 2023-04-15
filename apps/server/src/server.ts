@@ -5,9 +5,8 @@ import * as dotenv from 'dotenv';
 import express from 'express';
 import * as db from './db/index.js';
 import jobs from './db/jobs.js';
-import { queriesPaths } from './db/queries/index.js';
+import { queries } from './db/queries/index.js';
 import { mountRoutes } from './routes/index.js';
-import { getQuery } from './utils/getQuery/getQuery.js';
 
 const app = express();
 
@@ -27,9 +26,7 @@ await (async () => {
   const client = await db.getClient();
 
   try {
-    const query = await getQuery(queriesPaths.createPageTable);
-
-    await db.query(query);
+    await db.query(queries.createPageTable);
   } catch (error) {
     console.log(error);
   } finally {

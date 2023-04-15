@@ -1,21 +1,16 @@
 import { CronJob } from 'cron';
 import type { QueryResult } from 'pg';
-import { getQuery } from '../utils/getQuery/getQuery';
-import { queriesPaths } from './queries/index';
-import type { PageRowObject } from './queries/types';
-import * as db from './index';
+import { queries } from './queries/index.js';
+import type { PageRowObject } from './queries/types.js';
+import * as db from './index.js';
 
 const deleteExpiredPages = new CronJob('0 0 * * *', async () => {
   const client = await db.getClient();
 
   try {
-    const query = await getQuery(queriesPaths.deletePages);
-
-    if (typeof query !== 'string') {
-      throw query;
-    }
-
-    const { rowCount }: QueryResult<PageRowObject> = await db.query(query);
+    const { rowCount }: QueryResult<PageRowObject> = await db.query(
+      queries.deletePages,
+    );
 
     console.log(
       `Job: Delete expired pages\n

@@ -1,1 +1,0 @@
-SELECT id, stage_config "stageConfig", nodes FROM pages WHERE id = $1;
