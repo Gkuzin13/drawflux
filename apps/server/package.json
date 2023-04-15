@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "@eslint-config-bases": "workspace:eslint-config-bases@latest",
-    "@tsconfig/node16": "^1.0.3",
     "@types/compression": "^1.7.2",
     "@types/cors": "^2.8.13",
     "@types/cron": "^2.0.1",
@@ -37,7 +36,6 @@
     "@types/pg": "^8.6.6",
     "dotenv": "^16.0.3",
     "nodemon": "^2.0.22",
-    "ts-node": "^10.9.1",
     "tsx": "^3.12.6",
     "typescript": "*"
   }
