@@ -9,7 +9,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@/': new URL('./src/', import.meta.url).pathname,
-      '@shared': new URL('node_modules/@shared/dist', import.meta.url).pathname,
     },
   },
   test: {
