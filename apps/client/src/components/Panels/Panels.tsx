@@ -1,6 +1,6 @@
-import { type NodeStyle, type NodeObject, Schemas } from '@shared';
 import type Konva from 'konva';
 import { type RefObject, useMemo } from 'react';
+import { type NodeStyle, type NodeObject, Schemas } from 'shared';
 import { z } from 'zod';
 import { type MenuPanelActionType } from '@/constants/menu';
 import { type Tool } from '@/constants/tool';

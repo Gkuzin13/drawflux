@@ -1,8 +1,8 @@
-import type { NodeObject } from '@shared';
 import type Konva from 'konva';
 import { type KonvaEventObject } from 'konva/lib/Node';
 import { createElement, useState } from 'react';
 import { Group } from 'react-konva';
+import type { NodeObject } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import { getElement } from '@/constants/element';
 import useTransformer from '@/hooks/useTransformer';

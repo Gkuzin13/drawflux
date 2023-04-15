@@ -1,4 +1,3 @@
-import type { NodeObject, Point } from '@shared';
 import Konva from 'konva';
 import { type KonvaEventObject, type NodeConfig } from 'konva/lib/Node';
 import { type IRect } from 'konva/lib/types';
@@ -11,6 +10,7 @@ import {
 } from 'react';
 import { Layer, Stage } from 'react-konva';
 import { Html } from 'react-konva-utils';
+import type { NodeObject, Point } from 'shared';
 import { CURSOR } from '@/constants/cursor';
 import {
   STAGE_CONTEXT_MENU_ACTIONS,

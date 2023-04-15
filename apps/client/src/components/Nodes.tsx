@@ -1,4 +1,4 @@
-import type { NodeObject } from '@shared';
+import type { NodeObject } from 'shared';
 import type { Tool } from '@/constants/tool';
 import Node from './Node/Node';
 

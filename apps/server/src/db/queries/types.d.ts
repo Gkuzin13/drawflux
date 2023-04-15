@@ -1,4 +1,4 @@
-import type { NodeObject, StageConfig } from '@shared';
+import type { NodeObject, StageConfig } from 'shared';
 
 export type GetPageArgs = [string];
 export type SharePageArgs = [string, string];

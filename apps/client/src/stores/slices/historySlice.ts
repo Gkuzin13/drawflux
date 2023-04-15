@@ -1,5 +1,5 @@
 import { type Action, createAction, type Reducer } from '@reduxjs/toolkit';
-import type { NodeObject } from '@shared';
+import type { NodeObject } from 'shared';
 import { type NodesState } from './nodesSlice';
 
 export type NodesHistoryState = {

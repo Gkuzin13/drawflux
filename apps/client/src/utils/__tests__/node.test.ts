@@ -1,4 +1,4 @@
-import { colors } from '@shared';
+import { colors } from 'shared';
 import { LINE, SIZE } from '@/constants/style';
 import { createNode } from '../node';
 

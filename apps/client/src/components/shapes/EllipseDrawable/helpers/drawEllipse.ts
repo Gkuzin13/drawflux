@@ -1,4 +1,4 @@
-import type { NodeObject, Point } from '@shared';
+import type { NodeObject, Point } from 'shared';
 import { normalizePoints } from '@/utils/draw';
 
 export const drawEllipse = (node: NodeObject, position: Point) => {

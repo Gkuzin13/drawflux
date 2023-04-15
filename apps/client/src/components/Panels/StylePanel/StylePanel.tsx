@@ -1,4 +1,4 @@
-import type { NodeLIne, NodeStyle } from '@shared';
+import type { NodeLIne, NodeStyle } from 'shared';
 import { Divider } from '@/components/core/Divider/Divider';
 import { ICON_SIZES } from '@/constants/icon';
 import { ANIMATED, COLOR, LINE, SIZE } from '@/constants/style';

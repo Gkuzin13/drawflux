@@ -1,4 +1,4 @@
-import { colors } from '@shared';
+import { colors } from 'shared';
 import IconAnimatedStyle from '@/components/icons/IconAnimatedStyle';
 import IconLineDashed from '@/components/icons/IconLineDashed';
 import IconLineDotted from '@/components/icons/IconLineDotted';

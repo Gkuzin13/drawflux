@@ -1,5 +1,5 @@
-import { type NodeStyle } from '@shared';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { type NodeStyle } from 'shared';
 import { COLOR, LINE, SIZE, ANIMATED } from '@/constants/style';
 import { createNode } from '@/utils/node';
 import StylePanel from './StylePanel';

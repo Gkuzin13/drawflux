@@ -5,7 +5,7 @@ import {
   type ServerResponse,
   type SharedPage,
   type SharePageResponse,
-} from '@shared';
+} from 'shared';
 
 export const api = createApi({
   reducerPath: 'api',

@@ -1,4 +1,4 @@
-import { styled } from '@shared';
+import { styled } from 'shared';
 
 export const ToolsPanelContainer = styled('div', {
   position: 'fixed',

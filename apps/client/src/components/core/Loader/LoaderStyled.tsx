@@ -1,6 +1,6 @@
-import { styled } from '@shared';
 import { keyframes } from '@stitches/react';
 import { TbLoader2 } from 'react-icons/tb';
+import { styled } from 'shared';
 
 const dash = keyframes({
   '0%': {

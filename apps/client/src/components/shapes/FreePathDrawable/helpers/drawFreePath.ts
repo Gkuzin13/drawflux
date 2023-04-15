@@ -1,4 +1,4 @@
-import type { NodeObject, Point } from '@shared';
+import type { NodeObject, Point } from 'shared';
 
 export const drawFreePath = (node: NodeObject, position: Point) => {
   const points = node.nodeProps?.points || [];

@@ -1,4 +1,4 @@
-import { Schemas } from '@shared';
+import { Schemas } from 'shared';
 import { z } from 'zod';
 import { ToolType } from './tool';
 

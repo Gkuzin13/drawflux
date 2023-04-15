@@ -1,4 +1,4 @@
-import { styled } from '@shared';
+import { styled } from 'shared';
 
 export const ButtonStyled = styled('button', {
   display: 'flex',

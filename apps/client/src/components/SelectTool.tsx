@@ -1,8 +1,8 @@
-import { theme } from '@shared';
 import type Konva from 'konva';
 import type { IRect } from 'konva/lib/types';
 import { type PropsWithRef, forwardRef } from 'react';
 import { Rect } from 'react-konva';
+import { theme } from 'shared';
 
 type Props = PropsWithRef<{
   rect: IRect;

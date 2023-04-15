@@ -1,5 +1,5 @@
-import { type SharePageParams } from '@shared';
 import { TbLink, TbLoader } from 'react-icons/tb';
+import { type SharePageParams } from 'shared';
 import Menu from '@/components/core/Menu/Menu';
 import { PAGE_SHARE_INFO } from '@/constants/share';
 import { useSharePageMutation } from '@/services/api';

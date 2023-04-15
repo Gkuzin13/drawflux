@@ -1,7 +1,7 @@
-import type { NodeObject } from '@shared';
 import type { LayerConfig } from 'konva/lib/Layer';
 import type { PropsWithChildren } from 'react';
 import { Layer } from 'react-konva';
+import type { NodeObject } from 'shared';
 import type { Tool } from '@/constants/tool';
 import { useAppDispatch } from '../stores/hooks';
 import { controlActions } from '../stores/slices/controlSlice';

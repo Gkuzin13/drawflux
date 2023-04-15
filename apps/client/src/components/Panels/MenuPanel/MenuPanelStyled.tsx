@@ -1,4 +1,4 @@
-import { styled } from '@shared';
+import { styled } from 'shared';
 import Menu from '@/components/core/Menu/Menu';
 
 export const MenuPanelContainer = styled('div', {

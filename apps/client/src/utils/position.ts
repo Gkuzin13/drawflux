@@ -1,5 +1,5 @@
-import { type Point } from '@shared';
 import type Konva from 'konva';
+import { type Point } from 'shared';
 
 export function getPointsAbsolutePosition<T extends Konva.Node>(
   points: Point[],

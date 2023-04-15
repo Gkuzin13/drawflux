@@ -1,10 +1,10 @@
-import { type NodeStyle } from '@shared';
 import Konva from 'konva';
 import { type Shape } from 'konva/lib/Shape';
 import { type Ellipse } from 'konva/lib/shapes/Ellipse';
 import { type Line } from 'konva/lib/shapes/Line';
 import { type Rect } from 'konva/lib/shapes/Rect';
 import { useEffect } from 'react';
+import { type NodeStyle } from 'shared';
 
 const useAnimatedLine = (
   element: Shape | Rect | Ellipse | Line | null,

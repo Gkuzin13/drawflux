@@ -1,4 +1,3 @@
-import { type Point, type NodeProps } from '@shared';
 import type Konva from 'konva';
 import { type KonvaEventObject } from 'konva/lib/Node';
 import {
@@ -10,6 +9,7 @@ import {
   useState,
 } from 'react';
 import { Group } from 'react-konva';
+import { type Point, type NodeProps } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import { createDefaultNodeConfig } from '@/constants/element';
 import useAnimatedLine from '@/hooks/useAnimatedLine';

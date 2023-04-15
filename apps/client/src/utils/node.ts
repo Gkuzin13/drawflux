@@ -1,5 +1,5 @@
-import type { NodeLIne, NodeType, Point, NodeObject } from '@shared';
-import { colors } from '@shared';
+import type { NodeLIne, NodeType, Point, NodeObject } from 'shared';
+import { colors } from 'shared';
 import { LINE, SIZE } from '../constants/style';
 
 export const createNode = (type: NodeType, point: Point): NodeObject => {

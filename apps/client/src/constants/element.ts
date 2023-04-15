@@ -1,6 +1,6 @@
-import type { NodeType } from '@shared';
 import { type NodeConfig } from 'konva/lib/Node';
 import { type ShapeConfig } from 'konva/lib/Shape';
+import type { NodeType } from 'shared';
 import ArrowDrawable from '@/components/shapes/ArrowDrawable/ArrowDrawable';
 import EditableText from '@/components/shapes/EditableText/EditableText';
 import EllipseDrawable from '@/components/shapes/EllipseDrawable/EllipseDrawable';

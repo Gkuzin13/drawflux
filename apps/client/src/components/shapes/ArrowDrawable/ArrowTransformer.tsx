@@ -1,7 +1,7 @@
-import { type Point } from '@shared';
 import type Konva from 'konva';
 import { type KonvaEventObject } from 'konva/lib/Node';
 import { useCallback, useMemo } from 'react';
+import { type Point } from 'shared';
 import { getRatioFromValue } from '@/utils/math';
 import { ANCHOR_INDEX } from './constants';
 import { calcMidPointAndPerp, calcMinMaxMovementPoints } from './helpers/calc';

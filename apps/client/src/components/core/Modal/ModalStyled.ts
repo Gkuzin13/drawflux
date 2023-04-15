@@ -1,4 +1,4 @@
-import { styled } from '@shared';
+import { styled } from 'shared';
 import Button from '../Button/Button';
 
 export const ModalContainer = styled('div', {

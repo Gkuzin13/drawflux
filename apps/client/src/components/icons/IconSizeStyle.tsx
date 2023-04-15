@@ -1,6 +1,6 @@
-import { styled } from '@shared';
 import { type IconBaseProps } from 'react-icons';
 import { TbMinus } from 'react-icons/tb';
+import { styled } from 'shared';
 
 type Props = {
   lineSize: number;

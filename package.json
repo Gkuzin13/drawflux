@@ -12,10 +12,12 @@
     "packages:typecheck": "pnpm --filter '{./packages/**}' typecheck"
   },
   "dependencies": {
+    "react": "^18.2.0",
     "zod": "^3.21.4",
     "@stitches/react": "^1.2.8"
   },
   "devDependencies": {
+    "@types/react": "^18.0.31",
     "@vitest/coverage-c8": "^0.29.8",
     "eslint": "^8.38.0",
     "prettier": "^2.8.7",

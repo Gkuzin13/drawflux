@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { NodeObject } from '@shared';
+import type { NodeObject } from 'shared';
 import { api } from '@/services/api';
 import { type RootState } from '../store';
 

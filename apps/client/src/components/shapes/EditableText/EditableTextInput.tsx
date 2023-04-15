@@ -1,6 +1,6 @@
-import type { NodeColor, NodeObject } from '@shared';
 import { type ChangeEvent, useEffect, useRef } from 'react';
 import { Html } from 'react-konva-utils';
+import type { NodeColor, NodeObject } from 'shared';
 import { useClickAway } from '@/hooks/useClickAway';
 
 type Props = {

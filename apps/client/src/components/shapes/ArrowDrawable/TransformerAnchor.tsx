@@ -1,9 +1,9 @@
-import { theme } from '@shared';
 import type Konva from 'konva';
 import { type KonvaEventObject } from 'konva/lib/Node';
 import { type Vector2d } from 'konva/lib/types';
 import { useCallback, useRef, useState } from 'react';
 import { Circle } from 'react-konva';
+import { theme } from 'shared';
 
 export type TransformerAnchorProps = {
   draggable: boolean;
