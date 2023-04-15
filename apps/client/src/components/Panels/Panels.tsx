@@ -123,10 +123,10 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
 
   return (
     <>
-      {/* <SharePanel
+      <SharePanel
         isPageShared={isPageShared}
         pageState={{ page: { nodes, stageConfig } }}
-      /> */}
+      />
       <MenuPanel onAction={handleMenuAction} />
       <ToolsDock activeTool={toolType} onToolSelect={onToolTypeChange} />
       {selectedNode && (
