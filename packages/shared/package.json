@@ -1,11 +1,10 @@
 {
   "name": "shared",
   "description": "Shared modules",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "private": true,
   "sideEffects": false,
-  "module": "dist/index.esm.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
