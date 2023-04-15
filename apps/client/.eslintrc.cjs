@@ -1,14 +1,9 @@
-const {
-  getDefaultIgnorePatterns,
-} = require('@eslint-config-bases/src/helpers');
+const { getDefaultIgnorePatterns } = require('eslint-config-bases/helpers');
 
 module.exports = {
   root: true,
   ignorePatterns: [...getDefaultIgnorePatterns()],
-  extends: [
-    '../../packages/eslint-config-bases/src/bases/typescript',
-    '../../packages/eslint-config-bases/src/bases/react',
-  ],
+  extends: ['eslint-config-bases/typescript', 'eslint-config-bases/react'],
   rules: {
     'no-console': 'warn',
     'jsx-a11y/anchor-is-valid': 'off',

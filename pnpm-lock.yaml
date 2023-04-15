@@ -72,9 +72,6 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.21.0
         version: 7.21.0(@babel/core@7.21.3)
-      '@eslint-config-bases':
-        specifier: workspace:eslint-config-bases@latest
-        version: link:../../packages/eslint-config-bases
       '@redux-devtools/core':
         specifier: ^3.13.1
         version: 3.13.1(react-redux@8.0.5)(react@18.2.0)(redux@4.2.1)
@@ -102,6 +99,9 @@ importers:
       babel-loader:
         specifier: ^9.1.2
         version: 9.1.2(@babel/core@7.21.3)(webpack@5.79.0)
+      eslint-config-bases:
+        specifier: workspace:eslint-config-bases@latest
+        version: link:../../packages/eslint-config-bases
       jsdom:
         specifier: ^21.1.1
         version: 21.1.1
@@ -133,9 +133,6 @@ importers:
         specifier: workspace:shared@latest
         version: link:../../packages/shared
     devDependencies:
-      '@eslint-config-bases':
-        specifier: workspace:eslint-config-bases@latest
-        version: link:../../packages/eslint-config-bases
       '@types/compression':
         specifier: ^1.7.2
         version: 1.7.2
@@ -157,6 +154,9 @@ importers:
       dotenv:
         specifier: ^16.0.3
         version: 16.0.3
+      eslint-config-bases:
+        specifier: workspace:eslint-config-bases@latest
+        version: link:../../packages/eslint-config-bases
       nodemon:
         specifier: ^2.0.22
         version: 2.0.22

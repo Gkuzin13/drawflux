@@ -30,7 +30,6 @@
     "@babel/core": "^7.21.3",
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.21.0",
-    "@eslint-config-bases": "workspace:eslint-config-bases@latest",
     "@redux-devtools/core": "^3.13.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
@@ -39,6 +38,7 @@
     "@types/react-dom": "^18.0.11",
     "@types/testing-library__jest-dom": "^5.14.5",
     "@vitejs/plugin-react": "^3.1.0",
+    "eslint-config-bases": "workspace:eslint-config-bases@latest",
     "babel-loader": "^9.1.2",
     "jsdom": "^21.1.1"
   }
