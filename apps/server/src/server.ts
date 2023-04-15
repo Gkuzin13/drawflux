@@ -10,13 +10,19 @@ import { mountRoutes } from './routes/index.js';
 
 const app = express();
 
-if (process.env.NODE_ENV === 'production') {
+const isProduction = process.env.NODE_ENV === 'production';
+
+if (isProduction) {
   app.use(compression());
 } else {
   dotenv.config();
 }
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(
+  cors({
+    origin: isProduction ? process.env.ORIGIN_URL : 'http://localhost:5174',
+  }),
+);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
