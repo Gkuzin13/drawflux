@@ -1,19 +1,15 @@
-import {
-  Schemas,
-  type SharePageParams,
-  BadRequestError,
-  type SharePageResponse,
-} from '@shared';
 import Router from 'express-promise-router';
 import type { QueryResult } from 'pg';
 import pg from 'pg';
+import type { SharePageParams, SharePageResponse } from 'shared';
+import { BadRequestError, Schemas } from 'shared';
 import { ZodError } from 'zod';
 import * as db from '../db/index.js';
 import { queriesPaths } from '../db/queries/index.js';
-import {
-  type SharePageArgs,
-  type GetPageArgs,
-  type PageRowObject,
+import type {
+  SharePageArgs,
+  GetPageArgs,
+  PageRowObject,
 } from '../db/queries/types';
 import { getQuery } from '../utils/getQuery/getQuery.js';
 import { loadRoute } from '../utils/route.js';

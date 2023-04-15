@@ -2,12 +2,10 @@ import pg from 'pg';
 import type { PoolClient, QueryConfig } from 'pg';
 
 const poolClient = new pg.Pool({
-  user: 'me',
-  password: 'password',
-  host: 'localhost',
-  database: 'api',
-  port: 5432,
-  idleTimeoutMillis: 30000,
+  connectionString:
+    process.env.NODE_ENV === 'production'
+      ? process.env.PG_CONNECTION_URI
+      : undefined,
 });
 
 export async function query<T extends [...T]>(text: string, params?: T) {

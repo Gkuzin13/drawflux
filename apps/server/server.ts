@@ -1,6 +1,7 @@
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import cors from 'cors';
+import * as dotenv from 'dotenv';
 import express from 'express';
 import * as db from './db/index.js';
 import jobs from './db/jobs.js';
@@ -12,8 +13,10 @@ const app = express();
 
 if (process.env.NODE_ENV === 'production') {
   app.use(compression());
+} else {
+  dotenv.config();
 }
-console;
+
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
