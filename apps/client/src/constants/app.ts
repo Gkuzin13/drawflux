@@ -2,6 +2,8 @@ import { Schemas } from 'shared';
 import { z } from 'zod';
 import { ToolType } from './tool';
 
+export const BASE_URL = 'https://drawflux-api.onrender.com';
+
 export const LOCAL_STORAGE = {
   KEY: 'drawflux',
 };

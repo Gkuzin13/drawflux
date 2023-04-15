@@ -1,15 +1,21 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import {
-  type GetPageParams,
-  type SharePageParams,
-  type ServerResponse,
-  type SharedPage,
-  type SharePageResponse,
+import type {
+  GetPageParams,
+  SharePageParams,
+  ServerResponse,
+  SharedPage,
+  SharePageResponse,
 } from 'shared';
+import { BASE_URL } from '@/constants/app';
 
 export const api = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:7456/' }),
+  baseQuery: fetchBaseQuery({
+    baseUrl:
+      process.env.NODE_ENV === 'production'
+        ? BASE_URL
+        : 'http://localhost:7456/',
+  }),
   endpoints: (builder) => ({
     getPage: builder.query<ServerResponse<SharedPage>, GetPageParams>({
       query(params) {
