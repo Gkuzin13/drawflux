@@ -7,6 +7,7 @@ import DrawingCanvas from '@/components/DrawingCanvas/DrawingCanvas';
 import Panels from '@/components/Panels/Panels';
 import { LOCAL_STORAGE, PageState, type PageStateType } from '@/constants/app';
 import useKeydownListener from '@/hooks/useKeyListener';
+import useWindowSize from '@/hooks/useWindowSize/useWindowSize';
 import { useGetPageQuery } from '@/services/api';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { controlActions } from '@/stores/slices/controlSlice';
@@ -35,6 +36,8 @@ const Root = () => {
   const stageRef = useRef<Konva.Stage>(null);
 
   useKeydownListener();
+
+  const [width, height] = useWindowSize();
 
   useEffect(() => {
     if (id) {
@@ -82,8 +85,8 @@ const Root = () => {
       <DrawingCanvas
         ref={stageRef}
         config={{
-          width: window.innerWidth,
-          height: window.innerHeight,
+          width,
+          height,
           scale: { x: stageConfig.scale, y: stageConfig.scale },
           x: stageConfig.position.x,
           y: stageConfig.position.y,

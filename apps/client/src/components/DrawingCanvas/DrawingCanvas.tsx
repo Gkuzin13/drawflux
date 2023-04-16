@@ -13,6 +13,7 @@ import { Layer, Stage } from 'react-konva';
 import { Html } from 'react-konva-utils';
 import type { NodeObject, Point } from 'shared';
 import { CURSOR } from '@/constants/cursor';
+import { BACKGROUND_LAYER_RECT_ID } from '@/constants/element';
 import {
   STAGE_CONTEXT_MENU_ACTIONS,
   NODE_CONTEXT_MENU_ACTIONS,
@@ -21,11 +22,14 @@ import {
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { controlActions, selectControl } from '@/stores/slices/controlSlice';
 import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
-import type { StageConfigState } from '@/stores/slices/stageConfigSlice';
+import {
+  type StageConfigState,
+  selectStageConfig,
+  stageConfigActions,
+} from '@/stores/slices/stageConfigSlice';
 import { debounce } from '@/utils/debounce';
 import { drawRectangle } from '@/utils/draw';
 import { createNode } from '@/utils/node';
-import CanvasBackgroundLayer from '../CanvasBackgroundLayer';
 import ContextMenu from '../ContextMenu/ContextMenu';
 import NodesLayer from '../NodesLayer';
 import SelectTool from '../SelectTool';
@@ -64,6 +68,8 @@ const DrawingCanvas = forwardRef<Ref, Props>(
 
     const { selectedNodeId, selectedNodesIds, toolType } =
       useAppSelector(selectControl);
+    const stageConfig = useAppSelector(selectStageConfig);
+
     const { nodes } = useAppSelector(selectNodes).present;
 
     const dispatch = useAppDispatch();
@@ -81,6 +87,28 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           return drawing ? CURSOR.CROSSHAIR : CURSOR.DEFAULT;
       }
     }, [drawing, toolType, draggingStage]);
+
+    const offsetBackgroundLayerRect = useMemo(() => {
+      if (!ref || typeof ref === 'function' || !ref.current) {
+        return {
+          x: 0,
+          y: 0,
+          width: config.width || 0,
+          height: config.height || 0,
+        };
+      }
+
+      const stage = ref.current;
+
+      const { position, scale } = stageConfig;
+
+      return {
+        x: -position.x / scale,
+        y: -position.y / scale,
+        width: stage.width() / scale,
+        height: stage.height() / scale,
+      };
+    }, [stageConfig, ref, config.width, config.height]);
 
     const onNodeMenuAction = (key: ContextMenuItem['key']) => {
       switch (key) {
@@ -102,20 +130,18 @@ const DrawingCanvas = forwardRef<Ref, Props>(
     };
 
     const dispatchSelectedNodesIds = useCallback(
-      debounce(
-        () =>
-          dispatch(
-            controlActions.setSelectedNodesIds(
-              intersectedNodes.map((node) => node.nodeProps.id),
-            ),
+      debounce(() => {
+        dispatch(
+          controlActions.setSelectedNodesIds(
+            intersectedNodes.map((node) => node.nodeProps.id),
           ),
-        20,
-      ),
+        );
+      }, 35),
       [dispatch, intersectedNodes],
     );
 
     const setIntersectingNodes = (stage: Konva.Stage, selectRect: IRect) => {
-      const layer = stage.getChildren((child) => child.nodeType === 'Layer')[1];
+      const layer = stage.getLayers()[0];
       const children = layer.getChildren((child) => child.attrs.id);
 
       const intersectedChildren = children.filter((child) => {
@@ -329,6 +355,52 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       }
     };
 
+    const handleStageDragMove = useCallback(
+      (event: KonvaEventObject<DragEvent>) => {
+        if (event.target !== event.target.getStage()) {
+          return;
+        }
+        const stage = event.target;
+        const layer = stage.getLayers()[0];
+
+        const backgroundLayerRect = layer.children?.find(
+          (child) => child.id() === BACKGROUND_LAYER_RECT_ID,
+        );
+
+        if (!backgroundLayerRect) {
+          return;
+        }
+
+        const { scale } = stageConfig;
+
+        backgroundLayerRect.position({
+          x: -stage.x() / scale,
+          y: -stage.y() / scale,
+        });
+      },
+      [stageConfig],
+    );
+
+    const handleStageDragEnd = useCallback(
+      (event: KonvaEventObject<DragEvent>) => {
+        if (event.target.getStage() !== event.target) {
+          return;
+        }
+
+        const stage = event.target;
+
+        dispatch(
+          stageConfigActions.set({
+            ...stageConfig,
+            position: stage.position(),
+          }),
+        );
+
+        setDraggingStage(false);
+      },
+      [stageConfig, dispatch],
+    );
+
     return (
       <Stage
         ref={ref}
@@ -344,16 +416,17 @@ const DrawingCanvas = forwardRef<Ref, Props>(
         onContextMenu={handleOnContextMenu}
         onWheel={handleStageOnWheel}
         onDragStart={() => setDraggingStage(true)}
-        onDragEnd={() => setDraggingStage(false)}
+        onDragMove={handleStageDragMove}
+        onDragEnd={handleStageDragEnd}
       >
-        <CanvasBackgroundLayer config={config} />
         <NodesLayer
           nodes={nodes}
           draftNode={draftNode}
           selectedNodeId={selectedNodeId}
           toolType={toolType}
           selectedNodesIds={selectedNodesIds}
-          config={{ listening: !drawing }}
+          config={{ ...config, listening: !drawing }}
+          backgroundLayerRect={offsetBackgroundLayerRect}
           onDraftEnd={handleDraftEnd}
         >
           <Html

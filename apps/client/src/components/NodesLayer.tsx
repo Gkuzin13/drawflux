@@ -6,6 +6,7 @@ import type { Tool } from '@/constants/tool';
 import { useAppDispatch } from '../stores/hooks';
 import { controlActions } from '../stores/slices/controlSlice';
 import { nodesActions } from '../stores/slices/nodesSlice';
+import BackgroundLayerRect from './BackgroundLayerRect';
 import DraftNode from './Node/DraftNode';
 import NodeGroupTransformer from './NodeGroupTransformer/NodeGroupTransformer';
 import Nodes from './Nodes';
@@ -17,6 +18,12 @@ type Props = PropsWithChildren<{
   draftNode: NodeObject | null;
   selectedNodesIds: string[];
   config?: LayerConfig;
+  backgroundLayerRect: {
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+  };
   onDraftEnd: (node: NodeObject) => void;
 }>;
 
@@ -27,6 +34,7 @@ const NodesLayer = ({
   draftNode,
   selectedNodesIds,
   config,
+  backgroundLayerRect,
   onDraftEnd,
   children,
 }: Props) => {
@@ -46,7 +54,8 @@ const NodesLayer = ({
   }, [selectedNodesIds]);
 
   return (
-    <Layer {...config}>
+    <Layer listening={config?.listening}>
+      <BackgroundLayerRect {...backgroundLayerRect} />
       <Nodes
         nodes={nodes}
         selectedNodeId={selectedNodeId}
