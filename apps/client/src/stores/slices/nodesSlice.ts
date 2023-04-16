@@ -22,28 +22,21 @@ export const nodesSlice = createSlice({
       state.nodes = [...state.nodes, ...action.payload];
     },
     update: (state, action: PayloadAction<NodeObject[]>) => {
-      const nodesMap = new Map<string, NodeObject>();
+      const nodesMap = new Map<string, NodeObject>(
+        action.payload.map((node) => [node.nodeProps.id, node]),
+      );
 
-      action.payload.forEach((node) => {
-        nodesMap.set(node.nodeProps.id, node);
+      state.nodes = state.nodes.map((node) => {
+        if (nodesMap.has(node.nodeProps.id)) {
+          return nodesMap.get(node.nodeProps.id) as NodeObject;
+        }
+        return node;
       });
-
-      return {
-        nodes: state.nodes.map((node) => {
-          if (nodesMap.has(node.nodeProps.id)) {
-            return nodesMap.get(node.nodeProps.id) as NodeObject;
-          }
-
-          return node;
-        }),
-      };
     },
     delete: (state, action: PayloadAction<string[]>) => {
       const ids = new Set<string>(action.payload);
 
-      return {
-        nodes: state.nodes.filter((node) => !ids.has(node.nodeProps.id)),
-      };
+      state.nodes = state.nodes.filter((node) => !ids.has(node.nodeProps.id));
     },
     deleteAll: (state) => {
       state.nodes = [];
