@@ -169,6 +169,9 @@ importers:
       eslint-config-bases:
         specifier: workspace:eslint-config-bases@latest
         version: link:../../packages/eslint-config-bases
+      helmet:
+        specifier: ^6.1.5
+        version: 6.1.5
       nodemon:
         specifier: ^2.0.22
         version: 2.0.22
@@ -3320,6 +3323,11 @@ packages:
     engines: {node: '>= 0.4.0'}
     dependencies:
       function-bind: 1.1.1
+
+  /helmet@6.1.5:
+    resolution: {integrity: sha512-UgAvdoG0BhF9vcCh/j0bWtElo2ZHHk6OzC98NLCM6zK03DEVSM0vUAtT7iR+oTo2Mi6sGelAH3tL6B/uUWxV4g==}
+    engines: {node: '>=14.0.0'}
+    dev: true
 
   /hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}

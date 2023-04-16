@@ -3,14 +3,15 @@ import compression from 'compression';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import express from 'express';
+import helmet from 'helmet';
 import * as db from './db/index.js';
 import jobs from './db/jobs.js';
 import { queries } from './db/queries/index.js';
 import { mountRoutes } from './routes/index.js';
 
-const app = express();
-
 const isProduction = process.env.NODE_ENV === 'production';
+
+const app = express();
 
 if (isProduction) {
   app.use(compression());
@@ -18,6 +19,8 @@ if (isProduction) {
   dotenv.config();
 }
 
+app.disable('x-powered-by');
+app.use(helmet());
 app.use(
   cors({
     origin: isProduction ? process.env.ORIGIN_URL : 'http://localhost:5174',

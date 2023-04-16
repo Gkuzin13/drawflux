@@ -36,6 +36,7 @@
     "@types/pg": "^8.6.6",
     "dotenv": "^16.0.3",
     "eslint-config-bases": "workspace:eslint-config-bases@latest",
+    "helmet": "^6.1.5",
     "nodemon": "^2.0.22",
     "tsx": "^3.12.6",
     "typescript": "*"
