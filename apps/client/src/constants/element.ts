@@ -7,6 +7,8 @@ import EllipseDrawable from '@/components/shapes/EllipseDrawable/EllipseDrawable
 import FreePathDrawable from '@/components/shapes/FreePathDrawable/FreePathDrawable';
 import RectDrawable from '@/components/shapes/RectDrawable/RectDrawable';
 
+export const BACKGROUND_LAYER_RECT_ID = 'BackgroundLayerRect';
+
 export const getElement = (element: NodeType) => {
   switch (element) {
     case 'arrow':
