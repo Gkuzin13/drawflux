@@ -43,7 +43,9 @@ const ArrowDrawable = memo(
         node.nodeProps.point,
         ...(node.nodeProps?.points || [node.nodeProps.point]),
       ]);
-    }, [node.nodeProps.point, node.nodeProps.points]);
+
+      setBendValue(node.nodeProps.bend ?? DEFAULT_BEND);
+    }, [node.nodeProps.point, node.nodeProps.points, node.nodeProps.bend]);
 
     const lineRef = useRef<Konva.Line>(null);
 
