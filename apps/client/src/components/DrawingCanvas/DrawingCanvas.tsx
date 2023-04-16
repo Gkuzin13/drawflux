@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useCallback,
 } from 'react';
 import { Layer, Stage } from 'react-konva';
 import { Html } from 'react-konva-utils';
@@ -21,6 +22,7 @@ import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { controlActions, selectControl } from '@/stores/slices/controlSlice';
 import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
 import type { StageConfigState } from '@/stores/slices/stageConfigSlice';
+import { debounce } from '@/utils/debounce';
 import { drawRectangle } from '@/utils/draw';
 import { createNode } from '@/utils/node';
 import CanvasBackgroundLayer from '../CanvasBackgroundLayer';
@@ -60,13 +62,13 @@ const DrawingCanvas = forwardRef<Ref, Props>(
     const [draggingStage, setDraggingStage] = useState(false);
     const [intersectedNodes, setIntersectedNodes] = useState<NodeObject[]>([]);
 
-    const { selectedNodeId, toolType } = useAppSelector(selectControl);
+    const { selectedNodeId, selectedNodesIds, toolType } =
+      useAppSelector(selectControl);
     const { nodes } = useAppSelector(selectNodes).present;
 
     const dispatch = useAppDispatch();
 
     const moveStartPosition = useRef<Point>([0, 0]);
-
     const selectRectRef = useRef<Konva.Rect>(null);
 
     const cursorStyle = useMemo(() => {
@@ -87,13 +89,30 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           dispatch(nodesActions.delete([selectedNodeId]));
           break;
         case 'select-all':
-          setIntersectedNodes(nodes);
+          dispatch(
+            controlActions.setSelectedNodesIds(
+              nodes.map((node) => node.nodeProps.id),
+            ),
+          );
           break;
       }
 
-      dispatch(controlActions.setSelectedNode(null));
+      dispatch(controlActions.setSelectedNodeId(null));
       setContextMenu(null);
     };
+
+    const dispatchSelectedNodesIds = useCallback(
+      debounce(
+        () =>
+          dispatch(
+            controlActions.setSelectedNodesIds(
+              intersectedNodes.map((node) => node.nodeProps.id),
+            ),
+          ),
+        20,
+      ),
+      [dispatch, intersectedNodes],
+    );
 
     const setIntersectingNodes = (stage: Konva.Stage, selectRect: IRect) => {
       const layer = stage.getChildren((child) => child.nodeType === 'Layer')[1];
@@ -111,13 +130,13 @@ const DrawingCanvas = forwardRef<Ref, Props>(
         return Konva.Util.haveIntersection(selectRect, child.getClientRect());
       });
 
-      const intersectedIds = new Set<string>(
-        intersectedChildren.map((child) => child.attrs.id),
-      );
+      const intersectedIds = intersectedChildren.map((child) => child.attrs.id);
 
       setIntersectedNodes(
-        nodes.filter((node) => intersectedIds.has(node.nodeProps.id)),
+        nodes.filter((node) => intersectedIds.includes(node.nodeProps.id)),
       );
+
+      dispatchSelectedNodesIds();
     };
 
     const handleOnContextMenu = (e: KonvaEventObject<PointerEvent>) => {
@@ -142,7 +161,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       const node = nodes.find((node) => node.nodeProps.id === shape?.attrs.id);
 
       if (node) {
-        dispatch(controlActions.setSelectedNode(node.nodeProps.id));
+        dispatch(controlActions.setSelectedNodeId(node.nodeProps.id));
         setContextMenu({
           items: NODE_CONTEXT_MENU_ACTIONS,
           position: [position.x, position.y],
@@ -212,11 +231,12 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       }
 
       if (selectedNodeId) {
-        dispatch(controlActions.setSelectedNode(null));
+        dispatch(controlActions.setSelectedNodeId(null));
       }
 
-      if (intersectedNodes.length) {
+      if (selectedNodesIds.length) {
         setIntersectedNodes([]);
+        dispatch(controlActions.setSelectedNodesIds([]));
       }
     };
 
@@ -332,9 +352,9 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           draftNode={draftNode}
           selectedNodeId={selectedNodeId}
           toolType={toolType}
-          intersectedNodes={intersectedNodes}
+          selectedNodesIds={selectedNodesIds}
           config={{ listening: !drawing }}
-          handleDraftEnd={handleDraftEnd}
+          onDraftEnd={handleDraftEnd}
         >
           <Html
             groupProps={{

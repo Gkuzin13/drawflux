@@ -1,5 +1,5 @@
 import type { LayerConfig } from 'konva/lib/Layer';
-import type { PropsWithChildren } from 'react';
+import { type PropsWithChildren, useMemo } from 'react';
 import { Layer } from 'react-konva';
 import type { NodeObject } from 'shared';
 import type { Tool } from '@/constants/tool';
@@ -10,24 +10,24 @@ import DraftNode from './Node/DraftNode';
 import NodeGroupTransformer from './NodeGroupTransformer/NodeGroupTransformer';
 import Nodes from './Nodes';
 
-type Props = {
+type Props = PropsWithChildren<{
   nodes: NodeObject[];
   selectedNodeId: string | null;
   toolType: Tool['value'];
   draftNode: NodeObject | null;
-  intersectedNodes: NodeObject[];
+  selectedNodesIds: string[];
   config?: LayerConfig;
-  handleDraftEnd: (node: NodeObject) => void;
-} & PropsWithChildren;
+  onDraftEnd: (node: NodeObject) => void;
+}>;
 
 const NodesLayer = ({
   nodes,
   selectedNodeId,
   toolType,
   draftNode,
-  intersectedNodes,
+  selectedNodesIds,
   config,
-  handleDraftEnd,
+  onDraftEnd,
   children,
 }: Props) => {
   const dispatch = useAppDispatch();
@@ -37,8 +37,13 @@ const NodesLayer = ({
   };
 
   const handleNodePress = (nodeId: string) => {
-    dispatch(controlActions.setSelectedNode(nodeId));
+    dispatch(controlActions.setSelectedNodeId(nodeId));
   };
+
+  const selectedNodes = useMemo(() => {
+    return nodes.filter((node) => selectedNodesIds.includes(node.nodeProps.id));
+    // Temporary workaround
+  }, [selectedNodesIds]);
 
   return (
     <Layer {...config}>
@@ -49,11 +54,10 @@ const NodesLayer = ({
         onNodePress={handleNodePress}
         onNodeChange={(node) => handleNodeChange([node])}
       />
-      {draftNode && <DraftNode node={draftNode} onDraftEnd={handleDraftEnd} />}
-      {intersectedNodes.length ? (
+      {draftNode && <DraftNode node={draftNode} onDraftEnd={onDraftEnd} />}
+      {selectedNodes.length ? (
         <NodeGroupTransformer
-          selectedNodes={intersectedNodes}
-          onDragStart={handleNodeChange}
+          selectedNodes={selectedNodes}
           onDragEnd={handleNodeChange}
         />
       ) : null}

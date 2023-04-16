@@ -7,14 +7,14 @@ describe('ControlPanel', () => {
 
     render(
       <ControlPanel
-        enabledControls={{ undo: true, redo: true, clear: true }}
+        enabledControls={{ undo: true, redo: true, deleteSelectedNodes: true }}
         onControl={handleControl}
       />,
     );
 
     fireEvent.click(screen.getByTitle(/Redo/));
     fireEvent.click(screen.getByTitle(/Undo/));
-    fireEvent.click(screen.getByTitle(/Clear/));
+    fireEvent.click(screen.getByTitle(/Delete/));
 
     expect(handleControl).toBeCalledTimes(3);
   });

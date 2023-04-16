@@ -1,31 +1,30 @@
 import Button from '@/components/core/Button/Button';
-import { CONTROL, type ControlValue } from '@/constants/control';
+import { CONTROL, type ControlAction } from '@/constants/control';
 import { getKeyTitle } from '@/utils/string';
 import { ControlPanelContainer, ControlPanelRow } from './ControlPanelStyled';
 
 type Props = {
-  onControl: (type: ControlValue) => void;
+  onControl: (type: ControlAction) => void;
   enabledControls: {
     undo: boolean;
     redo: boolean;
-    clear: boolean;
+    deleteSelectedNodes: boolean;
   };
 };
 
 const ControlPanel = ({ enabledControls, onControl }: Props) => {
-  const getDisabledByControlValue = (value: ControlValue['type']) => {
-    switch (value) {
+  const getDisabledByControlValue = (action: ControlAction) => {
+    switch (action.type) {
       case 'history/undo':
         return !enabledControls.undo;
       case 'history/redo':
         return !enabledControls.redo;
-      case 'nodes/deleteAll':
-        return !enabledControls.clear;
+      case 'nodes/delete':
+        return !enabledControls.deleteSelectedNodes;
       default:
         return false;
     }
   };
-
   return (
     <ControlPanelContainer>
       <ControlPanelRow>
@@ -40,7 +39,7 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
                 control.key,
               ])}
               squared={true}
-              disabled={getDisabledByControlValue(control.value.type)}
+              disabled={getDisabledByControlValue(control.value)}
               onClick={() => onControl(control.value)}
             >
               {control.icon({})}

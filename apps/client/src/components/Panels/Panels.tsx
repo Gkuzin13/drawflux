@@ -2,6 +2,7 @@ import type Konva from 'konva';
 import { type RefObject, useMemo } from 'react';
 import { type NodeStyle, type NodeObject, Schemas } from 'shared';
 import { z } from 'zod';
+import type { ControlAction } from '@/constants/control';
 import { type MenuPanelActionType } from '@/constants/menu';
 import { type Tool } from '@/constants/tool';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
@@ -28,7 +29,8 @@ type Props = {
 };
 
 const Panels = ({ stageRef, isPageShared = false }: Props) => {
-  const { selectedNodeId, toolType } = useAppSelector(selectControl);
+  const { selectedNodeId, selectedNodesIds, toolType } =
+    useAppSelector(selectControl);
   const stageConfig = useAppSelector(selectStageConfig);
 
   const { past, present, future } = useAppSelector(selectNodes);
@@ -40,6 +42,14 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
   const selectedNode = useMemo(() => {
     return nodes.find((n) => n.nodeProps.id === selectedNodeId);
   }, [selectedNodeId, nodes]);
+
+  const enabledControls = useMemo(() => {
+    return {
+      undo: Boolean(past.length),
+      redo: Boolean(future.length),
+      deleteSelectedNodes: Boolean(selectedNodeId || selectedNodesIds.length),
+    };
+  }, [past, future, selectedNodesIds, selectedNodeId]);
 
   const stylePanelEnabledOptions = useMemo<
     StylePanelProps['enabledOptions']
@@ -121,6 +131,30 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
     dispatch(stageConfigActions.set({ ...stageConfig, scale: value }));
   };
 
+  const handleControlActions = (action: ControlAction) => {
+    switch (action.type) {
+      case 'nodes/delete': {
+        dispatch(
+          nodesActions.delete(
+            selectedNodeId ? [selectedNodeId] : selectedNodesIds,
+          ),
+        );
+        dispatch(
+          controlActions.set({
+            toolType,
+            selectedNodeId: null,
+            selectedNodesIds: [],
+          }),
+        );
+        break;
+      }
+      default: {
+        dispatch(action());
+        break;
+      }
+    }
+  };
+
   return (
     <>
       <SharePanel
@@ -137,12 +171,8 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
         />
       )}
       <ControlPanel
-        onControl={dispatch}
-        enabledControls={{
-          undo: Boolean(past.length),
-          redo: Boolean(future.length),
-          clear: Boolean(nodes.length),
-        }}
+        onControl={handleControlActions}
+        enabledControls={enabledControls}
       />
       <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
     </>

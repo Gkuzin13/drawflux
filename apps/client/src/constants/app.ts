@@ -15,6 +15,7 @@ export const PageState = z.object({
     control: z.object({
       toolType: ToolType,
       selectedNodeId: z.string().or(z.null()),
+      selectedNodesIds: z.string().array(),
     }),
   }),
 });

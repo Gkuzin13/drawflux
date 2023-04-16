@@ -7,26 +7,26 @@ import { historyActions } from '@/stores/slices/historySlice';
 import { nodesActions } from '@/stores/slices/nodesSlice';
 import { KEYS } from './keys.js';
 
-export type ControlValue = (typeof CONTROL)[number]['value'];
+export type ControlAction = (typeof CONTROL)[number]['value'];
 
 export const CONTROL = [
   {
     name: 'Undo',
-    value: historyActions.undo(),
+    value: historyActions.undo,
     icon: IoArrowUndoOutline,
     key: KEYS.Z,
     modifierKeys: [KEYS.CTRL],
   },
   {
     name: 'Redo',
-    value: historyActions.redo(),
+    value: historyActions.redo,
     icon: IoArrowRedoOutline,
     key: KEYS.Z,
     modifierKeys: [KEYS.CTRL, KEYS.SHIFT],
   },
   {
-    name: 'Clear',
-    value: nodesActions.deleteAll(),
+    name: 'Delete',
+    value: nodesActions.delete,
     icon: IoTrashOutline,
     key: KEYS.C,
     modifierKeys: [KEYS.CTRL],

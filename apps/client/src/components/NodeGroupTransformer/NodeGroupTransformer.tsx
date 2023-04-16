@@ -1,6 +1,6 @@
 import type Konva from 'konva';
-import { type KonvaEventObject } from 'konva/lib/Node';
-import { createElement, useState } from 'react';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import { createElement, useCallback, useState } from 'react';
 import { Group } from 'react-konva';
 import type { NodeObject } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
@@ -11,15 +11,10 @@ import NodeTransformer from '../NodeTransformer';
 
 type Props = {
   selectedNodes: NodeObject[];
-  onDragStart: (nodes: NodeObject[]) => void;
   onDragEnd: (nodes: NodeObject[]) => void;
 };
 
-const NodeGroupTransformer = ({
-  selectedNodes,
-  onDragStart,
-  onDragEnd,
-}: Props) => {
+const NodeGroupTransformer = ({ selectedNodes, onDragEnd }: Props) => {
   const [dragging, setDragging] = useState(false);
 
   const { transformerRef, nodeRef } = useTransformer<Konva.Group>([
@@ -27,25 +22,12 @@ const NodeGroupTransformer = ({
   ]);
 
   const onGroupDragStart = (event: KonvaEventObject<DragEvent>) => {
-    setDragging(true);
     const group = event.target as Konva.Group & Konva.Shape;
 
-    const nodeMap = new Map<string, NodeObject>(
-      selectedNodes.map((node) => [node.nodeProps.id, node]),
-    );
+    const layerChildren = group.getLayer()?.getChildren();
 
-    const hiddenNodes = group
-      .getChildren()
-      .map((child) => {
-        const node = nodeMap.get(child.attrs.id);
-
-        if (!node) return null;
-
-        return { ...node, nodeProps: { ...node.nodeProps, visible: false } };
-      })
-      .filter(Boolean) as NodeObject[];
-
-    onDragStart(hiddenNodes);
+    toggleDraggedNodesVisibility(layerChildren, false);
+    setDragging(true);
   };
 
   const onGroupDragEnd = (event: KonvaEventObject<DragEvent>) => {
@@ -53,14 +35,16 @@ const NodeGroupTransformer = ({
 
     const stage = group.getStage() as Konva.Stage;
 
-    const nodeMap = new Map<string, NodeObject>(
-      selectedNodes.map((node) => [node.nodeProps.id, node]),
-    );
+    const layerChildren = group.getLayer()?.getChildren();
+
+    toggleDraggedNodesVisibility(layerChildren, true);
 
     const updatedNodes = group
       .getChildren()
       .map((child) => {
-        const node = nodeMap.get(child.attrs.id);
+        const node = selectedNodes.find(
+          (node) => node.nodeProps.id === child.id(),
+        );
 
         if (!node) return;
 
@@ -79,7 +63,6 @@ const NodeGroupTransformer = ({
               ...node.nodeProps,
               point: firstPoint,
               points: restPoints,
-              visible: true,
             },
           };
         }
@@ -88,7 +71,7 @@ const NodeGroupTransformer = ({
 
         return {
           ...node,
-          nodeProps: { ...node.nodeProps, point: [x, y], visible: true },
+          nodeProps: { ...node.nodeProps, point: [x, y] },
         };
       })
       .filter(Boolean) as NodeObject[];
@@ -96,6 +79,21 @@ const NodeGroupTransformer = ({
     onDragEnd(updatedNodes);
     setDragging(false);
   };
+
+  const toggleDraggedNodesVisibility = useCallback(
+    (layerChildren: Konva.Group['children'], visibile: boolean) => {
+      for (const node of selectedNodes) {
+        const child = layerChildren?.find(
+          (child) => child.id() === node.nodeProps.id,
+        );
+
+        if (child) {
+          child.opacity(visibile ? 1 : 0);
+        }
+      }
+    },
+    [selectedNodes],
+  );
 
   return (
     <>

@@ -7,7 +7,8 @@ import { historyActions } from '@/stores/slices/historySlice';
 import { nodesActions } from '@/stores/slices/nodesSlice';
 
 function useKeydownListener() {
-  const { selectedNodeId, toolType } = useAppSelector(selectControl);
+  const { selectedNodeId, selectedNodesIds, toolType } =
+    useAppSelector(selectControl);
 
   const dispatch = useAppDispatch();
 
@@ -33,8 +34,19 @@ function useKeydownListener() {
         return;
       }
 
-      if (selectedNodeId && key === KEYS.DELETE) {
-        dispatch(nodesActions.delete([selectedNodeId]));
+      if (key === KEYS.DELETE) {
+        dispatch(
+          nodesActions.delete(
+            selectedNodeId ? [selectedNodeId] : selectedNodesIds,
+          ),
+        );
+        dispatch(
+          controlActions.set({
+            toolType,
+            selectedNodeId: null,
+            selectedNodesIds: [],
+          }),
+        );
         return;
       }
 
@@ -54,7 +66,7 @@ function useKeydownListener() {
     return () => {
       window.removeEventListener('keydown', handleKeyUp);
     };
-  }, [toolType, selectedNodeId]);
+  }, [toolType, selectedNodeId, selectedNodesIds]);
 }
 
 export default useKeydownListener;

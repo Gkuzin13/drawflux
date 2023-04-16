@@ -3,7 +3,9 @@ import {
   addListener,
   isAnyOf,
   type TypedStopListening,
-type  TypedStartListening, type TypedAddListener } from '@reduxjs/toolkit';
+  type TypedStartListening,
+  type TypedAddListener,
+} from '@reduxjs/toolkit';
 import { LOCAL_STORAGE, type PageStateType } from '@/constants/app';
 import { api } from '@/services/api';
 import { setToStorage } from '@/utils/storage';
@@ -30,7 +32,7 @@ export const addAppListener = addListener as TypedAddListener<
 >;
 
 const actionsToListenTo = [
-  controlActions.setSelectedNode,
+  controlActions.setSelectedNodeId,
   controlActions.setToolType,
   historyActions.undo,
   historyActions.redo,
