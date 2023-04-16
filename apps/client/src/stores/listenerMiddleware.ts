@@ -33,6 +33,7 @@ export const addAppListener = addListener as TypedAddListener<
 
 const actionsToListenTo = [
   controlActions.setSelectedNodeId,
+  controlActions.setSelectedNodesIds,
   controlActions.setToolType,
   historyActions.undo,
   historyActions.redo,
