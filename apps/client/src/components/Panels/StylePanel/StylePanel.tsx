@@ -1,4 +1,4 @@
-import type { NodeLIne, NodeStyle } from 'shared';
+import type { NodeColor, NodeLIne, NodeSize, NodeStyle } from 'shared';
 import { Divider } from '@/components/core/Divider/Divider';
 import { ICON_SIZES } from '@/constants/icon';
 import { ANIMATED, COLOR, LINE, SIZE } from '@/constants/style';
@@ -25,6 +25,29 @@ const StylePanel = ({
   enabledOptions,
   onStyleChange,
 }: StylePanelProps) => {
+  const handleColorSelect = (color: NodeColor) => {
+    onStyleChange({ ...style, color });
+  };
+
+  const handleLineSelect = (
+    value: NodeLIne,
+    name: (typeof LINE)[number]['name'],
+  ) => {
+    onStyleChange({
+      ...style,
+      animated: style.animated && name !== 'solid' ? true : false,
+      line: value,
+    });
+  };
+
+  const handleAnimatedSelect = () => {
+    onStyleChange({ ...style, animated: !style.animated });
+  };
+
+  const handleSizeSelect = (value: NodeSize) => {
+    onStyleChange({ ...style, size: value });
+  };
+
   return (
     <StylePanelContainer>
       <ColorPicker>
@@ -38,9 +61,9 @@ const StylePanel = ({
               color={
                 color.value === style.color ? 'secondary' : 'secondary-light'
               }
-              onClick={() => onStyleChange({ ...style, color: color.value })}
+              onClick={() => handleColorSelect(color.value)}
             >
-              <ColorCircle style={{ backgroundColor: color.value }} />
+              <ColorCircle css={{ backgroundColor: color.value }} />
             </StyleButton>
           );
         })}
@@ -56,16 +79,14 @@ const StylePanel = ({
                 size="small"
                 squared={true}
                 color={
-                  line.value === style?.line ? 'secondary' : 'secondary-light'
+                  line.value[0] === style.line[0] &&
+                  line.value[1] === style.line[1]
+                    ? 'secondary'
+                    : 'secondary-light'
                 }
-                onClick={() => {
-                  onStyleChange({
-                    ...style,
-                    animated:
-                      style.animated && line.name !== 'solid' ? true : false,
-                    line: line.value as NodeLIne,
-                  });
-                }}
+                onClick={() =>
+                  handleLineSelect(line.value as NodeLIne, line.name)
+                }
               >
                 {line.icon({ size: ICON_SIZES.LARGE })}
               </StyleButton>
@@ -78,9 +99,7 @@ const StylePanel = ({
             squared={true}
             color={style.animated ? 'primary' : 'secondary-light'}
             disabled={style.line.every((l) => l === 0)}
-            onClick={() =>
-              onStyleChange({ ...style, animated: !style.animated })
-            }
+            onClick={() => handleAnimatedSelect()}
           >
             {ANIMATED.icon({ size: ICON_SIZES.LARGE })}
           </StyleButton>
@@ -98,7 +117,7 @@ const StylePanel = ({
                 color={
                   size.value === style?.size ? 'secondary' : 'secondary-light'
                 }
-                onClick={() => onStyleChange({ ...style, size: size.value })}
+                onClick={() => handleSizeSelect(size.value)}
               >
                 {size.icon({ size: ICON_SIZES.LARGE, lineSize: size.value })}
               </StyleButton>
