@@ -19,8 +19,6 @@ function useKeydownListener() {
     switch (key) {
       case KEYS.Z:
         return shiftPressed ? historyActions.redo() : historyActions.undo();
-      case KEYS.C:
-        return nodesActions.deleteAll();
     }
   }, []);
 

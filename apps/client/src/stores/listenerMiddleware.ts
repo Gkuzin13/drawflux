@@ -42,7 +42,6 @@ const actionsToListenTo = [
   nodesActions.update,
   nodesActions.set,
   nodesActions.delete,
-  nodesActions.deleteAll,
   api.endpoints.getPage.matchRejected,
   api.endpoints.getPage.matchFulfilled,
 ];

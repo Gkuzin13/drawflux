@@ -38,9 +38,6 @@ export const nodesSlice = createSlice({
 
       state.nodes = state.nodes.filter((node) => !ids.has(node.nodeProps.id));
     },
-    deleteAll: (state) => {
-      state.nodes = [];
-    },
   },
   extraReducers(builder) {
     builder.addMatcher(
