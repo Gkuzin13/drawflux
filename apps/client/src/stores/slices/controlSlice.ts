@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type ControlState } from '@/constants/app';
 import { type Tool } from '@/constants/tool';
 import { type RootState } from '../store';
+import { historyActions } from './historySlice';
 
 const initialState: ControlState = {
   selectedNodeId: null,
@@ -31,6 +32,15 @@ export const controlSlice = createSlice({
     set: (state, action: PayloadAction<ControlState>) => {
       return (state = action.payload);
     },
+  },
+  extraReducers(builder) {
+    builder
+      .addMatcher(historyActions.redo.match, (state) => {
+        return { ...state, selectedNodeId: null, selectedNodesIds: [] };
+      })
+      .addMatcher(historyActions.undo.match, (state) => {
+        return { ...state, selectedNodeId: null, selectedNodesIds: [] };
+      });
   },
 });
 
