@@ -16,6 +16,4 @@ export const MenuPanelToggle = styled(Menu.Toggle, {
   backgroundColor: '$white',
 });
 
-export const MenuPanelDropdown = styled(Menu.Dropdown, {
-  backgroundColor: '$white',
-});
+export const MenuPanelDropdown = styled(Menu.Dropdown);
