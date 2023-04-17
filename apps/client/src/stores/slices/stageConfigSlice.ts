@@ -23,8 +23,9 @@ export const stageConfigSlice = createSlice({
       api.endpoints.getPage.matchFulfilled,
       (state, { payload }) => {
         if (payload.data) {
-          state = payload.data.page.stageConfig;
+          return payload.data.page.stageConfig;
         }
+        return state;
       },
     );
   },
