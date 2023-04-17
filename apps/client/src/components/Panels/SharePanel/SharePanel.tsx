@@ -14,6 +14,10 @@ const SharePanel = ({ pageState, isPageShared }: Props) => {
   const [sharePage, { isLoading, isSuccess }] = useSharePageMutation();
 
   const handlePageShare = async () => {
+    if (!pageState.page.nodes.length) {
+      return;
+    }
+
     const { data } = await sharePage(pageState).unwrap();
 
     if (data?.id) {
@@ -35,6 +39,7 @@ const SharePanel = ({ pageState, isPageShared }: Props) => {
               <Menu.Item
                 fullWidth={true}
                 size="small"
+                disabled={!pageState.page.nodes.length}
                 color="secondary-light"
                 closeOnItemClick={false}
                 onItemClick={handlePageShare}
