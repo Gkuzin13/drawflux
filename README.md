@@ -4,19 +4,14 @@
   </h1>
 </div>
 
-<div align="center">
-  <h2>
-    A drawing app
-  </h2>
-</div>
-
 # Features
 
 - Selection of tools - rectangle, ellipse, arrow, free-draw, text.
 - Customizable shape style - color, size, line-style, animation.
-- Export to PNG / JSON.
-- Undo / Redo.
 - Zoom and panning.
+- Undo / Redo.
+- Shareable read-only links.
+- Export to PNG / JSON.
 
 # Structure
 
