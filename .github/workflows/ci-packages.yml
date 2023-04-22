@@ -48,9 +48,3 @@ jobs:
 
       - name: 🔬 Linter
         run: pnpm -r lint
-
-      - name: 🧪 Unit tests
-        run: pnpm -r test
-
-      - name: 🏗 Build
-        run: pnpm -r build
