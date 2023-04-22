@@ -11,7 +11,7 @@ import type {
   GetPageArgs,
   PageRowObject,
 } from '../db/queries/types.js';
-import { loadRoute } from '../utils/route.js';
+import { loadRoute } from '../utils/route/route.js';
 
 const pageRouter = Router();
 
