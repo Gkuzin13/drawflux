@@ -5,8 +5,10 @@
   "type": "module",
   "private": true,
   "sideEffects": false,
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
+    "build": "tsc --project tsconfig.build.json",
     "lint": "eslint . --ext .ts",
     "fix-all-files": "eslint --fix . --ext .ts",
     "typecheck": "tsc --project ./tsconfig.json --noEmit"
