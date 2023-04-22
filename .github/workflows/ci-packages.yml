@@ -25,10 +25,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: apps/server
-
     strategy:
       matrix:
         node-version: [18.x]
