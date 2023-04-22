@@ -1,10 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["ESNext"],
-    "noEmit": false,
-    "outDir": "dist",
-    "declaration": true,
-    "declarationMap": true
+    "lib": ["ESNext"]
   },
   "include": ["src"],
   "extends": "../../tsconfig.base.json"

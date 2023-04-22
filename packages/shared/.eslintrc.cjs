@@ -8,6 +8,6 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   ignorePatterns: [...getDefaultIgnorePatterns()],
-  extends: ['../../packages/eslint-config-bases/src/bases/typescript'],
+  extends: ['@eslint-config-bases/typescript'],
   overrides: [],
 };
