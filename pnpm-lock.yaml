@@ -226,8 +226,8 @@ importers:
 
   packages/shared:
     devDependencies:
-      '@eslint-config-bases':
-        specifier: workspace:eslint-config-bases@latest
+      eslint-config-bases:
+        specifier: workspace:^
         version: link:../eslint-config-bases
 
 packages:

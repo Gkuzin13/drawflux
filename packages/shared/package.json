@@ -12,6 +12,6 @@
     "typecheck": "tsc --project ./tsconfig.json --noEmit"
   },
   "devDependencies": {
-    "@eslint-config-bases": "workspace:eslint-config-bases@latest"
+    "eslint-config-bases": "workspace:^"
   }
 }
