@@ -1,7 +1,5 @@
 import { defineConfig } from 'vitest/config';
 
-const testFiles = ['./**/*.test.{js,jsx,ts,tsx}'];
-
 export default defineConfig({
   test: {
     globals: true,
@@ -11,9 +9,7 @@ export default defineConfig({
       reporter: ['text', 'clover'],
       extension: ['js', 'ts'],
     },
-    include: testFiles,
-    // To mimic Jest behaviour regarding mocks.
-    // @link https://vitest.dev/config/#clearmocks
+    include: ['./**/*.test.{js,jsx,ts,tsx}'],
     clearMocks: true,
     mockReset: true,
     restoreMocks: true,

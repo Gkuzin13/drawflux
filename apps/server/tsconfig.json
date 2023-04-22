@@ -5,6 +5,7 @@
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "sourceMap": true,
+    "types": ["vitest/globals"],
     "baseUrl": "."
   },
   "include": ["src"]
