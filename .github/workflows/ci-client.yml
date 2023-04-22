@@ -44,7 +44,7 @@ jobs:
         uses: ./.github/actions/pnpm-install
 
       - name: Build Packages
-        working_directory: ./
+        working-directory: ./
         run: pnpm packages:build
 
       - name: 🕵️ Typecheck
