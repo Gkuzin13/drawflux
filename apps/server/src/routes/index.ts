@@ -1,6 +1,6 @@
-import type { Express } from 'express';
-import { pageRouter } from './page.js';
+import type { Application } from 'express';
+import { pageRouter } from './page/page.js';
 
-export const mountRoutes = (app: Express) => {
+export const mountRoutes = (app: Application) => {
   app.use('/p', pageRouter);
 };

@@ -1,12 +1,12 @@
 import type { Request, Response, NextFunction } from 'express';
 
-type LoadRouteHandler<T> = (
+type LoadRouteHandler = (
   req: Request,
   res: Response,
   next: NextFunction,
-) => Promise<T>;
+) => Promise<unknown>;
 
-export const loadRoute = <T>(handler: LoadRouteHandler<T>) => {
+export const loadRoute = (handler: LoadRouteHandler) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const response = await handler(req, res, next);

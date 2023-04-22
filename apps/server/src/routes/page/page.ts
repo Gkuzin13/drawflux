@@ -4,20 +4,20 @@ import pg from 'pg';
 import type { SharePageParams, SharePageResponse } from 'shared';
 import { BadRequestError, Schemas } from 'shared';
 import { ZodError } from 'zod';
-import * as db from '../db/index.js';
-import { queries } from '../db/queries/index.js';
+import * as db from '../../db/index.js';
+import { queries } from '../../db/queries/index.js';
 import type {
   SharePageArgs,
   GetPageArgs,
   PageRowObject,
-} from '../db/queries/types.js';
-import { loadRoute } from '../utils/route/route.js';
+} from '../../db/queries/types.js';
+import { loadRoute } from '../../utils/route/route.js';
 
 const pageRouter = Router();
 
 pageRouter.get(
   '/:id',
-  loadRoute<SharePageParams>(async (req) => {
+  loadRoute(async (req) => {
     const client = await db.getClient();
 
     try {
