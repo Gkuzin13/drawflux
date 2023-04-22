@@ -43,7 +43,8 @@ jobs:
       - name: 📥 Monorepo install
         uses: ./.github/actions/pnpm-install
 
-      - name: Build Packages
+      - name: 🏗 Build Packages
+        working-directory: ./
         run: pnpm packages:build
 
       - name: 🕵️ Typecheck
