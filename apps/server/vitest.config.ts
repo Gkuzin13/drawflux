@@ -9,7 +9,10 @@ export default defineConfig({
       reporter: ['text', 'clover'],
       extension: ['js', 'ts'],
     },
-    include: ['./**/*.test.{js,jsx,ts,tsx}'],
+    deps: {
+      inline: [/shared/],
+    },
+    include: ['./src/**/*.test.{js,ts}'],
     clearMocks: true,
     mockReset: true,
     restoreMocks: true,
