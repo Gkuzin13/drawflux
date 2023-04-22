@@ -43,8 +43,11 @@ jobs:
       - name: 📥 Monorepo install
         uses: ./.github/actions/pnpm-install
 
+      - name: 🔬 Linter
+        run: pnpm packages:build
+
       - name: 🕵️ Typecheck
-        run: pnpm -r typecheck
+        run: pnpm packages:typecheck
 
       - name: 🔬 Linter
-        run: pnpm -r lint
+        run: pnpm packages:lint
