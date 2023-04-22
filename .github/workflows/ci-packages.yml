@@ -24,6 +24,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/server
+
     strategy:
       matrix:
         node-version: [18.x]
@@ -39,13 +44,13 @@ jobs:
         uses: ./.github/actions/pnpm-install
 
       - name: 🕵️ Typecheck
-        run: pnpm --filter ./packages/ -r typecheck
+        run: pnpm -r typecheck
 
       - name: 🔬 Linter
-        run: pnpm --filter ./packages/ -r lint
+        run: pnpm -r lint
 
       - name: 🧪 Unit tests
-        run: pnpm --filter ./packages/ -r test
+        run: pnpm -r test
 
       - name: 🏗 Build
-        run: pnpm --filter ./packages/ -r build
+        run: pnpm -r build

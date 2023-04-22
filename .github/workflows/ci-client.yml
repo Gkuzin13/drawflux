@@ -44,13 +44,13 @@ jobs:
         uses: ./.github/actions/pnpm-install
 
       - name: 🕵️ Typecheck
-        run: pnpm --filter ./apps/client typecheck
+        run: pnpm typecheck
 
       - name: 🔬 Linter
-        run: pnpm --filter ./apps/client lint
+        run: pnpm lint
 
       - name: 🧪 Unit tests
-        run: pnpm --filter ./apps/client test
+        run: pnpm test
 
       - name: 🏗 Build client
-        run: pnpm --filter ./apps/client build
+        run: pnpm build
