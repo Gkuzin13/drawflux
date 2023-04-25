@@ -1,5 +1,5 @@
 import type { ContextMenuItem } from '@/constants/menu';
-import { ContextMenuButton, ContextMenuContainer } from './ContextMenuStyled';
+import Menu from '../core/Menu/Menu';
 
 type Props = {
   items: ContextMenuItem[];
@@ -8,22 +8,24 @@ type Props = {
 
 const NodeMenu = ({ items, onAction }: Props) => {
   return (
-    <ContextMenuContainer>
+    <Menu.Dropdown opened={true}>
       {items.map((item) => {
         return (
-          <ContextMenuButton
+          <Menu.Item
             key={item.key}
             title={item.name}
+            fullWidth={true}
+            spanned={true}
             size="small"
             color="secondary-light"
-            onClick={() => onAction(item.key)}
+            onItemClick={() => onAction(item.key)}
           >
             {item.name}
             {item.icon && item.icon({})}
-          </ContextMenuButton>
+          </Menu.Item>
         );
       })}
-    </ContextMenuContainer>
+    </Menu.Dropdown>
   );
 };
 

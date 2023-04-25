@@ -11,6 +11,7 @@ export const PopoverContainer = styled('div', {
 export const PopoverDropdown = styled('div', {
   display: 'flex',
   flexDirection: 'column',
+  gap: '$1',
   boxShadow: '$small',
   padding: '$1',
   borderRadius: '$1',
