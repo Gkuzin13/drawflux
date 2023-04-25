@@ -6,7 +6,7 @@ import type { Tool } from '@/constants/tool';
 import { useAppDispatch } from '../stores/hooks';
 import { controlActions } from '../stores/slices/controlSlice';
 import { nodesActions } from '../stores/slices/nodesSlice';
-import BackgroundLayerRect from './BackgroundLayerRect';
+import BackgroundLayer from './BackgroundLayer';
 import DraftNode from './Node/DraftNode';
 import NodeGroupTransformer from './NodeGroupTransformer/NodeGroupTransformer';
 import Nodes from './Nodes';
@@ -45,7 +45,9 @@ const NodesLayer = ({
   };
 
   const handleNodePress = (nodeId: string) => {
-    dispatch(controlActions.setSelectedNodeId(nodeId));
+    if (toolType === 'select') {
+      dispatch(controlActions.setSelectedNodeId(nodeId));
+    }
   };
 
   const selectedNodes = useMemo(() => {
@@ -55,7 +57,7 @@ const NodesLayer = ({
 
   return (
     <Layer listening={config?.listening}>
-      <BackgroundLayerRect {...backgroundLayerRect} />
+      <BackgroundLayer {...backgroundLayerRect} />
       <Nodes
         nodes={nodes}
         selectedNodeId={selectedNodeId}
