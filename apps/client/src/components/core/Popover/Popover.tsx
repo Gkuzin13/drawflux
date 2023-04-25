@@ -1,4 +1,10 @@
-import { type PropsWithChildren, type ReactNode, useContext, useRef } from 'react';
+import {
+  type PropsWithChildren,
+  type ReactNode,
+  useContext,
+  useRef,
+  forwardRef,
+} from 'react';
 import { useClickAway } from '@/hooks/useClickAway';
 import useDisclosure from '@/hooks/useDisclosure/useDisclosure';
 import Button from '../Button/Button';
@@ -12,8 +18,13 @@ export type PopoverToggleProps = PropsWithChildren<
 
 export type PopoverProps = typeof PopoverContainer.defaultProps & {
   initiallyOpened?: boolean;
-  children: ReactNode[];
+  closeOnClickAway?: boolean;
+  children: ReactNode[] | ReactNode;
 };
+
+type DropdownProps = PropsWithChildren<{
+  opened?: boolean;
+}>;
 
 const Toggle = ({ children, ...props }: PopoverToggleProps) => {
   const ctx = useContext(PopoverContext);
@@ -25,10 +36,10 @@ const Toggle = ({ children, ...props }: PopoverToggleProps) => {
   );
 };
 
-const Dropdown = ({ children }: PropsWithChildren) => {
+const Dropdown = ({ opened = false, children }: DropdownProps) => {
   const ctx = useContext(PopoverContext);
 
-  return ctx?.opened ? (
+  return opened || ctx?.opened ? (
     <PopoverDropdown data-testid="popover-dropdown">{children}</PopoverDropdown>
   ) : null;
 };
@@ -36,13 +47,14 @@ const Dropdown = ({ children }: PropsWithChildren) => {
 const Popover = ({
   children,
   initiallyOpened = false,
+  closeOnClickAway = true,
   ...restProps
 }: PopoverProps) => {
   const [opened, { close, toggle }] = useDisclosure(initiallyOpened);
 
   const ref = useRef<HTMLDivElement>(null);
 
-  useClickAway(ref, close);
+  useClickAway(ref, () => closeOnClickAway && close());
 
   return (
     <PopoverContext.Provider value={{ opened, toggle, close }}>
