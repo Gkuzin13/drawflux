@@ -86,6 +86,7 @@ const ResizableText = ({
         <NodeTransformer
           ref={transformerRef}
           transformerConfig={{
+            id: node.nodeProps.id,
             enabledAnchors: ['middle-left', 'middle-right'],
           }}
           transformerEvents={{

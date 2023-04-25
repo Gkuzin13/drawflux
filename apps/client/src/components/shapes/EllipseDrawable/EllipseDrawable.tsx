@@ -93,7 +93,12 @@ const EllipseDrawable = memo(
           onTap={() => onPress(node.nodeProps.id)}
           onClick={() => onPress(node.nodeProps.id)}
         />
-        {selected && <NodeTransformer ref={transformerRef} />}
+        {selected && (
+          <NodeTransformer
+            ref={transformerRef}
+            transformerConfig={{ id: node.nodeProps.id }}
+          />
+        )}
       </>
     );
   },
