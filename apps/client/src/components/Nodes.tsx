@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { NodeObject } from 'shared';
 import type { Tool } from '@/constants/tool';
 import Node from './Node/Node';
@@ -17,6 +18,7 @@ const Nodes = ({
   onNodePress,
   onNodeChange,
 }: Props) => {
+  const isDraggable = useMemo(() => toolType === 'select', [toolType]);
   return (
     <>
       {nodes.map((node) => {
@@ -25,7 +27,7 @@ const Nodes = ({
             key={node.nodeProps.id}
             node={node}
             selected={selectedNodeId === node.nodeProps.id}
-            draggable={toolType !== 'hand'}
+            draggable={isDraggable}
             onPress={onNodePress}
             onNodeChange={onNodeChange}
           />

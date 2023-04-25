@@ -13,7 +13,7 @@ import { Layer, Stage } from 'react-konva';
 import { Html } from 'react-konva-utils';
 import type { NodeObject, Point } from 'shared';
 import { CURSOR } from '@/constants/cursor';
-import { BACKGROUND_LAYER_RECT_ID } from '@/constants/element';
+import { BACKGROUND_LAYER_ID } from '@/constants/element';
 import {
   STAGE_CONTEXT_MENU_ACTIONS,
   NODE_CONTEXT_MENU_ACTIONS,
@@ -88,7 +88,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       }
     }, [drawing, toolType, draggingStage]);
 
-    const offsetBackgroundLayerRect = useMemo(() => {
+    const offsetBackgroundLayerRect = useMemo<IRect>(() => {
       if (!ref || typeof ref === 'function' || !ref.current) {
         return {
           x: 0,
@@ -152,11 +152,12 @@ const DrawingCanvas = forwardRef<Ref, Props>(
             return Konva.Util.haveIntersection(selectRect, c.getClientRect());
           });
         }
-
         return Konva.Util.haveIntersection(selectRect, child.getClientRect());
       });
 
-      const intersectedIds = intersectedChildren.map((child) => child.attrs.id);
+      const intersectedIds: string[] = intersectedChildren.map(
+        (child) => child.attrs.id,
+      );
 
       setIntersectedNodes(
         nodes.filter((node) => intersectedIds.includes(node.nodeProps.id)),
@@ -181,10 +182,10 @@ const DrawingCanvas = forwardRef<Ref, Props>(
         return;
       }
 
-      const isGroup = e.target.parent?.nodeType === 'Group';
-      const shape = isGroup ? e.target.parent : e.target;
+      const shape =
+        e.target.parent?.nodeType === 'Group' ? e.target.parent : e.target;
 
-      const node = nodes.find((node) => node.nodeProps.id === shape?.attrs.id);
+      const node = nodes.find((node) => node.nodeProps.id === shape?.id());
 
       if (node) {
         dispatch(controlActions.setSelectedNodeId(node.nodeProps.id));
@@ -216,17 +217,15 @@ const DrawingCanvas = forwardRef<Ref, Props>(
     };
 
     const onStagePress = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
-      if (
-        event.type === 'mousedown' &&
-        (event.evt as MouseEvent).button !== 0
-      ) {
+      const isMouseEvent = event.type === 'mousedown';
+
+      if (isMouseEvent && (event.evt as MouseEvent).button !== 0) {
         return;
       }
 
       const stage = event.target.getStage();
 
       const clickedOnEmpty = event.target === stage;
-
       if (!clickedOnEmpty) {
         return;
       }
@@ -267,11 +266,9 @@ const DrawingCanvas = forwardRef<Ref, Props>(
     };
 
     const onStageMove = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
-      if (!drawing) return;
-
       const stage = event.target.getStage();
 
-      if (!stage) return;
+      if (!drawing || !stage) return;
 
       const { x, y } = stage.getRelativePointerPosition();
 
@@ -364,7 +361,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
         const layer = stage.getLayers()[0];
 
         const backgroundLayerRect = layer.children?.find(
-          (child) => child.id() === BACKGROUND_LAYER_RECT_ID,
+          (child) => child.id() === BACKGROUND_LAYER_ID,
         );
 
         if (!backgroundLayerRect) {
@@ -423,8 +420,8 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           nodes={nodes}
           draftNode={draftNode}
           selectedNodeId={selectedNodeId}
-          toolType={toolType}
           selectedNodesIds={selectedNodesIds}
+          toolType={toolType}
           config={{ ...config, listening: !drawing }}
           backgroundLayerRect={offsetBackgroundLayerRect}
           onDraftEnd={handleDraftEnd}
@@ -447,7 +444,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           </Html>
         </NodesLayer>
         {selectRect && (
-          <Layer listening={!drawing}>
+          <Layer>
             <SelectTool rect={selectRect} ref={selectRectRef} />
           </Layer>
         )}

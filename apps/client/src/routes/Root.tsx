@@ -1,6 +1,7 @@
 import type Konva from 'konva';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import type { StageConfig } from 'shared';
 import Loader from '@/components/core/Loader/Loader';
 import Modal from '@/components/core/Modal/Modal';
 import DrawingCanvas from '@/components/DrawingCanvas/DrawingCanvas';
@@ -75,6 +76,20 @@ const Root = () => {
     }
   }, [isError, dispatch]);
 
+  const drawingCanvasConfig = useMemo(() => {
+    return {
+      width,
+      height,
+      scale: { x: stageConfig.scale, y: stageConfig.scale },
+      x: stageConfig.position.x,
+      y: stageConfig.position.y,
+    };
+  }, [stageConfig, width, height]);
+
+  const handleStageConfigChange = (config: Partial<StageConfig>) => {
+    dispatch(stageConfigActions.set(config));
+  };
+
   if (isLoading) {
     return <Loader fullScreen={true}>Loading</Loader>;
   }
@@ -84,14 +99,8 @@ const Root = () => {
       <Panels isPageShared={isSuccess} stageRef={stageRef} />
       <DrawingCanvas
         ref={stageRef}
-        config={{
-          width,
-          height,
-          scale: { x: stageConfig.scale, y: stageConfig.scale },
-          x: stageConfig.position.x,
-          y: stageConfig.position.y,
-        }}
-        onConfigChange={(config) => dispatch(stageConfigActions.set(config))}
+        config={drawingCanvasConfig}
+        onConfigChange={handleStageConfigChange}
       />
       {modal.open && (
         <Modal
