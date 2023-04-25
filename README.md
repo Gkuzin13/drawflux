@@ -4,6 +4,8 @@
   </h1>
 </div>
 
+![drawflux web app screenshot](./assets/screenshot.png)
+
 # Features
 
 - Selection of tools - rectangle, ellipse, arrow, free-draw, text.
