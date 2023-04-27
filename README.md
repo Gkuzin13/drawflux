@@ -11,7 +11,7 @@
 - Selection of tools - rectangle, ellipse, arrow, free-draw, text.
 - Customizable shape style - color, size, line-style, animation.
 - Zoom and panning.
-- Undo / Redo.
+- History undo / redo.
 - Shareable read-only links.
 - Export to PNG / JSON.
 
