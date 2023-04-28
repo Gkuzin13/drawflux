@@ -24,13 +24,13 @@ const EllipseDrawable = memo(
 
     const { scale: stageScale } = useAppSelector(selectStageConfig);
 
-    const scaledDash = useMemo(() => {
+    const scaledLine = useMemo(() => {
       return node.style.line.map((l) => l * stageScale);
     }, [node.style.line, stageScale]);
 
     useAnimatedLine(
       nodeRef.current,
-      scaledDash[0] + scaledDash[1],
+      scaledLine[0] + scaledLine[1],
       node.style.animated,
       node.style.line,
     );
@@ -41,12 +41,12 @@ const EllipseDrawable = memo(
         id: node.nodeProps.id,
         rotation: node.nodeProps.rotation,
         stroke: node.style.color,
-        strokeWidth: node.style.size,
+        strokeWidth: node.style.size * stageScale,
         opacity: node.style.opacity,
-        dash: scaledDash,
+        dash: scaledLine,
         draggable,
       });
-    }, [node.nodeProps, node.style, draggable, scaledDash]);
+    }, [node.nodeProps, node.style, draggable, scaledLine, stageScale]);
 
     const handleDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {

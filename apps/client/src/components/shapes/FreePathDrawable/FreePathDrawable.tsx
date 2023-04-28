@@ -22,13 +22,13 @@ const FreePathDrawable = memo(
     const { nodeRef, transformerRef } = useTransformer<Konva.Line>([selected]);
     const { scale: stageScale } = useAppSelector(selectStageConfig);
 
-    const scaledDash = useMemo(() => {
+    const scaledLine = useMemo(() => {
       return node.style.line.map((l) => l * stageScale);
     }, [node.style.line, stageScale]);
 
     useAnimatedLine(
       nodeRef.current,
-      scaledDash[0] + scaledDash[1],
+      scaledLine[0] + scaledLine[1],
       node.style.animated,
       node.style.line,
     );
@@ -43,12 +43,12 @@ const FreePathDrawable = memo(
         id: node.nodeProps.id,
         rotation: node.nodeProps.rotation,
         stroke: node.style.color,
-        strokeWidth: node.style.size,
-        dash: scaledDash,
+        strokeWidth: node.style.size * stageScale,
+        dash: scaledLine,
         opacity: node.style.opacity,
         draggable,
       });
-    }, [node.style, node.nodeProps, draggable, scaledDash]);
+    }, [node.style, node.nodeProps, draggable, scaledLine, stageScale]);
 
     const handleDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {

@@ -6,8 +6,6 @@ import { type PropsWithRef, useCallback, useRef, useMemo } from 'react';
 import { Line } from 'react-konva';
 import type { NodeStyle, NodeLIne, Point } from 'shared';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
-import { useAppSelector } from '@/stores/hooks';
-import { selectStageConfig } from '@/stores/slices/stageConfigSlice';
 
 type Props = PropsWithRef<{
   points: Point[];
@@ -18,22 +16,11 @@ type Props = PropsWithRef<{
 }>;
 
 const ArrowLine = ({ dash, animated, points, control, config }: Props) => {
-  const { scale: stageScale } = useAppSelector(selectStageConfig);
-
   const lineRef = useRef<Konva.Line>(null);
-
-  const scaledDash = useMemo(() => {
-    return dash.map((l) => l * stageScale);
-  }, [dash, stageScale]);
 
   const flattenedPoints = useMemo(() => points.flat(), [points]);
 
-  useAnimatedLine(
-    lineRef.current,
-    scaledDash[0] + scaledDash[1],
-    animated,
-    dash,
-  );
+  useAnimatedLine(lineRef.current, dash[0] + dash[1], animated, dash);
 
   const [start, end] = points;
 
@@ -53,7 +40,8 @@ const ArrowLine = ({ dash, animated, points, control, config }: Props) => {
     <Line
       ref={lineRef}
       {...config}
-      dash={scaledDash}
+      dash={dash}
+      strokeWidth={config.strokeWidth}
       points={flattenedPoints}
       sceneFunc={drawLine}
     />

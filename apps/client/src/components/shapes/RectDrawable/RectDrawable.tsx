@@ -2,6 +2,7 @@ import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { memo, useCallback, useMemo } from 'react';
 import { Rect } from 'react-konva';
+import type { NodeLIne } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import NodeTransformer from '@/components/NodeTransformer';
 import { createDefaultNodeConfig } from '@/constants/element';
@@ -22,13 +23,13 @@ const RectDrawable = memo(
 
     const { scale: stageScale } = useAppSelector(selectStageConfig);
 
-    const scaledDash = useMemo(() => {
-      return node.style.line.map((l) => l * stageScale);
+    const scaledLine = useMemo(() => {
+      return node.style.line.map((l) => l * stageScale) as NodeLIne;
     }, [node.style.line, stageScale]);
 
     useAnimatedLine(
       nodeRef.current,
-      scaledDash[0] + scaledDash[1],
+      scaledLine[0] + scaledLine[1],
       node.style.animated,
       node.style.line,
     );
@@ -38,13 +39,13 @@ const RectDrawable = memo(
         visible: node.nodeProps.visible,
         id: node.nodeProps.id,
         rotation: node.nodeProps.rotation,
-        strokeWidth: node.style.size,
+        strokeWidth: node.style.size * stageScale,
         stroke: node.style.color,
         opacity: node.style.opacity,
-        dash: scaledDash,
+        dash: scaledLine,
         draggable,
       });
-    }, [node.nodeProps, node.style, draggable, scaledDash]);
+    }, [node.nodeProps, node.style, draggable, scaledLine, stageScale]);
 
     const handleDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {

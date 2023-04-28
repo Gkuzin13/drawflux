@@ -2,9 +2,11 @@ import type Konva from 'konva';
 import { type KonvaEventObject } from 'konva/lib/Node';
 import { memo, useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { Group } from 'react-konva';
-import { type Point, type NodeProps } from 'shared';
+import type { Point, NodeProps, NodeLIne } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import { createDefaultNodeConfig } from '@/constants/element';
+import { useAppSelector } from '@/stores/hooks';
+import { selectStageConfig } from '@/stores/slices/stageConfigSlice';
 import { getValueFromRatio } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import ArrowHead from './ArrowHead';
@@ -31,6 +33,12 @@ const ArrowDrawable = memo(
     );
     const [dragging, setDragging] = useState(false);
 
+    const { scale: stageScale } = useAppSelector(selectStageConfig);
+
+    const scaledLine = useMemo(() => {
+      return node.style.line.map((l) => l * stageScale) as NodeLIne;
+    }, [node.style.line, stageScale]);
+
     useLayoutEffect(() => {
       setPoints([
         node.nodeProps.point,
@@ -45,10 +53,10 @@ const ArrowDrawable = memo(
     const config = useMemo(() => {
       return createDefaultNodeConfig({
         stroke: node.style.color,
-        strokeWidth: node.style.size,
+        strokeWidth: node.style.size * stageScale,
         visible: node.nodeProps.visible,
       });
-    }, [node.style.color, node.style.size, node.nodeProps.visible]);
+    }, [node.style.color, node.style.size, node.nodeProps.visible, stageScale]);
 
     const { minPoint, maxPoint } = useMemo(() => {
       return calculateMinMaxMovementPoints(start, end);
@@ -134,7 +142,7 @@ const ArrowDrawable = memo(
           <ArrowLine
             points={[start, end]}
             control={[control.x, control.y]}
-            dash={node.style.line}
+            dash={scaledLine}
             animated={node.style.animated}
             config={config}
           />
