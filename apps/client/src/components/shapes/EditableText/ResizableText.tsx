@@ -1,4 +1,6 @@
 import type Konva from 'konva';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import { useCallback, useMemo } from 'react';
 import { Text } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import { createDefaultNodeConfig } from '@/constants/element';
@@ -19,21 +21,60 @@ const ResizableText = ({
 }: Props) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Text>([selected]);
 
-  const { nodeProps, style } = node;
+  const config = useMemo(() => {
+    return createDefaultNodeConfig({
+      visible: node.nodeProps.visible,
+      fill: node.style.color,
+      id: node.nodeProps.id,
+      rotation: node.nodeProps.rotation,
+      fillEnabled: true,
+      opacity: node.style.opacity,
+      strokeWidth: 0,
+      draggable,
+      fontSize: node.style.size * 8,
+      height: node.nodeProps.height,
+      width: node.nodeProps.width,
+    });
+  }, [node.nodeProps, node.style, draggable]);
 
-  const config = createDefaultNodeConfig({
-    visible: nodeProps.visible,
-    fill: style.color,
-    id: nodeProps.id,
-    rotation: nodeProps.rotation,
-    fillEnabled: true,
-    opacity: style.opacity,
-    strokeWidth: 0,
-    draggable,
-    fontSize: style.size * 8,
-    height: nodeProps.height,
-    width: nodeProps.width,
-  });
+  const handleDragEnd = useCallback(
+    (event: KonvaEventObject<DragEvent>) => {
+      onNodeChange({
+        ...node,
+        nodeProps: {
+          ...node.nodeProps,
+          point: [event.target.x(), event.target.y()],
+        },
+      });
+    },
+    [node, onNodeChange],
+  );
+
+  const handleTransform = useCallback((event: KonvaEventObject<Event>) => {
+    const textNode = event.target as Konva.Text;
+
+    textNode.width(getNodeSize(textNode.width(), textNode.scaleX()));
+    textNode.scale({ x: 1, y: 1 });
+  }, []);
+
+  const handleTransformEnd = useCallback(
+    (event: KonvaEventObject<Event>) => {
+      const textNode = event.target as Konva.Text;
+
+      onNodeChange({
+        ...node,
+        nodeProps: {
+          ...node.nodeProps,
+          point: [textNode.x(), textNode.y()],
+          width: getNodeSize(textNode.width(), textNode.scaleX()),
+          rotation: textNode.rotation(),
+        },
+      });
+
+      textNode.scale({ x: 1, y: 1 });
+    },
+    [node, onNodeChange],
+  );
 
   function getNodeSize(width: number, scale: number, min = 20) {
     return Math.max(width * scale, min);
@@ -43,42 +84,15 @@ const ResizableText = ({
     <>
       <Text
         ref={nodeRef}
-        x={nodeProps.point[0]}
-        y={nodeProps.point[1]}
+        x={node.nodeProps.point[0]}
+        y={node.nodeProps.point[1]}
         text={node.text || ''}
         lineHeight={1.5}
         {...config}
         onDragStart={() => onPress(node.nodeProps.id)}
-        onDragEnd={(event) => {
-          onNodeChange({
-            ...node,
-            nodeProps: {
-              ...nodeProps,
-              point: [event.target.x(), event.target.y()],
-            },
-          });
-        }}
-        onTransform={(event) => {
-          const textNode = event.target as Konva.Text;
-
-          textNode.width(getNodeSize(textNode.width(), textNode.scaleX()));
-          textNode.scale({ x: 1, y: 1 });
-        }}
-        onTransformEnd={(event) => {
-          const textNode = event.target as Konva.Text;
-
-          onNodeChange({
-            ...node,
-            nodeProps: {
-              ...nodeProps,
-              point: [textNode.x(), textNode.y()],
-              width: getNodeSize(textNode.width(), textNode.scaleX()),
-              rotation: textNode.rotation(),
-            },
-          });
-
-          textNode.scale({ x: 1, y: 1 });
-        }}
+        onDragEnd={handleDragEnd}
+        onTransform={handleTransform}
+        onTransformEnd={handleTransformEnd}
         onTap={() => onPress(node.nodeProps.id)}
         onClick={() => onPress(node.nodeProps.id)}
       />
