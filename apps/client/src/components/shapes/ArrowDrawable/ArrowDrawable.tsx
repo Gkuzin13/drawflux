@@ -1,18 +1,10 @@
 import type Konva from 'konva';
 import { type KonvaEventObject } from 'konva/lib/Node';
-import {
-  memo,
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { memo, useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { Group } from 'react-konva';
 import { type Point, type NodeProps } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import { createDefaultNodeConfig } from '@/constants/element';
-import useAnimatedLine from '@/hooks/useAnimatedLine';
 import { getValueFromRatio } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import ArrowHead from './ArrowHead';
@@ -47,15 +39,6 @@ const ArrowDrawable = memo(
 
       setBendValue(node.nodeProps.bend ?? defaultBend);
     }, [node.nodeProps.point, node.nodeProps.points, node.nodeProps.bend]);
-
-    const lineRef = useRef<Konva.Line>(null);
-
-    useAnimatedLine(
-      lineRef.current,
-      node.style.line[0] + node.style.line[1],
-      node.style.animated,
-      node.style.line,
-    );
 
     const [start, end] = points;
 
@@ -149,10 +132,10 @@ const ArrowDrawable = memo(
             config={config}
           />
           <ArrowLine
-            ref={lineRef}
             points={[start, end]}
             control={[control.x, control.y]}
             dash={node.style.line}
+            animated={node.style.animated}
             config={config}
           />
         </Group>

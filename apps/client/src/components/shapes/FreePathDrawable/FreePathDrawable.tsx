@@ -6,6 +6,8 @@ import type { NodeComponentProps } from '@/components/Node/Node';
 import { createDefaultNodeConfig } from '@/constants/element';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
 import useTransformer from '@/hooks/useTransformer';
+import { useAppSelector } from '@/stores/hooks';
+import { selectStageConfig } from '@/stores/slices/stageConfigSlice';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import NodeTransformer from '../../NodeTransformer';
 
@@ -18,10 +20,15 @@ const FreePathDrawable = memo(
     onPress,
   }: NodeComponentProps) => {
     const { nodeRef, transformerRef } = useTransformer<Konva.Line>([selected]);
+    const { scale: stageScale } = useAppSelector(selectStageConfig);
+
+    const scaledDash = useMemo(() => {
+      return node.style.line.map((l) => l * stageScale);
+    }, [node.style.line, stageScale]);
 
     useAnimatedLine(
       nodeRef.current,
-      node.style.line[0] + node.style.line[1],
+      scaledDash[0] + scaledDash[1],
       node.style.animated,
       node.style.line,
     );
@@ -37,11 +44,11 @@ const FreePathDrawable = memo(
         rotation: node.nodeProps.rotation,
         stroke: node.style.color,
         strokeWidth: node.style.size,
-        dash: node.style.line,
+        dash: scaledDash,
         opacity: node.style.opacity,
         draggable,
       });
-    }, [node.style, node.nodeProps, draggable]);
+    }, [node.style, node.nodeProps, draggable, scaledDash]);
 
     const handleDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {

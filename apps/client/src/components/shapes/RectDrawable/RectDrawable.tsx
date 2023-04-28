@@ -7,6 +7,8 @@ import NodeTransformer from '@/components/NodeTransformer';
 import { createDefaultNodeConfig } from '@/constants/element';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
 import useTransformer from '@/hooks/useTransformer';
+import { useAppSelector } from '@/stores/hooks';
+import { selectStageConfig } from '@/stores/slices/stageConfigSlice';
 
 const RectDrawable = memo(
   ({
@@ -18,9 +20,15 @@ const RectDrawable = memo(
   }: NodeComponentProps) => {
     const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
 
+    const { scale: stageScale } = useAppSelector(selectStageConfig);
+
+    const scaledDash = useMemo(() => {
+      return node.style.line.map((l) => l * stageScale);
+    }, [node.style.line, stageScale]);
+
     useAnimatedLine(
       nodeRef.current,
-      node.style.line[0] + node.style.line[1],
+      scaledDash[0] + scaledDash[1],
       node.style.animated,
       node.style.line,
     );
@@ -33,10 +41,10 @@ const RectDrawable = memo(
         strokeWidth: node.style.size,
         stroke: node.style.color,
         opacity: node.style.opacity,
-        dash: node.style.line,
+        dash: scaledDash,
         draggable,
       });
-    }, [node.nodeProps, node.style, draggable]);
+    }, [node.nodeProps, node.style, draggable, scaledDash]);
 
     const handleDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
