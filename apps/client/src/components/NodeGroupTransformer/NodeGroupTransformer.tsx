@@ -1,10 +1,9 @@
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { createElement, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Group } from 'react-konva';
 import type { NodeObject } from 'shared';
-import type { NodeComponentProps } from '@/components/Node/Node';
-import { getElement } from '@/constants/element';
+import Node from '@/components/Node/Node';
 import useTransformer from '@/hooks/useTransformer';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import NodeTransformer from '../NodeTransformer';
@@ -40,7 +39,7 @@ const NodeGroupTransformer = ({ selectedNodes, onDragEnd }: Props) => {
     toggleDraggedNodesVisibility(layerChildren, true);
 
     const updatedNodes = group
-      .getChildren()
+      .getChildren((child) => child.attrs.id)
       .map((child) => {
         const node = selectedNodes.find(
           (node) => node.nodeProps.id === child.id(),
@@ -101,22 +100,25 @@ const NodeGroupTransformer = ({ selectedNodes, onDragEnd }: Props) => {
         ref={nodeRef}
         onDragEnd={onGroupDragEnd}
         onDragStart={onGroupDragStart}
+        listening={false}
       >
         {selectedNodes.map((node) => {
-          return createElement(getElement(node.type), {
-            key: node.nodeProps.id,
-            node: {
-              ...node,
-              style: {
-                ...node.style,
-                opacity: dragging ? 1 : 0,
-              },
-            },
-            selected: false,
-            draggable: false,
-            onPress: () => null,
-            onNodeChange: () => null,
-          } as NodeComponentProps);
+          return (
+            <Node
+              key={node.nodeProps.id}
+              node={{
+                ...node,
+                style: {
+                  ...node.style,
+                  opacity: dragging ? 1 : 0,
+                },
+              }}
+              selected={false}
+              draggable={false}
+              onPress={() => null}
+              onNodeChange={() => null}
+            />
+          );
         })}
       </Group>
       <NodeTransformer
