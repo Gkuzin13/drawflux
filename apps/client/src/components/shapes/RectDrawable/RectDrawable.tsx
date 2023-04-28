@@ -15,30 +15,28 @@ const RectDrawable = memo(
     draggable,
     onNodeChange,
     onPress,
-  }: Omit<NodeComponentProps, 'text'>) => {
+  }: NodeComponentProps) => {
     const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
-
-    const { nodeProps, style } = node;
 
     useAnimatedLine(
       nodeRef.current,
-      style.line[0] + style.line[1],
-      style.animated,
-      style.line,
+      node.style.line[0] + node.style.line[1],
+      node.style.animated,
+      node.style.line,
     );
 
     const config = useMemo(() => {
       return createDefaultNodeConfig({
-        visible: nodeProps.visible,
-        id: nodeProps.id,
-        rotation: nodeProps.rotation,
-        strokeWidth: style.size,
-        stroke: style.color,
-        opacity: style.opacity,
-        dash: style.line,
+        visible: node.nodeProps.visible,
+        id: node.nodeProps.id,
+        rotation: node.nodeProps.rotation,
+        strokeWidth: node.style.size,
+        stroke: node.style.color,
+        opacity: node.style.opacity,
+        dash: node.style.line,
         draggable,
       });
-    }, [style, nodeProps.id, nodeProps.rotation, nodeProps.visible, draggable]);
+    }, [node.nodeProps, node.style, draggable]);
 
     const handleDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
@@ -83,10 +81,10 @@ const RectDrawable = memo(
       <>
         <Rect
           ref={nodeRef}
-          x={nodeProps.point[0]}
-          y={nodeProps.point[1]}
-          width={nodeProps.width}
-          height={nodeProps.height}
+          x={node.nodeProps.point[0]}
+          y={node.nodeProps.point[1]}
+          width={node.nodeProps.width}
+          height={node.nodeProps.height}
           cornerRadius={8}
           {...config}
           onDragStart={() => onPress(node.nodeProps.id)}
@@ -98,7 +96,7 @@ const RectDrawable = memo(
         {selected && (
           <NodeTransformer
             ref={transformerRef}
-            transformerConfig={{ id: nodeProps.id }}
+            transformerConfig={{ id: node.nodeProps.id }}
           />
         )}
       </>

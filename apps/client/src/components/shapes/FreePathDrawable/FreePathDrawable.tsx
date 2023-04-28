@@ -30,27 +30,25 @@ const FreePathDrawable = memo(
       return node.nodeProps.points?.flat() || [];
     }, [node.nodeProps.points]);
 
-    const { nodeProps, style } = node;
-
     const config = useMemo(() => {
       return createDefaultNodeConfig({
-        visible: nodeProps.visible,
-        id: nodeProps.id,
-        rotation: nodeProps.rotation,
-        stroke: style.color,
-        strokeWidth: style.size,
-        dash: style.line,
-        opacity: style.opacity,
+        visible: node.nodeProps.visible,
+        id: node.nodeProps.id,
+        rotation: node.nodeProps.rotation,
+        stroke: node.style.color,
+        strokeWidth: node.style.size,
+        dash: node.style.line,
+        opacity: node.style.opacity,
         draggable,
       });
-    }, [style, nodeProps, draggable]);
+    }, [node.style, node.nodeProps, draggable]);
 
     const handleDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
         const line = event.target as Konva.Line;
         const stage = line.getStage() as Konva.Stage;
 
-        const points = nodeProps.points || [];
+        const points = node.nodeProps.points || [];
 
         const updatedPoints = getPointsAbsolutePosition(points, line, stage);
 
@@ -64,7 +62,7 @@ const FreePathDrawable = memo(
 
         line.position({ x: 0, y: 0 });
       },
-      [node, nodeProps.points, onNodeChange],
+      [node, onNodeChange],
     );
 
     const handleTransformEnd = useCallback(
@@ -72,7 +70,7 @@ const FreePathDrawable = memo(
         const line = event.target as Konva.Line;
         const stage = line.getStage() as Konva.Stage;
 
-        const points = nodeProps.points || [];
+        const points = node.nodeProps.points || [];
 
         const updatedPoints = getPointsAbsolutePosition(points, line, stage);
 
@@ -87,7 +85,7 @@ const FreePathDrawable = memo(
         line.scale({ x: 1, y: 1 });
         line.position({ x: 0, y: 0 });
       },
-      [node, nodeProps.points, onNodeChange],
+      [node, onNodeChange],
     );
 
     return (

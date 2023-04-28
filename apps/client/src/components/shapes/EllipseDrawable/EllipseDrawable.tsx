@@ -27,20 +27,18 @@ const EllipseDrawable = memo(
       node.style.line,
     );
 
-    const { nodeProps, style } = node;
-
     const config = useMemo(() => {
       return createDefaultNodeConfig({
-        visible: nodeProps.visible,
-        id: nodeProps.id,
-        rotation: nodeProps.rotation,
-        stroke: style.color,
-        strokeWidth: style.size,
-        opacity: style.opacity,
-        dash: style.line,
+        visible: node.nodeProps.visible,
+        id: node.nodeProps.id,
+        rotation: node.nodeProps.rotation,
+        stroke: node.style.color,
+        strokeWidth: node.style.size,
+        opacity: node.style.opacity,
+        dash: node.style.line,
         draggable,
       });
-    }, [nodeProps.visible, nodeProps.id, nodeProps.rotation, style, draggable]);
+    }, [node.nodeProps, node.style, draggable]);
 
     const handleDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
