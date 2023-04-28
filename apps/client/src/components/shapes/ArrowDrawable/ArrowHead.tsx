@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import { type NodeConfig } from 'konva/lib/Node';
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Shape } from 'react-konva';
 import { type Point } from 'shared';
 
