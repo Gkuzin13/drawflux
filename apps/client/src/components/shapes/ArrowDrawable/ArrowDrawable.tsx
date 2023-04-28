@@ -18,8 +18,9 @@ import { getPointsAbsolutePosition } from '@/utils/position';
 import ArrowHead from './ArrowHead';
 import ArrowLine from './ArrowLine';
 import ArrowTransformer from './ArrowTransformer';
-import { DEFAULT_BEND } from './constants';
-import { calcMinMaxMovementPoints } from './helpers/calc';
+import { calculateMinMaxMovementPoints } from './helpers/calc';
+
+const defaultBend = 0.5;
 
 const ArrowDrawable = memo(
   ({
@@ -34,7 +35,7 @@ const ArrowDrawable = memo(
       ...(node.nodeProps?.points || [node.nodeProps.point]),
     ]);
     const [bendValue, setBendValue] = useState<number>(
-      node.nodeProps.bend ?? DEFAULT_BEND,
+      node.nodeProps.bend ?? defaultBend,
     );
     const [dragging, setDragging] = useState(false);
 
@@ -44,7 +45,7 @@ const ArrowDrawable = memo(
         ...(node.nodeProps?.points || [node.nodeProps.point]),
       ]);
 
-      setBendValue(node.nodeProps.bend ?? DEFAULT_BEND);
+      setBendValue(node.nodeProps.bend ?? defaultBend);
     }, [node.nodeProps.point, node.nodeProps.points, node.nodeProps.bend]);
 
     const lineRef = useRef<Konva.Line>(null);
@@ -67,7 +68,7 @@ const ArrowDrawable = memo(
     }, [node.style.color, node.style.size, node.nodeProps.visible]);
 
     const { minPoint, maxPoint } = useMemo(() => {
-      return calcMinMaxMovementPoints(start, end);
+      return calculateMinMaxMovementPoints(start, end);
     }, [start, end]);
 
     const control = useMemo(() => {
@@ -106,28 +107,28 @@ const ArrowDrawable = memo(
     );
 
     const handleTransformEnd = useCallback(
-      (updatedPoints: Point[], bend: NodeProps['bend']) => {
+      (updatedPoints: Point[], bend?: NodeProps['bend']) => {
         setPoints(updatedPoints);
 
         onNodeChange({
           ...node,
           nodeProps: {
             ...node.nodeProps,
-            bend,
+            bend: bend ?? bendValue,
             point: updatedPoints[0],
             points: [updatedPoints[1]],
           },
         });
       },
-      [node, onNodeChange],
+      [node, bendValue, onNodeChange],
     );
 
     const handleTransform = useCallback(
       (updatedPoints: Point[], bend: NodeProps['bend']) => {
         setPoints(updatedPoints);
-        setBendValue(bend ?? DEFAULT_BEND);
+        setBendValue(bend ?? bendValue);
       },
-      [],
+      [bendValue],
     );
 
     return (
@@ -157,10 +158,10 @@ const ArrowDrawable = memo(
         </Group>
         {selected && !dragging && (
           <ArrowTransformer
-            draggable
-            points={[start, end]}
+            draggable={draggable}
+            start={start}
+            end={end}
             control={[control.x, control.y]}
-            bend={bendValue}
             onTransform={handleTransform}
             onTransformEnd={handleTransformEnd}
           />

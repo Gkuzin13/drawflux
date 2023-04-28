@@ -3,124 +3,95 @@ import { type KonvaEventObject } from 'konva/lib/Node';
 import { useCallback, useMemo } from 'react';
 import { type Point } from 'shared';
 import { getRatioFromValue } from '@/utils/math';
-import { ANCHOR_INDEX } from './constants';
-import { calcMidPointAndPerp, calcMinMaxMovementPoints } from './helpers/calc';
+import {
+  calculateClampedMidPoint,
+  calculateMinMaxMovementPoints,
+} from './helpers/calc';
 import TransformerAnchor from './TransformerAnchor';
 
 type Props = {
-  points: [Point, Point];
-  bend: number;
+  start: Point;
+  end: Point;
   control: Point;
   draggable: boolean;
-  onTransform: (updatedPoints: Point[], bend: number) => void;
-  onTransformEnd: (updatedPoints: Point[], bend: number) => void;
+  onTransform: (updatedPoints: Point[], bend?: number) => void;
+  onTransformEnd: (updatedPoints: Point[], bend?: number) => void;
 };
 
+const controlIndex = 2;
+
 const ArrowTransformer = ({
-  points,
+  start,
+  end,
   control,
-  bend,
   draggable,
   onTransform,
   onTransformEnd,
 }: Props) => {
-  const [start, end] = points;
-
   const { minPoint, maxPoint } = useMemo(() => {
-    return calcMinMaxMovementPoints(start, end);
+    return calculateMinMaxMovementPoints(start, end);
   }, [start, end]);
 
-  const onAnchorDragMove = useCallback(
+  const getBendValue = useCallback(
+    (dragPosition: Point) => {
+      const bendX = getRatioFromValue(dragPosition[0], minPoint.x, maxPoint.x);
+      const bendY = getRatioFromValue(dragPosition[1], minPoint.y, maxPoint.y);
+
+      return +((bendX + bendY) / 2).toFixed(2);
+    },
+    [minPoint, maxPoint],
+  );
+
+  const handleDragMove = useCallback(
     (event: KonvaEventObject<DragEvent>, index: number) => {
       const node = event.target as Konva.Circle;
       const stage = node.getStage() as Konva.Stage;
 
-      const updatedPoints = [start, end];
-
       const { x, y } = node.getAbsolutePosition(stage);
 
-      if (index === ANCHOR_INDEX.CONTROL) {
-        const bendX = getRatioFromValue(x, minPoint.x, maxPoint.x);
-        const bendY = getRatioFromValue(y, minPoint.y, maxPoint.y);
+      if (index === controlIndex) {
+        const { x: clampedX, y: clampedY } = calculateClampedMidPoint(
+          [x, y],
+          start,
+          end,
+        );
 
-        const updatedBend = +((bendX + bendY) / 2).toFixed(2);
+        node.position({ x: clampedX, y: clampedY });
 
-        onTransform(updatedPoints, updatedBend);
+        const updatedBend = getBendValue([clampedX, clampedY]);
+
+        onTransform([start, end], updatedBend);
 
         return;
       }
 
+      const updatedPoints = [...[start, end]];
+
       updatedPoints[index] = [x, y];
 
-      onTransform(updatedPoints, bend);
+      onTransform(updatedPoints);
     },
-    [start, end, bend, maxPoint, minPoint, onTransform],
+    [start, end, getBendValue, onTransform],
   );
 
-  const onAnchorDragEnd = () => {
-    onTransformEnd(points, bend);
+  const handleDragEnd = () => {
+    onTransformEnd([start, end]);
   };
-
-  const handleDragMove = useCallback(
-    (event: KonvaEventObject<DragEvent>) => {
-      const anchor = event.target as Konva.Circle;
-      const stage = anchor.getStage() as Konva.Stage;
-      const position = anchor.getAbsolutePosition(stage);
-
-      function clampAnchorPoint(
-        position: Point,
-        startPos: Point,
-        endPos: Point,
-      ) {
-        const { mid, perp, length } = calcMidPointAndPerp(startPos, endPos);
-
-        // Calculate the distance of the drag from the midpoint along the perpendicular vector
-        let dragDist =
-          (position[0] - mid.x) * perp.x + (position[1] - mid.y) * perp.y;
-
-        dragDist = Math.max(Math.min(dragDist, length / 2), -length / 2);
-
-        return {
-          x: mid.x + dragDist * perp.x,
-          y: mid.y + dragDist * perp.y,
-        };
-      }
-
-      const { x, y } = clampAnchorPoint([position.x, position.y], start, end);
-
-      anchor.position({ x, y });
-
-      onAnchorDragMove(event, ANCHOR_INDEX.CONTROL);
-    },
-    [start, end, onAnchorDragMove],
-  );
 
   return (
     <>
-      <TransformerAnchor
-        key={0}
-        x={start[0]}
-        y={start[1]}
-        onDragMove={(event) => onAnchorDragMove(event, ANCHOR_INDEX.START)}
-        onDragEnd={onAnchorDragEnd}
-        draggable={draggable}
-      />
-      <TransformerAnchor
-        key={1}
-        x={end[0]}
-        y={end[1]}
-        onDragMove={(event) => onAnchorDragMove(event, ANCHOR_INDEX.END)}
-        onDragEnd={onAnchorDragEnd}
-        draggable={draggable}
-      />
-      <TransformerAnchor
-        key={2}
-        x={control[0]}
-        y={control[1]}
-        onDragMove={handleDragMove}
-        onDragEnd={onAnchorDragEnd}
-        draggable={draggable}
-      />
+      {[start, end, control].map(([x, y], index) => {
+        return (
+          <TransformerAnchor
+            key={index}
+            x={x}
+            y={y}
+            onDragMove={(event) => handleDragMove(event, index)}
+            onDragEnd={handleDragEnd}
+            draggable={draggable}
+          />
+        );
+      })}
     </>
   );
 };
