@@ -107,7 +107,7 @@ const ArrowDrawable = memo(
     );
 
     const handleTransformEnd = useCallback(
-      (updatedPoints: Point[], bend?: NodeProps['bend']) => {
+      (updatedPoints: Point[], bend: NodeProps['bend']) => {
         setPoints(updatedPoints);
 
         onNodeChange({
@@ -161,7 +161,8 @@ const ArrowDrawable = memo(
             draggable={draggable}
             start={start}
             end={end}
-            control={[control.x, control.y]}
+            bendPoint={[control.x, control.y]}
+            bendMovement={{ min: minPoint, max: maxPoint }}
             onTransform={handleTransform}
             onTransformEnd={handleTransformEnd}
           />

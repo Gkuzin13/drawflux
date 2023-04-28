@@ -1,18 +1,20 @@
 import type Konva from 'konva';
 import { type KonvaEventObject } from 'konva/lib/Node';
-import { useCallback, useMemo } from 'react';
+import type { Vector2d } from 'konva/lib/types';
+import { useCallback } from 'react';
 import { type Point } from 'shared';
 import { getRatioFromValue } from '@/utils/math';
-import {
-  calculateClampedMidPoint,
-  calculateMinMaxMovementPoints,
-} from './helpers/calc';
+import { calculateClampedMidPoint } from './helpers/calc';
 import TransformerAnchor from './TransformerAnchor';
 
 type Props = {
   start: Point;
   end: Point;
-  control: Point;
+  bendPoint: Point;
+  bendMovement: {
+    min: Vector2d;
+    max: Vector2d;
+  };
   draggable: boolean;
   onTransform: (updatedPoints: Point[], bend?: number) => void;
   onTransformEnd: (updatedPoints: Point[], bend?: number) => void;
@@ -23,23 +25,28 @@ const controlIndex = 2;
 const ArrowTransformer = ({
   start,
   end,
-  control,
+  bendPoint,
+  bendMovement,
   draggable,
   onTransform,
   onTransformEnd,
 }: Props) => {
-  const { minPoint, maxPoint } = useMemo(() => {
-    return calculateMinMaxMovementPoints(start, end);
-  }, [start, end]);
-
   const getBendValue = useCallback(
     (dragPosition: Point) => {
-      const bendX = getRatioFromValue(dragPosition[0], minPoint.x, maxPoint.x);
-      const bendY = getRatioFromValue(dragPosition[1], minPoint.y, maxPoint.y);
+      const bendX = getRatioFromValue(
+        dragPosition[0],
+        bendMovement.min.x,
+        bendMovement.max.x,
+      );
+      const bendY = getRatioFromValue(
+        dragPosition[1],
+        bendMovement.min.y,
+        bendMovement.max.y,
+      );
 
       return +((bendX + bendY) / 2).toFixed(2);
     },
-    [minPoint, maxPoint],
+    [bendMovement],
   );
 
   const handleDragMove = useCallback(
@@ -80,7 +87,7 @@ const ArrowTransformer = ({
 
   return (
     <>
-      {[start, end, control].map(([x, y], index) => {
+      {[start, end, bendPoint].map(([x, y], index) => {
         return (
           <TransformerAnchor
             key={index}
