@@ -3,7 +3,6 @@ import {
   type ReactNode,
   useContext,
   useRef,
-  forwardRef,
 } from 'react';
 import { useClickAway } from '@/hooks/useClickAway';
 import useDisclosure from '@/hooks/useDisclosure/useDisclosure';
@@ -40,7 +39,7 @@ const Dropdown = ({ opened = false, children }: DropdownProps) => {
   const ctx = useContext(PopoverContext);
 
   return opened || ctx?.opened ? (
-    <PopoverDropdown data-testid="popover-dropdown">{children}</PopoverDropdown>
+    <PopoverDropdown>{children}</PopoverDropdown>
   ) : null;
 };
 

@@ -23,7 +23,7 @@ const MenuPanel = ({ onAction }: Props) => {
         <MenuPanelToggle title="Toggle Menu" size="small" squared={true}>
           <IoEllipsisHorizontal size={ICON_SIZES.LARGE} />
         </MenuPanelToggle>
-        <MenuPanelDropdown data-testid="menu-panel-content">
+        <MenuPanelDropdown>
           {MENU_PANEL_ACTIONS.map((action) => {
             return (
               <Menu.Item
