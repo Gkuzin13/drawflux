@@ -1,6 +1,7 @@
-import Konva from 'konva';
+import type Konva from 'konva';
 import { type KonvaEventObject, type NodeConfig } from 'konva/lib/Node';
 import { type IRect } from 'konva/lib/types';
+import { Util } from 'konva/lib/Util';
 import {
   type PropsWithRef,
   forwardRef,
@@ -149,10 +150,10 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           const group = child as Konva.Group;
 
           return group.getChildren().some((c) => {
-            return Konva.Util.haveIntersection(selectRect, c.getClientRect());
+            return Util.haveIntersection(selectRect, c.getClientRect());
           });
         }
-        return Konva.Util.haveIntersection(selectRect, child.getClientRect());
+        return Util.haveIntersection(selectRect, child.getClientRect());
       });
 
       const intersectedIds: string[] = intersectedChildren.map(

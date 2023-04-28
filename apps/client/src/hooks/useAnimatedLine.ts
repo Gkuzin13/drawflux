@@ -1,4 +1,4 @@
-import Konva from 'konva';
+import { Animation } from 'konva/lib/Animation';
 import { type Shape } from 'konva/lib/Shape';
 import { type Ellipse } from 'konva/lib/shapes/Ellipse';
 import { type Line } from 'konva/lib/shapes/Line';
@@ -14,7 +14,7 @@ const useAnimatedLine = (
 ) => {
   useEffect(() => {
     function animateDashOffset() {
-      return new Konva.Animation((frame) => {
+      return new Animation((frame) => {
         if (!frame) return;
 
         const time = frame.time / 600;
