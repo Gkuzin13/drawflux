@@ -111,19 +111,25 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       };
     }, [stageConfig, ref, config.width, config.height]);
 
-    const onNodeMenuAction = (key: ContextMenuItem['key']) => {
+    const handleContextMenuAction = (key: ContextMenuItem['key']) => {
       switch (key) {
-        case 'delete-node':
+        case 'delete-node': {
           if (!selectedNodeId) return;
           dispatch(nodesActions.delete([selectedNodeId]));
           break;
-        case 'select-all':
+        }
+        case 'select-all': {
           dispatch(
             controlActions.setSelectedNodesIds(
               nodes.map((node) => node.nodeProps.id),
             ),
           );
           break;
+        }
+        case 'select-none': {
+          dispatch(controlActions.setSelectedNodesIds([]));
+          break;
+        }
       }
 
       dispatch(controlActions.setSelectedNodeId(null));
@@ -177,7 +183,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
 
       if (clickedOnEmpty) {
         setContextMenu({
-          items: STAGE_CONTEXT_MENU_ACTIONS,
+          items: [...STAGE_CONTEXT_MENU_ACTIONS],
           position: [position.x, position.y],
         });
         return;
@@ -191,7 +197,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       if (node) {
         dispatch(controlActions.setSelectedNodeId(node.nodeProps.id));
         setContextMenu({
-          items: NODE_CONTEXT_MENU_ACTIONS,
+          items: [...NODE_CONTEXT_MENU_ACTIONS],
           position: [position.x, position.y],
         });
       }
@@ -439,7 +445,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
             {contextMenu && (
               <ContextMenu
                 items={contextMenu.items}
-                onAction={onNodeMenuAction}
+                onAction={handleContextMenuAction}
               />
             )}
           </Html>
