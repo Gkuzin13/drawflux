@@ -1,4 +1,5 @@
 import type Konva from 'konva';
+import type { KonvaEventObject } from 'konva/lib/Node';
 import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
 import { type PropsWithRef, forwardRef } from 'react';
 import { type KonvaNodeEvents, Transformer } from 'react-konva';
@@ -13,6 +14,14 @@ type Ref = Konva.Transformer;
 
 const NodeTransformer = forwardRef<Ref, Props>(
   ({ transformerConfig, transformerEvents }, ref) => {
+    const handleDragStart = (event: KonvaEventObject<DragEvent>) => {
+      event.target.visible(false);
+    };
+
+    const handleDragEnd = (event: KonvaEventObject<DragEvent>) => {
+      event.target.visible(true);
+    };
+
     return (
       <Transformer
         ref={ref}
@@ -34,6 +43,8 @@ const NodeTransformer = forwardRef<Ref, Props>(
 
           return newBox;
         }}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
         {...transformerConfig}
         {...transformerEvents}
       />
