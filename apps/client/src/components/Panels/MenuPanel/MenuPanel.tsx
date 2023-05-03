@@ -29,9 +29,6 @@ const MenuPanel = ({ onAction }: Props) => {
               <Menu.Item
                 key={action.key}
                 title={action.name}
-                fullWidth={true}
-                size="small"
-                color="secondary-light"
                 onItemClick={() => handleOnClick(action.key)}
               >
                 {action.icon({ size: ICON_SIZES.LARGE })}
