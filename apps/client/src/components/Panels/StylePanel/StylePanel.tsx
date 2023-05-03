@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from 'react';
 import type { NodeColor, NodeLIne, NodeSize, NodeStyle } from 'shared';
 import { Divider } from '@/components/core/Divider/Divider';
 import { ICON_SIZES } from '@/constants/icon';
@@ -12,12 +13,12 @@ import {
 } from './StylePanelStyled';
 
 export type StylePanelProps = {
-  style: NodeStyle;
+  style: Partial<NodeStyle>;
   enabledOptions: {
     line: boolean;
     size: boolean;
   };
-  onStyleChange: (updatedStyle: NodeStyle) => void;
+  onStyleChange: (updatedStyle: Partial<NodeStyle>) => void;
 };
 
 const StylePanel = ({
@@ -26,7 +27,7 @@ const StylePanel = ({
   onStyleChange,
 }: StylePanelProps) => {
   const handleColorSelect = (color: NodeColor) => {
-    onStyleChange({ ...style, color });
+    onStyleChange({ color });
   };
 
   const handleLineSelect = (
@@ -34,19 +35,37 @@ const StylePanel = ({
     name: (typeof LINE)[number]['name'],
   ) => {
     onStyleChange({
-      ...style,
       animated: style.animated && name !== 'solid' ? true : false,
       line: value,
     });
   };
 
   const handleAnimatedSelect = () => {
-    onStyleChange({ ...style, animated: !style.animated });
+    onStyleChange({ animated: !style.animated });
   };
 
   const handleSizeSelect = (value: NodeSize) => {
-    onStyleChange({ ...style, size: value });
+    onStyleChange({ size: value });
   };
+
+  const isLineStyleActive = useCallback(
+    (value: Readonly<NodeLIne>) => {
+      if (!style.line) {
+        return false;
+      }
+
+      return value.every((line, index) => line === style.line?.[index]);
+    },
+    [style.line],
+  );
+
+  const animatedStyleDisabled = useMemo(() => {
+    if (!style.line) {
+      return false;
+    }
+
+    return style.line.every((l) => l === 0);
+  }, [style.line]);
 
   return (
     <StylePanelContainer>
@@ -79,8 +98,7 @@ const StylePanel = ({
                 size="small"
                 squared={true}
                 color={
-                  line.value[0] === style.line[0] &&
-                  line.value[1] === style.line[1]
+                  isLineStyleActive(line.value)
                     ? 'secondary'
                     : 'secondary-light'
                 }
@@ -98,7 +116,7 @@ const StylePanel = ({
             size="small"
             squared={true}
             color={style.animated ? 'primary' : 'secondary-light'}
-            disabled={style.line.every((l) => l === 0)}
+            disabled={animatedStyleDisabled}
             onClick={() => handleAnimatedSelect()}
           >
             {ANIMATED.icon({ size: ICON_SIZES.LARGE })}
