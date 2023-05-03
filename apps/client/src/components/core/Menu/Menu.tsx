@@ -34,7 +34,13 @@ const Item = ({
   };
 
   return (
-    <Button {...props} onClick={hanleClick}>
+    <Button
+      fullWidth={true}
+      size="small"
+      color="secondary-light"
+      {...props}
+      onClick={hanleClick}
+    >
       {children}
     </Button>
   );
