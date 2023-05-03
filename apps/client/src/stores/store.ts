@@ -1,14 +1,14 @@
 import { type Action, configureStore, type Reducer } from '@reduxjs/toolkit';
 import { api } from '@/services/api';
 import { listenerMiddleware } from './listenerMiddleware';
-import control from './slices/controlSlice';
+import canvas from './slices/canvasSlice';
+import contextMenu from './slices/contextMenu';
 import historyReducer, {
   type HistoryActionType,
   type NodesHistoryState,
 } from './slices/historySlice';
 import modal from './slices/modalSlice';
 import nodesReducer from './slices/nodesSlice';
-import stageConfig from './slices/stageConfigSlice';
 
 const nodesHistory = historyReducer(nodesReducer) as Reducer<
   NodesHistoryState,
@@ -18,9 +18,9 @@ const nodesHistory = historyReducer(nodesReducer) as Reducer<
 export const store = configureStore({
   reducer: {
     nodesHistory,
-    control,
-    stageConfig,
+    canvas,
     modal,
+    contextMenu,
     [api.reducerPath]: api.reducer,
   },
   middleware: (getDefaultMiddleware) =>
