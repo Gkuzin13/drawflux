@@ -24,7 +24,6 @@ const ArrowHead = ({ control, end, config }: Props) => {
       ctx.save();
 
       ctx.beginPath();
-      ctx.translate(end[0], end[1]);
       ctx.rotate(radians);
 
       ctx.moveTo(0, 0);
@@ -39,7 +38,7 @@ const ArrowHead = ({ control, end, config }: Props) => {
     [config.strokeWidth, control, end],
   );
 
-  return <Shape {...config} sceneFunc={drawHead} />;
+  return <Shape {...config} x={end[0]} y={end[1]} sceneFunc={drawHead} />;
 };
 
 export default ArrowHead;
