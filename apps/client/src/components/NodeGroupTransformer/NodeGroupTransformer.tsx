@@ -1,49 +1,68 @@
 import type Konva from 'konva';
-import type { KonvaEventObject } from 'konva/lib/Node';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { Group } from 'react-konva';
 import type { NodeObject } from 'shared';
 import Node from '@/components/Node/Node';
+import useForceUpdate from '@/hooks/useForceUpdate/useForceUpdate';
 import useTransformer from '@/hooks/useTransformer';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import NodeTransformer from '../NodeTransformer';
 
 type Props = {
-  selectedNodes: NodeObject[];
+  nodes: NodeObject[];
+  draggable: boolean;
   onDragEnd: (nodes: NodeObject[]) => void;
 };
 
-const NodeGroupTransformer = ({ selectedNodes, onDragEnd }: Props) => {
-  const [dragging, setDragging] = useState(false);
+const NodeGroupTransformer = ({ nodes, draggable, onDragEnd }: Props) => {
+  // Solves the issue when a nested group inside a tranformer is not updated properly when changed
+  // Forces transformer to rerender with the updated nodes
+  const { rerenderCount } = useForceUpdate([nodes]);
 
   const { transformerRef, nodeRef } = useTransformer<Konva.Group>([
-    selectedNodes,
+    nodes,
+    rerenderCount,
   ]);
 
-  const onGroupDragStart = (event: KonvaEventObject<DragEvent>) => {
-    const group = event.target as Konva.Group & Konva.Shape;
+  const setVisibility = useCallback(
+    (group: Konva.Group, transformer: Konva.Transformer, dragging = false) => {
+      const layer = nodeRef.current?.getLayer();
 
-    const layerChildren = group.getLayer()?.getChildren();
+      const selectedLayerChildren = layer?.getChildren((child) =>
+        nodes.some((node) => node.nodeProps.id === child.attrs.id),
+      );
 
-    toggleDraggedNodesVisibility(layerChildren, false);
-    setDragging(true);
-  };
+      selectedLayerChildren?.forEach((child) => {
+        child.visible(dragging ? false : true);
+      });
 
-  const onGroupDragEnd = (event: KonvaEventObject<DragEvent>) => {
-    const group = event.target as Konva.Group & Konva.Shape;
+      group.visible(dragging);
 
+      setTimeout(() => transformer.visible(dragging ? false : true));
+    },
+    [nodeRef, nodes],
+  );
+
+  const handleDragStart = useCallback(() => {
+    if (!transformerRef.current || !nodeRef.current) return;
+
+    const transformer = transformerRef.current;
+    const group = nodeRef.current;
+
+    setVisibility(group, transformer, true);
+  }, [setVisibility, nodeRef, transformerRef]);
+
+  const handleDragEnd = useCallback(() => {
+    if (!transformerRef.current || !nodeRef.current) return;
+
+    const transformer = transformerRef.current;
+    const group = nodeRef.current;
     const stage = group.getStage() as Konva.Stage;
+    const children = group.getChildren();
 
-    const layerChildren = group.getLayer()?.getChildren();
-
-    toggleDraggedNodesVisibility(layerChildren, true);
-
-    const updatedNodes = group
-      .getChildren((child) => child.attrs.id)
+    const updatedNodes = children
       .map((child) => {
-        const node = selectedNodes.find(
-          (node) => node.nodeProps.id === child.id(),
-        );
+        const node = nodes.find((node) => node.nodeProps.id === child.id());
 
         if (!node) return;
 
@@ -76,43 +95,27 @@ const NodeGroupTransformer = ({ selectedNodes, onDragEnd }: Props) => {
       .filter(Boolean) as NodeObject[];
 
     onDragEnd(updatedNodes);
-    setDragging(false);
-  };
 
-  const toggleDraggedNodesVisibility = useCallback(
-    (layerChildren: Konva.Group['children'], visibile: boolean) => {
-      for (const node of selectedNodes) {
-        const child = layerChildren?.find(
-          (child) => child.id() === node.nodeProps.id,
-        );
+    group.position({ x: 0, y: 0 });
 
-        if (child) {
-          child.opacity(visibile ? 1 : 0);
-        }
-      }
-    },
-    [selectedNodes],
-  );
+    setVisibility(group, transformer);
+  }, [nodes, nodeRef, transformerRef, setVisibility, onDragEnd]);
 
   return (
     <>
       <Group
         ref={nodeRef}
-        onDragEnd={onGroupDragEnd}
-        onDragStart={onGroupDragStart}
-        listening={false}
+        visible={false}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        draggable={draggable}
+        listening={draggable}
       >
-        {selectedNodes.map((node) => {
+        {nodes.map((node) => {
           return (
             <Node
               key={node.nodeProps.id}
-              node={{
-                ...node,
-                style: {
-                  ...node.style,
-                  opacity: dragging ? 1 : 0,
-                },
-              }}
+              node={node}
               selected={false}
               draggable={false}
               onPress={() => null}
@@ -123,7 +126,14 @@ const NodeGroupTransformer = ({ selectedNodes, onDragEnd }: Props) => {
       </Group>
       <NodeTransformer
         ref={transformerRef}
-        transformerConfig={{ enabledAnchors: [], rotateEnabled: false }}
+        transformerConfig={{
+          enabledAnchors: [],
+          rotateEnabled: false,
+          resizeEnabled: false,
+          listening: draggable,
+          draggable,
+        }}
+        transformerEvents={{ onDragEnd: undefined, onDragStart: undefined }}
       />
     </>
   );
