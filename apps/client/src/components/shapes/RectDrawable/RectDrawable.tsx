@@ -9,7 +9,7 @@ import { createDefaultNodeConfig } from '@/constants/element';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
-import { selectStageConfig } from '@/stores/slices/stageConfigSlice';
+import { selectCanvas } from '@/stores/slices/canvasSlice';
 
 const RectDrawable = memo(
   ({
@@ -21,7 +21,7 @@ const RectDrawable = memo(
   }: NodeComponentProps) => {
     const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
 
-    const { scale: stageScale } = useAppSelector(selectStageConfig);
+    const { scale: stageScale } = useAppSelector(selectCanvas).stageConfig;
 
     const scaledLine = useMemo(() => {
       return node.style.line.map((l) => l * stageScale) as NodeLIne;

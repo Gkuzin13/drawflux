@@ -1,7 +1,6 @@
 import type Konva from 'konva';
 import { type KonvaEventObject, type NodeConfig } from 'konva/lib/Node';
-import { type IRect } from 'konva/lib/types';
-import { Util } from 'konva/lib/Util';
+import type { IRect } from 'konva/lib/types';
 import {
   type PropsWithRef,
   forwardRef,
@@ -10,34 +9,29 @@ import {
   useState,
   useCallback,
 } from 'react';
-import { Layer, Stage } from 'react-konva';
-import { Html } from 'react-konva-utils';
-import type { NodeObject, Point } from 'shared';
+import { Stage } from 'react-konva';
+import type { NodeObject, Point, StageConfig } from 'shared';
+import type { SelectedNodesIds } from '@/constants/app';
 import { CURSOR } from '@/constants/cursor';
 import { BACKGROUND_LAYER_ID } from '@/constants/element';
-import {
-  STAGE_CONTEXT_MENU_ACTIONS,
-  NODE_CONTEXT_MENU_ACTIONS,
-  type ContextMenuItem,
-} from '@/constants/menu';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { controlActions, selectControl } from '@/stores/slices/controlSlice';
-import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
+import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
 import {
-  type StageConfigState,
-  selectStageConfig,
-  stageConfigActions,
-} from '@/stores/slices/stageConfigSlice';
+  contextMenuActions,
+  selectContextMenu,
+} from '@/stores/slices/contextMenu';
+import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
 import { debounce } from '@/utils/debounce';
-import { drawRectangle } from '@/utils/draw';
 import { createNode } from '@/utils/node';
+import BackgroundRect from '../BackgroundRect';
 import ContextMenu from '../ContextMenu/ContextMenu';
 import NodesLayer from '../NodesLayer';
-import SelectTool from '../SelectTool';
+import SelectRect from '../SelectRect';
 import { drawArrow } from '../shapes/ArrowDrawable/helpers/drawArrow';
 import { drawEllipse } from '../shapes/EllipseDrawable/helpers/drawEllipse';
 import { drawFreePath } from '../shapes/FreePathDrawable/helpers/drawFreePath';
 import { drawRect } from '../shapes/RectDrawable/helpers/drawRect';
+import { getIntersectingChildren } from './helpers/intersect';
 import {
   calcNewStagePositionAndScale,
   hasStageScaleReachedLimit,
@@ -46,36 +40,33 @@ import {
 type Props = PropsWithRef<{
   config: NodeConfig;
   containerStyle?: React.CSSProperties;
-  onConfigChange: (config: Partial<StageConfigState>) => void;
+  onConfigChange: (config: Partial<StageConfig>) => void;
 }>;
 
 type Ref = Konva.Stage;
 
-type ContextMenuState = {
-  items: ContextMenuItem[];
-  position: Point;
+type DrawPosition = {
+  start: Point;
+  current: Point;
 };
 
 const DrawingCanvas = forwardRef<Ref, Props>(
   ({ config, containerStyle, onConfigChange }, ref) => {
     const [draftNode, setDraftNode] = useState<NodeObject | null>(null);
-    const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(
-      null,
-    );
-    const [selectRect, setSelectRect] = useState<IRect | null>(null);
     const [drawing, setDrawing] = useState(false);
+    const [drawPosition, setDrawPosition] = useState<DrawPosition>({
+      start: [0, 0],
+      current: [0, 0],
+    });
     const [draggingStage, setDraggingStage] = useState(false);
-    const [intersectedNodes, setIntersectedNodes] = useState<NodeObject[]>([]);
 
-    const { selectedNodeId, selectedNodesIds, toolType } =
-      useAppSelector(selectControl);
-    const stageConfig = useAppSelector(selectStageConfig);
-
+    const { stageConfig, toolType, selectedNodesIds } =
+      useAppSelector(selectCanvas);
     const { nodes } = useAppSelector(selectNodes).present;
+    const contextMenuState = useAppSelector(selectContextMenu);
 
     const dispatch = useAppDispatch();
 
-    const moveStartPosition = useRef<Point>([0, 0]);
     const selectRectRef = useRef<Konva.Rect>(null);
 
     const cursorStyle = useMemo(() => {
@@ -89,103 +80,61 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       }
     }, [drawing, toolType, draggingStage]);
 
-    const offsetBackgroundLayerRect = useMemo<IRect>(() => {
-      if (!ref || typeof ref === 'function' || !ref.current) {
-        return {
-          x: 0,
-          y: 0,
-          width: config.width || 0,
-          height: config.height || 0,
-        };
+    const selectClientRect = useMemo<IRect>(() => {
+      if (!selectRectRef?.current || toolType !== 'select') {
+        return { x: 0, y: 0, width: 0, height: 0 };
       }
 
-      const stage = ref.current;
+      return selectRectRef.current.getClientRect();
+    }, [selectRectRef, drawPosition, toolType]);
 
-      const { position, scale } = stageConfig;
-
-      return {
-        x: -position.x / scale,
-        y: -position.y / scale,
-        width: stage.width() / scale,
-        height: stage.height() / scale,
-      };
-    }, [stageConfig, ref, config.width, config.height]);
-
-    const handleContextMenuAction = (key: ContextMenuItem['key']) => {
-      switch (key) {
-        case 'delete-node': {
-          if (!selectedNodeId) return;
-          dispatch(nodesActions.delete([selectedNodeId]));
-          break;
-        }
-        case 'select-all': {
-          dispatch(
-            controlActions.setSelectedNodesIds(
-              nodes.map((node) => node.nodeProps.id),
-            ),
-          );
-          break;
-        }
-        case 'select-none': {
-          dispatch(controlActions.setSelectedNodesIds([]));
-          break;
-        }
-      }
-
-      dispatch(controlActions.setSelectedNodeId(null));
-      setContextMenu(null);
-    };
-
-    const dispatchSelectedNodesIds = useCallback(
+    const setIntersectedNodes = useCallback(
       debounce(() => {
-        dispatch(
-          controlActions.setSelectedNodesIds(
-            intersectedNodes.map((node) => node.nodeProps.id),
-          ),
-        );
-      }, 35),
-      [dispatch, intersectedNodes],
-    );
-
-    const setIntersectingNodes = (stage: Konva.Stage, selectRect: IRect) => {
-      const layer = stage.getLayers()[0];
-      const children = layer.getChildren((child) => child.attrs.id);
-
-      const intersectedChildren = children.filter((child) => {
-        if (child.hasChildren()) {
-          const group = child as Konva.Group;
-
-          return group.getChildren().some((c) => {
-            return Util.haveIntersection(selectRect, c.getClientRect());
-          });
+        if (typeof ref === 'function' || !ref?.current) {
+          return;
         }
-        return Util.haveIntersection(selectRect, child.getClientRect());
-      });
 
-      const intersectedIds: string[] = intersectedChildren.map(
-        (child) => child.attrs.id,
-      );
+        const layer = ref.current.getLayers()[0];
+        const children = layer.getChildren((child) =>
+          nodes.some((node) => node.nodeProps.id === child.attrs.id),
+        );
 
-      setIntersectedNodes(
-        nodes.filter((node) => intersectedIds.includes(node.nodeProps.id)),
-      );
+        if (!children.length) return;
 
-      dispatchSelectedNodesIds();
-    };
+        const intersectedChildren = getIntersectingChildren(
+          children,
+          selectClientRect,
+        );
+
+        const intersectedIds = intersectedChildren.map(
+          (child) => child.attrs.id,
+        ) as string[];
+
+        const newSelectedNodesIds: SelectedNodesIds = {};
+
+        for (const nodeId of intersectedIds) {
+          newSelectedNodesIds[nodeId] = true;
+        }
+
+        dispatch(canvasActions.setSelectedNodesIds(newSelectedNodesIds));
+      }, 35),
+      [nodes, dispatch, selectClientRect],
+    );
 
     const handleOnContextMenu = (e: KonvaEventObject<PointerEvent>) => {
       e.evt.preventDefault();
 
       const stage = e.target.getStage() as Konva.Stage;
       const position = stage.getRelativePointerPosition();
-
       const clickedOnEmpty = e.target === stage;
 
       if (clickedOnEmpty) {
-        setContextMenu({
-          items: [...STAGE_CONTEXT_MENU_ACTIONS],
-          position: [position.x, position.y],
-        });
+        dispatch(
+          contextMenuActions.open({
+            type: 'drawing-canvas-menu',
+            position,
+          }),
+        );
         return;
       }
 
@@ -195,11 +144,15 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       const node = nodes.find((node) => node.nodeProps.id === shape?.id());
 
       if (node) {
-        dispatch(controlActions.setSelectedNodeId(node.nodeProps.id));
-        setContextMenu({
-          items: [...NODE_CONTEXT_MENU_ACTIONS],
-          position: [position.x, position.y],
-        });
+        dispatch(
+          canvasActions.setSelectedNodesIds({ [node.nodeProps.id]: true }),
+        );
+        dispatch(
+          contextMenuActions.open({
+            type: 'node-menu',
+            position,
+          }),
+        );
       }
     };
 
@@ -212,7 +165,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           return drawArrow(node, position);
         }
         case 'rectangle': {
-          return drawRect(node, moveStartPosition.current, position);
+          return drawRect(node, drawPosition?.start, position);
         }
         case 'ellipse': {
           return drawEllipse(node, position);
@@ -233,24 +186,24 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       const stage = event.target.getStage();
 
       const clickedOnEmpty = event.target === stage;
+
       if (!clickedOnEmpty) {
         return;
       }
 
-      if (contextMenu) {
-        setContextMenu(null);
+      if (contextMenuState.opened) {
+        dispatch(contextMenuActions.close());
         return;
       }
 
       const { x, y } = stage.getRelativePointerPosition();
 
-      moveStartPosition.current = [x, y];
+      setDrawPosition({ start: [x, y], current: [x, y] });
 
       switch (toolType) {
         case 'hand':
           return;
         case 'select':
-          setSelectRect(drawRectangle([moveStartPosition.current, [x, y]]));
           setDrawing(true);
           break;
         case 'text':
@@ -262,13 +215,8 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           break;
       }
 
-      if (selectedNodeId) {
-        dispatch(controlActions.setSelectedNodeId(null));
-      }
-
-      if (selectedNodesIds.length) {
-        setIntersectedNodes([]);
-        dispatch(controlActions.setSelectedNodesIds([]));
+      if (selectedNodesIds) {
+        dispatch(canvasActions.setSelectedNodesIds({}));
       }
     };
 
@@ -279,9 +227,11 @@ const DrawingCanvas = forwardRef<Ref, Props>(
 
       const { x, y } = stage.getRelativePointerPosition();
 
-      if (toolType === 'select' && selectRectRef.current) {
-        setSelectRect(drawRectangle([moveStartPosition.current, [x, y]]));
-        setIntersectingNodes(stage, selectRectRef.current.getClientRect());
+      if (toolType === 'select' && drawing) {
+        setDrawPosition((prevState) => {
+          return { start: prevState.start, current: [x, y] };
+        });
+        setIntersectedNodes();
         return;
       }
 
@@ -293,7 +243,6 @@ const DrawingCanvas = forwardRef<Ref, Props>(
     const onStageMoveEnd = () => {
       switch (toolType) {
         case 'select':
-          setSelectRect(null);
           setDrawing(false);
           break;
         case 'draw':
@@ -355,7 +304,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       setDrawing(false);
 
       if (resetToolType) {
-        dispatch(controlActions.setToolType('select'));
+        dispatch(canvasActions.setToolType('select'));
       }
     };
 
@@ -367,17 +316,17 @@ const DrawingCanvas = forwardRef<Ref, Props>(
         const stage = event.target;
         const layer = stage.getLayers()[0];
 
-        const backgroundLayerRect = layer.children?.find(
+        const BackgroundRectRect = layer.children?.find(
           (child) => child.id() === BACKGROUND_LAYER_ID,
         );
 
-        if (!backgroundLayerRect) {
+        if (!BackgroundRectRect) {
           return;
         }
 
         const { scale } = stageConfig;
 
-        backgroundLayerRect.position({
+        BackgroundRectRect.position({
           x: -stage.x() / scale,
           y: -stage.y() / scale,
         });
@@ -394,7 +343,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
         const stage = event.target;
 
         dispatch(
-          stageConfigActions.set({
+          canvasActions.setStageConfig({
             ...stageConfig,
             position: stage.position(),
           }),
@@ -426,35 +375,20 @@ const DrawingCanvas = forwardRef<Ref, Props>(
         <NodesLayer
           nodes={nodes}
           draftNode={draftNode}
-          selectedNodeId={selectedNodeId}
-          selectedNodesIds={selectedNodesIds}
           toolType={toolType}
           config={{ ...config, listening: !drawing }}
-          backgroundLayerRect={offsetBackgroundLayerRect}
           onDraftEnd={handleDraftEnd}
         >
-          <Html
-            groupProps={{
-              x: contextMenu?.position[0],
-              y: contextMenu?.position[1],
-            }}
-            transformFunc={(attrs) => {
-              return { ...attrs, scaleX: 1, scaleY: 1 };
-            }}
-          >
-            {contextMenu && (
-              <ContextMenu
-                items={contextMenu.items}
-                onAction={handleContextMenuAction}
-              />
-            )}
-          </Html>
+          <BackgroundRect stageRef={ref} stageConfig={stageConfig} />
+          {drawing && toolType === 'select' && (
+            <SelectRect
+              ref={selectRectRef}
+              startPoint={drawPosition.start}
+              currentPoint={drawPosition.current}
+            />
+          )}
+          <ContextMenu {...contextMenuState} />
         </NodesLayer>
-        {selectRect && (
-          <Layer>
-            <SelectTool rect={selectRect} ref={selectRectRef} />
-          </Layer>
-        )}
       </Stage>
     );
   },

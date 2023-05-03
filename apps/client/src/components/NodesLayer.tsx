@@ -3,41 +3,30 @@ import { type PropsWithChildren, useMemo } from 'react';
 import { Layer } from 'react-konva';
 import type { NodeObject } from 'shared';
 import type { Tool } from '@/constants/tool';
-import { useAppDispatch } from '../stores/hooks';
-import { controlActions } from '../stores/slices/controlSlice';
+import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
+import { useAppDispatch, useAppSelector } from '../stores/hooks';
 import { nodesActions } from '../stores/slices/nodesSlice';
-import BackgroundLayer from './BackgroundLayer';
 import DraftNode from './Node/DraftNode';
 import NodeGroupTransformer from './NodeGroupTransformer/NodeGroupTransformer';
 import Nodes from './Nodes';
 
 type Props = PropsWithChildren<{
   nodes: NodeObject[];
-  selectedNodeId: string | null;
   toolType: Tool['value'];
   draftNode: NodeObject | null;
-  selectedNodesIds: string[];
   config?: LayerConfig;
-  backgroundLayerRect: {
-    width: number;
-    height: number;
-    x: number;
-    y: number;
-  };
   onDraftEnd: (node: NodeObject) => void;
 }>;
 
 const NodesLayer = ({
   nodes,
-  selectedNodeId,
   toolType,
   draftNode,
-  selectedNodesIds,
   config,
-  backgroundLayerRect,
   onDraftEnd,
   children,
 }: Props) => {
+  const { selectedNodesIds } = useAppSelector(selectCanvas);
   const dispatch = useAppDispatch();
 
   const handleNodeChange = (nodes: NodeObject[]) => {
@@ -46,18 +35,23 @@ const NodesLayer = ({
 
   const handleNodePress = (nodeId: string) => {
     if (toolType === 'select') {
-      dispatch(controlActions.setSelectedNodeId(nodeId));
+      dispatch(canvasActions.setSelectedNodesIds({ [nodeId]: true }));
     }
   };
 
-  const selectedNodes = useMemo(() => {
-    return nodes.filter((node) => selectedNodesIds.includes(node.nodeProps.id));
-    // Temporary workaround
+  const selectedNodeId = useMemo(() => {
+    if (Object.keys(selectedNodesIds).length !== 1) return null;
+
+    return Object.keys(selectedNodesIds)[0];
   }, [selectedNodesIds]);
+
+  const selectedNodes = useMemo(() => {
+    return nodes.filter((node) => selectedNodesIds[node.nodeProps.id]);
+  }, [selectedNodesIds, nodes]);
 
   return (
     <Layer listening={config?.listening}>
-      <BackgroundLayer {...backgroundLayerRect} />
+      {children}
       <Nodes
         nodes={nodes}
         selectedNodeId={selectedNodeId}
@@ -66,13 +60,13 @@ const NodesLayer = ({
         onNodeChange={(node) => handleNodeChange([node])}
       />
       {draftNode && <DraftNode node={draftNode} onDraftEnd={onDraftEnd} />}
-      {selectedNodes.length ? (
+      {selectedNodes.length > 1 ? (
         <NodeGroupTransformer
-          selectedNodes={selectedNodes}
+          nodes={selectedNodes}
+          draggable={toolType !== 'hand'}
           onDragEnd={handleNodeChange}
         />
       ) : null}
-      {children}
     </Layer>
   );
 };

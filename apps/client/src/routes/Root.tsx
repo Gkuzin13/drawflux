@@ -11,13 +11,9 @@ import useKeydownListener from '@/hooks/useKeyListener';
 import useWindowSize from '@/hooks/useWindowSize/useWindowSize';
 import { useGetPageQuery } from '@/services/api';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { controlActions } from '@/stores/slices/controlSlice';
+import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
 import { modalActions, selectModal } from '@/stores/slices/modalSlice';
 import { nodesActions } from '@/stores/slices/nodesSlice';
-import {
-  selectStageConfig,
-  stageConfigActions,
-} from '@/stores/slices/stageConfigSlice';
 import { getFromStorage } from '@/utils/storage';
 
 const Root = () => {
@@ -29,7 +25,7 @@ const Root = () => {
     { skip: !id },
   );
 
-  const stageConfig = useAppSelector(selectStageConfig);
+  const { stageConfig } = useAppSelector(selectCanvas);
   const modal = useAppSelector(selectModal);
 
   const dispatch = useAppDispatch();
@@ -55,13 +51,14 @@ const Root = () => {
       }
 
       const batchDispatchPageState = (state: PageStateType) => {
-        const { control, nodes, stageConfig } = state.page;
+        const { toolType, nodes, stageConfig, selectedNodesIds } = state.page;
 
         // Order of dispatch is important in dev mode
         // Cause is unknown, needs investigation
-        dispatch(controlActions.set(control));
+        dispatch(canvasActions.setToolType(toolType));
         dispatch(nodesActions.set(nodes));
-        dispatch(stageConfigActions.set(stageConfig));
+        dispatch(canvasActions.setSelectedNodesIds(selectedNodesIds));
+        dispatch(canvasActions.setStageConfig(stageConfig));
       };
 
       batchDispatchPageState(stateFromStorage);
@@ -87,7 +84,7 @@ const Root = () => {
   }, [stageConfig, width, height]);
 
   const handleStageConfigChange = (config: Partial<StageConfig>) => {
-    dispatch(stageConfigActions.set(config));
+    dispatch(canvasActions.setStageConfig(config));
   };
 
   if (isLoading) {

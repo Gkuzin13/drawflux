@@ -1,19 +1,15 @@
 import type Konva from 'konva';
 import { type RefObject, useMemo } from 'react';
-import { type NodeStyle, type NodeObject, Schemas } from 'shared';
+import type { NodeStyle, NodeObject, StageConfig } from 'shared';
+import { Schemas } from 'shared';
 import { z } from 'zod';
 import type { ControlAction } from '@/constants/control';
 import { type MenuPanelActionType } from '@/constants/menu';
 import { type Tool } from '@/constants/tool';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { controlActions, selectControl } from '@/stores/slices/controlSlice';
+import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
 import { modalActions } from '@/stores/slices/modalSlice';
 import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
-import {
-  selectStageConfig,
-  stageConfigActions,
-  type StageConfigState,
-} from '@/stores/slices/stageConfigSlice';
 import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
 import ControlPanel from './ControlPanel/ControlPanel';
@@ -29,49 +25,66 @@ type Props = {
 };
 
 const Panels = ({ stageRef, isPageShared = false }: Props) => {
-  const { selectedNodeId, selectedNodesIds, toolType } =
-    useAppSelector(selectControl);
-  const stageConfig = useAppSelector(selectStageConfig);
-
+  const { stageConfig, toolType, selectedNodesIds } =
+    useAppSelector(selectCanvas);
   const { past, present, future } = useAppSelector(selectNodes);
 
   const nodes = present.nodes;
 
   const dispatch = useAppDispatch();
 
-  const selectedNode = useMemo(() => {
-    return nodes.find((n) => n.nodeProps.id === selectedNodeId);
-  }, [selectedNodeId, nodes]);
+  const selectedNodes = useMemo(() => {
+    return nodes.filter((node) => selectedNodesIds[node.nodeProps.id]);
+  }, [selectedNodesIds, nodes]);
 
   const enabledControls = useMemo(() => {
     return {
       undo: Boolean(past.length),
       redo: Boolean(future.length),
-      deleteSelectedNodes: Boolean(selectedNodeId || selectedNodesIds.length),
+      deleteSelectedNodes: Boolean(Object.keys(selectedNodesIds).length),
     };
-  }, [past, future, selectedNodesIds, selectedNodeId]);
+  }, [past, future, selectedNodesIds]);
 
   const stylePanelEnabledOptions = useMemo<
     StylePanelProps['enabledOptions']
   >(() => {
-    switch (selectedNode?.type) {
-      case 'text':
-        return { line: false, size: true };
-      default:
-        return { line: true, size: true };
+    const selectedNodesTypes = selectedNodes.map(({ type }) => type);
+
+    if (selectedNodesTypes.includes('text')) {
+      return { line: false, size: true };
     }
-  }, [selectedNode]);
+
+    return { line: true, size: true };
+  }, [selectedNodes]);
+
+  const selectedNodesStyle = useMemo<Partial<NodeStyle>>(() => {
+    const styles: NodeStyle[] = selectedNodes.map(({ style }) => style);
+
+    const colors = new Set(styles.map(({ color }) => color));
+    const lines = new Map(styles.map(({ line }) => [`${line}`, line]));
+    const sizes = new Set(styles.map(({ size }) => size));
+    const opacities = new Set(styles.map(({ opacity }) => opacity));
+    const animated = styles.every(({ animated }) => animated);
+
+    return {
+      color: colors.size > 1 ? undefined : Array.from(colors)[0],
+      line: lines.size > 1 ? undefined : Array.from(lines.values())[0],
+      size: sizes.size > 1 ? undefined : Array.from(sizes)[0],
+      opacity: opacities.size > 1 ? undefined : Array.from(opacities)[0],
+      animated,
+    };
+  }, [selectedNodes]);
 
   const onToolTypeChange = (type: Tool['value']) => {
-    dispatch(controlActions.setToolType(type));
+    dispatch(canvasActions.setToolType(type));
   };
 
-  const handleStyleChange = (style: NodeStyle) => {
-    if (!selectedNode) return;
+  const handleStyleChange = (style: Partial<NodeStyle>) => {
+    const updatedNodes = selectedNodes.map((node) => {
+      return { ...node, style: { ...node.style, ...style } };
+    });
 
-    const updatedNode = { ...selectedNode, style };
-
-    dispatch(nodesActions.update([updatedNode]));
+    dispatch(nodesActions.update(updatedNodes));
   };
 
   const handleMenuAction = (type: MenuPanelActionType) => {
@@ -88,7 +101,7 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
         const state = store.getState();
 
         const stateToExport = {
-          stageConfig: state.stageConfig,
+          stageConfig: state.canvas.stageConfig,
           nodes: state.nodesHistory.present.nodes,
         };
 
@@ -107,7 +120,7 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
           stageConfig: z.unknown(),
         });
 
-        loadJsonFile<{ nodes: NodeObject[]; stageConfig: StageConfigState }>(
+        loadJsonFile<{ nodes: NodeObject[]; stageConfig: StageConfig }>(
           schema,
         ).then((state) => {
           if (!state) {
@@ -120,7 +133,7 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
             return;
           }
           dispatch(nodesActions.set(state.nodes));
-          dispatch(stageConfigActions.set(state.stageConfig));
+          dispatch(canvasActions.setStageConfig(state.stageConfig));
         });
         break;
       }
@@ -128,24 +141,14 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
   };
 
   const handleZoomChange = (value: number) => {
-    dispatch(stageConfigActions.set({ ...stageConfig, scale: value }));
+    dispatch(canvasActions.setStageConfig({ ...stageConfig, scale: value }));
   };
 
   const handleControlActions = (action: ControlAction) => {
     switch (action.type) {
       case 'nodes/delete': {
-        dispatch(
-          nodesActions.delete(
-            selectedNodeId ? [selectedNodeId] : selectedNodesIds,
-          ),
-        );
-        dispatch(
-          controlActions.set({
-            toolType,
-            selectedNodeId: null,
-            selectedNodesIds: [],
-          }),
-        );
+        dispatch(nodesActions.delete(Object.keys(selectedNodesIds)));
+        dispatch(canvasActions.setSelectedNodesIds({}));
         break;
       }
       default: {
@@ -163,13 +166,13 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
       />
       <MenuPanel onAction={handleMenuAction} />
       <ToolsDock activeTool={toolType} onToolSelect={onToolTypeChange} />
-      {selectedNode && (
+      {selectedNodes.length ? (
         <StylePanel
-          style={selectedNode.style}
+          style={selectedNodesStyle}
           enabledOptions={stylePanelEnabledOptions}
           onStyleChange={handleStyleChange}
         />
-      )}
+      ) : null}
       <ControlPanel
         onControl={handleControlActions}
         enabledControls={enabledControls}

@@ -6,7 +6,7 @@ import type { Point, NodeProps, NodeLIne } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import { createDefaultNodeConfig } from '@/constants/element';
 import { useAppSelector } from '@/stores/hooks';
-import { selectStageConfig } from '@/stores/slices/stageConfigSlice';
+import { selectCanvas } from '@/stores/slices/canvasSlice';
 import { getValueFromRatio } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import ArrowHead from './ArrowHead';
@@ -33,7 +33,7 @@ const ArrowDrawable = memo(
     );
     const [dragging, setDragging] = useState(false);
 
-    const { scale: stageScale } = useAppSelector(selectStageConfig);
+    const { scale: stageScale } = useAppSelector(selectCanvas).stageConfig;
 
     const scaledLine = useMemo(() => {
       return node.style.line.map((l) => l * stageScale) as NodeLIne;

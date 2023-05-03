@@ -8,7 +8,7 @@ import { createDefaultNodeConfig } from '@/constants/element';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
-import { selectStageConfig } from '@/stores/slices/stageConfigSlice';
+import { selectCanvas } from '@/stores/slices/canvasSlice';
 
 const EllipseDrawable = memo(
   ({
@@ -22,7 +22,7 @@ const EllipseDrawable = memo(
       selected,
     ]);
 
-    const { scale: stageScale } = useAppSelector(selectStageConfig);
+    const { scale: stageScale } = useAppSelector(selectCanvas).stageConfig;
 
     const scaledLine = useMemo(() => {
       return node.style.line.map((l) => l * stageScale);

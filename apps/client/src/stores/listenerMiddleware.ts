@@ -9,10 +9,9 @@ import {
 import { LOCAL_STORAGE, type PageStateType } from '@/constants/app';
 import { api } from '@/services/api';
 import { setToStorage } from '@/utils/storage';
-import { controlActions } from './slices/controlSlice';
+import { canvasActions } from './slices/canvasSlice';
 import { historyActions } from './slices/historySlice';
 import { nodesActions } from './slices/nodesSlice';
-import { stageConfigActions } from './slices/stageConfigSlice';
 import type { RootState, AppDispatch } from './store';
 
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
@@ -32,16 +31,15 @@ export const addAppListener = addListener as TypedAddListener<
 >;
 
 const actionsToListenTo = [
-  controlActions.setSelectedNodeId,
-  controlActions.setSelectedNodesIds,
-  controlActions.setToolType,
   historyActions.undo,
   historyActions.redo,
-  stageConfigActions.set,
   nodesActions.add,
   nodesActions.update,
   nodesActions.set,
   nodesActions.delete,
+  canvasActions.setSelectedNodesIds,
+  canvasActions.setStageConfig,
+  canvasActions.setToolType,
   api.endpoints.getPage.matchRejected,
   api.endpoints.getPage.matchFulfilled,
 ];
@@ -57,10 +55,13 @@ startAppListening({
       return;
     }
 
-    const { stageConfig, nodesHistory, control } = listenerApi.getState();
+    const { nodesHistory, canvas } = listenerApi.getState();
 
     setToStorage<PageStateType>(LOCAL_STORAGE.KEY, {
-      page: { stageConfig, nodes: nodesHistory.present.nodes, control },
+      page: {
+        nodes: nodesHistory.present.nodes,
+        ...canvas,
+      },
     });
   },
 });

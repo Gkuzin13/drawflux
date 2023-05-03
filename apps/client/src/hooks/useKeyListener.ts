@@ -2,13 +2,13 @@ import { useCallback, useEffect } from 'react';
 import { KEYS, type Key } from '@/constants/keys';
 import { TOOLS } from '@/constants/tool';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { controlActions, selectControl } from '@/stores/slices/controlSlice';
+import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
 import { historyActions } from '@/stores/slices/historySlice';
 import { nodesActions } from '@/stores/slices/nodesSlice';
 
 function useKeydownListener() {
-  const { selectedNodeId, selectedNodesIds, toolType } =
-    useAppSelector(selectControl);
+  const { selectedNodesIds } = useAppSelector(selectCanvas);
+  const { toolType } = useAppSelector(selectCanvas);
 
   const dispatch = useAppDispatch();
 
@@ -33,18 +33,7 @@ function useKeydownListener() {
       }
 
       if (key === KEYS.DELETE) {
-        dispatch(
-          nodesActions.delete(
-            selectedNodeId ? [selectedNodeId] : selectedNodesIds,
-          ),
-        );
-        dispatch(
-          controlActions.set({
-            toolType,
-            selectedNodeId: null,
-            selectedNodesIds: [],
-          }),
-        );
+        dispatch(nodesActions.delete(Object.keys(selectedNodesIds)));
         return;
       }
 
@@ -52,7 +41,7 @@ function useKeydownListener() {
         (tool) => tool.key === key.toLowerCase(),
       );
 
-      dispatch(controlActions.setToolType(toolTypeByKey?.value || 'select'));
+      dispatch(canvasActions.setToolType(toolTypeByKey?.value || 'select'));
     };
 
     if (toolType === 'text') {
@@ -64,7 +53,7 @@ function useKeydownListener() {
     return () => {
       window.removeEventListener('keydown', handleKeyUp);
     };
-  }, [toolType, selectedNodeId, selectedNodesIds]);
+  }, [toolType, selectedNodesIds]);
 }
 
 export default useKeydownListener;

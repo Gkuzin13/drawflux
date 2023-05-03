@@ -7,7 +7,7 @@ import { createDefaultNodeConfig } from '@/constants/element';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
-import { selectStageConfig } from '@/stores/slices/stageConfigSlice';
+import { selectCanvas } from '@/stores/slices/canvasSlice';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import NodeTransformer from '../../NodeTransformer';
 
@@ -20,7 +20,7 @@ const FreePathDrawable = memo(
     onPress,
   }: NodeComponentProps) => {
     const { nodeRef, transformerRef } = useTransformer<Konva.Line>([selected]);
-    const { scale: stageScale } = useAppSelector(selectStageConfig);
+    const { scale: stageScale } = useAppSelector(selectCanvas).stageConfig;
 
     const scaledLine = useMemo(() => {
       return node.style.line.map((l) => l * stageScale);

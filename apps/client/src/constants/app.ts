@@ -12,15 +12,12 @@ export const PageState = z.object({
   page: z.object({
     stageConfig: Schemas.StageConfig,
     nodes: Schemas.Node.array(),
-    control: z.object({
-      toolType: ToolType,
-      selectedNodeId: z.string().or(z.null()),
-      selectedNodesIds: z.string().array(),
-    }),
+    toolType: ToolType,
+    selectedNodesIds: z.record(z.string(), z.boolean()),
   }),
 });
 
-const { control } = PageState.shape.page.shape;
-
 export type PageStateType = z.infer<typeof PageState>;
-export type ControlState = z.infer<typeof control>;
+export type SelectedNodesIds = z.infer<
+  (typeof PageState)['shape']['page']['shape']['selectedNodesIds']
+>;
