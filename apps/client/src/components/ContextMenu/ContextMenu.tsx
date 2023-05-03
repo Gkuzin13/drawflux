@@ -21,8 +21,13 @@ type Props = {
 
 const DrawingCanvasMenu = () => {
   const { nodes } = useAppSelector(selectNodes).present;
+  const { selectedNodesIds } = useAppSelector(selectCanvas);
 
   const dispatch = useAppDispatch();
+
+  const areNodesSelected = useMemo(() => {
+    return Boolean(Object.keys(selectedNodesIds).length);
+  }, [selectedNodesIds]);
 
   const handleSelectAll = useCallback(() => {
     const allSelectedNodesIds: SelectedNodesIds = {};
@@ -42,9 +47,10 @@ const DrawingCanvasMenu = () => {
 
   return (
     <>
-      <Divider type="horizontal" />
       <Menu.Item onItemClick={handleSelectAll}>Select All</Menu.Item>
-      <Menu.Item onItemClick={handleSelectNone}>Select None</Menu.Item>
+      {areNodesSelected && (
+        <Menu.Item onItemClick={handleSelectNone}>Select None</Menu.Item>
+      )}
     </>
   );
 };
