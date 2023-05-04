@@ -147,13 +147,13 @@ const DrawingCanvas = forwardRef<Ref, Props>(
         dispatch(
           canvasActions.setSelectedNodesIds({ [node.nodeProps.id]: true }),
         );
-        dispatch(
-          contextMenuActions.open({
-            type: 'node-menu',
-            position,
-          }),
-        );
       }
+      dispatch(
+        contextMenuActions.open({
+          type: 'node-menu',
+          position,
+        }),
+      );
     };
 
     const drawNodeByType = (node: NodeObject, position: Point): NodeObject => {
