@@ -1,11 +1,10 @@
 import { useContext } from 'react';
 import type { PropsWithChildren } from 'react';
-import Button from '../Button/Button';
 import type { ButtonStyled } from '../Button/ButtonStyled';
 import { Divider } from '../Divider/Divider';
 import Popover, { type PopoverProps } from '../Popover/Popover';
 import { PopoverContext } from '../Popover/PopoverContext';
-import { Label as MenuLabel } from './MenuStyled';
+import { MenuItem, MenuLabel } from './MenuStyled';
 
 type ItemProps = {
   closeOnItemClick?: boolean;
@@ -34,15 +33,9 @@ const Item = ({
   };
 
   return (
-    <Button
-      fullWidth={true}
-      size="small"
-      color="secondary-light"
-      {...props}
-      onClick={hanleClick}
-    >
+    <MenuItem fullWidth={true} {...props} onClick={hanleClick}>
       {children}
-    </Button>
+    </MenuItem>
   );
 };
 

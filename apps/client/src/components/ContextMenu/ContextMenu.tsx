@@ -8,8 +8,7 @@ import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
 import { contextMenuActions } from '@/stores/slices/contextMenu';
 import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
 import { Divider } from '../core/Divider/Divider';
-import Menu from '../core/Menu/Menu';
-import { ContextMenuContainer } from './ContextMenuStyled';
+import { ContextMenuContainer, ContextMenuItem } from './ContextMenuStyled';
 
 export type ContextMenuType = 'node-menu' | 'drawing-canvas-menu';
 
@@ -47,9 +46,13 @@ const DrawingCanvasMenu = () => {
 
   return (
     <>
-      <Menu.Item onItemClick={handleSelectAll}>Select All</Menu.Item>
+      <ContextMenuItem onItemClick={handleSelectAll}>
+        Select All
+      </ContextMenuItem>
       {areNodesSelected && (
-        <Menu.Item onItemClick={handleSelectNone}>Select None</Menu.Item>
+        <ContextMenuItem onItemClick={handleSelectNone}>
+          Select None
+        </ContextMenuItem>
       )}
     </>
   );
@@ -64,9 +67,42 @@ const NodeMenu = () => {
     dispatch(contextMenuActions.close());
   }, [dispatch, selectedNodesIds]);
 
+  const handleBringToFront = useCallback(() => {
+    dispatch(nodesActions.moveToEnd(Object.keys(selectedNodesIds)));
+    dispatch(contextMenuActions.close());
+  }, [dispatch, selectedNodesIds]);
+
+  const handleBringForward = useCallback(() => {
+    dispatch(nodesActions.moveForward(Object.keys(selectedNodesIds)));
+    dispatch(contextMenuActions.close());
+  }, [dispatch, selectedNodesIds]);
+
+  const handleSendToBack = useCallback(() => {
+    dispatch(nodesActions.moveToStart(Object.keys(selectedNodesIds)));
+    dispatch(contextMenuActions.close());
+  }, [dispatch, selectedNodesIds]);
+
+  const handleSendBackward = useCallback(() => {
+    dispatch(nodesActions.moveBackward(Object.keys(selectedNodesIds)));
+    dispatch(contextMenuActions.close());
+  }, [dispatch, selectedNodesIds]);
+
   return (
     <>
-      <Menu.Item onItemClick={handleDeleteNode}>Delete</Menu.Item>
+      <ContextMenuItem onItemClick={handleBringToFront}>
+        Bring to front
+      </ContextMenuItem>
+      <ContextMenuItem onItemClick={handleBringForward}>
+        Bring forward
+      </ContextMenuItem>
+      <ContextMenuItem onItemClick={handleSendBackward}>
+        Send backward
+      </ContextMenuItem>
+      <ContextMenuItem onItemClick={handleSendToBack}>
+        Send to back
+      </ContextMenuItem>
+      <Divider type="horizontal" />
+      <ContextMenuItem onItemClick={handleDeleteNode}>Delete</ContextMenuItem>
     </>
   );
 };

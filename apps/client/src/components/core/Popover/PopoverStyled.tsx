@@ -16,6 +16,5 @@ export const PopoverDropdown = styled('div', {
   padding: '$1',
   borderRadius: '$1',
   marginTop: '$2',
-  width: '$11',
   backgroundColor: '$white',
 });
