@@ -42,7 +42,7 @@ export const ButtonStyled = styled('button', {
       'extra-small': {
         fontSize: '$1',
         gap: '$1',
-        padding: '$1',
+        padding: '$2',
       },
       small: {
         fontSize: '$2',

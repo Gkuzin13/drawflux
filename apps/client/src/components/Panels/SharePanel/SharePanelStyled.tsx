@@ -4,6 +4,7 @@ export const SharePanelContainer = styled('div', {
   position: 'fixed',
   right: '$12',
   top: '$2',
+  maxWidth: '$11',
   zIndex: 1,
 });
 
