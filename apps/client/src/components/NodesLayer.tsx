@@ -39,12 +39,6 @@ const NodesLayer = ({
     }
   };
 
-  const selectedNodeId = useMemo(() => {
-    if (Object.keys(selectedNodesIds).length !== 1) return null;
-
-    return Object.keys(selectedNodesIds)[0];
-  }, [selectedNodesIds]);
-
   const selectedNodes = useMemo(() => {
     return nodes.filter((node) => selectedNodesIds[node.nodeProps.id]);
   }, [selectedNodesIds, nodes]);
@@ -54,7 +48,7 @@ const NodesLayer = ({
       {children}
       <Nodes
         nodes={nodes}
-        selectedNodeId={selectedNodeId}
+        selectedNodesIds={selectedNodesIds}
         toolType={toolType}
         onNodePress={handleNodePress}
         onNodeChange={(node) => handleNodeChange([node])}

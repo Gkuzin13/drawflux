@@ -1,10 +1,12 @@
+import { useMemo } from 'react';
 import type { NodeObject } from 'shared';
+import type { SelectedNodesIds } from '@/constants/app';
 import type { Tool } from '@/constants/tool';
 import Node from './Node/Node';
 
 type Props = {
   nodes: NodeObject[];
-  selectedNodeId: string | null;
+  selectedNodesIds: SelectedNodesIds;
   toolType: Tool['value'];
   onNodePress: (nodeId: string) => void;
   onNodeChange: (node: NodeObject) => void;
@@ -12,11 +14,17 @@ type Props = {
 
 const Nodes = ({
   nodes,
-  selectedNodeId,
+  selectedNodesIds,
   toolType,
   onNodePress,
   onNodeChange,
 }: Props) => {
+  const selectedNodeId = useMemo(() => {
+    if (Object.keys(selectedNodesIds).length !== 1) return null;
+
+    return Object.keys(selectedNodesIds)[0];
+  }, [selectedNodesIds]);
+
   return (
     <>
       {nodes.map((node) => {
