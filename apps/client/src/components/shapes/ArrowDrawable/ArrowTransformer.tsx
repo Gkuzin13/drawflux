@@ -1,7 +1,8 @@
 import type Konva from 'konva';
 import { type KonvaEventObject } from 'konva/lib/Node';
 import type { Vector2d } from 'konva/lib/types';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { Group } from 'react-konva';
 import { type Point } from 'shared';
 import { getRatioFromValue } from '@/utils/math';
 import { calculateClampedMidPoint } from './helpers/calc';
@@ -31,6 +32,14 @@ const ArrowTransformer = ({
   onTransform,
   onTransformEnd,
 }: Props) => {
+  const transformerRef = useRef<Konva.Group>(null);
+
+  useEffect(() => {
+    if (transformerRef.current) {
+      transformerRef.current.moveToTop();
+    }
+  }, [transformerRef]);
+
   const getBendValue = useCallback(
     (dragPosition: Point) => {
       const bendX = getRatioFromValue(
@@ -86,7 +95,7 @@ const ArrowTransformer = ({
   };
 
   return (
-    <>
+    <Group ref={transformerRef}>
       {[start, end, bendPoint].map(([x, y], index) => {
         return (
           <TransformerAnchor
@@ -99,7 +108,7 @@ const ArrowTransformer = ({
           />
         );
       })}
-    </>
+    </Group>
   );
 };
 

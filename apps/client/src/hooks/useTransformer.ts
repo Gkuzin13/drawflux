@@ -9,6 +9,7 @@ const useTransformer = <T extends Konva.Node>(deps: unknown[]) => {
   useEffect(() => {
     if (transformerRef.current && nodeRef.current) {
       transformerRef.current.nodes([nodeRef.current]);
+      transformerRef.current.moveToTop();
       transformerRef.current.getLayer()?.batchDraw();
     }
   }, [...deps]);
