@@ -7,13 +7,13 @@ type UseAnimatedLineArgs = {
   elementRef: RefObject<
     Konva.Shape | Konva.Rect | Konva.Ellipse | Konva.Line | null
   >;
-  maxOffset: number;
+  totalDashLength: number;
 };
 
 const useAnimatedLine = ({
   enabled,
   elementRef,
-  maxOffset,
+  totalDashLength,
 }: UseAnimatedLineArgs) => {
   useEffect(() => {
     const element = elementRef.current;
@@ -23,7 +23,7 @@ const useAnimatedLine = ({
         if (!frame) return;
 
         const time = frame.time / 600;
-        const offset = maxOffset * ((time * 2) % 2);
+        const offset = totalDashLength * ((time * 2) % 2);
 
         element?.dashOffset(-offset);
       }, element?.getLayer());
@@ -42,7 +42,7 @@ const useAnimatedLine = ({
     return () => {
       anim.stop();
     };
-  }, [elementRef, maxOffset, enabled]);
+  }, [elementRef, totalDashLength, enabled]);
 };
 
 export default useAnimatedLine;

@@ -23,7 +23,7 @@ const ArrowLine = ({ dash, animated, points, control, config }: Props) => {
   useAnimatedLine({
     enabled: animated,
     elementRef: lineRef,
-    maxOffset: dash[0] + dash[1],
+    totalDashLength: dash[0] + dash[1],
   });
 
   const [start, end] = points;

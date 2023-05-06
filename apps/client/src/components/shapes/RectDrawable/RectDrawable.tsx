@@ -30,7 +30,7 @@ const RectDrawable = memo(
     useAnimatedLine({
       enabled: node.style.animated,
       elementRef: nodeRef,
-      maxOffset: scaledLine[0] + scaledLine[1],
+      totalDashLength: scaledLine[0] + scaledLine[1],
     });
 
     const config = useMemo(() => {
