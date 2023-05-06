@@ -20,7 +20,11 @@ const ArrowLine = ({ dash, animated, points, control, config }: Props) => {
 
   const flattenedPoints = useMemo(() => points.flat(), [points]);
 
-  useAnimatedLine(lineRef.current, dash[0] + dash[1], animated, dash);
+  useAnimatedLine({
+    enabled: animated,
+    elementRef: lineRef,
+    maxOffset: dash[0] + dash[1],
+  });
 
   const [start, end] = points;
 

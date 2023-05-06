@@ -28,12 +28,11 @@ const EllipseDrawable = memo(
       return node.style.line.map((l) => l * stageScale);
     }, [node.style.line, stageScale]);
 
-    useAnimatedLine(
-      nodeRef.current,
-      scaledLine[0] + scaledLine[1],
-      node.style.animated,
-      node.style.line,
-    );
+    useAnimatedLine({
+      enabled: node.style.animated,
+      elementRef: nodeRef,
+      maxOffset: scaledLine[0] + scaledLine[1],
+    });
 
     const config = useMemo(() => {
       return createDefaultNodeConfig({
