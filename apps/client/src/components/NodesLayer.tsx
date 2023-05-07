@@ -3,18 +3,18 @@ import { type PropsWithChildren, useMemo } from 'react';
 import { Layer } from 'react-konva';
 import type { NodeObject } from 'shared';
 import type { Tool } from '@/constants/tool';
-import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
-import { useAppDispatch, useAppSelector } from '../stores/hooks';
-import { nodesActions } from '../stores/slices/nodesSlice';
 import DraftNode from './Node/DraftNode';
+import Node from './Node/Node';
 import NodeGroupTransformer from './NodeGroupTransformer/NodeGroupTransformer';
-import Nodes from './Nodes';
 
 type Props = PropsWithChildren<{
   nodes: NodeObject[];
   toolType: Tool['value'];
   draftNode: NodeObject | null;
   config?: LayerConfig;
+  selectedNodesIds: string[];
+  onNodePress: (nodeId: string) => void;
+  onNodesChange: (nodes: NodeObject[]) => void;
   onDraftEnd: (node: NodeObject) => void;
 }>;
 
@@ -23,42 +23,45 @@ const NodesLayer = ({
   toolType,
   draftNode,
   config,
+  selectedNodesIds,
+  onNodePress,
+  onNodesChange,
   onDraftEnd,
   children,
 }: Props) => {
-  const { selectedNodesIds } = useAppSelector(selectCanvas);
-  const dispatch = useAppDispatch();
-
-  const handleNodeChange = (nodes: NodeObject[]) => {
-    dispatch(nodesActions.update(nodes));
-  };
-
-  const handleNodePress = (nodeId: string) => {
-    if (toolType === 'select') {
-      dispatch(canvasActions.setSelectedNodesIds([nodeId]));
-    }
-  };
-
   const selectedNodes = useMemo(() => {
-    return nodes.filter((node) => selectedNodesIds[node.nodeProps.id]);
+    const nodesIds = new Set(selectedNodesIds);
+
+    return nodes.filter((node) => nodesIds.has(node.nodeProps.id));
   }, [selectedNodesIds, nodes]);
+
+  const selectedNodeId = useMemo(() => {
+    if (selectedNodesIds.length !== 1) return null;
+
+    return selectedNodesIds[0];
+  }, [selectedNodesIds]);
 
   return (
     <Layer listening={config?.listening}>
       {children}
-      <Nodes
-        nodes={nodes}
-        selectedNodesIds={selectedNodesIds}
-        toolType={toolType}
-        onNodePress={handleNodePress}
-        onNodeChange={(node) => handleNodeChange([node])}
-      />
+      {nodes.map((node) => {
+        return (
+          <Node
+            key={node.nodeProps.id}
+            node={node}
+            selected={selectedNodeId === node.nodeProps.id}
+            draggable={toolType === 'select'}
+            onPress={onNodePress}
+            onNodeChange={(updatedNode) => onNodesChange([updatedNode])}
+          />
+        );
+      })}
       {draftNode && <DraftNode node={draftNode} onDraftEnd={onDraftEnd} />}
       {selectedNodes.length > 1 ? (
         <NodeGroupTransformer
           nodes={selectedNodes}
           draggable={toolType !== 'hand'}
-          onDragEnd={handleNodeChange}
+          onDragEnd={onNodesChange}
         />
       ) : null}
     </Layer>

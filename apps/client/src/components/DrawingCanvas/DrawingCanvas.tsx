@@ -8,10 +8,10 @@ import {
   useRef,
   useState,
   useCallback,
+  useEffect,
 } from 'react';
 import { Stage } from 'react-konva';
 import type { NodeObject, Point, StageConfig } from 'shared';
-import type { SelectedNodesIds } from '@/constants/app';
 import { CURSOR } from '@/constants/cursor';
 import { BACKGROUND_LAYER_ID } from '@/constants/element';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
@@ -20,8 +20,7 @@ import {
   contextMenuActions,
   selectContextMenu,
 } from '@/stores/slices/contextMenu';
-import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
-import { debounce } from '@/utils/debounce';
+import { nodesActions, selectCurrentNodes } from '@/stores/slices/nodesSlice';
 import { createNode } from '@/utils/node';
 import BackgroundRect from '../BackgroundRect';
 import ContextMenu from '../ContextMenu/ContextMenu';
@@ -40,6 +39,8 @@ import {
 type Props = PropsWithRef<{
   config: NodeConfig;
   containerStyle?: React.CSSProperties;
+  intersectedNodesIds: string[];
+  onNodesIntersection: (nodesIds: string[]) => void;
   onConfigChange: (config: Partial<StageConfig>) => void;
 }>;
 
@@ -50,19 +51,30 @@ type DrawPosition = {
   current: Point;
 };
 
+const initialDrawPosition: DrawPosition = {
+  start: [0, 0],
+  current: [0, 0],
+};
+
 const DrawingCanvas = forwardRef<Ref, Props>(
-  ({ config, containerStyle, onConfigChange }, ref) => {
+  (
+    {
+      config,
+      containerStyle,
+      intersectedNodesIds,
+      onNodesIntersection,
+      onConfigChange,
+    },
+    ref,
+  ) => {
     const [draftNode, setDraftNode] = useState<NodeObject | null>(null);
     const [drawing, setDrawing] = useState(false);
-    const [drawPosition, setDrawPosition] = useState<DrawPosition>({
-      start: [0, 0],
-      current: [0, 0],
-    });
+    const [drawPosition, setDrawPosition] = useState(initialDrawPosition);
     const [draggingStage, setDraggingStage] = useState(false);
 
     const { stageConfig, toolType, selectedNodesIds } =
       useAppSelector(selectCanvas);
-    const { nodes } = useAppSelector(selectNodes).present;
+    const nodes = useAppSelector(selectCurrentNodes);
     const contextMenuState = useAppSelector(selectContextMenu);
 
     const dispatch = useAppDispatch();
@@ -80,163 +92,202 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       }
     }, [drawing, toolType, draggingStage]);
 
-    const selectClientRect = useMemo<IRect>(() => {
-      if (!selectRectRef?.current || toolType !== 'select') {
-        return { x: 0, y: 0, width: 0, height: 0 };
+    useEffect(() => {
+      if (typeof ref === 'function' || !ref?.current) {
+        return;
       }
+      const container = ref.current.container();
 
-      return selectRectRef.current.getClientRect();
-    }, [selectRectRef, drawPosition, toolType]);
+      container.tabIndex = 1;
+      container.focus();
+    }, [ref, toolType, selectedNodesIds]);
 
-    const setIntersectedNodes = useCallback(
-      debounce(() => {
-        if (typeof ref === 'function' || !ref?.current) {
+    const getIntersectedNodes = useCallback(
+      (stage: Konva.Stage, rect: IRect) => {
+        const layer = stage.getLayers()[0];
+        const children = layer.getChildren((child) =>
+          nodes.some((node) => node.nodeProps.id === child.id()),
+        );
+
+        if (!children.length) return [];
+
+        const intersectedChildren = getIntersectingChildren(children, rect);
+
+        return [...new Set(intersectedChildren.map((child) => child.id()))];
+      },
+      [nodes],
+    );
+
+    const handleOnContextMenu = useCallback(
+      (e: KonvaEventObject<PointerEvent>) => {
+        e.evt.preventDefault();
+
+        const stage = e.target.getStage() as Konva.Stage;
+        const position = stage.getRelativePointerPosition();
+        const clickedOnEmpty = e.target === stage;
+
+        if (clickedOnEmpty) {
+          dispatch(
+            contextMenuActions.open({
+              type: 'drawing-canvas-menu',
+              position,
+            }),
+          );
           return;
         }
 
-        const layer = ref.current.getLayers()[0];
-        const children = layer.getChildren((child) =>
-          nodes.some((node) => node.nodeProps.id === child.attrs.id),
-        );
+        const shape =
+          e.target.parent?.nodeType === 'Group' ? e.target.parent : e.target;
 
-        if (!children.length) return;
+        const node = nodes.find((node) => node.nodeProps.id === shape?.id());
 
-        const intersectedChildren = getIntersectingChildren(
-          children,
-          selectClientRect,
-        );
-
-        const intersectedIds = intersectedChildren.map(
-          (child) => child.attrs.id,
-        ) as string[];
-
-        dispatch(canvasActions.setSelectedNodesIds(intersectedIds));
-      }, 35),
-      [nodes, dispatch, selectClientRect],
-    );
-
-    const handleOnContextMenu = (e: KonvaEventObject<PointerEvent>) => {
-      e.evt.preventDefault();
-
-      const stage = e.target.getStage() as Konva.Stage;
-      const position = stage.getRelativePointerPosition();
-      const clickedOnEmpty = e.target === stage;
-
-      if (clickedOnEmpty) {
+        if (node) {
+          dispatch(canvasActions.setSelectedNodesIds([node.nodeProps.id]));
+        }
         dispatch(
           contextMenuActions.open({
-            type: 'drawing-canvas-menu',
+            type: 'node-menu',
             position,
           }),
         );
-        return;
-      }
+      },
+      [nodes, dispatch],
+    );
 
-      const shape =
-        e.target.parent?.nodeType === 'Group' ? e.target.parent : e.target;
-
-      const node = nodes.find((node) => node.nodeProps.id === shape?.id());
-
-      if (node) {
-        dispatch(canvasActions.setSelectedNodesIds([node.nodeProps.id]));
-      }
-      dispatch(
-        contextMenuActions.open({
-          type: 'node-menu',
-          position,
-        }),
-      );
-    };
-
-    const drawNodeByType = (node: NodeObject, position: Point): NodeObject => {
-      switch (node.type) {
-        case 'draw': {
-          return drawFreePath(node, position);
+    const drawNodeByType = useCallback(
+      (node: NodeObject, position: Point): NodeObject => {
+        switch (node.type) {
+          case 'draw': {
+            return drawFreePath(node, position);
+          }
+          case 'arrow': {
+            return drawArrow(node, position);
+          }
+          case 'rectangle': {
+            return drawRect(node, drawPosition?.start, position);
+          }
+          case 'ellipse': {
+            return drawEllipse(node, position);
+          }
+          default: {
+            return node;
+          }
         }
-        case 'arrow': {
-          return drawArrow(node, position);
-        }
-        case 'rectangle': {
-          return drawRect(node, drawPosition?.start, position);
-        }
-        case 'ellipse': {
-          return drawEllipse(node, position);
-        }
-        default: {
-          return node;
-        }
-      }
-    };
+      },
+      [drawPosition],
+    );
 
-    const onStagePress = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
-      const isMouseEvent = event.type === 'mousedown';
+    const handleDraftEnd = useCallback(
+      (node: NodeObject, resetToolType = true) => {
+        setDraftNode(null);
 
-      if (isMouseEvent && (event.evt as MouseEvent).button !== 0) {
-        return;
-      }
-
-      const stage = event.target.getStage();
-
-      const clickedOnEmpty = event.target === stage;
-
-      if (!clickedOnEmpty) {
-        return;
-      }
-
-      if (contextMenuState.opened) {
-        dispatch(contextMenuActions.close());
-        return;
-      }
-
-      const { x, y } = stage.getRelativePointerPosition();
-
-      setDrawPosition({ start: [x, y], current: [x, y] });
-
-      switch (toolType) {
-        case 'hand':
+        if (node.type === 'text' && !node.text) {
           return;
-        case 'select':
-          setDrawing(true);
-          break;
-        case 'text':
-          setDraftNode(createNode(toolType, [x, y]));
-          break;
-        default:
-          setDraftNode(createNode(toolType, [x, y]));
-          setDrawing(true);
-          break;
-      }
+        }
 
-      if (selectedNodesIds) {
-        dispatch(canvasActions.setSelectedNodesIds([]));
-      }
-    };
+        dispatch(nodesActions.add([node]));
+        setDrawing(false);
 
-    const onStageMove = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
-      const stage = event.target.getStage();
+        if (resetToolType) {
+          dispatch(canvasActions.setToolType('select'));
+        }
+      },
+      [dispatch],
+    );
 
-      if (!drawing || !stage) return;
+    const onStagePress = useCallback(
+      (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
+        const isMouseEvent = event.type === 'mousedown';
 
-      const { x, y } = stage.getRelativePointerPosition();
+        if (isMouseEvent && (event.evt as MouseEvent).button !== 0) {
+          return;
+        }
 
-      if (toolType === 'select' && drawing) {
+        const stage = event.target.getStage();
+
+        const clickedOnEmpty = event.target === stage;
+
+        if (!clickedOnEmpty) {
+          return;
+        }
+
+        if (contextMenuState.opened) {
+          dispatch(contextMenuActions.close());
+          return;
+        }
+
+        const { x, y } = stage.getRelativePointerPosition();
+
+        setDrawPosition({ start: [x, y], current: [x, y] });
+
+        switch (toolType) {
+          case 'hand':
+            return;
+          case 'select':
+            setDrawing(true);
+            break;
+          case 'text':
+            setDraftNode(createNode(toolType, [x, y]));
+            break;
+          default:
+            setDraftNode(createNode(toolType, [x, y]));
+            setDrawing(true);
+            break;
+        }
+
+        if (Object.keys(intersectedNodesIds).length) {
+          onNodesIntersection([]);
+        }
+      },
+      [
+        contextMenuState.opened,
+        toolType,
+        intersectedNodesIds,
+        dispatch,
+        onNodesIntersection,
+      ],
+    );
+
+    const onStageMove = useCallback(
+      (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
+        const stage = event.target.getStage();
+
+        if (!drawing || !stage) return;
+
+        const { x, y } = stage.getRelativePointerPosition();
+
         setDrawPosition((prevState) => {
           return { start: prevState.start, current: [x, y] };
         });
-        setIntersectedNodes();
-        return;
-      }
 
-      setDraftNode((prevNode) => {
-        return prevNode ? drawNodeByType(prevNode, [x, y]) : prevNode;
-      });
-    };
+        if (toolType === 'select' && drawing && selectRectRef.current) {
+          const selectRect = selectRectRef.current.getClientRect();
 
-    const onStageMoveEnd = () => {
+          onNodesIntersection(getIntersectedNodes(stage, selectRect));
+          return;
+        }
+
+        setDraftNode((prevNode) => {
+          return prevNode ? drawNodeByType(prevNode, [x, y]) : prevNode;
+        });
+      },
+      [
+        drawing,
+        toolType,
+        drawNodeByType,
+        getIntersectedNodes,
+        selectRectRef,
+        onNodesIntersection,
+      ],
+    );
+
+    const onStageMoveEnd = useCallback(() => {
       switch (toolType) {
-        case 'select':
+        case 'select': {
+          dispatch(canvasActions.setSelectedNodesIds(intersectedNodesIds));
           setDrawing(false);
           break;
+        }
         case 'draw':
           if (!draftNode) return;
           handleDraftEnd(draftNode, false);
@@ -258,47 +309,42 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           handleDraftEnd(draftNode);
         }
       }
-    };
+    }, [
+      draftNode,
+      drawing,
+      toolType,
+      intersectedNodesIds,
+      dispatch,
+      handleDraftEnd,
+    ]);
 
-    const zoomStageRelativeToPointerPosition = (
-      stage: Konva.Stage,
-      event: WheelEvent,
-    ) => {
-      const { position, scale } = calcNewStagePositionAndScale(
-        stage.scaleX(),
-        stage.getRelativePointerPosition(),
-        stage.getPosition(),
-        event.deltaY,
-      );
+    const zoomStageRelativeToPointerPosition = useCallback(
+      (stage: Konva.Stage, event: WheelEvent) => {
+        const { position, scale } = calcNewStagePositionAndScale(
+          stage.scaleX(),
+          stage.getRelativePointerPosition(),
+          stage.getPosition(),
+          event.deltaY,
+        );
 
-      if (!hasStageScaleReachedLimit(scale)) {
-        onConfigChange({ scale, position });
-      }
-    };
+        if (!hasStageScaleReachedLimit(scale)) {
+          onConfigChange({ scale, position });
+        }
+      },
+      [onConfigChange],
+    );
 
-    const handleStageOnWheel = (e: KonvaEventObject<WheelEvent>) => {
-      const stage = e.target.getStage();
+    const handleStageOnWheel = useCallback(
+      (e: KonvaEventObject<WheelEvent>) => {
+        const stage = e.target.getStage();
 
-      if (e.evt.ctrlKey && stage) {
-        e.evt.preventDefault();
-        zoomStageRelativeToPointerPosition(stage, e.evt);
-      }
-    };
-
-    const handleDraftEnd = (node: NodeObject, resetToolType = true) => {
-      setDraftNode(null);
-
-      if (node.type === 'text' && !node.text) {
-        return;
-      }
-
-      dispatch(nodesActions.add([node]));
-      setDrawing(false);
-
-      if (resetToolType) {
-        dispatch(canvasActions.setToolType('select'));
-      }
-    };
+        if (e.evt.ctrlKey && stage) {
+          e.evt.preventDefault();
+          zoomStageRelativeToPointerPosition(stage, e.evt);
+        }
+      },
+      [zoomStageRelativeToPointerPosition],
+    );
 
     const handleStageDragMove = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
@@ -346,6 +392,16 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       [stageConfig, dispatch],
     );
 
+    const handleNodesChange = (nodes: NodeObject[]) => {
+      dispatch(nodesActions.update(nodes));
+    };
+
+    const handleNodePress = (nodeId: string) => {
+      if (toolType === 'select') {
+        dispatch(canvasActions.setSelectedNodesIds([nodeId]));
+      }
+    };
+
     return (
       <Stage
         ref={ref}
@@ -368,7 +424,10 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           nodes={nodes}
           draftNode={draftNode}
           toolType={toolType}
-          config={{ ...config, listening: !drawing }}
+          config={{ ...config, listening: !drawing || toolType !== 'select' }}
+          selectedNodesIds={intersectedNodesIds}
+          onNodePress={handleNodePress}
+          onNodesChange={handleNodesChange}
           onDraftEnd={handleDraftEnd}
         >
           <BackgroundRect stageRef={ref} stageConfig={stageConfig} />

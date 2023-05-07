@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import type { IRect } from 'konva/lib/types';
-import { type ForwardedRef, useMemo } from 'react';
+import { type ForwardedRef, useMemo, memo } from 'react';
 import { Rect } from 'react-konva';
 import { type StageConfig, theme } from 'shared';
 import { BACKGROUND_LAYER_ID } from '@/constants/element';
@@ -10,7 +10,7 @@ type Props = {
   stageConfig: StageConfig;
 };
 
-const BackgroundRect = ({ stageRef, stageConfig }: Props) => {
+const BackgroundRect = memo(({ stageRef, stageConfig }: Props) => {
   const normalizedRect = useMemo<IRect>(() => {
     if (!stageRef || typeof stageRef === 'function' || !stageRef.current) {
       return {
@@ -45,6 +45,8 @@ const BackgroundRect = ({ stageRef, stageConfig }: Props) => {
       draggable={false}
     />
   );
-};
+});
+
+BackgroundRect.displayName = 'BackgroundRect';
 
 export default BackgroundRect;

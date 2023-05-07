@@ -21,12 +21,16 @@ import ZoomPanel from './ZoomPanel/ZoomPanel';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;
+  intersectedNodesIds: string[];
   isPageShared?: boolean;
 };
 
-const Panels = ({ stageRef, isPageShared = false }: Props) => {
-  const { stageConfig, toolType, selectedNodesIds } =
-    useAppSelector(selectCanvas);
+const Panels = ({
+  stageRef,
+  intersectedNodesIds,
+  isPageShared = false,
+}: Props) => {
+  const { stageConfig, toolType } = useAppSelector(selectCanvas);
   const { past, present, future } = useAppSelector(selectNodes);
 
   const nodes = present.nodes;
@@ -34,16 +38,18 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
   const dispatch = useAppDispatch();
 
   const selectedNodes = useMemo(() => {
-    return nodes.filter((node) => selectedNodesIds[node.nodeProps.id]);
-  }, [selectedNodesIds, nodes]);
+    const nodesIds = new Set(intersectedNodesIds);
+
+    return nodes.filter((node) => nodesIds.has(node.nodeProps.id));
+  }, [intersectedNodesIds, nodes]);
 
   const enabledControls = useMemo(() => {
     return {
       undo: Boolean(past.length),
       redo: Boolean(future.length),
-      deleteSelectedNodes: Boolean(Object.keys(selectedNodesIds).length),
+      deleteSelectedNodes: Boolean(intersectedNodesIds.length),
     };
-  }, [past, future, selectedNodesIds]);
+  }, [past, future, intersectedNodesIds]);
 
   const stylePanelEnabledOptions = useMemo<
     StylePanelProps['enabledOptions']
@@ -147,7 +153,7 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
   const handleControlActions = (action: ControlAction) => {
     switch (action.type) {
       case 'nodes/delete': {
-        dispatch(nodesActions.delete(Object.keys(selectedNodesIds)));
+        dispatch(nodesActions.delete(intersectedNodesIds));
         dispatch(canvasActions.setSelectedNodesIds([]));
         break;
       }

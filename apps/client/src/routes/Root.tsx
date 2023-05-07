@@ -1,5 +1,5 @@
 import type Konva from 'konva';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { StageConfig } from 'shared';
 import Loader from '@/components/core/Loader/Loader';
@@ -17,6 +17,8 @@ import { nodesActions } from '@/stores/slices/nodesSlice';
 import { getFromStorage } from '@/utils/storage';
 
 const Root = () => {
+  const [intersectedNodesIds, setIntersectedNodesIds] = useState<string[]>([]);
+
   const { id } = useParams();
   const { isLoading, isError, isSuccess } = useGetPageQuery(
     {
@@ -25,7 +27,7 @@ const Root = () => {
     { skip: !id },
   );
 
-  const { stageConfig } = useAppSelector(selectCanvas);
+  const { stageConfig, selectedNodesIds } = useAppSelector(selectCanvas);
   const modal = useAppSelector(selectModal);
 
   const dispatch = useAppDispatch();
@@ -35,6 +37,10 @@ const Root = () => {
   useKeydownListener(stageRef);
 
   const [width, height] = useWindowSize();
+
+  useEffect(() => {
+    setIntersectedNodesIds(Object.keys(selectedNodesIds));
+  }, [selectedNodesIds]);
 
   useEffect(() => {
     if (id) {
@@ -49,7 +55,6 @@ const Root = () => {
       } catch (error) {
         return;
       }
-
       const batchDispatchPageState = (state: PageStateType) => {
         const { toolType, nodes, stageConfig, selectedNodesIds } = state.page;
 
@@ -89,16 +94,26 @@ const Root = () => {
     dispatch(canvasActions.setStageConfig(config));
   };
 
+  const handleNodesIntersection = (nodesIds: string[]) => {
+    setIntersectedNodesIds(nodesIds);
+  };
+
   if (isLoading) {
     return <Loader fullScreen={true}>Loading</Loader>;
   }
 
   return (
     <>
-      <Panels isPageShared={isSuccess} stageRef={stageRef} />
+      <Panels
+        intersectedNodesIds={intersectedNodesIds}
+        isPageShared={isSuccess}
+        stageRef={stageRef}
+      />
       <DrawingCanvas
         ref={stageRef}
         config={drawingCanvasConfig}
+        intersectedNodesIds={intersectedNodesIds}
+        onNodesIntersection={handleNodesIntersection}
         onConfigChange={handleStageConfigChange}
       />
       {modal.open && (
