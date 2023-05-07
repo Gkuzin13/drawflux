@@ -29,7 +29,7 @@ const NodeGroupTransformer = ({ nodes, draggable, onDragEnd }: Props) => {
       const layer = nodeRef.current?.getLayer();
 
       const selectedLayerChildren = layer?.getChildren((child) =>
-        nodes.some((node) => node.nodeProps.id === child.attrs.id),
+        nodes.some((node) => node.nodeProps.id === child.id()),
       );
 
       selectedLayerChildren?.forEach((child) => {
