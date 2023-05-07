@@ -109,7 +109,7 @@ const FreePathDrawable = memo(
         {selected && (
           <NodeTransformer
             ref={transformerRef}
-            transformerConfig={{ id: node.nodeProps.id, rotateEnabled: false }}
+            transformerConfig={{ rotateEnabled: false }}
           />
         )}
       </>
