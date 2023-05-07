@@ -1,18 +1,19 @@
-import { type ChangeEvent, useEffect, useRef } from 'react';
+import { type ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Html } from 'react-konva-utils';
 import type { NodeColor, NodeObject } from 'shared';
+import { KEYS } from '@/constants/keys';
 import { useClickAway } from '@/hooks/useClickAway';
+import type { OnTextSaveArgs } from './EditableText';
 
 type Props = {
   node: NodeObject;
-  value: string;
-  onTextChange: (event: ChangeEvent) => void;
-  onKeyDown: (event: React.KeyboardEvent) => void;
-  onClickAway: () => void;
+  initialValue: string;
+  onTextSave: (args: OnTextSaveArgs) => void;
 };
 
 const getStyle = (
   width: string,
+  height: string,
   fontSize: number,
   color: NodeColor,
 ): React.CSSProperties => {
@@ -20,6 +21,7 @@ const getStyle = (
 
   const baseStyle: React.CSSProperties = {
     width,
+    height,
     color,
     border: 'none',
     padding: '0px',
@@ -43,31 +45,60 @@ const getStyle = (
   };
 };
 
-const EditableTextInput = ({
-  node,
-  value,
-  onTextChange,
-  onKeyDown,
-  onClickAway,
-}: Props) => {
+const textSaveKeys: string[] = [KEYS.ENTER, KEYS.ESCAPE];
+
+const EditableTextInput = ({ node, initialValue, onTextSave }: Props) => {
+  const [value, setValue] = useState(initialValue);
   const ref = useRef<HTMLTextAreaElement>(null);
 
-  useClickAway(ref, onClickAway);
+  useClickAway(ref, () => handleTextChange(value));
 
   useEffect(() => {
-    if (value && ref.current) {
-      const end = ref.current.value.length;
+    if (ref.current) {
+      const end = initialValue.length;
       ref.current.setSelectionRange(end, end);
     }
-  }, [value]);
+  }, [initialValue, ref]);
 
   const { nodeProps } = node;
 
   const style = getStyle(
     nodeProps.width ? `${nodeProps.width}px` : `${Math.max(value.length, 1)}ch`,
+    nodeProps.height ? `${nodeProps.height}px` : `${node.style.size}`,
     node.style.size,
     node.style.color,
   );
+
+  const handleTextChange = (text: string) => {
+    if (!ref.current) {
+      return;
+    }
+
+    const textAreaElement = ref.current;
+
+    onTextSave({
+      text,
+      width: textAreaElement.offsetWidth,
+    });
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    event.stopPropagation();
+
+    if (event.shiftKey) {
+      return;
+    }
+
+    if (textSaveKeys.includes(event.key)) {
+      handleTextChange(value);
+    }
+  };
+
+  const handleValueChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = event.target as HTMLTextAreaElement;
+
+    setValue(value);
+  };
 
   return (
     <Html
@@ -80,8 +111,8 @@ const EditableTextInput = ({
       <textarea
         ref={ref}
         value={value}
-        onChange={onTextChange}
-        onKeyDown={onKeyDown}
+        onChange={handleValueChange}
+        onKeyDown={handleKeyDown}
         style={style}
         autoFocus={true}
       />
