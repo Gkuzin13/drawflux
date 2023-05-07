@@ -5,7 +5,7 @@ import { Provider as StoreProvider, useStore } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
 import { contextMenuActions } from '@/stores/slices/contextMenu';
-import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
+import { nodesActions, selectCurrentNodes } from '@/stores/slices/nodesSlice';
 import type { RootState } from '@/stores/store';
 import { Divider } from '../core/Divider/Divider';
 import { ContextMenuContainer, ContextMenuItem } from './ContextMenuStyled';
@@ -19,7 +19,7 @@ type Props = {
 };
 
 const DrawingCanvasMenu = () => {
-  const { nodes } = useAppSelector(selectNodes).present;
+  const nodes = useAppSelector(selectCurrentNodes);
   const { selectedNodesIds } = useAppSelector(selectCanvas);
 
   const dispatch = useAppDispatch();
