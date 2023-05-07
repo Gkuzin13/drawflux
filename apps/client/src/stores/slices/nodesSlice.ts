@@ -1,8 +1,9 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { NodeObject } from 'shared';
 import { api } from '@/services/api';
-import { reorderNodes } from '@/utils/node';
+import { duplicateNodes, reorderNodes } from '@/utils/node';
 import { type RootState } from '../store';
+
 export type NodesState = {
   nodes: NodeObject[];
 };
@@ -37,6 +38,15 @@ export const nodesSlice = createSlice({
       const ids = new Set<string>(action.payload);
 
       state.nodes = state.nodes.filter((node) => !ids.has(node.nodeProps.id));
+    },
+    duplicate: (state, action: PayloadAction<string[]>) => {
+      const ids = new Set<string>(action.payload);
+
+      const duplicatedNodes = duplicateNodes(
+        state.nodes.filter((node) => ids.has(node.nodeProps.id)),
+      );
+
+      state.nodes.push(...duplicatedNodes);
     },
     moveToStart: (state, action: PayloadAction<string[]>) => {
       state.nodes = reorderNodes(action.payload, state.nodes).toStart();

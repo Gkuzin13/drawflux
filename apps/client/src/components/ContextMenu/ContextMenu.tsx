@@ -2,11 +2,11 @@ import type { Vector2d } from 'konva/lib/types';
 import { memo, useCallback, useMemo } from 'react';
 import { Html } from 'react-konva-utils';
 import { Provider as StoreProvider, useStore } from 'react-redux';
-import type { SelectedNodesIds } from '@/constants/app';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
 import { contextMenuActions } from '@/stores/slices/contextMenu';
 import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
+import type { RootState } from '@/stores/store';
 import { Divider } from '../core/Divider/Divider';
 import { ContextMenuContainer, ContextMenuItem } from './ContextMenuStyled';
 
@@ -29,18 +29,14 @@ const DrawingCanvasMenu = () => {
   }, [selectedNodesIds]);
 
   const handleSelectAll = useCallback(() => {
-    const allSelectedNodesIds: SelectedNodesIds = {};
-
-    for (const node of nodes) {
-      allSelectedNodesIds[node.nodeProps.id] = true;
-    }
+    const allSelectedNodesIds = nodes.map((node) => node.nodeProps.id);
 
     dispatch(canvasActions.setSelectedNodesIds(allSelectedNodesIds));
     dispatch(contextMenuActions.close());
   }, [dispatch, nodes]);
 
   const handleSelectNone = useCallback(() => {
-    dispatch(canvasActions.setSelectedNodesIds({}));
+    dispatch(canvasActions.setSelectedNodesIds([]));
     dispatch(contextMenuActions.close());
   }, [dispatch]);
 
@@ -60,7 +56,24 @@ const DrawingCanvasMenu = () => {
 
 const NodeMenu = () => {
   const { selectedNodesIds } = useAppSelector(selectCanvas);
+  const store = useStore<RootState>();
+
   const dispatch = useAppDispatch();
+
+  const handleDuplicateNode = useCallback(async () => {
+    const nodesToDuplicate = Object.keys(selectedNodesIds);
+
+    dispatch(nodesActions.duplicate(nodesToDuplicate));
+
+    const duplicatedNodes = store
+      .getState()
+      .nodesHistory.present.nodes.slice(-nodesToDuplicate.length)
+      .map((node) => node.nodeProps.id);
+
+    dispatch(canvasActions.setSelectedNodesIds(duplicatedNodes));
+
+    dispatch(contextMenuActions.close());
+  }, [dispatch, selectedNodesIds, store]);
 
   const handleDeleteNode = useCallback(() => {
     dispatch(nodesActions.delete(Object.keys(selectedNodesIds)));
@@ -89,6 +102,10 @@ const NodeMenu = () => {
 
   return (
     <>
+      <ContextMenuItem onItemClick={handleDuplicateNode}>
+        Duplicate
+      </ContextMenuItem>
+      <Divider type="horizontal" />
       <ContextMenuItem onItemClick={handleBringToFront}>
         Bring to front
       </ContextMenuItem>
