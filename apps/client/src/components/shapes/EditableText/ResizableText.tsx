@@ -1,10 +1,12 @@
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { Text } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Node/Node';
-import { createDefaultNodeConfig } from '@/constants/element';
+import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
+import { useAppSelector } from '@/stores/hooks';
+import { selectCanvas } from '@/stores/slices/canvasSlice';
 import NodeTransformer from '../../NodeTransformer';
 
 type Props = {
@@ -21,20 +23,16 @@ const ResizableText = ({
 }: Props) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Text>([selected]);
 
-  const config = useMemo(() => {
-    return createDefaultNodeConfig({
-      visible: node.nodeProps.visible,
-      fill: node.style.color,
-      id: node.nodeProps.id,
-      rotation: node.nodeProps.rotation,
-      fillEnabled: true,
-      opacity: node.style.opacity,
-      strokeWidth: 0,
-      fontSize: node.style.size * 8,
-      width: node.nodeProps.width,
-      draggable,
-    });
-  }, [node.nodeProps, node.style, draggable]);
+  const { stageConfig } = useAppSelector(selectCanvas);
+
+  const { config } = useNode(node, stageConfig, {
+    fillEnabled: true,
+    strokeWidth: 0,
+    fontSize: node.style.size * 8,
+    width: node.nodeProps.width,
+    fill: node.style.color,
+    dash: [],
+  });
 
   const handleDragEnd = useCallback(
     (event: KonvaEventObject<DragEvent>) => {
@@ -91,6 +89,7 @@ const ResizableText = ({
         text={node.text || ''}
         lineHeight={1.5}
         {...config}
+        draggable={draggable}
         onDragStart={() => onPress(node.nodeProps.id)}
         onDragEnd={handleDragEnd}
         onTransform={handleTransform}

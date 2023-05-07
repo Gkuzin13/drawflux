@@ -5,8 +5,8 @@ import { Rect } from 'react-konva';
 import type { NodeLIne } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import NodeTransformer from '@/components/NodeTransformer';
-import { createDefaultNodeConfig } from '@/constants/element';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
+import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvasSlice';
@@ -21,30 +21,15 @@ const RectDrawable = memo(
   }: NodeComponentProps) => {
     const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
 
-    const { scale: stageScale } = useAppSelector(selectCanvas).stageConfig;
+    const { stageConfig } = useAppSelector(selectCanvas);
 
-    const scaledLine = useMemo(() => {
-      return node.style.line.map((l) => l * stageScale) as NodeLIne;
-    }, [node.style.line, stageScale]);
+    const { totalDashLength, config } = useNode(node, stageConfig);
 
     useAnimatedLine({
       enabled: node.style.animated,
       elementRef: nodeRef,
-      totalDashLength: scaledLine[0] + scaledLine[1],
+      totalDashLength,
     });
-
-    const config = useMemo(() => {
-      return createDefaultNodeConfig({
-        visible: node.nodeProps.visible,
-        id: node.nodeProps.id,
-        rotation: node.nodeProps.rotation,
-        strokeWidth: node.style.size * stageScale,
-        stroke: node.style.color,
-        opacity: node.style.opacity,
-        dash: scaledLine,
-        draggable,
-      });
-    }, [node.nodeProps, node.style, draggable, scaledLine, stageScale]);
 
     const handleDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
@@ -95,6 +80,7 @@ const RectDrawable = memo(
           height={node.nodeProps.height}
           cornerRadius={8}
           {...config}
+          draggable={draggable}
           onDragStart={() => onPress(node.nodeProps.id)}
           onDragEnd={handleDragEnd}
           onTransformEnd={handleTransformEnd}

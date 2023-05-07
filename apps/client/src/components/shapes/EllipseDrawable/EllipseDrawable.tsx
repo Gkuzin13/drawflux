@@ -1,11 +1,11 @@
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback } from 'react';
 import { Ellipse } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import NodeTransformer from '@/components/NodeTransformer';
-import { createDefaultNodeConfig } from '@/constants/element';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
+import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvasSlice';
@@ -22,30 +22,15 @@ const EllipseDrawable = memo(
       selected,
     ]);
 
-    const { scale: stageScale } = useAppSelector(selectCanvas).stageConfig;
+    const { stageConfig } = useAppSelector(selectCanvas);
 
-    const scaledLine = useMemo(() => {
-      return node.style.line.map((l) => l * stageScale);
-    }, [node.style.line, stageScale]);
+    const { totalDashLength, config } = useNode(node, stageConfig);
 
     useAnimatedLine({
       enabled: node.style.animated,
       elementRef: nodeRef,
-      totalDashLength: scaledLine[0] + scaledLine[1],
+      totalDashLength,
     });
-
-    const config = useMemo(() => {
-      return createDefaultNodeConfig({
-        visible: node.nodeProps.visible,
-        id: node.nodeProps.id,
-        rotation: node.nodeProps.rotation,
-        stroke: node.style.color,
-        strokeWidth: node.style.size * stageScale,
-        opacity: node.style.opacity,
-        dash: scaledLine,
-        draggable,
-      });
-    }, [node.nodeProps, node.style, draggable, scaledLine, stageScale]);
 
     const handleDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
@@ -92,6 +77,7 @@ const EllipseDrawable = memo(
           x={node.nodeProps.point[0]}
           y={node.nodeProps.point[1]}
           {...config}
+          draggable={draggable}
           onDragStart={() => onPress(node.nodeProps.id)}
           onDragEnd={handleDragEnd}
           onTransformEnd={handleTransformEnd}

@@ -23,32 +23,3 @@ export const getElement = (element: NodeType) => {
       return EditableText;
   }
 };
-
-export const createDefaultNodeConfig = ({
-  visible,
-  strokeWidth,
-  stroke,
-  id,
-  rotation,
-  draggable,
-  dash,
-  ...rest
-}: NodeConfig & ShapeConfig): NodeConfig & ShapeConfig => {
-  return {
-    lineCap: 'round',
-    strokeScaleEnabled: false,
-    perfectDrawEnabled: false,
-    shadowForStrokeEnabled: false,
-    hitStrokeWidth: 12,
-    fillEnabled: false,
-    opacity: 1,
-    visible,
-    strokeWidth,
-    stroke,
-    id,
-    rotation,
-    draggable,
-    dash,
-    ...rest,
-  };
-};
