@@ -1,5 +1,5 @@
 import type Konva from 'konva';
-import { type RefObject, useCallback, useEffect, useMemo } from 'react';
+import { type RefObject, useCallback, useEffect } from 'react';
 import { useStore } from 'react-redux';
 import { KEYS, type Key } from '@/constants/keys';
 import { TOOLS } from '@/constants/tool';
@@ -14,18 +14,6 @@ function useKeydownListener(stageRef: RefObject<Konva.Stage>) {
   const { toolType } = useAppSelector(selectCanvas);
 
   const store = useStore<RootState>();
-
-  const stageContainer = useMemo(() => {
-    if (!stageRef.current) {
-      return null;
-    }
-
-    const container = stageRef.current.container();
-    container.tabIndex = 1;
-    container.focus();
-
-    return container;
-  }, [stageRef.current]);
 
   const dispatch = useAppDispatch();
 
@@ -59,6 +47,8 @@ function useKeydownListener(stageRef: RefObject<Konva.Stage>) {
   );
 
   useEffect(() => {
+    const stageContainer = stageRef.current?.container();
+
     if (!stageContainer) {
       return;
     }
