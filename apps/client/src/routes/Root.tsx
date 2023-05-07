@@ -32,7 +32,7 @@ const Root = () => {
 
   const stageRef = useRef<Konva.Stage>(null);
 
-  useKeydownListener();
+  useKeydownListener(stageRef);
 
   const [width, height] = useWindowSize();
 
@@ -57,7 +57,9 @@ const Root = () => {
         // Cause is unknown, needs investigation
         dispatch(canvasActions.setToolType(toolType));
         dispatch(nodesActions.set(nodes));
-        dispatch(canvasActions.setSelectedNodesIds(selectedNodesIds));
+        dispatch(
+          canvasActions.setSelectedNodesIds(Object.keys(selectedNodesIds)),
+        );
         dispatch(canvasActions.setStageConfig(stageConfig));
       };
 
