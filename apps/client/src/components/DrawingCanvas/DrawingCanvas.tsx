@@ -100,7 +100,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
 
       container.tabIndex = 1;
       container.focus();
-    }, [ref, toolType, selectedNodesIds]);
+    }, [ref, toolType, selectedNodesIds, stageConfig]);
 
     const getIntersectedNodes = useCallback(
       (stage: Konva.Stage, rect: IRect) => {
