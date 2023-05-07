@@ -1,6 +1,8 @@
-import type { NodeLIne, NodeType, Point, NodeObject } from 'shared';
+import type { NodeLIne, NodeType, Point, NodeObject, NodeProps } from 'shared';
 import { colors } from 'shared';
+import { v4 as uuid } from 'uuid';
 import { LINE, SIZE } from '../constants/style';
+import { getWidthFromPoints } from './position';
 
 export const createNode = (type: NodeType, point: Point): NodeObject => {
   return {
@@ -13,7 +15,7 @@ export const createNode = (type: NodeType, point: Point): NodeObject => {
       animated: false,
     },
     nodeProps: {
-      id: `node-${Date.now()}`,
+      id: uuid(),
       point,
       rotation: 0,
       visible: true,
@@ -102,4 +104,55 @@ export function reorderNodes(nodesIdsToReorder: string[], nodes: NodeObject[]) {
   }
 
   return { toEnd, toStart, forward, backward };
+}
+
+const DUPLICATION_GAP = 16;
+
+export function duplicateNodes(nodes: NodeObject[]): NodeObject[] {
+  const minX = Math.min(
+    ...nodes.map((node) => {
+      const [x] = node.nodeProps.point;
+
+      if (node.nodeProps.points) {
+        const minPoints = Math.min(...node.nodeProps.points.map(([x]) => x));
+        return x < minPoints ? minPoints : x;
+      }
+
+      return x;
+    }),
+  );
+
+  const maxX = Math.max(
+    ...nodes.map((node) => {
+      const [x, y] = node.nodeProps.point;
+
+      if (node.nodeProps.points) {
+        return x + getWidthFromPoints([[x, y], ...node.nodeProps.points]);
+      }
+
+      if (node.type === 'ellipse') {
+        return x + (node.nodeProps?.width || 0) * 2;
+      }
+
+      return x + (node.nodeProps?.width || 0);
+    }),
+  );
+  const duplicationStartXPoint = maxX + DUPLICATION_GAP;
+  const distance = duplicationStartXPoint - minX;
+
+  return nodes.map((node) => {
+    const updatedNodeProps: Partial<NodeProps> = {
+      id: uuid(),
+      point: [node.nodeProps.point[0] + distance, node.nodeProps.point[1]],
+    };
+
+    if (node.nodeProps.points) {
+      updatedNodeProps.points = node.nodeProps.points.map((point) => [
+        point[0] + distance,
+        point[1],
+      ]);
+    }
+
+    return { ...node, nodeProps: { ...node.nodeProps, ...updatedNodeProps } };
+  });
 }

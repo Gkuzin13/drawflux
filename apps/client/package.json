@@ -24,7 +24,8 @@
     "react-konva-utils": "^0.3.2",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.10.0",
-    "shared": "workspace:^"
+    "shared": "workspace:^",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.21.3",
@@ -37,9 +38,10 @@
     "@types/react": "^18.0.31",
     "@types/react-dom": "^18.0.11",
     "@types/testing-library__jest-dom": "^5.14.5",
+    "@types/uuid": "^9.0.1",
     "@vitejs/plugin-react": "^3.1.0",
-    "eslint-config-bases": "workspace:eslint-config-bases@latest",
     "babel-loader": "^9.1.2",
+    "eslint-config-bases": "workspace:eslint-config-bases@latest",
     "jsdom": "^21.1.1"
   }
 }

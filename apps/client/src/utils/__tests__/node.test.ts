@@ -14,7 +14,7 @@ describe('createNode', () => {
     expect(node.style.color).toBe(colors.black);
     expect(node.style.size).toBe(SIZE[1].value);
     expect(node.style.animated).toBe(false);
-    expect(node.nodeProps.id).toMatch(/^node-\d+$/);
+    expect(node.nodeProps.id).toBeTruthy();
     expect(node.nodeProps.rotation).toBe(0);
     expect(node.nodeProps.visible).toBe(true);
   });
