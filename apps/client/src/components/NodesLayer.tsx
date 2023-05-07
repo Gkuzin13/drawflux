@@ -35,7 +35,7 @@ const NodesLayer = ({
 
   const handleNodePress = (nodeId: string) => {
     if (toolType === 'select') {
-      dispatch(canvasActions.setSelectedNodesIds({ [nodeId]: true }));
+      dispatch(canvasActions.setSelectedNodesIds([nodeId]));
     }
   };
 

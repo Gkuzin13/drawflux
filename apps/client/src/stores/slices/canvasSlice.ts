@@ -38,8 +38,18 @@ export const canvasSlice = createSlice({
     ) => {
       state.stageConfig = { ...state.stageConfig, ...action.payload };
     },
-    setSelectedNodesIds: (state, action: PayloadAction<SelectedNodesIds>) => {
-      state.selectedNodesIds = action.payload;
+    setSelectedNodesIds: (state, action: PayloadAction<string[]>) => {
+      if (!action.payload.length) {
+        state.selectedNodesIds = {};
+        return;
+      }
+      const newSelectedNodes: SelectedNodesIds = {};
+
+      for (const nodeId of action.payload) {
+        newSelectedNodes[nodeId] = true;
+      }
+
+      state.selectedNodesIds = newSelectedNodes;
     },
   },
   extraReducers(builder) {

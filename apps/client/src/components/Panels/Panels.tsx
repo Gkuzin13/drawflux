@@ -148,7 +148,7 @@ const Panels = ({ stageRef, isPageShared = false }: Props) => {
     switch (action.type) {
       case 'nodes/delete': {
         dispatch(nodesActions.delete(Object.keys(selectedNodesIds)));
-        dispatch(canvasActions.setSelectedNodesIds({}));
+        dispatch(canvasActions.setSelectedNodesIds([]));
         break;
       }
       default: {

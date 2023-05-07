@@ -110,13 +110,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           (child) => child.attrs.id,
         ) as string[];
 
-        const newSelectedNodesIds: SelectedNodesIds = {};
-
-        for (const nodeId of intersectedIds) {
-          newSelectedNodesIds[nodeId] = true;
-        }
-
-        dispatch(canvasActions.setSelectedNodesIds(newSelectedNodesIds));
+        dispatch(canvasActions.setSelectedNodesIds(intersectedIds));
       }, 35),
       [nodes, dispatch, selectClientRect],
     );
@@ -144,9 +138,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       const node = nodes.find((node) => node.nodeProps.id === shape?.id());
 
       if (node) {
-        dispatch(
-          canvasActions.setSelectedNodesIds({ [node.nodeProps.id]: true }),
-        );
+        dispatch(canvasActions.setSelectedNodesIds([node.nodeProps.id]));
       }
       dispatch(
         contextMenuActions.open({
@@ -216,7 +208,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       }
 
       if (selectedNodesIds) {
-        dispatch(canvasActions.setSelectedNodesIds({}));
+        dispatch(canvasActions.setSelectedNodesIds([]));
       }
     };
 
