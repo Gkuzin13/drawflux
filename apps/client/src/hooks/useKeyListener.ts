@@ -5,6 +5,7 @@ import { KEYS, type Key } from '@/constants/keys';
 import { TOOLS } from '@/constants/tool';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
+import { contextMenuActions } from '@/stores/slices/contextMenu';
 import { historyActions } from '@/stores/slices/historySlice';
 import { nodesActions } from '@/stores/slices/nodesSlice';
 import type { RootState } from '@/stores/store';
@@ -63,6 +64,7 @@ function useKeydownListener(stageRef: RefObject<Konva.Stage>) {
 
       if (key === KEYS.DELETE) {
         dispatch(nodesActions.delete(Object.keys(selectedNodesIds)));
+        dispatch(contextMenuActions.close());
         return;
       }
 
