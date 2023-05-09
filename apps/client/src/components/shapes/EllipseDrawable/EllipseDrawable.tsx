@@ -41,8 +41,9 @@ const EllipseDrawable = memo(
             point: [event.target.x(), event.target.y()],
           },
         });
+        onPress(node.nodeProps.id);
       },
-      [node, onNodeChange],
+      [node, onNodeChange, onPress],
     );
 
     const handleTransformEnd = useCallback(
@@ -78,7 +79,6 @@ const EllipseDrawable = memo(
           y={node.nodeProps.point[1]}
           {...config}
           draggable={draggable}
-          onDragStart={() => onPress(node.nodeProps.id)}
           onDragEnd={handleDragEnd}
           onTransformEnd={handleTransformEnd}
           onTap={() => onPress(node.nodeProps.id)}

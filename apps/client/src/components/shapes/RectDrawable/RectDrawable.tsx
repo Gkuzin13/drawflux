@@ -40,8 +40,9 @@ const RectDrawable = memo(
             point: [event.target.x(), event.target.y()],
           },
         });
+        onPress(node.nodeProps.id);
       },
-      [node, onNodeChange],
+      [node, onNodeChange, onPress],
     );
 
     const handleTransformEnd = useCallback(
@@ -81,7 +82,6 @@ const RectDrawable = memo(
           cornerRadius={8}
           {...config}
           draggable={draggable}
-          onDragStart={() => onPress(node.nodeProps.id)}
           onDragEnd={handleDragEnd}
           onTransformEnd={handleTransformEnd}
           onTap={() => onPress(node.nodeProps.id)}

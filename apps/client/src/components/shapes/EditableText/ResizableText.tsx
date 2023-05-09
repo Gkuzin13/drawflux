@@ -43,8 +43,9 @@ const ResizableText = ({
           point: [event.target.x(), event.target.y()],
         },
       });
+      onPress(node.nodeProps.id);
     },
-    [node, onNodeChange],
+    [node, onNodeChange, onPress],
   );
 
   const handleTransform = useCallback((event: KonvaEventObject<Event>) => {
@@ -90,7 +91,6 @@ const ResizableText = ({
         lineHeight={1.5}
         {...config}
         draggable={draggable}
-        onDragStart={() => onPress(node.nodeProps.id)}
         onDragEnd={handleDragEnd}
         onTransform={handleTransform}
         onTransformEnd={handleTransformEnd}

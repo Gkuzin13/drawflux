@@ -52,8 +52,10 @@ const FreePathDrawable = memo(
         });
 
         line.position({ x: 0, y: 0 });
+
+        onPress(node.nodeProps.id);
       },
-      [node, onNodeChange],
+      [node, onNodeChange, onPress],
     );
 
     const handleTransformEnd = useCallback(
@@ -86,7 +88,6 @@ const FreePathDrawable = memo(
           points={flattenedPoints}
           {...config}
           draggable={draggable}
-          onDragStart={() => onPress(node.nodeProps.id)}
           onDragEnd={handleDragEnd}
           onTransformEnd={handleTransformEnd}
           onTap={() => onPress(node.nodeProps.id)}
