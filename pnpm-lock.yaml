@@ -60,8 +60,8 @@ importers:
         specifier: ^18.2.5
         version: 18.2.5(konva@8.4.3)(react-dom@18.2.0)(react@18.2.0)
       react-konva-utils:
-        specifier: ^0.3.2
-        version: 0.3.2(konva@8.4.3)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^1.0.4
+        version: 1.0.4(konva@8.4.3)(react-dom@18.2.0)(react@18.2.0)
       react-redux:
         specifier: ^8.0.5
         version: 8.0.5(@types/react-dom@18.0.11)(@types/react@18.0.31)(react-dom@18.2.0)(react@18.2.0)(redux@4.2.1)
@@ -4619,10 +4619,10 @@ packages:
   /react-is@18.2.0:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
 
-  /react-konva-utils@0.3.2(konva@8.4.3)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-BocSYCPd58rCumFAL9sUs5aum+eRD53Amknd78Mm2BQln/XMZZS8zHq35HPbiZkSMcj5Q6fZ4foHa9aMLcPRIQ==}
+  /react-konva-utils@1.0.4(konva@8.4.3)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-K1J1K9MoVNGFrUxYt+dn7TUVqpppW3Y0fRcf42Ws1wzTQ2Od4qicCom9jnGxLiwh8zyhYaHAUn3hztgfTyYF7g==}
     peerDependencies:
-      konva: ^8.3.5
+      konva: ^8.3.5 || ^9.0.0
       react: ^18.2.0
       react-dom: ^18.2.0
     dependencies:

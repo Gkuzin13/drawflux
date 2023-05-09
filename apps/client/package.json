@@ -21,7 +21,7 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
     "react-konva": "^18.2.5",
-    "react-konva-utils": "^0.3.2",
+    "react-konva-utils": "^1.0.4",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.10.0",
     "shared": "workspace:^",
