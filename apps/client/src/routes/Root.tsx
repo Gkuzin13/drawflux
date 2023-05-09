@@ -2,9 +2,9 @@ import type Konva from 'konva';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { StageConfig } from 'shared';
+import Canvas from '@/components/Canvas/Canvas';
 import Loader from '@/components/core/Loader/Loader';
 import Modal from '@/components/core/Modal/Modal';
-import DrawingCanvas from '@/components/DrawingCanvas/DrawingCanvas';
 import Panels from '@/components/Panels/Panels';
 import { LOCAL_STORAGE, PageState, type PageStateType } from '@/constants/app';
 import useKeydownListener from '@/hooks/useKeyListener';
@@ -109,7 +109,7 @@ const Root = () => {
         isPageShared={isSuccess}
         stageRef={stageRef}
       />
-      <DrawingCanvas
+      <Canvas
         ref={stageRef}
         config={drawingCanvasConfig}
         intersectedNodesIds={intersectedNodesIds}
