@@ -8,7 +8,8 @@ import { contextMenuActions } from '@/stores/slices/contextMenu';
 import { nodesActions, selectCurrentNodes } from '@/stores/slices/nodesSlice';
 import type { RootState } from '@/stores/store';
 import { Divider } from '../core/Divider/Divider';
-import { ContextMenuContainer, ContextMenuItem } from './ContextMenuStyled';
+import Kbd from '../core/Kbd/Kbd';
+import Menu from '../core/Menu/Menu';
 
 export type ContextMenuType = 'node-menu' | 'drawing-canvas-menu';
 
@@ -42,13 +43,9 @@ const DrawingCanvasMenu = () => {
 
   return (
     <>
-      <ContextMenuItem onItemClick={handleSelectAll}>
-        Select All
-      </ContextMenuItem>
+      <Menu.Item onItemClick={handleSelectAll}>Select All</Menu.Item>
       {areNodesSelected && (
-        <ContextMenuItem onItemClick={handleSelectNone}>
-          Select None
-        </ContextMenuItem>
+        <Menu.Item onItemClick={handleSelectNone}>Select None</Menu.Item>
       )}
     </>
   );
@@ -102,29 +99,24 @@ const NodeMenu = () => {
 
   return (
     <>
-      <ContextMenuItem onItemClick={handleDuplicateNode}>
-        Duplicate
-      </ContextMenuItem>
+      <Menu.Item onItemClick={handleDuplicateNode} spanned>
+        Duplicate <Kbd>Ctrl + D</Kbd>
+      </Menu.Item>
       <Divider type="horizontal" />
-      <ContextMenuItem onItemClick={handleBringToFront}>
-        Bring to front
-      </ContextMenuItem>
-      <ContextMenuItem onItemClick={handleBringForward}>
-        Bring forward
-      </ContextMenuItem>
-      <ContextMenuItem onItemClick={handleSendBackward}>
-        Send backward
-      </ContextMenuItem>
-      <ContextMenuItem onItemClick={handleSendToBack}>
-        Send to back
-      </ContextMenuItem>
+      <Menu.Item onItemClick={handleBringToFront}>Bring to front</Menu.Item>
+      <Menu.Item onItemClick={handleBringForward}>Bring forward</Menu.Item>
+      <Menu.Item onItemClick={handleSendBackward}>Send backward</Menu.Item>
+      <Menu.Item onItemClick={handleSendToBack}>Send to back</Menu.Item>
       <Divider type="horizontal" />
-      <ContextMenuItem onItemClick={handleDeleteNode}>Delete</ContextMenuItem>
+      <Menu.Item onItemClick={handleDeleteNode} spanned>
+        Delete
+        <Kbd>Del</Kbd>
+      </Menu.Item>
     </>
   );
 };
 
-const ContextMenu = memo(({ type, position, opened = false }: Props) => {
+const ContextMenu = memo(({ type, position, opened }: Props) => {
   const store = useStore();
 
   const ActiveMenu = useMemo(() => {
@@ -138,15 +130,15 @@ const ContextMenu = memo(({ type, position, opened = false }: Props) => {
 
   return (
     <Html
-      groupProps={{ ...position }}
+      groupProps={{ ...position, visible: opened, listening: opened }}
       transformFunc={(attrs) => {
         return { ...attrs, scaleX: 1, scaleY: 1 };
       }}
     >
       <StoreProvider store={store}>
-        <ContextMenuContainer opened={opened}>
+        <Menu.Dropdown opened={opened}>
           <ActiveMenu />
-        </ContextMenuContainer>
+        </Menu.Dropdown>
       </StoreProvider>
     </Html>
   );

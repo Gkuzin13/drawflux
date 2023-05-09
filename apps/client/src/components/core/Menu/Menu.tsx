@@ -33,7 +33,7 @@ const Item = ({
   };
 
   return (
-    <MenuItem fullWidth={true} {...props} onClick={hanleClick}>
+    <MenuItem {...props} onClick={hanleClick}>
       {children}
     </MenuItem>
   );

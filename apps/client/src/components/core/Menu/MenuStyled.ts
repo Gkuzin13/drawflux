@@ -4,9 +4,10 @@ import { ButtonStyled } from '../Button/ButtonStyled';
 export const MenuLabel = styled('div', {});
 
 export const MenuItem = styled(ButtonStyled, {
-  minWidth: '$9',
+  minWidth: '$10',
   defaultVariants: {
     size: 'extra-small',
     color: 'secondary-light',
+    fullWidth: true,
   },
 });
