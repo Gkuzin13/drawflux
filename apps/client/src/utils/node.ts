@@ -106,14 +106,16 @@ export function reorderNodes(nodesIdsToReorder: string[], nodes: NodeObject[]) {
   return { toEnd, toStart, forward, backward };
 }
 
-export function getNodesMinMaxXEdges(nodes: NodeObject[]) {
+export function getNodesMinMaxXEdges(nodes: NodeObject[]): {
+  min: number;
+  max: number;
+} {
   const min = Math.min(
     ...nodes.map((node) => {
       const [x] = node.nodeProps.point;
 
       if (node.nodeProps.points) {
-        const minXPoint = Math.min(...node.nodeProps.points.map(([x]) => x));
-        return x < minXPoint ? minXPoint : x;
+        return Math.min(x, ...node.nodeProps.points.map(([x]) => x));
       }
 
       return x;
@@ -122,17 +124,23 @@ export function getNodesMinMaxXEdges(nodes: NodeObject[]) {
 
   const max = Math.max(
     ...nodes.map((node) => {
-      const [x, y] = node.nodeProps.point;
+      const [x] = node.nodeProps.point;
 
       if (node.nodeProps.points) {
-        return x + getWidthFromPoints([[x, y], ...node.nodeProps.points]);
+        const points = [...node.nodeProps.points, node.nodeProps.point];
+        const min = Math.min(...points.map(([x]) => x));
+        const width = getWidthFromPoints(points);
+
+        return min + width;
       }
+
+      const width = node.nodeProps.width || 0;
 
       if (node.type === 'ellipse') {
-        return x + (node.nodeProps?.width || 0) * 2;
+        return x + width * 2;
       }
 
-      return x + (node.nodeProps?.width || 0);
+      return x + width;
     }),
   );
 

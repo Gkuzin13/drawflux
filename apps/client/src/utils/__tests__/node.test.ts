@@ -139,7 +139,7 @@ describe('getNodesMinMaxXEdges', () => {
   });
 
   it('should return min and max x edges correctly for nodes with points array', () => {
-    const arrowNode = createNode('arrow', [0, 0]);
+    const arrowNode = createNode('arrow', [25, 25]);
     const drawNode = createNode('draw', [50, 50]);
 
     const nodes: NodeObject[] = [
