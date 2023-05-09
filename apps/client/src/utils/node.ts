@@ -106,23 +106,21 @@ export function reorderNodes(nodesIdsToReorder: string[], nodes: NodeObject[]) {
   return { toEnd, toStart, forward, backward };
 }
 
-const DUPLICATION_GAP = 16;
-
-export function duplicateNodes(nodes: NodeObject[]): NodeObject[] {
-  const minX = Math.min(
+export function getNodesMinMaxXEdges(nodes: NodeObject[]) {
+  const min = Math.min(
     ...nodes.map((node) => {
       const [x] = node.nodeProps.point;
 
       if (node.nodeProps.points) {
-        const minPoints = Math.min(...node.nodeProps.points.map(([x]) => x));
-        return x < minPoints ? minPoints : x;
+        const minXPoint = Math.min(...node.nodeProps.points.map(([x]) => x));
+        return x < minXPoint ? minXPoint : x;
       }
 
       return x;
     }),
   );
 
-  const maxX = Math.max(
+  const max = Math.max(
     ...nodes.map((node) => {
       const [x, y] = node.nodeProps.point;
 
@@ -137,8 +135,17 @@ export function duplicateNodes(nodes: NodeObject[]): NodeObject[] {
       return x + (node.nodeProps?.width || 0);
     }),
   );
-  const duplicationStartXPoint = maxX + DUPLICATION_GAP;
-  const distance = duplicationStartXPoint - minX;
+
+  return { min, max };
+}
+
+const DUPLICATION_GAP = 16;
+
+export function duplicateNodes(nodes: NodeObject[]): NodeObject[] {
+  const { min: nodeMinXEdge, max: nodeMaxXEdge } = getNodesMinMaxXEdges(nodes);
+
+  const duplicationStartXPoint = nodeMaxXEdge + DUPLICATION_GAP;
+  const distance = duplicationStartXPoint - nodeMinXEdge;
 
   return nodes.map((node) => {
     const updatedNodeProps: Partial<NodeProps> = {

@@ -16,8 +16,14 @@ export function getPointsAbsolutePosition<T extends Konva.Node>(
   });
 }
 
-export function getWidthFromPoints(points: Point[]) {
-  const xPoints = points.map(([x]) => x);
+export function getWidthFromPoints(points: Point[]): number {
+  if (!points.length) {
+    return 0;
+  }
 
-  return Math.max(...xPoints) - Math.min(...xPoints);
+  const xPoints = points.map(([x]) => x);
+  const maxX = Math.max(...xPoints);
+  const minX = Math.min(...xPoints);
+
+  return Math.abs(maxX - minX);
 }
