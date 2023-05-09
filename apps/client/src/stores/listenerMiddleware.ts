@@ -8,7 +8,7 @@ import {
 } from '@reduxjs/toolkit';
 import { LOCAL_STORAGE, type PageStateType } from '@/constants/app';
 import { api } from '@/services/api';
-import { setToStorage } from '@/utils/storage';
+import { storage } from '@/utils/storage';
 import { canvasActions } from './slices/canvasSlice';
 import { historyActions } from './slices/historySlice';
 import { nodesActions } from './slices/nodesSlice';
@@ -61,7 +61,7 @@ startAppListening({
 
     const { nodesHistory, canvas } = listenerApi.getState();
 
-    setToStorage<PageStateType>(LOCAL_STORAGE.KEY, {
+    storage.set<PageStateType>(LOCAL_STORAGE.KEY, {
       page: {
         nodes: nodesHistory.present.nodes,
         ...canvas,

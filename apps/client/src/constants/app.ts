@@ -6,7 +6,7 @@ export const BASE_URL = 'https://drawflux-api.onrender.com';
 
 export const LOCAL_STORAGE = {
   KEY: 'drawflux',
-};
+} as const;
 
 export const PageState = z.object({
   page: z.object({

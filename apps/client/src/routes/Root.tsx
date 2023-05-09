@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
 import { modalActions, selectModal } from '@/stores/slices/modalSlice';
 import { nodesActions } from '@/stores/slices/nodesSlice';
-import { getFromStorage } from '@/utils/storage';
+import { storage } from '@/utils/storage';
 
 const Root = () => {
   const [intersectedNodesIds, setIntersectedNodesIds] = useState<string[]>([]);
@@ -47,7 +47,7 @@ const Root = () => {
       return;
     }
 
-    const stateFromStorage = getFromStorage<PageStateType>(LOCAL_STORAGE.KEY);
+    const stateFromStorage = storage.get<PageStateType>(LOCAL_STORAGE.KEY);
 
     if (stateFromStorage) {
       try {
