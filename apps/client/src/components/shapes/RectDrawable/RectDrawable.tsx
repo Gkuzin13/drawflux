@@ -1,8 +1,7 @@
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback } from 'react';
 import { Rect } from 'react-konva';
-import type { NodeLIne } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import NodeTransformer from '@/components/NodeTransformer';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
