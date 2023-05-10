@@ -131,7 +131,7 @@ const SharePanel = ({ pageState, isPageShared }: Props) => {
 
   return (
     <SharePanelContainer>
-      <Menu>
+      <Menu initiallyOpened={isPageShared}>
         <SharePanelToggle color="primary">Share</SharePanelToggle>
         <Menu.Dropdown>
           {isPageShared ? (
