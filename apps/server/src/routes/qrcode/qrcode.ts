@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as QRCode from 'qrcode';
 import { BadRequestError, type GetQRCodeResponse } from 'shared';
-import { loadRoute } from 'src/utils/route/route.js';
+import { loadRoute } from 'src/utils/route/route';
 
 const qrCodeRouter = Router();
 

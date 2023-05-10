@@ -5,7 +5,7 @@ import type {
   StageConfig,
 } from 'shared';
 import request from 'supertest';
-import app from '../../app';
+import app from '../../app.js';
 
 const mockNode: NodeObject = {
   nodeProps: { id: 'node-id', point: [0, 0], rotation: 0, visible: true },
