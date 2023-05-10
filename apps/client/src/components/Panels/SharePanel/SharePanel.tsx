@@ -1,24 +1,96 @@
-import { TbLink, TbLoader } from 'react-icons/tb';
-import { type SharePageParams } from 'shared';
+import { useEffect, useState } from 'react';
+import { TbClipboardCheck, TbCopy, TbLink } from 'react-icons/tb';
+import type { GetQRCodeResponse, SharePageParams } from 'shared';
+import Loader from '@/components/core/Loader/Loader';
 import Menu from '@/components/core/Menu/Menu';
-import { PAGE_SHARE_INFO } from '@/constants/share';
-import { useSharePageMutation } from '@/services/api';
-import { SharePanelContainer, SharePanelDisclamer } from './SharePanelStyled';
+import QRCode from '@/components/QRCode/QRCode';
+import { ICON_SIZES } from '@/constants/icon';
+import useClipboard from '@/hooks/useClipboard/useClipboard';
+import { useGetQRCodeMutation, useSharePageMutation } from '@/services/api';
+import {
+  SharePanelContainer,
+  SharePanelDisclamer,
+  SharePanelToggle,
+} from './SharePanelStyled';
 
 type Props = {
   pageState: SharePageParams;
   isPageShared: boolean;
 };
 
-const SharePanel = ({ pageState, isPageShared }: Props) => {
-  const [sharePage, { isLoading, isSuccess }] = useSharePageMutation();
+type ShareablePageProps = {
+  page: SharePageParams['page'];
+};
 
-  const handlePageShare = async () => {
-    if (!pageState.page.nodes.length) {
+type SharedPageContentProps = {
+  qrCode?: GetQRCodeResponse;
+  onQRCodeFetchSuccess: (data: GetQRCodeResponse) => void;
+};
+
+const SharedPageContent = ({
+  qrCode,
+  onQRCodeFetchSuccess,
+}: SharedPageContentProps) => {
+  const [getQRCode] = useGetQRCodeMutation();
+  const { copied, copy } = useClipboard();
+
+  const pageUrl = window.location.href;
+
+  useEffect(() => {
+    async function fetchQRCode(url: string) {
+      const { data } = await getQRCode({ url }).unwrap();
+
+      if (data?.dataUrl) {
+        onQRCodeFetchSuccess(data);
+      }
+    }
+
+    if (!qrCode) {
+      fetchQRCode(pageUrl);
+    }
+  }, [pageUrl, qrCode, getQRCode, onQRCodeFetchSuccess]);
+
+  const handleCopyLinkClick = async () => {
+    if (!pageUrl) {
       return;
     }
 
-    const { data } = await sharePage(pageState).unwrap();
+    copy(pageUrl);
+  };
+
+  return (
+    <>
+      {qrCode && <QRCode dataUrl={qrCode.dataUrl} />}
+      <Menu.Item
+        title={copied ? 'Link Copied' : 'Copy link'}
+        size="extra-small"
+        spanned
+        closeOnItemClick={false}
+        onItemClick={handleCopyLinkClick}
+      >
+        {!copied ? 'Copy link' : 'Link Copied'}
+        {!copied ? (
+          <TbCopy size={ICON_SIZES.MEDIUM} />
+        ) : (
+          <TbClipboardCheck size={ICON_SIZES.MEDIUM} />
+        )}
+      </Menu.Item>
+      <SharePanelDisclamer>
+        Anyone with the link has access to this page for 24 hours since sharing.
+      </SharePanelDisclamer>
+    </>
+  );
+};
+
+const SharablePageContent = ({ page }: ShareablePageProps) => {
+  const [sharePage, { isLoading, isSuccess }] = useSharePageMutation();
+
+  const handlePageShare = async () => {
+    if (!page.nodes.length) {
+      return;
+    }
+
+    const { data } = await sharePage({ page }).unwrap();
 
     if (data?.id) {
       window.history.pushState({}, '', `/p/${data.id}`);
@@ -28,31 +100,43 @@ const SharePanel = ({ pageState, isPageShared }: Props) => {
   };
 
   return (
+    <>
+      <Menu.Item
+        fullWidth={true}
+        size="small"
+        disabled={!page.nodes.length}
+        color="secondary-light"
+        closeOnItemClick={false}
+        onItemClick={handlePageShare}
+      >
+        {!isLoading && <TbLink />}
+        {isLoading || isSuccess ? <Loader /> : 'Share this page'}
+      </Menu.Item>
+      <Menu.Divider type="horizontal" />
+      <SharePanelDisclamer>
+        Sharing this project will make it available for 24 hours publicly to
+        anyone who has access to the provided URL.
+      </SharePanelDisclamer>
+    </>
+  );
+};
+
+const SharePanel = ({ pageState, isPageShared }: Props) => {
+  const [linkQRCode, setLinkQRCode] = useState<GetQRCodeResponse>();
+
+  return (
     <SharePanelContainer>
       <Menu>
-        <Menu.Toggle size="normal" color="primary">
-          Share
-        </Menu.Toggle>
+        <SharePanelToggle color="primary">Share</SharePanelToggle>
         <Menu.Dropdown>
-          {!isPageShared && (
-            <>
-              <Menu.Item
-                fullWidth={true}
-                size="small"
-                disabled={!pageState.page.nodes.length}
-                color="secondary-light"
-                closeOnItemClick={false}
-                onItemClick={handlePageShare}
-              >
-                {!isLoading && <TbLink />}
-                {isLoading || isSuccess ? TbLoader({}) : 'Share this page'}
-              </Menu.Item>
-              <Menu.Divider type="horizontal" />
-            </>
+          {isPageShared ? (
+            <SharedPageContent
+              qrCode={linkQRCode}
+              onQRCodeFetchSuccess={(data) => setLinkQRCode(data)}
+            />
+          ) : (
+            <SharablePageContent page={pageState.page} />
           )}
-          <SharePanelDisclamer>
-            {isPageShared ? PAGE_SHARE_INFO.ACTIVE : PAGE_SHARE_INFO.CTA}
-          </SharePanelDisclamer>
         </Menu.Dropdown>
       </Menu>
     </SharePanelContainer>

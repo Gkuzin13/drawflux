@@ -11,3 +11,7 @@ export type SharePageParams = {
 export type GetPageParams = {
   id: string;
 };
+
+export type PostQRCodeBody = {
+  url: string;
+};

@@ -1,4 +1,5 @@
 import { styled } from 'shared';
+import Menu from '@/components/core/Menu/Menu';
 
 export const SharePanelContainer = styled('div', {
   position: 'fixed',
@@ -10,6 +11,10 @@ export const SharePanelContainer = styled('div', {
 
 export const SharePanelDisclamer = styled('p', {
   padding: '$1 $2 $2 $2',
-  fontSize: '$2',
+  fontSize: '$1',
   color: '$gray600',
+});
+
+export const SharePanelToggle = styled(Menu.Toggle, {
+  maxHeight: '$6',
 });

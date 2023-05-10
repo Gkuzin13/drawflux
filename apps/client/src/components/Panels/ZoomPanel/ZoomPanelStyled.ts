@@ -1,11 +1,11 @@
 import { styled } from 'shared';
 import Button from '@/components/core/Button/Button';
+import { ButtonStyled } from '@/components/core/Button/ButtonStyled';
 
 export const ZoomPanelContainer = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  gap: '$1',
   position: 'fixed',
   left: '$2',
   bottom: '$1',
@@ -15,10 +15,12 @@ export const ZoomPanelContainer = styled('div', {
   fontSize: '$2',
 });
 
-export const ZoomPanelButton = styled(Button, {
-  padding: '$1',
+export const ZoomPanelButton = styled(ButtonStyled, {
   textShadow: '$small',
   '&:hover': {
     color: '$gray900',
+  },
+  defaultVariants: {
+    size: 'extra-small',
   },
 });

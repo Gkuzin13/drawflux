@@ -18,3 +18,7 @@ export type SharedPage = {
 export type SharePageResponse = {
   id: string;
 };
+
+export type GetQRCodeResponse = {
+  dataUrl: string;
+};

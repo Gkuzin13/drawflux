@@ -74,4 +74,7 @@ export const ButtonStyled = styled('button', {
       },
     },
   },
+  defaultVariants: {
+    size: 'normal',
+  },
 });
