@@ -3,7 +3,7 @@ import * as db from './db/index.js';
 import jobs from './db/jobs.js';
 import { queries } from './db/queries/index.js';
 
-await (async () => {
+(async () => {
   const client = await db.getClient();
 
   try {
