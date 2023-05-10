@@ -1,4 +1,5 @@
 import { styled } from 'shared';
+import Button from '@/components/core/Button/Button';
 import { ButtonStyled } from '@/components/core/Button/ButtonStyled';
 
 export const ZoomPanelContainer = styled('div', {
