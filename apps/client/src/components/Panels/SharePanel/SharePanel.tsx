@@ -8,6 +8,7 @@ import { ICON_SIZES } from '@/constants/icon';
 import useClipboard from '@/hooks/useClipboard/useClipboard';
 import { useGetQRCodeMutation, useSharePageMutation } from '@/services/api';
 import {
+  QRCodeContainer,
   SharePanelContainer,
   SharePanelDisclamer,
   SharePanelToggle,
@@ -31,7 +32,7 @@ const SharedPageContent = ({
   qrCode,
   onQRCodeFetchSuccess,
 }: SharedPageContentProps) => {
-  const [getQRCode] = useGetQRCodeMutation();
+  const [getQRCode, { isLoading, isError }] = useGetQRCodeMutation();
   const { copied, copy } = useClipboard();
 
   const pageUrl = window.location.href;
@@ -60,7 +61,11 @@ const SharedPageContent = ({
 
   return (
     <>
-      {qrCode && <QRCode dataUrl={qrCode.dataUrl} />}
+      <QRCodeContainer>
+        {isLoading && <Loader filled />}
+        {qrCode && <QRCode dataUrl={qrCode.dataUrl} />}
+        {isError && <p>Error loading QR Code</p>}
+      </QRCodeContainer>
       <Menu.Item
         title={copied ? 'Link Copied' : 'Copy link'}
         size="extra-small"

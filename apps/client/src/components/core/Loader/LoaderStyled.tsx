@@ -34,6 +34,14 @@ export const LoaderContainer = styled('div', {
         zIndex: 1050,
       },
     },
+    filled: {
+      true: {
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+      },
+    },
   },
 });
 

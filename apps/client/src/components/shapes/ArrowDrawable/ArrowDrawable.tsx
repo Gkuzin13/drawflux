@@ -85,8 +85,12 @@ const ArrowDrawable = memo(
         group.position({ x: 0, y: 0 });
 
         setDragging(false);
+
+        if (!selected) {
+          onPress(node.nodeProps.id);
+        }
       },
-      [node, points, onNodeChange],
+      [node, points, selected, onNodeChange, onPress],
     );
 
     const handleTransformEnd = useCallback(

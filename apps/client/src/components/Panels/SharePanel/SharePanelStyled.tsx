@@ -17,4 +17,12 @@ export const SharePanelDisclamer = styled('p', {
 
 export const SharePanelToggle = styled(Menu.Toggle, {
   maxHeight: '$6',
+  boxShadow: '$small',
+});
+
+export const QRCodeContainer = styled('div', {
+  position: 'relative',
+  width: '100%',
+  height: '100%',
+  aspectRatio: '1 / 1',
 });

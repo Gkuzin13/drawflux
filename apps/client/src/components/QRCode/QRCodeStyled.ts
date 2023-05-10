@@ -1,17 +1,8 @@
 import { styled } from 'shared';
 
 export const QRCodeBgImage = styled('div', {
-  backgroundSize: '100%',
+  backgroundSize: '100% 100%',
   backgroundRepeat: 'repeat',
-  variants: {
-    size: {
-      md: {
-        width: '200px',
-        height: '200px',
-      },
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-  },
+  width: '100%',
+  height: '100%',
 });
