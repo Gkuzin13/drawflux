@@ -1,13 +1,12 @@
 {
   "name": "drawflux-server",
   "version": "0.1.0",
-  "type": "module",
   "sideEffects": false,
   "engines": {
     "node": ">=16.0.0"
   },
   "scripts": {
-    "start": "node --experimental-specifier-resolution=node dist/server.js",
+    "start": "node --enable-source-maps dist/server.js",
     "dev": "nodemon --watch './**' --ext 'ts,json' --exec 'tsx src/server.ts'",
     "build": "tsc --project tsconfig.build.json",
     "test:watch": "vitest",

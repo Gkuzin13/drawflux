@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import * as QRCode from 'qrcode';
+import { toDataURL } from 'qrcode';
 import { BadRequestError, type GetQRCodeResponse } from 'shared';
-import { loadRoute } from 'src/utils/route/route.js';
+import { loadRoute } from '../../utils/route/route';
 
 const qrCodeRouter = Router();
 
@@ -11,7 +11,7 @@ qrCodeRouter.post(
     const url = req.body?.url as string;
 
     try {
-      const dataUrl = await QRCode.toDataURL(url);
+      const dataUrl = await toDataURL(url);
 
       return { dataUrl } as GetQRCodeResponse;
     } catch (error) {

@@ -4,14 +4,14 @@ import pg from 'pg';
 import type { SharePageParams, SharePageResponse } from 'shared';
 import { BadRequestError, Schemas } from 'shared';
 import { ZodError } from 'zod';
-import * as db from '../../db/index.js';
-import { queries } from '../../db/queries/index.js';
+import * as db from '../../db/index';
+import { queries } from '../../db/queries/index';
 import type {
   SharePageArgs,
   GetPageArgs,
   PageRowObject,
-} from '../../db/queries/types.js';
-import { loadRoute } from '../../utils/route/route.js';
+} from '../../db/queries/types';
+import { loadRoute } from '../../utils/route/route';
 
 const pageRouter = Router();
 

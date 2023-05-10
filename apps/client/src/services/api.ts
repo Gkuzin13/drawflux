@@ -5,8 +5,8 @@ import type {
   ServerResponse,
   SharedPage,
   SharePageResponse,
-  GetQRCodeBody,
   GetQRCodeResponse,
+  PostQRCodeBody,
 } from 'shared';
 import { BASE_URL } from '@/constants/app';
 
@@ -40,7 +40,7 @@ export const api = createApi({
     }),
     getQRCode: builder.mutation<
       ServerResponse<GetQRCodeResponse>,
-      GetQRCodeBody
+      PostQRCodeBody
     >({
       query(body) {
         return {

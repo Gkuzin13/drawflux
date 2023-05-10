@@ -21,4 +21,12 @@ export default defineConfig({
       registerNodeLoader: true,
     },
   },
+  optimizeDeps: {
+    include: ['shared'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/shared/, /node_modules/],
+    },
+  },
 });

@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "noEmit": false,
-    "outDir": "dist"
+    "outDir": "dist",
+    "module": "CommonJS",
+    "target": "ESNext"
   },
   "extends": "./tsconfig.json",
   "exclude": ["src/**/*.test.ts"]

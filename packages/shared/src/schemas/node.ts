@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { colors } from '../design/design';
-import { createUnionSchema } from './zod';
+import { createUnionSchema } from '../utils/zod';
 
 const Type = z.union([
   z.literal('arrow'),

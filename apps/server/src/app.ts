@@ -4,7 +4,7 @@ import cors from 'cors';
 import * as dotenv from 'dotenv';
 import express from 'express';
 import helmet from 'helmet';
-import { mountRoutes } from './routes/index.js';
+import { mountRoutes } from './routes/index';
 
 const isProduction = process.env.NODE_ENV === 'production';
 

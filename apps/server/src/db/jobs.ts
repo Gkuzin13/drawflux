@@ -1,8 +1,8 @@
 import { CronJob } from 'cron';
 import type { QueryResult } from 'pg';
-import { queries } from './queries/index.js';
-import type { PageRowObject } from './queries/types.js';
-import * as db from './index.js';
+import { queries } from './queries/index';
+import type { PageRowObject } from './queries/types';
+import * as db from './index';
 
 const deleteExpiredPages = new CronJob('0 0 * * *', async () => {
   const client = await db.getClient();
