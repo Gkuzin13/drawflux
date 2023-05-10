@@ -82,5 +82,10 @@ export const { theme, styled, css } = createStitches({
       normal: '0.25s cubic-bezier(0.645, 0.045, 0.355, 1)',
       fast: '0.1s cubic-bezier(0.645, 0.045, 0.355, 1)',
     },
+    media: {
+      sm: '(min-width: 640px)',
+      md: '(min-width: 768px)',
+      lg: '(min-width: 1024px)',
+    },
   },
 });
