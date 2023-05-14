@@ -1,5 +1,7 @@
 import type Konva from 'konva';
-import { type Point } from 'shared';
+import type { IRect, Vector2d } from 'konva/lib/types';
+import type { NodeObject, Point } from 'shared';
+import { calculateMiddlePoint } from './math';
 
 export function getPointsAbsolutePosition<T extends Konva.Node>(
   points: Point[],
@@ -16,14 +18,109 @@ export function getPointsAbsolutePosition<T extends Konva.Node>(
   });
 }
 
-export function getWidthFromPoints(points: Point[]): number {
-  if (!points.length) {
-    return 0;
+export function getNodeRect(node: NodeObject): IRect {
+  if (node.nodeProps.points) {
+    const points = [...node.nodeProps.points, node.nodeProps.point];
+    const xPoints = points.map(([x]) => x);
+    const yPoints = points.map(([_, y]) => y);
+
+    const minX = Math.min(...xPoints);
+    const minY = Math.min(...yPoints);
+    const maxX = Math.max(...xPoints);
+    const maxY = Math.max(...yPoints);
+
+    return {
+      x: minX,
+      y: minY,
+      width: Math.abs(maxX - minX),
+      height: Math.abs(maxY - minY),
+    };
   }
 
-  const xPoints = points.map(([x]) => x);
-  const maxX = Math.max(...xPoints);
-  const minX = Math.min(...xPoints);
+  let width = node.nodeProps.width || 0;
+  let height = node.nodeProps.height || 0;
 
-  return Math.abs(maxX - minX);
+  if (node.type === 'ellipse') {
+    width *= 2;
+    height *= 2;
+  }
+
+  return {
+    x: node.nodeProps.point[0],
+    y: node.nodeProps.point[1],
+    width,
+    height,
+  };
+}
+
+export function getVisibleBoundaries(rect: IRect, scale: number): IRect {
+  return {
+    x: -rect.x / scale,
+    y: -rect.y / scale,
+    width: rect.width / scale,
+    height: rect.height / scale,
+  };
+}
+
+export function isNodeInView(
+  node: NodeObject,
+  stageRect: IRect,
+  stageScale: number,
+): boolean {
+  const visibleBoundaries = getVisibleBoundaries(stageRect, stageScale);
+  const nodeRect = getNodeRect(node);
+
+  return (
+    nodeRect.x >= visibleBoundaries.x &&
+    nodeRect.y >= visibleBoundaries.y &&
+    nodeRect.x + nodeRect.width <=
+      visibleBoundaries.x + visibleBoundaries.width &&
+    nodeRect.y + nodeRect.height <=
+      visibleBoundaries.y + visibleBoundaries.height
+  );
+}
+
+export function getMiddleNode(nodes: NodeObject[]): NodeObject {
+  if (nodes.length === 1) {
+    return nodes[0];
+  }
+
+  const sortedNodesByPosAsc = nodes.sort((a, b) => {
+    const aMid = calculateMiddlePoint(getNodeRect(a));
+    const bMid = calculateMiddlePoint(getNodeRect(b));
+
+    if (aMid.x < bMid.x) {
+      return -1;
+    }
+
+    if (aMid.x > bMid.x) {
+      return 1;
+    }
+
+    if (aMid.y < bMid.y) {
+      return -1;
+    }
+
+    if (aMid.y > bMid.y) {
+      return 1;
+    }
+
+    return 0;
+  });
+
+  const midIndex = Math.round((sortedNodesByPosAsc.length - 1) / 2);
+
+  return sortedNodesByPosAsc[midIndex];
+}
+
+export function getCenterPosition(
+  position: Vector2d,
+  scale: number,
+  width: number,
+  height: number,
+) {
+  return {
+    x: -position.x * scale + width / 2,
+    y: -position.y * scale + height / 2,
+  };
 }

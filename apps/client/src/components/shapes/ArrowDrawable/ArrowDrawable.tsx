@@ -6,7 +6,7 @@ import type { Point, NodeProps } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import useNode from '@/hooks/useNode/useNode';
 import { useAppSelector } from '@/stores/hooks';
-import { selectCanvas } from '@/stores/slices/canvasSlice';
+import { selectCanvas } from '@/stores/slices/canvas';
 import { getValueFromRatio } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import ArrowHead from './ArrowHead';

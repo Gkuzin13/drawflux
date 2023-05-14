@@ -6,7 +6,7 @@ import type { NodeComponentProps } from '@/components/Node/Node';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
-import { selectCanvas } from '@/stores/slices/canvasSlice';
+import { selectCanvas } from '@/stores/slices/canvas';
 import NodeTransformer from '../../NodeTransformer';
 
 type Props = {

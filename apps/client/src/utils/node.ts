@@ -1,8 +1,9 @@
+import type { IRect } from 'konva/lib/types';
 import type { NodeLIne, NodeType, Point, NodeObject, NodeProps } from 'shared';
 import { colors } from 'shared';
 import { v4 as uuid } from 'uuid';
 import { LINE, SIZE } from '../constants/style';
-import { getWidthFromPoints } from './position';
+import { getNodeRect, isNodeInView } from './position';
 
 export const createNode = (type: NodeType, point: Point): NodeObject => {
   return {
@@ -106,51 +107,16 @@ export function reorderNodes(nodesIdsToReorder: string[], nodes: NodeObject[]) {
   return { toEnd, toStart, forward, backward };
 }
 
-export function getNodesMinMaxXEdges(nodes: NodeObject[]): {
-  min: number;
-  max: number;
-} {
-  const min = Math.min(
-    ...nodes.map((node) => {
-      const [x] = node.nodeProps.point;
-
-      if (node.nodeProps.points) {
-        return Math.min(x, ...node.nodeProps.points.map(([x]) => x));
-      }
-
-      return x;
-    }),
-  );
-
-  const max = Math.max(
-    ...nodes.map((node) => {
-      const [x] = node.nodeProps.point;
-
-      if (node.nodeProps.points) {
-        const points = [...node.nodeProps.points, node.nodeProps.point];
-        const min = Math.min(...points.map(([x]) => x));
-        const width = getWidthFromPoints(points);
-
-        return min + width;
-      }
-
-      const width = node.nodeProps.width || 0;
-
-      if (node.type === 'ellipse') {
-        return x + width * 2;
-      }
-
-      return x + width;
-    }),
-  );
-
-  return { min, max };
-}
-
 const DUPLICATION_GAP = 16;
 
 export function duplicateNodes(nodes: NodeObject[]): NodeObject[] {
-  const { min: nodeMinXEdge, max: nodeMaxXEdge } = getNodesMinMaxXEdges(nodes);
+  const nodeMinXEdge = Math.min(...nodes.map((node) => getNodeRect(node).x));
+  const nodeMaxXEdge = Math.max(
+    ...nodes.map((node) => {
+      const { x, width } = getNodeRect(node);
+      return x + width;
+    }),
+  );
 
   const duplicationStartXPoint = nodeMaxXEdge + DUPLICATION_GAP;
   const distance = duplicationStartXPoint - nodeMinXEdge;
@@ -170,4 +136,12 @@ export function duplicateNodes(nodes: NodeObject[]): NodeObject[] {
 
     return { ...node, nodeProps: { ...node.nodeProps, ...updatedNodeProps } };
   });
+}
+
+export function allNodesInView(
+  nodes: NodeObject[],
+  stageRect: IRect,
+  stageScale: number,
+) {
+  return nodes.every((node) => isNodeInView(node, stageRect, stageScale));
 }

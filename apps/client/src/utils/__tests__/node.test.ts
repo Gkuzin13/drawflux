@@ -1,7 +1,7 @@
-import { type NodeObject, colors } from 'shared';
+import { colors } from 'shared';
 import { LINE, SIZE } from '@/constants/style';
 import { nodesGenerator } from '@/test/data-generators';
-import { createNode, getNodesMinMaxXEdges, reorderNodes } from '../node';
+import { createNode, reorderNodes } from '../node';
 
 describe('createNode', () => {
   it('should create a node object correctly', () => {
@@ -110,63 +110,5 @@ describe('reorderNodes', () => {
     const reorderedNodes = reorderNodes(idsToReorder, []).toStart();
 
     expect(reorderedNodes.map((node) => node.nodeProps.id)).toEqual([]);
-  });
-});
-
-describe('getNodesMinMaxXEdges', () => {
-  it('should return min and max x edges correctly for nodes with width value', () => {
-    const rectNode = createNode('rectangle', [0, 0]);
-    const ellipseNode = createNode('ellipse', [50, 50]);
-
-    const nodes: NodeObject[] = [
-      {
-        ...rectNode,
-        nodeProps: {
-          ...rectNode.nodeProps,
-          width: 50,
-        },
-      },
-      {
-        ...ellipseNode,
-        nodeProps: {
-          ...ellipseNode.nodeProps,
-          width: 25,
-        },
-      },
-    ];
-
-    expect(getNodesMinMaxXEdges(nodes)).toEqual({ min: 0, max: 100 });
-  });
-
-  it('should return min and max x edges correctly for nodes with points array', () => {
-    const arrowNode = createNode('arrow', [25, 25]);
-    const drawNode = createNode('draw', [50, 50]);
-
-    const nodes: NodeObject[] = [
-      {
-        ...arrowNode,
-        nodeProps: {
-          ...arrowNode.nodeProps,
-          points: [
-            [25, 25],
-            [50, 50],
-          ],
-        },
-      },
-      {
-        ...drawNode,
-        nodeProps: {
-          ...drawNode.nodeProps,
-          points: [
-            [50, 50],
-            [100, 100],
-            [150, 150],
-            [200, 200],
-          ],
-        },
-      },
-    ];
-
-    expect(getNodesMinMaxXEdges(nodes)).toEqual({ min: 25, max: 200 });
   });
 });

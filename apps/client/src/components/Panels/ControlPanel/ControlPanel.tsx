@@ -19,7 +19,7 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
         return !enabledControls.undo;
       case 'history/redo':
         return !enabledControls.redo;
-      case 'nodes/delete':
+      case 'canvas/deleteNodes':
         return !enabledControls.deleteSelectedNodes;
       default:
         return false;

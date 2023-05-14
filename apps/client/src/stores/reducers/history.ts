@@ -1,11 +1,11 @@
 import { type Action, createAction, type Reducer } from '@reduxjs/toolkit';
-import type { NodeObject } from 'shared';
-import { type NodesState } from './nodesSlice';
+import { initialState as initialCanvasState } from '../slices/canvas';
+import type { CanvasAcionType, CanvasSliceState } from '../slices/canvas';
 
-export type NodesHistoryState = {
-  past: NodeObject[];
-  present: NodesState;
-  future: NodeObject[];
+export type CanvasHistoryState = {
+  past: CanvasSliceState[];
+  present: CanvasSliceState;
+  future: CanvasSliceState[];
 };
 
 export type HistoryActionType =
@@ -16,17 +16,43 @@ export const historyActions = {
   redo: createAction('history/redo'),
 };
 
+export type IgnoreActionType = HistoryActionType | CanvasAcionType;
+
+const IGNORED_ACTIONS: IgnoreActionType[] = [
+  'canvas/setToolType',
+  'canvas/setStageConfig',
+  'canvas/set',
+  'canvas/setSelectedNodesIds',
+];
+
+function isIgnoredActionType(type: string) {
+  return IGNORED_ACTIONS.includes(type as IgnoreActionType);
+}
+
 function undoable(
-  reducer: Reducer<NodesState, Action<HistoryActionType | undefined>>,
+  reducer: Reducer<
+    CanvasSliceState,
+    Action<HistoryActionType | CanvasAcionType | undefined>
+  >,
 ) {
-  const initialState: NodesHistoryState = {
+  const initialState: CanvasHistoryState = {
     past: [],
-    present: reducer({ nodes: [] }, { type: undefined }),
+    present: reducer(initialCanvasState, { type: undefined }),
     future: [],
   };
 
-  return function (state = initialState, action: Action<HistoryActionType>) {
+  return function (
+    state = initialState,
+    action: Action<HistoryActionType | CanvasAcionType>,
+  ) {
     const { past, present, future } = state;
+
+    if (isIgnoredActionType(action.type)) {
+      return {
+        ...state,
+        present: reducer(present, action),
+      };
+    }
 
     switch (action.type) {
       case 'history/undo': {

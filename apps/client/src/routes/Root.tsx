@@ -11,9 +11,8 @@ import useKeydownListener from '@/hooks/useKeyListener';
 import useWindowSize from '@/hooks/useWindowSize/useWindowSize';
 import { useGetPageQuery } from '@/services/api';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
-import { modalActions, selectModal } from '@/stores/slices/modalSlice';
-import { nodesActions } from '@/stores/slices/nodesSlice';
+import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { uiActions, selectModal } from '@/stores/slices/ui';
 import { storage } from '@/utils/storage';
 
 const Root = () => {
@@ -55,27 +54,20 @@ const Root = () => {
       } catch (error) {
         return;
       }
-      const batchDispatchPageState = (state: PageStateType) => {
-        const { toolType, nodes, stageConfig, selectedNodesIds } = state.page;
 
-        // Order of dispatch is important in dev mode
-        // Cause is unknown, needs investigation
-        dispatch(canvasActions.setToolType(toolType));
-        dispatch(nodesActions.set(nodes));
-        dispatch(
-          canvasActions.setSelectedNodesIds(Object.keys(selectedNodesIds)),
-        );
-        dispatch(canvasActions.setStageConfig(stageConfig));
-      };
+      const { toolType, nodes, stageConfig, selectedNodesIds } =
+        stateFromStorage.page;
 
-      batchDispatchPageState(stateFromStorage);
+      dispatch(
+        canvasActions.set({ toolType, nodes, selectedNodesIds, stageConfig }),
+      );
     }
   }, [id, dispatch]);
 
   useEffect(() => {
     if (isError) {
       dispatch(
-        modalActions.open({ title: 'Error', message: 'Error loading page' }),
+        uiActions.openModal({ title: 'Error', message: 'Error loading page' }),
       );
     }
   }, [isError, dispatch]);
@@ -85,8 +77,7 @@ const Root = () => {
       width,
       height,
       scale: { x: stageConfig.scale, y: stageConfig.scale },
-      x: stageConfig.position.x,
-      y: stageConfig.position.y,
+      ...stageConfig.position,
     };
   }, [stageConfig, width, height]);
 
@@ -116,11 +107,11 @@ const Root = () => {
         onNodesIntersection={handleNodesIntersection}
         onConfigChange={handleStageConfigChange}
       />
-      {modal.open && (
+      {modal.opened && (
         <Modal
           title={modal.title}
           message={modal.message}
-          onClose={() => dispatch(modalActions.close())}
+          onClose={() => dispatch(uiActions.closeModal())}
         />
       )}
     </>

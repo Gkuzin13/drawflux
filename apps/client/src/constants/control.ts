@@ -3,8 +3,8 @@ import {
   IoArrowRedoOutline,
   IoTrashOutline,
 } from 'react-icons/io5';
-import { historyActions } from '@/stores/slices/historySlice';
-import { nodesActions } from '@/stores/slices/nodesSlice';
+import { historyActions } from '@/stores/reducers/history';
+import { canvasActions } from '@/stores/slices/canvas';
 import { KEYS } from './keys.js';
 
 export type ControlAction = (typeof CONTROL)[number]['value'];
@@ -26,7 +26,7 @@ export const CONTROL = [
   },
   {
     name: 'Delete',
-    value: nodesActions.delete,
+    value: canvasActions.deleteNodes,
     icon: IoTrashOutline,
     key: KEYS.C,
     modifierKeys: [KEYS.CTRL],

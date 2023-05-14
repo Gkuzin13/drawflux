@@ -1,26 +1,16 @@
-import { type Action, configureStore, type Reducer } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import { api } from '@/services/api';
 import { listenerMiddleware } from './listenerMiddleware';
-import canvas from './slices/canvasSlice';
-import contextMenu from './slices/contextMenu';
-import historyReducer, {
-  type HistoryActionType,
-  type NodesHistoryState,
-} from './slices/historySlice';
-import modal from './slices/modalSlice';
-import nodesReducer from './slices/nodesSlice';
+import historyReducer from './reducers/history';
+import canvas from './slices/canvas';
+import ui from './slices/ui';
 
-const nodesHistory = historyReducer(nodesReducer) as Reducer<
-  NodesHistoryState,
-  Action<HistoryActionType>
->;
+const canvasReducer = historyReducer(canvas);
 
 export const store = configureStore({
   reducer: {
-    nodesHistory,
-    canvas,
-    modal,
-    contextMenu,
+    canvas: canvasReducer,
+    ui,
     [api.reducerPath]: api.reducer,
   },
   middleware: (getDefaultMiddleware) =>

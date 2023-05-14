@@ -1,20 +1,15 @@
 import type Konva from 'konva';
 import { type RefObject, useCallback, useEffect } from 'react';
-import { useStore } from 'react-redux';
 import { KEYS, type Key } from '@/constants/keys';
 import { TOOLS } from '@/constants/tool';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
-import { contextMenuActions } from '@/stores/slices/contextMenu';
-import { historyActions } from '@/stores/slices/historySlice';
-import { nodesActions } from '@/stores/slices/nodesSlice';
-import type { RootState } from '@/stores/store';
+import { historyActions } from '@/stores/reducers/history';
+import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { uiActions } from '@/stores/slices/ui';
 
 function useKeydownListener(stageRef: RefObject<Konva.Stage>) {
   const { selectedNodesIds } = useAppSelector(selectCanvas);
   const { toolType } = useAppSelector(selectCanvas);
-
-  const store = useStore<RootState>();
 
   const dispatch = useAppDispatch();
 
@@ -33,14 +28,7 @@ function useKeydownListener(stageRef: RefObject<Konva.Stage>) {
           event.preventDefault();
           const nodesToDuplicate = Object.keys(selectedNodesIds);
 
-          dispatch(nodesActions.duplicate(nodesToDuplicate));
-
-          const duplicatedNodes = store
-            .getState()
-            .nodesHistory.present.nodes.slice(-nodesToDuplicate.length)
-            .map((node) => node.nodeProps.id);
-
-          dispatch(canvasActions.setSelectedNodesIds(duplicatedNodes));
+          dispatch(canvasActions.duplicateNodes(nodesToDuplicate));
         }
       }
     },
@@ -63,8 +51,8 @@ function useKeydownListener(stageRef: RefObject<Konva.Stage>) {
       }
 
       if (key === KEYS.DELETE) {
-        dispatch(nodesActions.delete(Object.keys(selectedNodesIds)));
-        dispatch(contextMenuActions.close());
+        dispatch(canvasActions.deleteNodes(Object.keys(selectedNodesIds)));
+        dispatch(uiActions.closeContextMenu());
         return;
       }
 

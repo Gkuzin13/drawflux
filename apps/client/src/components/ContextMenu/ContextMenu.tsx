@@ -3,10 +3,8 @@ import { memo, useCallback, useMemo } from 'react';
 import { Html } from 'react-konva-utils';
 import { Provider as StoreProvider, useStore } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
-import { contextMenuActions } from '@/stores/slices/contextMenu';
-import { nodesActions, selectCurrentNodes } from '@/stores/slices/nodesSlice';
-import type { RootState } from '@/stores/store';
+import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { uiActions } from '@/stores/slices/ui';
 import { Divider } from '../core/Divider/Divider';
 import Kbd from '../core/Kbd/Kbd';
 import Menu from '../core/Menu/Menu';
@@ -20,7 +18,7 @@ type Props = {
 };
 
 const DrawingCanvasMenu = () => {
-  const nodes = useAppSelector(selectCurrentNodes);
+  const { nodes } = useAppSelector(selectCanvas);
   const { selectedNodesIds } = useAppSelector(selectCanvas);
 
   const dispatch = useAppDispatch();
@@ -33,12 +31,12 @@ const DrawingCanvasMenu = () => {
     const allSelectedNodesIds = nodes.map((node) => node.nodeProps.id);
 
     dispatch(canvasActions.setSelectedNodesIds(allSelectedNodesIds));
-    dispatch(contextMenuActions.close());
+    dispatch(uiActions.closeContextMenu());
   }, [dispatch, nodes]);
 
   const handleSelectNone = useCallback(() => {
     dispatch(canvasActions.setSelectedNodesIds([]));
-    dispatch(contextMenuActions.close());
+    dispatch(uiActions.closeContextMenu());
   }, [dispatch]);
 
   return (
@@ -53,48 +51,39 @@ const DrawingCanvasMenu = () => {
 
 const NodeMenu = () => {
   const { selectedNodesIds } = useAppSelector(selectCanvas);
-  const store = useStore<RootState>();
 
   const dispatch = useAppDispatch();
 
   const handleDuplicateNode = useCallback(async () => {
     const nodesToDuplicate = Object.keys(selectedNodesIds);
 
-    dispatch(nodesActions.duplicate(nodesToDuplicate));
-
-    const duplicatedNodes = store
-      .getState()
-      .nodesHistory.present.nodes.slice(-nodesToDuplicate.length)
-      .map((node) => node.nodeProps.id);
-
-    dispatch(canvasActions.setSelectedNodesIds(duplicatedNodes));
-
-    dispatch(contextMenuActions.close());
-  }, [dispatch, selectedNodesIds, store]);
+    dispatch(canvasActions.duplicateNodes(nodesToDuplicate));
+    dispatch(uiActions.closeContextMenu());
+  }, [dispatch, selectedNodesIds]);
 
   const handleDeleteNode = useCallback(() => {
-    dispatch(nodesActions.delete(Object.keys(selectedNodesIds)));
-    dispatch(contextMenuActions.close());
+    dispatch(canvasActions.deleteNodes(Object.keys(selectedNodesIds)));
+    dispatch(uiActions.closeContextMenu());
   }, [dispatch, selectedNodesIds]);
 
   const handleBringToFront = useCallback(() => {
-    dispatch(nodesActions.moveToEnd(Object.keys(selectedNodesIds)));
-    dispatch(contextMenuActions.close());
+    dispatch(canvasActions.moveNodesToEnd(Object.keys(selectedNodesIds)));
+    dispatch(uiActions.closeContextMenu());
   }, [dispatch, selectedNodesIds]);
 
   const handleBringForward = useCallback(() => {
-    dispatch(nodesActions.moveForward(Object.keys(selectedNodesIds)));
-    dispatch(contextMenuActions.close());
+    dispatch(canvasActions.moveNodesForward(Object.keys(selectedNodesIds)));
+    dispatch(uiActions.closeContextMenu());
   }, [dispatch, selectedNodesIds]);
 
   const handleSendToBack = useCallback(() => {
-    dispatch(nodesActions.moveToStart(Object.keys(selectedNodesIds)));
-    dispatch(contextMenuActions.close());
+    dispatch(canvasActions.moveNodesToStart(Object.keys(selectedNodesIds)));
+    dispatch(uiActions.closeContextMenu());
   }, [dispatch, selectedNodesIds]);
 
   const handleSendBackward = useCallback(() => {
-    dispatch(nodesActions.moveBackward(Object.keys(selectedNodesIds)));
-    dispatch(contextMenuActions.close());
+    dispatch(canvasActions.moveNodesBackward(Object.keys(selectedNodesIds)));
+    dispatch(uiActions.closeContextMenu());
   }, [dispatch, selectedNodesIds]);
 
   return (

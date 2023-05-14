@@ -15,12 +15,8 @@ import type { NodeObject, Point, StageConfig } from 'shared';
 import { CURSOR } from '@/constants/cursor';
 import { BACKGROUND_LAYER_ID } from '@/constants/element';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
-import {
-  contextMenuActions,
-  selectContextMenu,
-} from '@/stores/slices/contextMenu';
-import { nodesActions, selectCurrentNodes } from '@/stores/slices/nodesSlice';
+import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { uiActions, selectContextMenu } from '@/stores/slices/ui';
 import { createNode } from '@/utils/node';
 import BackgroundRect from '../BackgroundRect';
 import ContextMenu from '../ContextMenu/ContextMenu';
@@ -72,9 +68,9 @@ const DrawingCanvas = forwardRef<Ref, Props>(
     const [drawPosition, setDrawPosition] = useState(initialDrawPosition);
     const [draggingStage, setDraggingStage] = useState(false);
 
-    const { stageConfig, toolType, selectedNodesIds } =
+    const { stageConfig, toolType, selectedNodesIds, nodes } =
       useAppSelector(selectCanvas);
-    const nodes = useAppSelector(selectCurrentNodes);
+
     const contextMenuState = useAppSelector(selectContextMenu);
 
     const dispatch = useAppDispatch();
@@ -128,7 +124,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
 
         if (clickedOnEmpty) {
           dispatch(
-            contextMenuActions.open({
+            uiActions.openContextMenu({
               type: 'drawing-canvas-menu',
               position,
             }),
@@ -145,7 +141,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           dispatch(canvasActions.setSelectedNodesIds([node.nodeProps.id]));
         }
         dispatch(
-          contextMenuActions.open({
+          uiActions.openContextMenu({
             type: 'node-menu',
             position,
           }),
@@ -185,7 +181,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           return;
         }
 
-        dispatch(nodesActions.add([node]));
+        dispatch(canvasActions.addNodes([node]));
         setDrawing(false);
 
         if (resetToolType) {
@@ -212,7 +208,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
         }
 
         if (contextMenuState.opened) {
-          dispatch(contextMenuActions.close());
+          dispatch(uiActions.closeContextMenu());
           return;
         }
 
@@ -393,7 +389,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
     );
 
     const handleNodesChange = (nodes: NodeObject[]) => {
-      dispatch(nodesActions.update(nodes));
+      dispatch(canvasActions.updateNodes(nodes));
     };
 
     const handleNodePress = (nodeId: string) => {

@@ -7,9 +7,12 @@ import type { ControlAction } from '@/constants/control';
 import { type MenuPanelActionType } from '@/constants/menu';
 import { type Tool } from '@/constants/tool';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { canvasActions, selectCanvas } from '@/stores/slices/canvasSlice';
-import { modalActions } from '@/stores/slices/modalSlice';
-import { nodesActions, selectNodes } from '@/stores/slices/nodesSlice';
+import {
+  canvasActions,
+  selectCanvas,
+  selectHistory,
+} from '@/stores/slices/canvas';
+import { uiActions } from '@/stores/slices/ui';
 import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
 import ControlPanel from './ControlPanel/ControlPanel';
@@ -30,10 +33,8 @@ const Panels = ({
   intersectedNodesIds,
   isPageShared = false,
 }: Props) => {
-  const { stageConfig, toolType } = useAppSelector(selectCanvas);
-  const { past, present, future } = useAppSelector(selectNodes);
-
-  const nodes = present.nodes;
+  const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
+  const { past, future } = useAppSelector(selectHistory);
 
   const dispatch = useAppDispatch();
 
@@ -90,7 +91,7 @@ const Panels = ({
       return { ...node, style: { ...node.style, ...style } };
     });
 
-    dispatch(nodesActions.update(updatedNodes));
+    dispatch(canvasActions.updateNodes(updatedNodes));
   };
 
   const handleMenuAction = (type: MenuPanelActionType) => {
@@ -104,11 +105,11 @@ const Panels = ({
         break;
       }
       case 'export-as-json': {
-        const state = store.getState();
+        const state = store.getState().canvas.present;
 
         const stateToExport = {
-          stageConfig: state.canvas.stageConfig,
-          nodes: state.nodesHistory.present.nodes,
+          stageConfig: state.stageConfig,
+          nodes: state.nodes,
         };
 
         const dataUrl = URL.createObjectURL(
@@ -131,14 +132,14 @@ const Panels = ({
         ).then((state) => {
           if (!state) {
             dispatch(
-              modalActions.open({
+              uiActions.openModal({
                 title: 'Error',
                 message: 'Could not load file',
               }),
             );
             return;
           }
-          dispatch(nodesActions.set(state.nodes));
+          dispatch(canvasActions.setNodes(state.nodes));
           dispatch(canvasActions.setStageConfig(state.stageConfig));
         });
         break;
@@ -152,8 +153,8 @@ const Panels = ({
 
   const handleControlActions = (action: ControlAction) => {
     switch (action.type) {
-      case 'nodes/delete': {
-        dispatch(nodesActions.delete(intersectedNodesIds));
+      case 'canvas/deleteNodes': {
+        dispatch(canvasActions.deleteNodes(intersectedNodesIds));
         dispatch(canvasActions.setSelectedNodesIds([]));
         break;
       }

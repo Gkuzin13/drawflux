@@ -7,7 +7,7 @@ import useAnimatedLine from '@/hooks/useAnimatedLine';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
-import { selectCanvas } from '@/stores/slices/canvasSlice';
+import { selectCanvas } from '@/stores/slices/canvas';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import NodeTransformer from '../../NodeTransformer';
 
