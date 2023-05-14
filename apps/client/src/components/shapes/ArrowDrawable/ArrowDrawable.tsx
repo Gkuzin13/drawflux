@@ -118,6 +118,10 @@ const ArrowDrawable = memo(
       [bendValue],
     );
 
+    const shouldTransformerRender = useMemo(() => {
+      return selected && !dragging && node.nodeProps.visible;
+    }, [selected, dragging, node.nodeProps.visible]);
+
     return (
       <>
         <Group
@@ -143,7 +147,7 @@ const ArrowDrawable = memo(
             config={config}
           />
         </Group>
-        {selected && !dragging && (
+        {shouldTransformerRender && (
           <ArrowTransformer
             draggable={draggable}
             start={start}
