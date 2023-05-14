@@ -4,7 +4,7 @@ import {
   useContext,
   useRef,
 } from 'react';
-import { useClickAway } from '@/hooks/useClickAway';
+import { useClickAway } from '@/hooks/useClickAway/useClickAway';
 import useDisclosure from '@/hooks/useDisclosure/useDisclosure';
 import Button from '../Button/Button';
 import { type ButtonStyled } from '../Button/ButtonStyled';

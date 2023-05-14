@@ -2,7 +2,7 @@ import { type ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Html } from 'react-konva-utils';
 import type { NodeColor, NodeObject } from 'shared';
 import { KEYS } from '@/constants/keys';
-import { useClickAway } from '@/hooks/useClickAway';
+import { useClickAway } from '@/hooks/useClickAway/useClickAway';
 import type { OnTextSaveArgs } from './EditableText';
 
 type Props = {
