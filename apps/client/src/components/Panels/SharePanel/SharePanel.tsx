@@ -114,7 +114,7 @@ const SharablePageContent = ({ page }: ShareablePageProps) => {
         closeOnItemClick={false}
         onItemClick={handlePageShare}
       >
-        {!isLoading && <TbLink />}
+        {!isLoading && !isSuccess && <TbLink />}
         {isLoading || isSuccess ? <Loader /> : 'Share this page'}
       </Menu.Item>
       <Menu.Divider type="horizontal" />
