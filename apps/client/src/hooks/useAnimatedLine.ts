@@ -2,11 +2,11 @@ import type Konva from 'konva';
 import { Animation } from 'konva/lib/Animation';
 import { type RefObject, useEffect } from 'react';
 
+type Element = Konva.Shape | Konva.Rect | Konva.Ellipse | Konva.Line;
+
 type UseAnimatedLineArgs = {
   enabled?: boolean;
-  elementRef: RefObject<
-    Konva.Shape | Konva.Rect | Konva.Ellipse | Konva.Line | null
-  >;
+  elementRef: RefObject<Element | null>;
   totalDashLength: number;
 };
 
@@ -16,31 +16,35 @@ const useAnimatedLine = ({
   totalDashLength,
 }: UseAnimatedLineArgs) => {
   useEffect(() => {
+    if (!elementRef.current) {
+      return;
+    }
+
     const element = elementRef.current;
 
-    function animateDashOffset() {
+    function animateDashOffset(element: Element) {
       return new Animation((frame) => {
         if (!frame) return;
 
         const time = frame.time / 600;
         const offset = totalDashLength * ((time * 2) % 2);
 
-        element?.dashOffset(-offset);
-      }, element?.getLayer());
+        element.dashOffset(-offset);
+      });
     }
 
-    const anim = animateDashOffset();
+    const animation = animateDashOffset(element);
 
     if (enabled) {
-      anim.start();
+      animation.start();
     }
 
-    if (!enabled && anim.isRunning()) {
-      anim.stop();
+    if (!enabled && animation.isRunning()) {
+      animation.stop();
     }
 
     return () => {
-      anim.stop();
+      animation.stop();
     };
   }, [elementRef, totalDashLength, enabled]);
 };
