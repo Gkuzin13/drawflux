@@ -6,6 +6,7 @@ const useClickAway = (ref: RefObject<Element>, handler: () => void) => {
   useEffect(() => {
     const listener = (event: Event) => {
       const element = event?.target as Element;
+
       if (ref.current && !ref.current.contains(element)) {
         handler();
       }
