@@ -37,6 +37,7 @@ function useNode(
       strokeWidth: node.style.size * stageScale,
       dash: scaledLine,
       opacity: node.style.opacity,
+      listening: node.nodeProps.visible,
     };
 
     return { ...baseConfig, ...shapeConfig, ...configOverrides };
