@@ -5,7 +5,7 @@ import { type LineConfig } from 'konva/lib/shapes/Line';
 import { type PropsWithRef, useCallback, useRef, useMemo } from 'react';
 import { Line } from 'react-konva';
 import type { NodeStyle, NodeLine, Point } from 'shared';
-import useAnimatedLine from '@/hooks/useAnimatedLine';
+import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 
 type Props = PropsWithRef<{
   points: Point[];
@@ -20,7 +20,7 @@ const ArrowLine = ({ dash, animated, points, control, config }: Props) => {
 
   const flattenedPoints = useMemo(() => points.flat(), [points]);
 
-  useAnimatedLine({
+  useAnimatedDash({
     enabled: animated,
     elementRef: lineRef,
     totalDashLength: dash[0] + dash[1],

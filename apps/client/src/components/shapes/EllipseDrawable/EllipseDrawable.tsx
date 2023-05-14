@@ -4,7 +4,7 @@ import { memo, useCallback } from 'react';
 import { Ellipse } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import NodeTransformer from '@/components/NodeTransformer';
-import useAnimatedLine from '@/hooks/useAnimatedLine';
+import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
@@ -26,7 +26,7 @@ const EllipseDrawable = memo(
 
     const { totalDashLength, config } = useNode(node, stageConfig);
 
-    useAnimatedLine({
+    useAnimatedDash({
       enabled: node.style.animated,
       elementRef: nodeRef,
       totalDashLength,

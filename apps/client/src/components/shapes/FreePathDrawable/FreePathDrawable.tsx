@@ -3,7 +3,7 @@ import type { KonvaEventObject } from 'konva/lib/Node';
 import { memo, useCallback, useMemo } from 'react';
 import { Line } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Node/Node';
-import useAnimatedLine from '@/hooks/useAnimatedLine';
+import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
@@ -24,7 +24,7 @@ const FreePathDrawable = memo(
 
     const { totalDashLength, config } = useNode(node, stageConfig);
 
-    useAnimatedLine({
+    useAnimatedDash({
       enabled: node.style.animated,
       elementRef: nodeRef,
       totalDashLength,
