@@ -1,4 +1,4 @@
-import { ZOOM, type ZoomAction } from '@/constants/zoom';
+import { ZOOM, ZOOM_RANGE, type ZoomAction } from '@/constants/zoom';
 import { ZoomPanelButton, ZoomPanelContainer } from './ZoomPanelStyled';
 
 type Props = {
@@ -12,9 +12,9 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
   const getScaleValueByAction = (currentValue: number, action: ZoomAction) => {
     switch (action) {
       case 'increase':
-        return currentValue + 0.1;
+        return Math.min(currentValue + 0.1, ZOOM_RANGE.MAX);
       case 'decrease':
-        return currentValue - 0.1;
+        return Math.max(currentValue - 0.1, ZOOM_RANGE.MIN);
       case 'reset':
         return 1;
       default:
