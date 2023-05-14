@@ -4,7 +4,7 @@ import type { NodeLine, NodeObject, StageConfig } from 'shared';
 
 type Config = Konva.NodeConfig & Konva.ShapeConfig;
 
-const baseConfig: Config = {
+export const baseConfig: Config = {
   lineCap: 'round',
   strokeScaleEnabled: false,
   perfectDrawEnabled: false,
