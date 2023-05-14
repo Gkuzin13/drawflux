@@ -29,7 +29,7 @@ import { drawRect } from '../shapes/RectDrawable/helpers/drawRect';
 import { getIntersectingChildren } from './helpers/intersect';
 import {
   calcNewStagePositionAndScale,
-  hasStageScaleReachedLimit,
+  isScaleOutOfRange,
 } from './helpers/zoom';
 
 type Props = PropsWithRef<{
@@ -323,7 +323,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           event.deltaY,
         );
 
-        if (!hasStageScaleReachedLimit(scale)) {
+        if (!isScaleOutOfRange(scale)) {
           onConfigChange({ scale, position });
         }
       },
