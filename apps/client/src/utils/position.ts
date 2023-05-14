@@ -62,7 +62,7 @@ export function getVisibleBoundaries(rect: IRect, scale: number): IRect {
   };
 }
 
-export function isNodeInView(
+export function isNodePartiallyInView(
   node: NodeObject,
   stageRect: IRect,
   stageScale: number,

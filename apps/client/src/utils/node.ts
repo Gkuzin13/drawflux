@@ -3,7 +3,7 @@ import type { NodeLine, NodeType, Point, NodeObject, NodeProps } from 'shared';
 import { colors } from 'shared';
 import { v4 as uuid } from 'uuid';
 import { LINE, SIZE } from '../constants/style';
-import { getNodeRect, isNodeInView } from './position';
+import { getNodeRect, isNodePartiallyInView } from './position';
 
 export const createNode = (type: NodeType, point: Point): NodeObject => {
   return {
@@ -143,5 +143,7 @@ export function allNodesInView(
   stageRect: IRect,
   stageScale: number,
 ) {
-  return nodes.every((node) => isNodeInView(node, stageRect, stageScale));
+  return nodes.every((node) =>
+    isNodePartiallyInView(node, stageRect, stageScale),
+  );
 }
