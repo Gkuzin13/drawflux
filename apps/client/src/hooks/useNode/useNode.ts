@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import { useMemo } from 'react';
-import type { NodeLIne, NodeObject, StageConfig } from 'shared';
+import type { NodeLine, NodeObject, StageConfig } from 'shared';
 
 type Config = Konva.NodeConfig & Konva.ShapeConfig;
 
@@ -21,7 +21,7 @@ function useNode(
   const { scale: stageScale } = stageConfig;
 
   const scaledLine = useMemo(() => {
-    return node.style.line.map((l) => l * stageScale) as NodeLIne;
+    return node.style.line.map((l) => l * stageScale) as NodeLine;
   }, [node.style.line, stageScale]);
 
   const totalDashLength = useMemo(() => {

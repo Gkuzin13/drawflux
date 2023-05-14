@@ -8,7 +8,7 @@ export type NodeProps = z.infer<typeof nodeProps>;
 export type NodeStyle = z.infer<typeof style>;
 export type NodeType = z.infer<typeof type>;
 
-export type NodeLIne = NodeStyle['line'];
+export type NodeLine = NodeStyle['line'];
 export type NodeSize = NodeStyle['size'];
 export type NodeColor = NodeStyle['color'];
 

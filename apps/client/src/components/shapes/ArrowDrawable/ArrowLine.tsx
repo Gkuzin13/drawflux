@@ -4,13 +4,13 @@ import { type Shape } from 'konva/lib/Shape';
 import { type LineConfig } from 'konva/lib/shapes/Line';
 import { type PropsWithRef, useCallback, useRef, useMemo } from 'react';
 import { Line } from 'react-konva';
-import type { NodeStyle, NodeLIne, Point } from 'shared';
+import type { NodeStyle, NodeLine, Point } from 'shared';
 import useAnimatedLine from '@/hooks/useAnimatedLine';
 
 type Props = PropsWithRef<{
   points: Point[];
   control: Point;
-  dash: NodeLIne;
+  dash: NodeLine;
   animated: NodeStyle['animated'];
   config: LineConfig;
 }>;

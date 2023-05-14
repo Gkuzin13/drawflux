@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import type { NodeColor, NodeLIne, NodeSize, NodeStyle } from 'shared';
+import type { NodeColor, NodeLine, NodeSize, NodeStyle } from 'shared';
 import { Divider } from '@/components/core/Divider/Divider';
 import { ICON_SIZES } from '@/constants/icon';
 import { ANIMATED, COLOR, LINE, SIZE } from '@/constants/style';
@@ -31,7 +31,7 @@ const StylePanel = ({
   };
 
   const handleLineSelect = (
-    value: NodeLIne,
+    value: NodeLine,
     name: (typeof LINE)[number]['name'],
   ) => {
     onStyleChange({
@@ -49,7 +49,7 @@ const StylePanel = ({
   };
 
   const isLineStyleActive = useCallback(
-    (value: Readonly<NodeLIne>) => {
+    (value: Readonly<NodeLine>) => {
       if (!style.line) {
         return false;
       }
@@ -103,7 +103,7 @@ const StylePanel = ({
                     : 'secondary-light'
                 }
                 onClick={() =>
-                  handleLineSelect(line.value as NodeLIne, line.name)
+                  handleLineSelect(line.value as NodeLine, line.name)
                 }
               >
                 {line.icon({ size: ICON_SIZES.LARGE })}
