@@ -21,3 +21,13 @@ export const getElement = (element: NodeType) => {
       return EditableText;
   }
 };
+
+export const TRANSFORMER = {
+  MIN_SIZE: 5,
+  ROTATION_SNAPS: [0, 90, 180, 270],
+  ROTATION_ANCHOR_OFFSET: 14,
+  PADDING: 6,
+  ANCHOR_CORNER_RADIUS: 5,
+  ANCHOR_SIZE: 9,
+  ANCHOR_STROKE_WIDTH: 1.5,
+};

@@ -1,9 +1,10 @@
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
-import { type PropsWithRef, forwardRef } from 'react';
+import type { Box, TransformerConfig } from 'konva/lib/shapes/Transformer';
+import { type PropsWithRef, forwardRef, useCallback } from 'react';
 import { type KonvaNodeEvents, Transformer } from 'react-konva';
 import { theme } from 'shared';
+import { TRANSFORMER } from '@/constants/element';
 
 type Props = PropsWithRef<{
   transformerConfig?: TransformerConfig;
@@ -14,35 +15,43 @@ type Ref = Konva.Transformer;
 
 const NodeTransformer = forwardRef<Ref, Props>(
   ({ transformerConfig, transformerEvents }, ref) => {
-    const handleDragStart = (event: KonvaEventObject<DragEvent>) => {
-      event.target.visible(false);
-    };
+    const handleDragStart = useCallback(
+      (event: KonvaEventObject<DragEvent>) => {
+        event.target.visible(false);
+      },
+      [],
+    );
 
-    const handleDragEnd = (event: KonvaEventObject<DragEvent>) => {
+    const handleDragEnd = useCallback((event: KonvaEventObject<DragEvent>) => {
       event.target.visible(true);
-    };
+    }, []);
+
+    const handleBoxFunc = useCallback((oldBox: Box, newBox: Box) => {
+      if (
+        newBox.width < TRANSFORMER.MIN_SIZE ||
+        newBox.height < TRANSFORMER.MIN_SIZE
+      ) {
+        return oldBox;
+      }
+
+      return newBox;
+    }, []);
 
     return (
       <Transformer
         ref={ref}
-        ignoreStroke={true}
         anchorFill={theme.colors.white.value}
         anchorStroke={theme.colors.green300.value}
         borderStroke={theme.colors.green400.value}
-        anchorStrokeWidth={1.5}
-        anchorSize={9}
-        anchorCornerRadius={5}
-        padding={6}
-        rotateAnchorOffset={14}
-        rotationSnaps={[0, 90, 180, 270]}
+        anchorStrokeWidth={TRANSFORMER.ANCHOR_STROKE_WIDTH}
+        anchorSize={TRANSFORMER.ANCHOR_SIZE}
+        anchorCornerRadius={TRANSFORMER.ANCHOR_CORNER_RADIUS}
+        padding={TRANSFORMER.PADDING}
+        rotateAnchorOffset={TRANSFORMER.ROTATION_ANCHOR_OFFSET}
+        rotationSnaps={TRANSFORMER.ROTATION_SNAPS}
+        ignoreStroke={true}
         shouldOverdrawWholeArea={true}
-        boundBoxFunc={(oldBox, newBox) => {
-          if (newBox.width < 5 || newBox.height < 5) {
-            return oldBox;
-          }
-
-          return newBox;
-        }}
+        boundBoxFunc={handleBoxFunc}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         {...transformerConfig}
