@@ -1,14 +1,17 @@
 import type Konva from 'konva';
 import { type KonvaEventObject } from 'konva/lib/Node';
 import { type Vector2d } from 'konva/lib/types';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback } from 'react';
 import { Circle } from 'react-konva';
 import { theme } from 'shared';
+import { TRANSFORMER } from '@/constants/element';
 
 export type TransformerAnchorProps = {
   draggable: boolean;
   x: number;
   y: number;
+  scale: number;
+  onDragStart: (e: KonvaEventObject<DragEvent>) => void;
   onDragMove: (e: KonvaEventObject<DragEvent>) => void;
   onDragEnd: (e: KonvaEventObject<DragEvent>) => void;
   dragBoundFunc?: (position: Vector2d) => void;
@@ -18,43 +21,47 @@ const TransformerAnchor = ({
   draggable,
   x,
   y,
+  scale,
+  onDragStart,
   onDragMove,
   onDragEnd,
 }: TransformerAnchorProps) => {
-  const [hovering, setHovering] = useState(false);
+  const handleMouseEnter = useCallback(
+    (event: KonvaEventObject<MouseEvent>) => {
+      const circle = event.target as Konva.Circle;
 
-  const ref = useRef<Konva.Circle>(null);
+      circle.strokeWidth(TRANSFORMER.ANCHOR_STROKE_WIDTH * 7);
+    },
+    [],
+  );
 
-  const scale = useCallback(() => {
-    const stage = ref.current?.getStage();
+  const handleMouseLeave = useCallback(
+    (event: KonvaEventObject<MouseEvent>) => {
+      const circle = event.target as Konva.Circle;
 
-    if (stage) {
-      return {
-        x: 1 / stage.scaleX(),
-        y: 1 / stage.scaleY(),
-      };
-    }
-
-    return { x: 1, y: 1 };
-  }, []);
+      circle.strokeWidth(TRANSFORMER.ANCHOR_STROKE_WIDTH);
+    },
+    [],
+  );
 
   return (
     <Circle
-      ref={ref}
       x={x}
       y={y}
-      scale={scale()}
+      scaleX={scale}
+      scaleY={scale}
       stroke={theme.colors.green300.value}
       fill={theme.colors.white.value}
       fillAfterStrokeEnabled={true}
-      strokeWidth={hovering ? 12 : 3}
+      strokeWidth={TRANSFORMER.ANCHOR_STROKE_WIDTH * 2.15}
       hitStrokeWidth={16}
-      radius={4}
+      radius={3.75}
       draggable={draggable}
+      onDragStart={onDragStart}
       onDragMove={onDragMove}
       onDragEnd={onDragEnd}
-      onMouseOver={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       perfectDrawEnabled={false}
       shadowForStrokeEnabled={false}
     />

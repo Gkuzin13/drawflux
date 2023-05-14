@@ -154,6 +154,7 @@ const ArrowDrawable = memo(
             end={end}
             bendPoint={[control.x, control.y]}
             bendMovement={{ min: minPoint, max: maxPoint }}
+            stageScale={stageConfig.scale}
             onTransform={handleTransform}
             onTransformEnd={handleTransformEnd}
           />
