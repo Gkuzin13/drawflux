@@ -1,38 +1,59 @@
+import { Root as LabelRoot } from '@radix-ui/react-label';
+import * as RadioGroup from '@radix-ui/react-radio-group';
+import * as Toggle from '@radix-ui/react-toggle';
 import { styled } from 'shared';
-import Button from '../../core/Button/Button';
+import { ButtonStyled } from '@/components/core/Button/ButtonStyled';
+import { Panel } from '../PanelsStyled';
 
-export const StylePanelContainer = styled('div', {
-  position: 'fixed',
-  left: '$2',
-  top: '$12',
-  zIndex: 1,
-  backgroundColor: '$white',
-  boxShadow: '$small',
-  borderRadius: '$1',
-  padding: '$1',
+export const StyleContainer = styled(Panel, {
+  position: 'absolute',
+  top: '100%',
+  marginTop: '$2',
+  flexDirection: 'column',
+  padding: '$2',
+  gap: '$3',
 });
 
-export const StylePanelRow = styled('div', {
+export const StyleRadioGroup = styled(RadioGroup.Root, {
   display: 'flex',
-  padding: '$1 0',
+  flexDirection: 'column',
+});
+
+export const StyleGrid = styled('div', {
+  display: 'grid',
+  placeItems: 'center',
+  gridTemplateColumns: '$5 $5 $5 $5',
   gap: '$1',
 });
 
-export const ColorPicker = styled('div', {
-  display: 'grid',
-  placeItems: 'center',
-  gridTemplateColumns: 'repeat(4, 1fr)',
-  gridTemplateRows: 'repeat(3, 1fr)',
-  gap: '$2',
-  padding: '$1 0',
+export const StyleLabel = styled(LabelRoot, {
+  display: 'inline-block',
+  paddingBottom: '$1',
+  color: '$gray700',
 });
 
-export const ColorCircle = styled('div', {
-  borderRadius: '$round',
-  width: '$3',
-  height: '$3',
+export const ToggleButton = styled(Toggle.Root, ButtonStyled, {
+  defaultVariants: {
+    size: 'extra-small',
+    color: 'secondary',
+    squared: true,
+  },
 });
 
-export const StyleButton = styled(Button, {
-  maxWidth: '$6',
+export const StyleButton = styled(RadioGroup.Item, ButtonStyled, {
+  defaultVariants: {
+    size: 'extra-small',
+    color: 'secondary',
+    squared: true,
+  },
+});
+
+export const ColorButton = styled(StyleButton, {
+  '&::after': {
+    content: '',
+    borderRadius: '$round',
+    minWidth: '$3',
+    minHeight: '$3',
+    backgroundColor: 'currentColor',
+  },
 });

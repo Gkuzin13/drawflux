@@ -1,5 +1,4 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { type Vector2d } from 'konva/lib/types';
 import { type RootState } from '../store';
 
 export type ContextMenuType = 'node-menu' | 'drawing-canvas-menu';
@@ -7,8 +6,6 @@ export type ContextMenuType = 'node-menu' | 'drawing-canvas-menu';
 export type UiState = {
   contextMenu: {
     type: ContextMenuType;
-    position: Vector2d;
-    opened: boolean;
   };
   modal: {
     opened: boolean;
@@ -20,8 +17,6 @@ export type UiState = {
 const initialState: UiState = {
   contextMenu: {
     type: 'drawing-canvas-menu',
-    position: { x: 0, y: 0 },
-    opened: false,
   },
   modal: {
     opened: false,
@@ -34,7 +29,7 @@ export const uiSlice = createSlice({
   name: 'contextMenu',
   initialState,
   reducers: {
-    openContextMenu: (
+    setContextMenu: (
       state,
       action: PayloadAction<Omit<UiState['contextMenu'], 'opened'>>,
     ) => {
@@ -44,9 +39,6 @@ export const uiSlice = createSlice({
       };
 
       state.contextMenu = updatedState;
-    },
-    closeContextMenu: (state) => {
-      state.contextMenu.opened = false;
     },
     openModal: (
       state,

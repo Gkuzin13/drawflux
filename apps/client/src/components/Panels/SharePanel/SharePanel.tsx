@@ -1,17 +1,19 @@
+import * as Popover from '@radix-ui/react-popover';
 import { useEffect, useState } from 'react';
 import { TbClipboardCheck, TbCopy, TbLink } from 'react-icons/tb';
 import type { GetQRCodeResponse, SharePageParams } from 'shared';
+import Button from '@/components/core/Button/Button';
+import { Divider } from '@/components/core/Divider/Divider';
 import Loader from '@/components/core/Loader/Loader';
-import Menu from '@/components/core/Menu/Menu';
 import QRCode from '@/components/QRCode/QRCode';
 import { ICON_SIZES } from '@/constants/icon';
 import useClipboard from '@/hooks/useClipboard/useClipboard';
 import { useGetQRCodeMutation, useSharePageMutation } from '@/services/api';
 import {
   QRCodeContainer,
-  SharePanelContainer,
+  SharePanelContent,
   SharePanelDisclamer,
-  SharePanelToggle,
+  SharePanelTrigger,
 } from './SharePanelStyled';
 
 type Props = {
@@ -66,20 +68,20 @@ const SharedPageContent = ({
         {qrCode && <QRCode dataUrl={qrCode.dataUrl} />}
         {isError && <p>Error loading QR Code</p>}
       </QRCodeContainer>
-      <Menu.Item
+      <Button
         title={copied ? 'Link Copied' : 'Copy link'}
+        align="between"
+        color="secondary-light"
         size="extra-small"
-        spanned
-        closeOnItemClick={false}
-        onItemClick={handleCopyLinkClick}
+        onClick={handleCopyLinkClick}
       >
-        {!copied ? 'Copy link' : 'Link Copied'}
+        Copy Link
         {!copied ? (
           <TbCopy size={ICON_SIZES.MEDIUM} />
         ) : (
           <TbClipboardCheck size={ICON_SIZES.MEDIUM} />
         )}
-      </Menu.Item>
+      </Button>
       <SharePanelDisclamer>
         Anyone with the link has access to this page for 24 hours since sharing.
       </SharePanelDisclamer>
@@ -106,18 +108,17 @@ const SharablePageContent = ({ page }: ShareablePageProps) => {
 
   return (
     <>
-      <Menu.Item
-        fullWidth={true}
-        size="small"
-        disabled={!page.nodes.length}
+      <Button
+        align="start"
         color="secondary-light"
-        closeOnItemClick={false}
-        onItemClick={handlePageShare}
+        size="extra-small"
+        disabled={!page.nodes.length}
+        onClick={handlePageShare}
       >
-        {!isLoading && !isSuccess && <TbLink />}
+        {!isLoading && !isSuccess && <TbLink size={ICON_SIZES.SMALL} />}
         {isLoading || isSuccess ? <Loader /> : 'Share this page'}
-      </Menu.Item>
-      <Menu.Divider type="horizontal" />
+      </Button>
+      <Divider orientation="horizontal" />
       <SharePanelDisclamer>
         Sharing this project will make it available for 24 hours publicly to
         anyone who has access to the provided URL.
@@ -130,10 +131,10 @@ const SharePanel = ({ pageState, isPageShared }: Props) => {
   const [linkQRCode, setLinkQRCode] = useState<GetQRCodeResponse>();
 
   return (
-    <SharePanelContainer>
-      <Menu initiallyOpened={isPageShared}>
-        <SharePanelToggle color="primary">Share</SharePanelToggle>
-        <Menu.Dropdown>
+    <Popover.Root>
+      <SharePanelTrigger>Share</SharePanelTrigger>
+      <Popover.Portal>
+        <SharePanelContent align="end">
           {isPageShared ? (
             <SharedPageContent
               qrCode={linkQRCode}
@@ -142,9 +143,9 @@ const SharePanel = ({ pageState, isPageShared }: Props) => {
           ) : (
             <SharablePageContent page={pageState.page} />
           )}
-        </Menu.Dropdown>
-      </Menu>
-    </SharePanelContainer>
+        </SharePanelContent>
+      </Popover.Portal>
+    </Popover.Root>
   );
 };
 

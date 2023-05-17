@@ -1,18 +1,21 @@
 import type Konva from 'konva';
+import { Util } from 'konva/lib/Util';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { StageConfig } from 'shared';
 import Canvas from '@/components/Canvas/Canvas';
+import ContextMenu from '@/components/ContextMenu/ContextMenu';
 import Loader from '@/components/core/Loader/Loader';
 import Modal from '@/components/core/Modal/Modal';
 import Panels from '@/components/Panels/Panels';
 import { LOCAL_STORAGE, PageState, type PageStateType } from '@/constants/app';
+import { BACKGROUND_LAYER_ID } from '@/constants/element';
 import useKeydownListener from '@/hooks/useKeyListener';
 import useWindowSize from '@/hooks/useWindowSize/useWindowSize';
 import { useGetPageQuery } from '@/services/api';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import { uiActions, selectModal } from '@/stores/slices/ui';
+import { uiActions, selectModal, selectContextMenu } from '@/stores/slices/ui';
 import { storage } from '@/utils/storage';
 
 const Root = () => {
@@ -27,6 +30,7 @@ const Root = () => {
   );
 
   const { stageConfig, selectedNodesIds } = useAppSelector(selectCanvas);
+  const contextMenuState = useAppSelector(selectContextMenu);
   const modal = useAppSelector(selectModal);
 
   const dispatch = useAppDispatch();
@@ -93,6 +97,45 @@ const Root = () => {
     return <Loader fullScreen={true}>Loading</Loader>;
   }
 
+  const handleContextMenuOpen = () => {
+    if (!stageRef.current) {
+      return;
+    }
+    const stage = stageRef.current;
+    const pos = stage.getPointerPosition() || { x: 0, y: 0 };
+    const children = stage
+      .getLayers()[0]
+      .getChildren(
+        (child) => child.attrs.id && child.id() !== BACKGROUND_LAYER_ID,
+      );
+
+    const intersectedNodes = children.filter((child) => {
+      return Util.haveIntersection(
+        {
+          ...pos,
+          width: 16 * stageConfig.scale,
+          height: 16 * stageConfig.scale,
+        },
+        child.getClientRect(),
+      );
+    });
+
+    const intersectedIds = intersectedNodes.map((node) => node.id());
+
+    if (
+      intersectedIds.length &&
+      !intersectedIds.some((id) => selectedNodesIds[id])
+    ) {
+      dispatch(canvasActions.setSelectedNodesIds([...intersectedIds]));
+    }
+
+    const menuType = intersectedNodes.length
+      ? 'node-menu'
+      : 'drawing-canvas-menu';
+
+    dispatch(uiActions.setContextMenu({ type: menuType }));
+  };
+
   return (
     <>
       <Panels
@@ -100,13 +143,18 @@ const Root = () => {
         isPageShared={isSuccess}
         stageRef={stageRef}
       />
-      <Canvas
-        ref={stageRef}
-        config={drawingCanvasConfig}
-        intersectedNodesIds={intersectedNodesIds}
-        onNodesIntersection={handleNodesIntersection}
-        onConfigChange={handleStageConfigChange}
-      />
+      <ContextMenu
+        type={contextMenuState.type}
+        onContextMenuOpen={handleContextMenuOpen}
+      >
+        <Canvas
+          ref={stageRef}
+          config={drawingCanvasConfig}
+          intersectedNodesIds={intersectedNodesIds}
+          onNodesIntersection={handleNodesIntersection}
+          onConfigChange={handleStageConfigChange}
+        />
+      </ContextMenu>
       {modal.opened && (
         <Modal
           title={modal.title}

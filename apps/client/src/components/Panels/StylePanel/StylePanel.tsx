@@ -1,15 +1,16 @@
 import { useCallback, useMemo } from 'react';
-import type { NodeColor, NodeLine, NodeSize, NodeStyle } from 'shared';
-import { Divider } from '@/components/core/Divider/Divider';
+import type { NodeColor, NodeLine, NodeStyle } from 'shared';
 import { ICON_SIZES } from '@/constants/icon';
 import { ANIMATED, COLOR, LINE, SIZE } from '@/constants/style';
 import { capitalizeFirstLetter } from '@/utils/string';
 import {
-  ColorCircle,
-  ColorPicker,
+  ColorButton,
   StyleButton,
-  StylePanelContainer,
-  StylePanelRow,
+  StyleContainer,
+  StyleGrid,
+  StyleRadioGroup,
+  ToggleButton,
+  StyleLabel,
 } from './StylePanelStyled';
 
 export type StylePanelProps = {
@@ -30,13 +31,12 @@ const StylePanel = ({
     onStyleChange({ color });
   };
 
-  const handleLineSelect = (
-    value: NodeLine,
-    name: (typeof LINE)[number]['name'],
-  ) => {
+  const handleLineSelect = (lineName: (typeof LINE)[number]['name']) => {
+    const value = LINE.find((l) => l.name === lineName)?.value;
+
     onStyleChange({
-      animated: style.animated && name !== 'solid' ? true : false,
-      line: value,
+      animated: style.animated && lineName !== 'solid' ? true : false,
+      line: value as NodeLine,
     });
   };
 
@@ -44,106 +44,132 @@ const StylePanel = ({
     onStyleChange({ animated: !style.animated });
   };
 
-  const handleSizeSelect = (value: NodeSize) => {
+  const handleSizeSelect = (sizeName: (typeof SIZE)[number]['name']) => {
+    const value = SIZE.find((s) => s.name === sizeName)?.value;
+
     onStyleChange({ size: value });
   };
 
   const isLineStyleActive = useCallback(
     (value: Readonly<NodeLine>) => {
-      if (!style.line) {
-        return false;
-      }
-
-      return value.every((line, index) => line === style.line?.[index]);
+      return style.line
+        ? value.every((line, index) => line === style.line?.[index])
+        : false;
     },
     [style.line],
   );
 
   const animatedStyleDisabled = useMemo(() => {
-    if (!style.line) {
-      return false;
-    }
-
-    return style.line.every((l) => l === 0);
+    return style.line ? style.line.every((l) => l === 0) : false;
   }, [style.line]);
 
   return (
-    <StylePanelContainer>
-      <ColorPicker>
-        {COLOR.map((color) => {
-          return (
-            <StyleButton
-              key={color.name}
-              title={capitalizeFirstLetter(color.name)}
-              size="small"
-              squared={true}
-              color={
-                color.value === style.color ? 'secondary' : 'secondary-light'
-              }
-              onClick={() => handleColorSelect(color.value)}
-            >
-              <ColorCircle css={{ backgroundColor: color.value }} />
-            </StyleButton>
-          );
-        })}
-      </ColorPicker>
-      <Divider type="horizontal" />
+    <StyleContainer>
+      <StyleRadioGroup
+        defaultValue={style.color}
+        aria-label="Color"
+        aria-labelledby="shape-color"
+        orientation="horizontal"
+        onValueChange={handleColorSelect}
+      >
+        <StyleLabel htmlFor="shape-color" css={{ fontSize: '$1' }}>
+          Color
+        </StyleLabel>
+        <StyleGrid>
+          {COLOR.map((color) => {
+            return (
+              <ColorButton
+                key={color.value}
+                id={color.value}
+                title={capitalizeFirstLetter(color.name)}
+                value={color.value}
+                checked={color.value === style.color}
+                color={
+                  color.value === style.color ? 'secondary' : 'secondary-light'
+                }
+                style={{ color: color.value }}
+              />
+            );
+          })}
+        </StyleGrid>
+      </StyleRadioGroup>
       {enabledOptions.line && (
-        <StylePanelRow>
-          {LINE.map((line) => {
-            return (
-              <StyleButton
-                key={line.name}
-                title={capitalizeFirstLetter(line.name)}
-                size="small"
-                squared={true}
-                color={
-                  isLineStyleActive(line.value)
-                    ? 'secondary'
-                    : 'secondary-light'
-                }
-                onClick={() =>
-                  handleLineSelect(line.value as NodeLine, line.name)
-                }
-              >
-                {line.icon({ size: ICON_SIZES.LARGE })}
-              </StyleButton>
-            );
-          })}
-          <StyleButton
-            key={ANIMATED.value}
-            title={capitalizeFirstLetter(ANIMATED.value)}
-            size="small"
-            squared={true}
-            color={style.animated ? 'primary' : 'secondary-light'}
-            disabled={animatedStyleDisabled}
-            onClick={() => handleAnimatedSelect()}
-          >
-            {ANIMATED.icon({ size: ICON_SIZES.LARGE })}
-          </StyleButton>
-        </StylePanelRow>
+        <StyleRadioGroup
+          aria-label="Line"
+          aria-labelledby="shape-line"
+          orientation="horizontal"
+          onValueChange={handleLineSelect}
+        >
+          <StyleLabel htmlFor="shape-line" css={{ fontSize: '$1' }}>
+            Line
+          </StyleLabel>
+          <StyleGrid>
+            {LINE.map((line) => {
+              return (
+                <StyleButton
+                  key={line.name}
+                  id={line.name}
+                  value={line.name}
+                  title={capitalizeFirstLetter(line.name)}
+                  checked={isLineStyleActive(line.value)}
+                  color={
+                    isLineStyleActive(line.value)
+                      ? 'secondary'
+                      : 'secondary-light'
+                  }
+                >
+                  {line.icon({ size: ICON_SIZES.LARGE })}
+                </StyleButton>
+              );
+            })}
+          </StyleGrid>
+        </StyleRadioGroup>
       )}
+      <div aria-labelledby="shape-animated">
+        <StyleLabel htmlFor="shape-animated" css={{ fontSize: '$1' }}>
+          Animated
+        </StyleLabel>
+        <ToggleButton
+          aria-label="Toggle Animated"
+          title={capitalizeFirstLetter(ANIMATED.value)}
+          pressed={style.animated}
+          color={style.animated ? 'primary' : 'secondary-light'}
+          disabled={animatedStyleDisabled}
+          onPressedChange={handleAnimatedSelect}
+        >
+          {style.animated ? 'On' : 'Off'}
+        </ToggleButton>
+      </div>
       {enabledOptions.size && (
-        <StylePanelRow>
-          {SIZE.map((size) => {
-            return (
-              <StyleButton
-                key={size.name}
-                title={capitalizeFirstLetter(size.name)}
-                size="small"
-                squared={true}
-                color={
-                  size.value === style?.size ? 'secondary' : 'secondary-light'
-                }
-                onClick={() => handleSizeSelect(size.value)}
-              >
-                {size.icon({ size: ICON_SIZES.LARGE, lineSize: size.value })}
-              </StyleButton>
-            );
-          })}
-        </StylePanelRow>
+        <StyleRadioGroup
+          aria-label="Size"
+          aria-labelledby="shape-size"
+          orientation="horizontal"
+          onValueChange={handleSizeSelect}
+        >
+          <StyleLabel htmlFor="shape-size" css={{ fontSize: '$1' }}>
+            Size
+          </StyleLabel>
+          <StyleGrid>
+            {SIZE.map((size) => {
+              return (
+                <StyleButton
+                  key={size.name}
+                  title={capitalizeFirstLetter(size.name)}
+                  value={size.name}
+                  checked={size.value === style?.size}
+                  color={
+                    size.value === style?.size ? 'secondary' : 'secondary-light'
+                  }
+                >
+                  {size.icon({ size: ICON_SIZES.LARGE, lineSize: size.value })}
+                </StyleButton>
+              );
+            })}
+          </StyleGrid>
+        </StyleRadioGroup>
       )}
-    </StylePanelContainer>
+    </StyleContainer>
   );
 };
 
