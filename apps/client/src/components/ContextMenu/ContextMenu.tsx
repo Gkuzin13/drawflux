@@ -1,4 +1,5 @@
 import * as RadixContextMenu from '@radix-ui/react-context-menu';
+import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import {
   type PropsWithChildren,
   type ReactNode,
@@ -56,52 +57,45 @@ const NodeMenu = () => {
 
   const dispatch = useAppDispatch();
 
-  const handleDuplicateNode = useCallback(async () => {
-    const nodesToDuplicate = Object.keys(selectedNodesIds);
-
-    dispatch(canvasActions.duplicateNodes(nodesToDuplicate));
-  }, [dispatch, selectedNodesIds]);
-
-  const handleDeleteNode = useCallback(() => {
-    dispatch(canvasActions.deleteNodes(Object.keys(selectedNodesIds)));
-  }, [dispatch, selectedNodesIds]);
-
-  const handleBringToFront = useCallback(() => {
-    dispatch(canvasActions.moveNodesToEnd(Object.keys(selectedNodesIds)));
-  }, [dispatch, selectedNodesIds]);
-
-  const handleBringForward = useCallback(() => {
-    dispatch(canvasActions.moveNodesForward(Object.keys(selectedNodesIds)));
-  }, [dispatch, selectedNodesIds]);
-
-  const handleSendToBack = useCallback(() => {
-    dispatch(canvasActions.moveNodesToStart(Object.keys(selectedNodesIds)));
-  }, [dispatch, selectedNodesIds]);
-
-  const handleSendBackward = useCallback(() => {
-    dispatch(canvasActions.moveNodesBackward(Object.keys(selectedNodesIds)));
-  }, [dispatch, selectedNodesIds]);
+  const dispatchNodesAction = useCallback(
+    (action: ActionCreatorWithPayload<string[]>) => {
+      dispatch(action(Object.keys(selectedNodesIds)));
+    },
+    [dispatch, selectedNodesIds],
+  );
 
   return (
     <>
-      <ContextMenuItem onSelect={handleDuplicateNode}>
+      <ContextMenuItem
+        onSelect={() => dispatchNodesAction(canvasActions.duplicateNodes)}
+      >
         Duplicate <Kbd>Ctrl + D</Kbd>
       </ContextMenuItem>
       <Divider orientation="horizontal" />
-      <ContextMenuItem onSelect={handleBringToFront}>
+      <ContextMenuItem
+        onSelect={() => dispatchNodesAction(canvasActions.moveNodesToEnd)}
+      >
         Bring to front
       </ContextMenuItem>
-      <ContextMenuItem onSelect={handleBringForward}>
+      <ContextMenuItem
+        onSelect={() => dispatchNodesAction(canvasActions.moveNodesForward)}
+      >
         Bring forward
       </ContextMenuItem>
-      <ContextMenuItem onSelect={handleSendBackward}>
+      <ContextMenuItem
+        onSelect={() => dispatchNodesAction(canvasActions.moveNodesBackward)}
+      >
         Send backward
       </ContextMenuItem>
-      <ContextMenuItem onSelect={handleSendToBack}>
+      <ContextMenuItem
+        onSelect={() => dispatchNodesAction(canvasActions.moveNodesToStart)}
+      >
         Send to back
       </ContextMenuItem>
       <Divider orientation="horizontal" />
-      <ContextMenuItem onSelect={handleDeleteNode}>
+      <ContextMenuItem
+        onSelect={() => dispatchNodesAction(canvasActions.deleteNodes)}
+      >
         Delete
         <Kbd>Del</Kbd>
       </ContextMenuItem>
