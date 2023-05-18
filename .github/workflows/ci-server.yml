@@ -28,6 +28,7 @@ jobs:
       postgres:
         image: postgres:15
         env:
+          POSTGRES_PASSWORD: test
           PGUSER: test
           PGPASSWORD: test
           PGPORT: 5432
