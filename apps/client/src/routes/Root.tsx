@@ -98,14 +98,14 @@ const Root = () => {
     setIntersectedNodesIds(nodesIds);
   };
 
-  const handleContextMenuOpen = () => {
+  const handleContextMenuOpen = (open: boolean) => {
     const stage = stageRef.current;
 
-    if (!stage || !nodes.length) {
+    if (!stage || !nodes.length || !open) {
       return;
     }
 
-    const pointerPosition = stageRef.current.getPointerPosition();
+    const pointerPosition = stage.getPointerPosition();
 
     if (!pointerPosition) {
       return;
