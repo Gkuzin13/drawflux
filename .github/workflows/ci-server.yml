@@ -28,12 +28,7 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_PASSWORD: test
-          PGUSER: test
-          PGPASSWORD: test-password
-          PGPORT: 5432
-          PGDATABASE: test-api
-          PGHOST: localhost
+          POSTGRES_PASSWORD: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -70,7 +65,10 @@ jobs:
         run: pnpm lint
 
       - name: 🧪 Unit tests
-        run: NODE_ENV=test pnpm test
+        run: pnpm test
+        env:
+          PGHOST: postgres
+          PGPORT: 5432
 
       - name: 🏗 Start build
         run: pnpm build
