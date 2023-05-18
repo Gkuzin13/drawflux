@@ -10,5 +10,6 @@
     "types": ["vitest/globals"],
     "baseUrl": "."
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/test"]
 }
