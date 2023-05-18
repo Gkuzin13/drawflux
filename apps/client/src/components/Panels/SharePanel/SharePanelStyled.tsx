@@ -12,6 +12,7 @@ export const SharePanelContent = styled(Popover.Content, {
   maxWidth: '$11',
   borderRadius: '$1',
   marginTop: '$2',
+  backgroundColor: '$white50',
 });
 
 export const SharePanelDisclamer = styled('p', {

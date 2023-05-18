@@ -11,6 +11,7 @@ export const ContextMenuContent = styled(ContextMenu.Content, {
   boxShadow: '$small',
   padding: '$2',
   minWidth: '$11',
+  zIndex: 3,
 });
 
 export const ContextMenuItem = styled(ContextMenu.Item, ButtonStyled, {

@@ -25,6 +25,7 @@ export const DropdownMenuContent = styled(DropdownMenu.Content, {
   borderRadius: '$1',
   marginTop: '$2',
   minWidth: '$11',
+  backgroundColor: '$white50',
 });
 
 export const DropdownMenuItem = styled(DropdownMenu.Item, ButtonStyled, {
