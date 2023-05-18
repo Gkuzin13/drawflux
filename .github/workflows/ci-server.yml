@@ -68,7 +68,7 @@ jobs:
         run: pnpm test
         env:
           PGUSER: postgres
-          PGHOST: localhost
+          PGHOST: postgres
           PGPASSWORD: postgres
           PGDATABASE: postgres
           PGPORT: 5432
