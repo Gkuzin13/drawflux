@@ -70,7 +70,7 @@ jobs:
         run: pnpm lint
 
       - name: 🧪 Unit tests
-        run: pnpm test
+        run: NODE_ENV=test pnpm test
 
       - name: 🏗 Start build
         run: pnpm build
