@@ -1,5 +1,4 @@
 import { colors } from 'shared';
-import IconAnimatedStyle from '@/components/icons/IconAnimatedStyle';
 import IconLineDashed from '@/components/icons/IconLineDashed';
 import IconLineDotted from '@/components/icons/IconLineDotted';
 import IconLineSolid from '@/components/icons/IconLineSolid';
@@ -26,7 +25,6 @@ export const LINE = [
 export const ANIMATED = {
   name: 'animated',
   value: 'animated',
-  icon: IconAnimatedStyle,
 } as const;
 
 export const SIZE = [
