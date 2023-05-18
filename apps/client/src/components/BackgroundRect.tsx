@@ -3,7 +3,7 @@ import type { IRect } from 'konva/lib/types';
 import { type ForwardedRef, useMemo, memo } from 'react';
 import { Rect } from 'react-konva';
 import { type StageConfig, theme } from 'shared';
-import { BACKGROUND_LAYER_ID } from '@/constants/element';
+import { BACKGROUND_LAYER_ID } from '@/constants/node';
 
 type Props = {
   stageRef: ForwardedRef<Konva.Stage>;
