@@ -55,10 +55,10 @@ const EditableTextInput = ({ node, initialValue, onTextSave }: Props) => {
 
   useEffect(() => {
     if (ref.current) {
-      const end = initialValue.length;
-      ref.current.setSelectionRange(end, end);
+      ref.current.focus();
+      ref.current.setSelectionRange(-1, -1);
     }
-  }, [initialValue, ref]);
+  }, [ref.current]);
 
   const { nodeProps } = node;
 
@@ -114,7 +114,6 @@ const EditableTextInput = ({ node, initialValue, onTextSave }: Props) => {
         onChange={handleValueChange}
         onKeyDown={handleKeyDown}
         style={style}
-        autoFocus={true}
       />
     </Html>
   );
