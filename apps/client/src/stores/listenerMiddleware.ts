@@ -59,11 +59,6 @@ startAppListening({
     }
 
     const canvas = listenerApi.getState().canvas.present;
-
-    storage.set<PageStateType>(LOCAL_STORAGE.KEY, {
-      page: {
-        ...canvas,
-      },
-    });
+    storage.set<PageStateType>(LOCAL_STORAGE.KEY, { page: { ...canvas } });
   },
 });

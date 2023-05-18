@@ -1,11 +1,11 @@
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { IoEllipsisHorizontal } from 'react-icons/io5';
-import Menu from '@/components/core/Menu/Menu';
 import { ICON_SIZES } from '@/constants/icon';
 import { type MenuPanelActionType, MENU_PANEL_ACTIONS } from '@/constants/menu';
 import {
-  MenuPanelContainer,
-  MenuPanelDropdown,
-  MenuPanelToggle,
+  DropdownMenuItem,
+  MenuPanelTrigger,
+  DropdownMenuContent,
 } from './MenuPanelStyled';
 
 type Props = {
@@ -18,27 +18,27 @@ const MenuPanel = ({ onAction }: Props) => {
   };
 
   return (
-    <MenuPanelContainer>
-      <Menu>
-        <MenuPanelToggle title="Toggle Menu" size="small" squared>
-          <IoEllipsisHorizontal size={ICON_SIZES.MEDIUM} />
-        </MenuPanelToggle>
-        <MenuPanelDropdown>
+    <DropdownMenu.Root>
+      <MenuPanelTrigger aria-label="Open Menu">
+        <IoEllipsisHorizontal size={ICON_SIZES.MEDIUM} />
+      </MenuPanelTrigger>
+      <DropdownMenu.Portal>
+        <DropdownMenuContent align="end">
           {MENU_PANEL_ACTIONS.map((action) => {
             return (
-              <Menu.Item
+              <DropdownMenuItem
                 key={action.key}
                 title={action.name}
-                onItemClick={() => handleOnClick(action.key)}
+                onSelect={() => handleOnClick(action.key)}
               >
-                {action.icon({ size: ICON_SIZES.LARGE })}
+                {action.icon({ size: ICON_SIZES.SMALL })}
                 {action.name}
-              </Menu.Item>
+              </DropdownMenuItem>
             );
           })}
-        </MenuPanelDropdown>
-      </Menu>
-    </MenuPanelContainer>
+        </DropdownMenuContent>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 };
 

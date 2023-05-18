@@ -1,19 +1,42 @@
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { styled } from 'shared';
-import Menu from '@/components/core/Menu/Menu';
+import { ButtonStyled } from '@/components/core/Button/ButtonStyled';
+import { Panel } from '../PanelsStyled';
 
-export const MenuPanelContainer = styled('div', {
-  position: 'fixed',
-  right: '$2',
-  top: '$2',
+export const MenuPanelTrigger = styled(
+  DropdownMenu.Trigger,
+  ButtonStyled,
+  Panel,
+  {
+    width: '$6',
+    height: '$6',
+    defaultVariants: {
+      size: 'extra-small',
+    },
+  },
+);
+
+export const DropdownMenuContent = styled(DropdownMenu.Content, {
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'flex-end',
-  zIndex: 1,
-});
-
-export const MenuPanelToggle = styled(Menu.Toggle, {
+  gap: '$1',
+  padding: '$2',
   boxShadow: '$small',
-  backgroundColor: '$white',
+  borderRadius: '$1',
+  marginTop: '$2',
+  minWidth: '$11',
+  backgroundColor: '$white50',
 });
 
-export const MenuPanelDropdown = styled(Menu.Dropdown);
+export const DropdownMenuItem = styled(DropdownMenu.Item, ButtonStyled, {
+  justifyContent: 'start',
+  gap: '$1',
+  padding: '$1',
+  userSelect: 'none',
+  outline: 'none',
+  defaultVariants: {
+    size: 'extra-small',
+    align: 'start',
+    color: 'secondary-light',
+  },
+});

@@ -1,23 +1,32 @@
+import * as Popover from '@radix-ui/react-popover';
 import { styled } from 'shared';
-import Menu from '@/components/core/Menu/Menu';
+import { ButtonStyled } from '@/components/core/Button/ButtonStyled';
+import { Panel } from '../PanelsStyled';
 
-export const SharePanelContainer = styled('div', {
-  position: 'fixed',
-  right: '$12',
-  top: '$2',
+export const SharePanelContent = styled(Popover.Content, {
+  padding: '$2',
+  display: 'flex',
+  gap: '$2',
+  flexDirection: 'column',
+  boxShadow: '$small',
   maxWidth: '$11',
-  zIndex: 1,
+  borderRadius: '$1',
+  marginTop: '$2',
+  backgroundColor: '$white50',
 });
 
 export const SharePanelDisclamer = styled('p', {
-  padding: '$1 $2 $2 $2',
+  padding: '0 $1 $1 $1',
   fontSize: '$1',
   color: '$gray600',
 });
 
-export const SharePanelToggle = styled(Menu.Toggle, {
+export const SharePanelTrigger = styled(Popover.Trigger, Panel, ButtonStyled, {
   maxHeight: '$6',
-  boxShadow: '$small',
+  marginLeft: 'auto',
+  defaultVariants: {
+    color: 'primary',
+  },
 });
 
 export const QRCodeContainer = styled('div', {

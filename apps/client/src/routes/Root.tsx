@@ -3,16 +3,22 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { StageConfig } from 'shared';
 import Canvas from '@/components/Canvas/Canvas';
+import {
+  getIntersectingNodes,
+  getLayerChildren,
+  getPointerRect,
+} from '@/components/Canvas/helpers/stage';
+import ContextMenu from '@/components/ContextMenu/ContextMenu';
 import Loader from '@/components/core/Loader/Loader';
-import Modal from '@/components/core/Modal/Modal';
+import Dialog from '@/components/Dialog/Dialog';
 import Panels from '@/components/Panels/Panels';
 import { LOCAL_STORAGE, PageState, type PageStateType } from '@/constants/app';
-import useKeydownListener from '@/hooks/useKeyListener';
+import useKbdShortcuts from '@/hooks/useKbdShortcuts';
 import useWindowSize from '@/hooks/useWindowSize/useWindowSize';
 import { useGetPageQuery } from '@/services/api';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import { uiActions, selectModal } from '@/stores/slices/ui';
+import { uiActions, selectDialog } from '@/stores/slices/ui';
 import { storage } from '@/utils/storage';
 
 const Root = () => {
@@ -26,14 +32,14 @@ const Root = () => {
     { skip: !id },
   );
 
-  const { stageConfig, selectedNodesIds } = useAppSelector(selectCanvas);
-  const modal = useAppSelector(selectModal);
+  const { stageConfig, selectedNodesIds, nodes } = useAppSelector(selectCanvas);
+  const dialog = useAppSelector(selectDialog);
 
   const dispatch = useAppDispatch();
 
   const stageRef = useRef<Konva.Stage>(null);
 
-  useKeydownListener(stageRef);
+  useKbdShortcuts(stageRef.current?.container() || null);
 
   const [width, height] = useWindowSize();
 
@@ -67,7 +73,10 @@ const Root = () => {
   useEffect(() => {
     if (isError) {
       dispatch(
-        uiActions.openModal({ title: 'Error', message: 'Error loading page' }),
+        uiActions.openDialog({
+          title: 'Error',
+          description: 'Error loading page',
+        }),
       );
     }
   }, [isError, dispatch]);
@@ -89,6 +98,36 @@ const Root = () => {
     setIntersectedNodesIds(nodesIds);
   };
 
+  const handleContextMenuOpen = (open: boolean) => {
+    const stage = stageRef.current;
+
+    if (!stage || !nodes.length || !open) {
+      return;
+    }
+
+    const pointerPosition = stage.getPointerPosition();
+
+    if (!pointerPosition) {
+      return;
+    }
+
+    const pointerRect = getPointerRect(pointerPosition, stageConfig.scale);
+    const multipleNodesSelected = Object.keys(selectedNodesIds).length > 1;
+
+    const children = getLayerChildren(stage.getLayers()[0]);
+
+    const nodesInClickArea = getIntersectingNodes(children, pointerRect);
+    const clickedOnNodes = nodesInClickArea.length > 0;
+    const clickedOnSelectedNodes = nodesInClickArea.some(
+      (node) => selectedNodesIds[node.id()],
+    );
+
+    if (clickedOnNodes && !clickedOnSelectedNodes && !multipleNodesSelected) {
+      const frontNodeId = nodesInClickArea[nodesInClickArea.length - 1].id();
+      dispatch(canvasActions.setSelectedNodesIds([frontNodeId]));
+    }
+  };
+
   if (isLoading) {
     return <Loader fullScreen={true}>Loading</Loader>;
   }
@@ -100,20 +139,16 @@ const Root = () => {
         isPageShared={isSuccess}
         stageRef={stageRef}
       />
-      <Canvas
-        ref={stageRef}
-        config={drawingCanvasConfig}
-        intersectedNodesIds={intersectedNodesIds}
-        onNodesIntersection={handleNodesIntersection}
-        onConfigChange={handleStageConfigChange}
-      />
-      {modal.opened && (
-        <Modal
-          title={modal.title}
-          message={modal.message}
-          onClose={() => dispatch(uiActions.closeModal())}
+      <ContextMenu onContextMenuOpen={handleContextMenuOpen}>
+        <Canvas
+          ref={stageRef}
+          config={drawingCanvasConfig}
+          intersectedNodesIds={intersectedNodesIds}
+          onNodesIntersection={handleNodesIntersection}
+          onConfigChange={handleStageConfigChange}
         />
-      )}
+      </ContextMenu>
+      <Dialog {...dialog} onClose={() => dispatch(uiActions.closeDialog())} />
     </>
   );
 };

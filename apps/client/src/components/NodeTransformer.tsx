@@ -4,7 +4,7 @@ import type { Box, TransformerConfig } from 'konva/lib/shapes/Transformer';
 import { type PropsWithRef, forwardRef, useCallback } from 'react';
 import { type KonvaNodeEvents, Transformer } from 'react-konva';
 import { theme } from 'shared';
-import { TRANSFORMER } from '@/constants/element';
+import { TRANSFORMER } from '@/constants/node';
 
 type Props = PropsWithRef<{
   transformerConfig?: TransformerConfig;

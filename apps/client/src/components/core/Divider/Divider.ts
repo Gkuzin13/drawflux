@@ -1,21 +1,14 @@
+import * as Seperator from '@radix-ui/react-separator';
 import { styled } from 'shared';
 
-export const Divider = styled('div', {
-  backgroundColor: '$gray300',
-  variants: {
-    type: {
-      horizontal: {
-        height: '1px',
-        width: '100%',
-        margin: '$1 auto',
-      },
-      vertical: {
-        width: '1px',
-        height: '$4',
-      },
-    },
+export const Divider = styled(Seperator.Root, {
+  backgroundColor: '$gray200',
+  '&[data-orientation=horizontal]': {
+    height: '1px',
+    width: '100%',
   },
-  defaultVariants: {
-    type: 'vertical',
+  '&[data-orientation=vertical]': {
+    height: '100%',
+    width: '1px',
   },
 });

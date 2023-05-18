@@ -13,20 +13,18 @@ import {
 import { Stage } from 'react-konva';
 import type { NodeObject, Point, StageConfig } from 'shared';
 import { CURSOR } from '@/constants/cursor';
-import { BACKGROUND_LAYER_ID } from '@/constants/element';
+import { BACKGROUND_LAYER_ID } from '@/constants/node';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import { uiActions, selectContextMenu } from '@/stores/slices/ui';
 import { createNode } from '@/utils/node';
 import BackgroundRect from '../BackgroundRect';
-import ContextMenu from '../ContextMenu/ContextMenu';
 import NodesLayer from '../NodesLayer';
 import SelectRect from '../SelectRect';
 import { drawArrow } from '../shapes/ArrowDrawable/helpers/drawArrow';
 import { drawEllipse } from '../shapes/EllipseDrawable/helpers/drawEllipse';
 import { drawFreePath } from '../shapes/FreePathDrawable/helpers/drawFreePath';
 import { drawRect } from '../shapes/RectDrawable/helpers/drawRect';
-import { getIntersectingChildren } from './helpers/intersect';
+import { getIntersectingNodes } from './helpers/stage';
 import {
   calcNewStagePositionAndScale,
   isScaleOutOfRange,
@@ -52,7 +50,7 @@ const initialDrawPosition: DrawPosition = {
   current: [0, 0],
 };
 
-const DrawingCanvas = forwardRef<Ref, Props>(
+const Canvas = forwardRef<Ref, Props>(
   (
     {
       config,
@@ -70,8 +68,6 @@ const DrawingCanvas = forwardRef<Ref, Props>(
 
     const { stageConfig, toolType, selectedNodesIds, nodes } =
       useAppSelector(selectCanvas);
-
-    const contextMenuState = useAppSelector(selectContextMenu);
 
     const dispatch = useAppDispatch();
 
@@ -107,47 +103,11 @@ const DrawingCanvas = forwardRef<Ref, Props>(
 
         if (!children.length) return [];
 
-        const intersectedChildren = getIntersectingChildren(children, rect);
+        const intersectedChildren = getIntersectingNodes(children, rect);
 
         return [...new Set(intersectedChildren.map((child) => child.id()))];
       },
       [nodes],
-    );
-
-    const handleOnContextMenu = useCallback(
-      (e: KonvaEventObject<PointerEvent>) => {
-        e.evt.preventDefault();
-
-        const stage = e.target.getStage() as Konva.Stage;
-        const position = stage.getRelativePointerPosition();
-        const clickedOnEmpty = e.target === stage;
-
-        if (clickedOnEmpty) {
-          dispatch(
-            uiActions.openContextMenu({
-              type: 'drawing-canvas-menu',
-              position,
-            }),
-          );
-          return;
-        }
-
-        const shape =
-          e.target.parent?.nodeType === 'Group' ? e.target.parent : e.target;
-
-        const node = nodes.find((node) => node.nodeProps.id === shape?.id());
-
-        if (node) {
-          dispatch(canvasActions.setSelectedNodesIds([node.nodeProps.id]));
-        }
-        dispatch(
-          uiActions.openContextMenu({
-            type: 'node-menu',
-            position,
-          }),
-        );
-      },
-      [nodes, dispatch],
     );
 
     const drawNodeByType = useCallback(
@@ -207,11 +167,6 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           return;
         }
 
-        if (contextMenuState.opened) {
-          dispatch(uiActions.closeContextMenu());
-          return;
-        }
-
         const { x, y } = stage.getRelativePointerPosition();
 
         setDrawPosition({ start: [x, y], current: [x, y] });
@@ -235,13 +190,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
           onNodesIntersection([]);
         }
       },
-      [
-        contextMenuState.opened,
-        toolType,
-        intersectedNodesIds,
-        dispatch,
-        onNodesIntersection,
-      ],
+      [toolType, intersectedNodesIds, onNodesIntersection],
     );
 
     const onStageMove = useCallback(
@@ -402,6 +351,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       <Stage
         ref={ref}
         {...config}
+        tabIndex={0}
         style={{ ...containerStyle, cursor: cursorStyle }}
         draggable={toolType === 'hand'}
         onMouseDown={onStagePress}
@@ -410,7 +360,6 @@ const DrawingCanvas = forwardRef<Ref, Props>(
         onTouchStart={onStagePress}
         onTouchMove={onStageMove}
         onTouchEnd={onStageMoveEnd}
-        onContextMenu={handleOnContextMenu}
         onWheel={handleStageOnWheel}
         onDragStart={() => setDraggingStage(true)}
         onDragMove={handleStageDragMove}
@@ -434,13 +383,12 @@ const DrawingCanvas = forwardRef<Ref, Props>(
               currentPoint={drawPosition.current}
             />
           )}
-          <ContextMenu {...contextMenuState} />
         </NodesLayer>
       </Stage>
     );
   },
 );
 
-DrawingCanvas.displayName = 'DrawingCanvas';
+Canvas.displayName = 'Canvas';
 
-export default DrawingCanvas;
+export default Canvas;
