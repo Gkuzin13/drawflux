@@ -13,7 +13,7 @@ import {
 import { Stage } from 'react-konva';
 import type { NodeObject, Point, StageConfig } from 'shared';
 import { CURSOR } from '@/constants/cursor';
-import { BACKGROUND_LAYER_ID } from '@/constants/element';
+import { BACKGROUND_LAYER_ID } from '@/constants/node';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { createNode } from '@/utils/node';
@@ -24,7 +24,7 @@ import { drawArrow } from '../shapes/ArrowDrawable/helpers/drawArrow';
 import { drawEllipse } from '../shapes/EllipseDrawable/helpers/drawEllipse';
 import { drawFreePath } from '../shapes/FreePathDrawable/helpers/drawFreePath';
 import { drawRect } from '../shapes/RectDrawable/helpers/drawRect';
-import { getIntersectingChildren } from './helpers/intersect';
+import { getIntersectingNodes } from './helpers/stage';
 import {
   calcNewStagePositionAndScale,
   isScaleOutOfRange,
@@ -50,7 +50,7 @@ const initialDrawPosition: DrawPosition = {
   current: [0, 0],
 };
 
-const DrawingCanvas = forwardRef<Ref, Props>(
+const Canvas = forwardRef<Ref, Props>(
   (
     {
       config,
@@ -103,7 +103,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
 
         if (!children.length) return [];
 
-        const intersectedChildren = getIntersectingChildren(children, rect);
+        const intersectedChildren = getIntersectingNodes(children, rect);
 
         return [...new Set(intersectedChildren.map((child) => child.id()))];
       },
@@ -351,6 +351,7 @@ const DrawingCanvas = forwardRef<Ref, Props>(
       <Stage
         ref={ref}
         {...config}
+        tabIndex={0}
         style={{ ...containerStyle, cursor: cursorStyle }}
         draggable={toolType === 'hand'}
         onMouseDown={onStagePress}
@@ -388,6 +389,6 @@ const DrawingCanvas = forwardRef<Ref, Props>(
   },
 );
 
-DrawingCanvas.displayName = 'DrawingCanvas';
+Canvas.displayName = 'Canvas';
 
-export default DrawingCanvas;
+export default Canvas;

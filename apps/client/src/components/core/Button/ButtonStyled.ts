@@ -24,17 +24,26 @@ export const ButtonStyled = styled('button', {
         '&:hover': {
           backgroundColor: '$green400',
         },
+        '&[data-highlighted]': {
+          border: '1px $green400 solid',
+        },
       },
       secondary: {
         backgroundColor: '$gray200',
         '&:hover': {
           backgroundColor: '$gray300',
         },
+        '&[data-highlighted]': {
+          border: '1px $gray300 solid',
+        },
       },
       'secondary-light': {
         backgroundColor: '$gray50',
         '&:hover': {
           backgroundColor: '$gray200',
+        },
+        '&[data-highlighted]': {
+          border: '1px $gray300 solid',
         },
       },
     },

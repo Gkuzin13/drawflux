@@ -37,7 +37,7 @@ const useAnimatedDash = ({
       element.dashOffset(-offset);
     }, element.getLayer());
 
-    if (enabled) {
+    if (enabled && !animation.isRunning()) {
       animation.start();
     }
 

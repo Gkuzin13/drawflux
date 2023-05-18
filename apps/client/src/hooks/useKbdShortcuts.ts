@@ -1,13 +1,11 @@
-import type Konva from 'konva';
-import { type RefObject, useCallback, useEffect } from 'react';
-import { KEYS, type Key } from '@/constants/keys';
+import { useCallback, useEffect } from 'react';
+import { KEYS } from '@/constants/keys';
 import { TOOLS } from '@/constants/tool';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { historyActions } from '@/stores/reducers/history';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import { uiActions } from '@/stores/slices/ui';
 
-function useKeydownListener(stageRef: RefObject<Konva.Stage>) {
+function useKbdShortcuts(element: HTMLElement | null) {
   const { selectedNodesIds } = useAppSelector(selectCanvas);
   const { toolType } = useAppSelector(selectCanvas);
 
@@ -36,14 +34,12 @@ function useKeydownListener(stageRef: RefObject<Konva.Stage>) {
   );
 
   useEffect(() => {
-    const stageContainer = stageRef.current?.container();
-
-    if (!stageContainer) {
+    if (!element) {
       return;
     }
 
     const handleKeyUp = (event: KeyboardEvent) => {
-      const key = event.key as Key;
+      const key = event.key;
 
       if (event.ctrlKey) {
         dispatchActionsOnCtrlCombo(event);
@@ -52,7 +48,6 @@ function useKeydownListener(stageRef: RefObject<Konva.Stage>) {
 
       if (key === KEYS.DELETE) {
         dispatch(canvasActions.deleteNodes(Object.keys(selectedNodesIds)));
-        dispatch(uiActions.closeContextMenu());
         return;
       }
 
@@ -63,12 +58,12 @@ function useKeydownListener(stageRef: RefObject<Konva.Stage>) {
       dispatch(canvasActions.setToolType(toolTypeByKey?.value || 'select'));
     };
 
-    stageContainer.addEventListener('keydown', handleKeyUp);
+    element.addEventListener('keydown', handleKeyUp);
 
     return () => {
-      stageContainer.removeEventListener('keydown', handleKeyUp);
+      element.removeEventListener('keydown', handleKeyUp);
     };
-  }, [toolType, selectedNodesIds]);
+  }, [toolType, selectedNodesIds, element]);
 }
 
-export default useKeydownListener;
+export default useKbdShortcuts;

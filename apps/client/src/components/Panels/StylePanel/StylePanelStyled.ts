@@ -12,6 +12,14 @@ export const StyleContainer = styled(Panel, {
   flexDirection: 'column',
   padding: '$2',
   gap: '$3',
+  display: 'none',
+  variants: {
+    active: {
+      true: {
+        display: 'flex',
+      },
+    },
+  },
 });
 
 export const StyleRadioGroup = styled(RadioGroup.Root, {

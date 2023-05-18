@@ -12,23 +12,15 @@ import { Divider } from '../core/Divider/Divider';
 import Kbd from '../core/Kbd/Kbd';
 import { ContextMenuContent, ContextMenuItem } from './ContextMenuStyled';
 
-export type ContextMenuType = 'node-menu' | 'drawing-canvas-menu';
-
 type Props = PropsWithChildren<{
-  type: ContextMenuType;
   children: ReactNode;
-  onContextMenuOpen: () => void;
+  onContextMenuOpen: (open: boolean) => void;
 }>;
 
-const DrawingCanvasMenu = () => {
+const CanvasMenu = () => {
   const { nodes } = useAppSelector(selectCanvas);
-  const { selectedNodesIds } = useAppSelector(selectCanvas);
 
   const dispatch = useAppDispatch();
-
-  const areNodesSelected = useMemo(() => {
-    return Boolean(Object.keys(selectedNodesIds).length);
-  }, [selectedNodesIds]);
 
   const handleSelectAll = useCallback(() => {
     const allSelectedNodesIds = nodes.map((node) => node.nodeProps.id);
@@ -36,18 +28,9 @@ const DrawingCanvasMenu = () => {
     dispatch(canvasActions.setSelectedNodesIds(allSelectedNodesIds));
   }, [dispatch, nodes]);
 
-  const handleSelectNone = useCallback(() => {
-    dispatch(canvasActions.setSelectedNodesIds([]));
-  }, [dispatch]);
-
   return (
     <>
       <ContextMenuItem onSelect={handleSelectAll}>Select All</ContextMenuItem>
-      {areNodesSelected && (
-        <ContextMenuItem onSelect={handleSelectNone}>
-          Select None
-        </ContextMenuItem>
-      )}
     </>
   );
 };
@@ -63,6 +46,10 @@ const NodeMenu = () => {
     },
     [dispatch, selectedNodesIds],
   );
+
+  const handleSelectNone = useCallback(() => {
+    dispatch(canvasActions.setSelectedNodesIds([]));
+  }, [dispatch]);
 
   return (
     <>
@@ -93,6 +80,8 @@ const NodeMenu = () => {
         Send to back
       </ContextMenuItem>
       <Divider orientation="horizontal" />
+      <ContextMenuItem onSelect={handleSelectNone}>Select None</ContextMenuItem>
+      <Divider orientation="horizontal" />
       <ContextMenuItem
         onSelect={() => dispatchNodesAction(canvasActions.deleteNodes)}
       >
@@ -103,24 +92,17 @@ const NodeMenu = () => {
   );
 };
 
-const ContextMenu = ({ type, onContextMenuOpen, children }: Props) => {
-  const ActiveMenu = useMemo(() => {
-    switch (type) {
-      case 'node-menu':
-        return NodeMenu;
-      case 'drawing-canvas-menu':
-        return DrawingCanvasMenu;
-    }
-  }, [type]);
+const ContextMenu = ({ onContextMenuOpen, children }: Props) => {
+  const { selectedNodesIds } = useAppSelector(selectCanvas);
 
-  const handleOnOpenChange = (open: boolean) => {
-    if (open) {
-      onContextMenuOpen();
-    }
-  };
+  const ActiveMenu = useMemo(() => {
+    const nodesSelected = Object.keys(selectedNodesIds).length > 0;
+
+    return nodesSelected ? NodeMenu : CanvasMenu;
+  }, [selectedNodesIds]);
 
   return (
-    <RadixContextMenu.Root onOpenChange={handleOnOpenChange}>
+    <RadixContextMenu.Root onOpenChange={onContextMenuOpen}>
       <RadixContextMenu.Trigger
         asChild={true}
         style={{

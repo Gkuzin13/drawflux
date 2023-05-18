@@ -14,6 +14,7 @@ import {
 } from './StylePanelStyled';
 
 export type StylePanelProps = {
+  active: boolean;
   style: Partial<NodeStyle>;
   enabledOptions: {
     line: boolean;
@@ -23,6 +24,7 @@ export type StylePanelProps = {
 };
 
 const StylePanel = ({
+  active,
   style,
   enabledOptions,
   onStyleChange,
@@ -31,24 +33,30 @@ const StylePanel = ({
     onStyleChange({ color });
   };
 
-  const handleLineSelect = (lineName: (typeof LINE)[number]['name']) => {
-    const value = LINE.find((l) => l.name === lineName)?.value;
+  const handleLineSelect = useCallback(
+    (lineName: (typeof LINE)[number]['name']) => {
+      const value = LINE.find((l) => l.name === lineName)?.value;
 
-    onStyleChange({
-      animated: style.animated && lineName !== 'solid' ? true : false,
-      line: value as NodeLine,
-    });
-  };
+      onStyleChange({
+        animated: style.animated && lineName !== 'solid' ? true : false,
+        line: value as NodeLine,
+      });
+    },
+    [style.animated, onStyleChange],
+  );
 
-  const handleAnimatedSelect = () => {
+  const handleAnimatedSelect = useCallback(() => {
     onStyleChange({ animated: !style.animated });
-  };
+  }, [style.animated, onStyleChange]);
 
-  const handleSizeSelect = (sizeName: (typeof SIZE)[number]['name']) => {
-    const value = SIZE.find((s) => s.name === sizeName)?.value;
+  const handleSizeSelect = useCallback(
+    (sizeName: (typeof SIZE)[number]['name']) => {
+      const value = SIZE.find((s) => s.name === sizeName)?.value;
 
-    onStyleChange({ size: value });
-  };
+      onStyleChange({ size: value });
+    },
+    [onStyleChange],
+  );
 
   const isLineStyleActive = useCallback(
     (value: Readonly<NodeLine>) => {
@@ -64,7 +72,7 @@ const StylePanel = ({
   }, [style.line]);
 
   return (
-    <StyleContainer>
+    <StyleContainer active={active}>
       <StyleRadioGroup
         defaultValue={style.color}
         aria-label="Color"
@@ -94,52 +102,54 @@ const StylePanel = ({
         </StyleGrid>
       </StyleRadioGroup>
       {enabledOptions.line && (
-        <StyleRadioGroup
-          aria-label="Line"
-          aria-labelledby="shape-line"
-          orientation="horizontal"
-          onValueChange={handleLineSelect}
-        >
-          <StyleLabel htmlFor="shape-line" css={{ fontSize: '$1' }}>
-            Line
-          </StyleLabel>
-          <StyleGrid>
-            {LINE.map((line) => {
-              return (
-                <StyleButton
-                  key={line.name}
-                  id={line.name}
-                  value={line.name}
-                  title={capitalizeFirstLetter(line.name)}
-                  checked={isLineStyleActive(line.value)}
-                  color={
-                    isLineStyleActive(line.value)
-                      ? 'secondary'
-                      : 'secondary-light'
-                  }
-                >
-                  {line.icon({ size: ICON_SIZES.LARGE })}
-                </StyleButton>
-              );
-            })}
-          </StyleGrid>
-        </StyleRadioGroup>
+        <>
+          <StyleRadioGroup
+            aria-label="Line"
+            aria-labelledby="shape-line"
+            orientation="horizontal"
+            onValueChange={handleLineSelect}
+          >
+            <StyleLabel htmlFor="shape-line" css={{ fontSize: '$1' }}>
+              Line
+            </StyleLabel>
+            <StyleGrid>
+              {LINE.map((line) => {
+                return (
+                  <StyleButton
+                    key={line.name}
+                    id={line.name}
+                    value={line.name}
+                    title={capitalizeFirstLetter(line.name)}
+                    checked={isLineStyleActive(line.value)}
+                    color={
+                      isLineStyleActive(line.value)
+                        ? 'secondary'
+                        : 'secondary-light'
+                    }
+                  >
+                    {line.icon({ size: ICON_SIZES.LARGE })}
+                  </StyleButton>
+                );
+              })}
+            </StyleGrid>
+          </StyleRadioGroup>
+          <div aria-labelledby="shape-animated">
+            <StyleLabel htmlFor="shape-animated" css={{ fontSize: '$1' }}>
+              Animated
+            </StyleLabel>
+            <ToggleButton
+              aria-label="Toggle Animated"
+              title={capitalizeFirstLetter(ANIMATED.value)}
+              pressed={style.animated}
+              color={style.animated ? 'primary' : 'secondary-light'}
+              disabled={animatedStyleDisabled}
+              onPressedChange={handleAnimatedSelect}
+            >
+              {style.animated ? 'On' : 'Off'}
+            </ToggleButton>
+          </div>
+        </>
       )}
-      <div aria-labelledby="shape-animated">
-        <StyleLabel htmlFor="shape-animated" css={{ fontSize: '$1' }}>
-          Animated
-        </StyleLabel>
-        <ToggleButton
-          aria-label="Toggle Animated"
-          title={capitalizeFirstLetter(ANIMATED.value)}
-          pressed={style.animated}
-          color={style.animated ? 'primary' : 'secondary-light'}
-          disabled={animatedStyleDisabled}
-          onPressedChange={handleAnimatedSelect}
-        >
-          {style.animated ? 'On' : 'Off'}
-        </ToggleButton>
-      </div>
       {enabledOptions.size && (
         <StyleRadioGroup
           aria-label="Size"

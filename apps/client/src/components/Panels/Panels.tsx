@@ -133,9 +133,9 @@ const Panels = ({
         ).then((state) => {
           if (!state) {
             dispatch(
-              uiActions.openModal({
+              uiActions.openDialog({
                 title: 'Error',
-                message: 'Could not load file',
+                description: 'Could not load file',
               }),
             );
             return;
@@ -179,13 +179,12 @@ const Panels = ({
           pageState={{ page: { nodes, stageConfig } }}
         />
         <MenuPanel onAction={handleMenuAction} />
-        {selectedNodes.length ? (
-          <StylePanel
-            style={selectedNodesStyle}
-            enabledOptions={stylePanelEnabledOptions}
-            onStyleChange={handleStyleChange}
-          />
-        ) : null}
+        <StylePanel
+          active={selectedNodes.length > 0}
+          style={selectedNodesStyle}
+          enabledOptions={stylePanelEnabledOptions}
+          onStyleChange={handleStyleChange}
+        />
       </TopPanel>
       <BottomPanel>
         <ToolsPanel activeTool={toolType} onToolSelect={onToolTypeChange} />
