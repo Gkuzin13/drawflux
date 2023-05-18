@@ -1,27 +1,19 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type RootState } from '../store';
 
-export type ContextMenuType = 'node-menu' | 'drawing-canvas-menu';
-
 export type UiState = {
-  contextMenu: {
-    type: ContextMenuType;
-  };
-  modal: {
-    opened: boolean;
+  dialog: {
+    open: boolean;
     title: string;
-    message: string;
+    description: string;
   };
 };
 
 const initialState: UiState = {
-  contextMenu: {
-    type: 'drawing-canvas-menu',
-  },
-  modal: {
-    opened: false,
+  dialog: {
+    open: false,
     title: '',
-    message: '',
+    description: '',
   },
 };
 
@@ -29,33 +21,21 @@ export const uiSlice = createSlice({
   name: 'contextMenu',
   initialState,
   reducers: {
-    setContextMenu: (
+    openDialog: (
       state,
-      action: PayloadAction<Omit<UiState['contextMenu'], 'opened'>>,
+      action: PayloadAction<Omit<UiState['dialog'], 'open'>>,
     ) => {
-      const updatedState = {
-        ...action.payload,
-        opened: true,
-      };
+      const updatedState = { open: true, ...action.payload };
 
-      state.contextMenu = updatedState;
+      state.dialog = updatedState;
     },
-    openModal: (
-      state,
-      action: PayloadAction<Omit<UiState['modal'], 'opened'>>,
-    ) => {
-      const updatedState = { opened: true, ...action.payload };
-
-      state.modal = updatedState;
-    },
-    closeModal: (state) => {
-      state.modal.opened = false;
+    closeDialog: (state) => {
+      state.dialog = initialState.dialog;
     },
   },
 });
 
-export const selectContextMenu = (state: RootState) => state.ui.contextMenu;
-export const selectModal = (state: RootState) => state.ui.modal;
+export const selectDialog = (state: RootState) => state.ui.dialog;
 
 export const uiActions = uiSlice.actions;
 
