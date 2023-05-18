@@ -67,6 +67,7 @@ jobs:
       - name: 🧪 Unit tests
         run: pnpm test
         env:
+          POSTGRES_PASSWORD: postgres
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
 
