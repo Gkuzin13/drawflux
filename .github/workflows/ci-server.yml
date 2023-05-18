@@ -30,6 +30,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: test
           PGUSER: test
+          PGPASSWORD: test-password
           PGPORT: 5432
           PGDATABASE: test-api
           PGHOST: localhost
