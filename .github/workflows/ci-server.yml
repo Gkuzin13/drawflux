@@ -67,11 +67,8 @@ jobs:
       - name: 🧪 Unit tests
         run: pnpm test
         env:
-          PGUSER: postgres
-          PGHOST: localhost
-          PGPASSWORD: postgres
-          PGDATABASE: postgres
-          PGPORT: 5432
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
 
       - name: 🏗 Start build
         run: pnpm build
