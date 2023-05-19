@@ -73,5 +73,8 @@ jobs:
           PGDATABASE: postgres
           PGPORT: 5432
 
-      - name: 🏗 Start build
+      - name: 🏗 Build
         run: pnpm build
+
+      - name: 🏗 Start Server
+        run: pnpm start
