@@ -75,12 +75,3 @@ jobs:
 
       - name: 🏗 Build
         run: pnpm build
-
-      - name: 🚀 Start Server
-        run: pnpm start
-        env:
-          PGUSER: postgres
-          PGHOST: localhost
-          PGPASSWORD: postgres
-          PGDATABASE: postgres
-          PGPORT: 5432
