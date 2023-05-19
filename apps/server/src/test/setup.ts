@@ -1,8 +1,8 @@
-import { beforeAll } from 'vitest';
+import { beforeEach } from 'vitest';
 import * as db from '../db/index';
 import { queries } from '../db/queries/index';
 
-beforeAll(() => {
+beforeEach(() => {
   (async () => {
     const client = await db.getClient();
 
