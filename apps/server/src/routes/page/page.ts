@@ -63,6 +63,7 @@ pageRouter.post(
       return { id: rows[0].id };
     } catch (error) {
       if (error instanceof pg.DatabaseError || error instanceof ZodError) {
+        console.log(error);
         throw new BadRequestError('Invalid request body', 400);
       }
     } finally {

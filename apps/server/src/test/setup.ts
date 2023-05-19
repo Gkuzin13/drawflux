@@ -2,7 +2,7 @@ import { beforeEach } from 'vitest';
 import * as db from '../db/index';
 import { queries } from '../db/queries/index';
 
-beforeEach(() => {
+beforeAll(() => {
   (async () => {
     const client = await db.getClient();
 
