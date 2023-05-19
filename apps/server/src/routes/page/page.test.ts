@@ -26,7 +26,7 @@ describe('POST /p', () => {
     };
 
     const response = await request(app).post('/p').send(mockPage);
-
+    console.log(response);
     expect(response.status).toBe(200);
     expect(typeof response.body.data.id).toBe('string');
   });
