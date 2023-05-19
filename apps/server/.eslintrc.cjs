@@ -5,7 +5,7 @@ module.exports = {
   parserOptions: {
     tsconfigRootDir: __dirname,
   },
-  ignorePatterns: [...getDefaultIgnorePatterns(), 'src/test/setup.ts'],
+  ignorePatterns: [...getDefaultIgnorePatterns()],
   extends: ['eslint-config-bases/typescript'],
   rules: {},
   overrides: [],
