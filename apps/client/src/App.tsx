@@ -1,6 +1,5 @@
 import type Konva from 'konva';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import type { StageConfig } from 'shared';
 import Canvas from '@/components/Canvas/Canvas';
 import {
@@ -9,10 +8,15 @@ import {
   getPointerRect,
 } from '@/components/Canvas/helpers/stage';
 import ContextMenu from '@/components/ContextMenu/ContextMenu';
+import Dialog from '@/components/core/Dialog/Dialog';
 import Loader from '@/components/core/Loader/Loader';
-import Dialog from '@/components/Dialog/Dialog';
 import Panels from '@/components/Panels/Panels';
-import { LOCAL_STORAGE, PageState, type PageStateType } from '@/constants/app';
+import {
+  LOCAL_STORAGE,
+  PAGE_URL_SEARCH_PARAM_KEY,
+  PageState,
+  type PageStateType,
+} from '@/constants/app';
 import useKbdShortcuts from '@/hooks/useKbdShortcuts';
 import useWindowSize from '@/hooks/useWindowSize/useWindowSize';
 import { useGetPageQuery } from '@/services/api';
@@ -20,14 +24,16 @@ import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { uiActions, selectDialog } from '@/stores/slices/ui';
 import { storage } from '@/utils/storage';
+import { urlSearchParam } from './utils/url';
 
-const Root = () => {
+const App = () => {
   const [intersectedNodesIds, setIntersectedNodesIds] = useState<string[]>([]);
 
-  const { id } = useParams();
+  const id = useMemo(() => urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY), []);
+
   const { isLoading, isError, isSuccess } = useGetPageQuery(
     {
-      id: id as string, // Temporary workaround
+      id: id as string,
     },
     { skip: !id },
   );
@@ -81,7 +87,7 @@ const Root = () => {
     }
   }, [isError, dispatch]);
 
-  const drawingCanvasConfig = useMemo(() => {
+  const canvasConfig = useMemo(() => {
     return {
       width,
       height,
@@ -142,7 +148,7 @@ const Root = () => {
       <ContextMenu onContextMenuOpen={handleContextMenuOpen}>
         <Canvas
           ref={stageRef}
-          config={drawingCanvasConfig}
+          config={canvasConfig}
           intersectedNodesIds={intersectedNodesIds}
           onNodesIntersection={handleNodesIntersection}
           onConfigChange={handleStageConfigChange}
@@ -153,4 +159,4 @@ const Root = () => {
   );
 };
 
-export default Root;
+export default App;

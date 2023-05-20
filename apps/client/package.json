@@ -31,7 +31,6 @@
     "react-konva": "^18.2.8",
     "react-konva-utils": "^1.0.4",
     "react-redux": "^8.0.5",
-    "react-router-dom": "^6.10.0",
     "shared": "workspace:^",
     "uuid": "^9.0.0"
   },
