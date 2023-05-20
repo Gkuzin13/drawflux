@@ -6,9 +6,11 @@ import Button from '@/components/core/Button/Button';
 import { Divider } from '@/components/core/Divider/Divider';
 import Loader from '@/components/core/Loader/Loader';
 import QRCode from '@/components/QRCode/QRCode';
+import { PAGE_URL_SEARCH_PARAM_KEY } from '@/constants/app';
 import { ICON_SIZES } from '@/constants/icon';
 import useClipboard from '@/hooks/useClipboard/useClipboard';
 import { useGetQRCodeMutation, useSharePageMutation } from '@/services/api';
+import { urlSearchParam } from '@/utils/url';
 import {
   QRCodeContainer,
   SharePanelContent,
@@ -37,8 +39,6 @@ const SharedPageContent = ({
   const [getQRCode, { isLoading, isError }] = useGetQRCodeMutation();
   const { copied, copy } = useClipboard();
 
-  const pageUrl = window.location.href;
-
   useEffect(() => {
     async function fetchQRCode(url: string) {
       const { data } = await getQRCode({ url }).unwrap();
@@ -49,16 +49,16 @@ const SharedPageContent = ({
     }
 
     if (!qrCode) {
-      fetchQRCode(pageUrl);
+      fetchQRCode(window.location.href);
     }
-  }, [pageUrl, qrCode, getQRCode, onQRCodeFetchSuccess]);
+  }, [qrCode, getQRCode, onQRCodeFetchSuccess]);
 
   const handleCopyLinkClick = async () => {
-    if (!pageUrl) {
+    if (!qrCode) {
       return;
     }
 
-    copy(pageUrl);
+    copy(window.location.href);
   };
 
   return (
@@ -100,7 +100,9 @@ const SharablePageContent = ({ page }: ShareablePageProps) => {
     const { data } = await sharePage({ page }).unwrap();
 
     if (data?.id) {
-      window.history.pushState({}, '', `/p/${data.id}`);
+      const updatedURL = urlSearchParam.set(PAGE_URL_SEARCH_PARAM_KEY, data.id);
+
+      window.history.pushState({}, '', updatedURL);
       window.location.reload();
       return;
     }
