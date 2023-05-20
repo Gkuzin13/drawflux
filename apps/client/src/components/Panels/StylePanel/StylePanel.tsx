@@ -172,7 +172,7 @@ const StylePanel = ({
                     size.value === style?.size ? 'secondary' : 'secondary-light'
                   }
                 >
-                  {size.icon({ size: ICON_SIZES.LARGE, lineSize: size.value })}
+                  {size.icon({ size: ICON_SIZES.LARGE })}
                 </StyleButton>
               );
             })}

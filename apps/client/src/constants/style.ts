@@ -1,24 +1,22 @@
+import type { IconBaseProps } from 'react-icons';
+import { TbLineDashed, TbLineDotted, TbMinus } from 'react-icons/tb';
 import { colors } from 'shared';
-import IconLineDashed from '@/components/icons/IconLineDashed';
-import IconLineDotted from '@/components/icons/IconLineDotted';
-import IconLineSolid from '@/components/icons/IconLineSolid';
-import IconSizeStyle from '@/components/icons/IconSizeStyle';
 
 export const LINE = [
   {
     value: [0, 0],
     name: 'solid',
-    icon: IconLineSolid,
+    icon: TbMinus,
   },
   {
     value: [16, 12],
     name: 'dashed',
-    icon: IconLineDashed,
+    icon: TbLineDashed,
   },
   {
     value: [1, 12],
     name: 'dotted',
-    icon: IconLineDotted,
+    icon: TbLineDotted,
   },
 ] as const;
 
@@ -27,26 +25,30 @@ export const ANIMATED = {
   value: 'animated',
 } as const;
 
+const SizeIcon = (props: IconBaseProps) => {
+  return TbMinus({ transform: 'rotate(-45)', ...props });
+};
+
 export const SIZE = [
   {
     value: 2,
     name: 'small',
-    icon: IconSizeStyle,
+    icon: (props: IconBaseProps) => SizeIcon({ strokeWidth: 2, ...props }),
   },
   {
     value: 4,
     name: 'medium',
-    icon: IconSizeStyle,
+    icon: (props: IconBaseProps) => SizeIcon({ strokeWidth: 4, ...props }),
   },
   {
     value: 6,
     name: 'large',
-    icon: IconSizeStyle,
+    icon: (props: IconBaseProps) => SizeIcon({ strokeWidth: 6, ...props }),
   },
   {
     value: 8,
     name: 'extra large',
-    icon: IconSizeStyle,
+    icon: (props: IconBaseProps) => SizeIcon({ strokeWidth: 8, ...props }),
   },
 ] as const;
 

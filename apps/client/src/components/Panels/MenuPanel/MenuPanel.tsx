@@ -31,7 +31,7 @@ const MenuPanel = ({ onAction }: Props) => {
                 title={action.name}
                 onSelect={() => handleOnClick(action.key)}
               >
-                {action.icon({ size: ICON_SIZES.SMALL })}
+                {action.icon({ size: ICON_SIZES.MEDIUM })}
                 {action.name}
               </DropdownMenuItem>
             );
