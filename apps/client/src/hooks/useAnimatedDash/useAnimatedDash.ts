@@ -1,6 +1,7 @@
 import type Konva from 'konva';
 import { Animation } from 'konva/lib/Animation';
-import { type RefObject, useEffect, useState } from 'react';
+import { type RefObject, useEffect, useMemo } from 'react';
+import { clamp } from '@/utils/math';
 
 export type UseAnimatedDashElement =
   | Konva.Shape
@@ -19,23 +20,28 @@ const useAnimatedDash = ({
   elementRef,
   totalDashLength,
 }: UseAnimatedDashArgs) => {
-  const [isRunning, setIsRunning] = useState(false);
-
-  useEffect(() => {
+  const animation = useMemo(() => {
     if (!elementRef.current) {
-      return;
+      return null;
     }
 
     const element = elementRef.current;
+    const speedFactor = clamp(35 * totalDashLength, 600, 750);
 
-    const animation = new Animation((frame) => {
+    return new Animation((frame) => {
       if (!frame) return;
 
-      const time = frame.time / 600;
+      const time = frame.time / speedFactor;
       const offset = totalDashLength * ((time * 2) % 2);
 
       element.dashOffset(-offset);
     }, element.getLayer());
+  }, [elementRef.current, totalDashLength]);
+
+  useEffect(() => {
+    if (!animation) {
+      return;
+    }
 
     if (enabled && !animation.isRunning()) {
       animation.start();
@@ -45,15 +51,12 @@ const useAnimatedDash = ({
       animation.stop();
     }
 
-    setIsRunning(animation.isRunning());
-
     return () => {
       animation.stop();
-      setIsRunning(false);
     };
-  }, [elementRef, totalDashLength, enabled]);
+  }, [enabled, animation]);
 
-  return { isRunning };
+  return { animation };
 };
 
 export default useAnimatedDash;

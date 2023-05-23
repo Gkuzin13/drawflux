@@ -12,12 +12,12 @@ describe('useAnimatedDash', () => {
       initialProps: { enabled: false, elementRef, totalDashLength: 8 },
     });
 
-    expect(result.current.isRunning).toBe(false);
+    expect(result.current.animation?.isRunning()).toBe(false);
 
     rerender({ enabled: true, elementRef, totalDashLength: 8 });
-    expect(result.current.isRunning).toBe(true);
+    expect(result.current.animation?.isRunning()).toBe(true);
 
     rerender({ enabled: false, elementRef, totalDashLength: 8 });
-    expect(result.current.isRunning).toBe(false);
+    expect(result.current.animation?.isRunning()).toBe(false);
   });
 });
