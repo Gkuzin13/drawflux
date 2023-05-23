@@ -17,7 +17,12 @@ import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
 import ControlPanel from './ControlPanel/ControlPanel';
 import MenuPanel from './MenuPanel/MenuPanel';
-import { BottomPanel, PanelsContainer, TopPanel } from './PanelsStyled';
+import {
+  BottomPanel,
+  PanelsContainer,
+  TopPanel,
+  TopPanelRightContainer,
+} from './PanelsStyled';
 import SharePanel from './SharePanel/SharePanel';
 import StylePanel, { type StylePanelProps } from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
@@ -173,18 +178,20 @@ const Panels = ({
           onControl={handleControlActions}
           enabledControls={enabledControls}
         />
-        <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
-        <SharePanel
-          isPageShared={isPageShared}
-          pageState={{ page: { nodes, stageConfig } }}
-        />
-        <MenuPanel onAction={handleMenuAction} />
         <StylePanel
           active={selectedNodes.length > 0}
           style={selectedNodesStyle}
           enabledOptions={stylePanelEnabledOptions}
           onStyleChange={handleStyleChange}
         />
+        <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
+        <TopPanelRightContainer>
+          <SharePanel
+            isPageShared={isPageShared}
+            pageState={{ page: { nodes, stageConfig } }}
+          />
+          <MenuPanel onAction={handleMenuAction} />
+        </TopPanelRightContainer>
       </TopPanel>
       <BottomPanel>
         <ToolsPanel activeTool={toolType} onToolSelect={onToolTypeChange} />

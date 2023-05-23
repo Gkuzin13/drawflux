@@ -22,7 +22,7 @@ export const Panel = styled('div', {
   pointerEvents: 'all',
   boxShadow: '$small',
   borderRadius: '$1',
-  backgroundColor: '$white',
+  backgroundColor: '$white50',
 });
 
 export const PanelButton = styled(ButtonStyled, {
@@ -39,6 +39,10 @@ export const TopPanel = styled('div', {
   justifyContent: 'space-between',
   width: '100%',
   gap: '$2',
+});
+
+export const TopPanelRightContainer = styled(Panel, {
+  marginLeft: 'auto',
 });
 
 export const BottomPanel = styled('div', {
