@@ -67,12 +67,7 @@ const App = () => {
         return;
       }
 
-      const { toolType, nodes, stageConfig, selectedNodesIds } =
-        stateFromStorage.page;
-
-      dispatch(
-        canvasActions.set({ toolType, nodes, selectedNodesIds, stageConfig }),
-      );
+      dispatch(canvasActions.set(stateFromStorage.page));
     }
   }, [id, dispatch]);
 
