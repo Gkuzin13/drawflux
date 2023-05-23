@@ -20,10 +20,7 @@ import { createNode } from '@/utils/node';
 import BackgroundRect from '../BackgroundRect';
 import NodesLayer from '../NodesLayer';
 import SelectRect from '../SelectRect';
-import { drawArrow } from '../shapes/ArrowDrawable/helpers/drawArrow';
-import { drawEllipse } from '../shapes/EllipseDrawable/helpers/drawEllipse';
-import { drawFreePath } from '../shapes/FreePathDrawable/helpers/drawFreePath';
-import { drawRect } from '../shapes/RectDrawable/helpers/drawRect';
+import { drawArrow, drawEllipse, drawFreePath, drawRect } from './helpers/draw';
 import { getIntersectingNodes } from './helpers/stage';
 import {
   calcNewStagePositionAndScale,
