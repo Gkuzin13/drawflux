@@ -14,3 +14,7 @@ export function calculateMiddlePoint(rect: IRect): Vector2d {
     y: rect.y + rect.y + rect.height / 2,
   };
 }
+
+export function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
