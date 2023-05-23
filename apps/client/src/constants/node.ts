@@ -9,3 +9,8 @@ export const TRANSFORMER = {
   ANCHOR_SIZE: 9,
   ANCHOR_STROKE_WIDTH: 1.5,
 };
+
+export const RECT = {
+  CORNER_RADIUS: 8,
+  MIN_SIZE: 5,
+};
