@@ -1,20 +1,11 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { styled } from 'shared';
 import { ButtonStyled } from '@/components/core/Button/ButtonStyled';
-import { Panel } from '../PanelsStyled';
+import { PanelButton } from '../PanelsStyled';
 
-export const MenuPanelTrigger = styled(
-  DropdownMenu.Trigger,
-  ButtonStyled,
-  Panel,
-  {
-    width: '$6',
-    height: '$6',
-    defaultVariants: {
-      size: 'extra-small',
-    },
-  },
-);
+export const MenuPanelTrigger = styled(DropdownMenu.Trigger, PanelButton, {
+  defaultVariants: {},
+});
 
 export const DropdownMenuContent = styled(DropdownMenu.Content, {
   display: 'flex',
