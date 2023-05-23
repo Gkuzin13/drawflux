@@ -1,9 +1,8 @@
 import type { NodeColor, NodeStyle } from 'shared';
 import { ICON_SIZES } from '@/constants/icon';
 import { ANIMATED, COLOR, LINE, SIZE } from '@/constants/style';
-import { capitalizeFirstLetter } from '@/utils/string';
+import { getColorValue } from '@/utils/shape';
 import {
-  ColorButton,
   StyleButton,
   StyleContainer,
   StyleGrid,
@@ -56,6 +55,7 @@ const StylePanel = ({
         aria-label="Color"
         aria-labelledby="shape-color"
         orientation="horizontal"
+        value={style.color}
         onValueChange={handleColorSelect}
       >
         <StyleLabel htmlFor="shape-color" css={{ fontSize: '$1' }}>
@@ -64,16 +64,21 @@ const StylePanel = ({
         <StyleGrid>
           {COLOR.map((color) => {
             return (
-              <ColorButton
+              <StyleButton
+                aria-label="Select Color"
                 key={color.value}
-                title={capitalizeFirstLetter(color.name)}
                 value={color.value}
+                title={color.name}
                 checked={color.value === style.color}
                 color={
                   color.value === style.color ? 'secondary' : 'secondary-light'
                 }
-                style={{ color: color.value }}
-              />
+                style={{ color: getColorValue(color.value) }}
+              >
+                {color.icon({
+                  size: ICON_SIZES.LARGE,
+                })}
+              </StyleButton>
             );
           })}
         </StyleGrid>
@@ -84,6 +89,7 @@ const StylePanel = ({
             aria-label="Line"
             aria-labelledby="shape-line"
             orientation="horizontal"
+            value={style.line}
             onValueChange={handleLineSelect}
           >
             <StyleLabel htmlFor="shape-line" css={{ fontSize: '$1' }}>
@@ -116,7 +122,7 @@ const StylePanel = ({
             </StyleLabel>
             <ToggleButton
               aria-label="Toggle Animated"
-              title={capitalizeFirstLetter(ANIMATED.value)}
+              title={ANIMATED.name}
               pressed={style.animated}
               color={style.animated ? 'primary' : 'secondary-light'}
               disabled={style.line === 'solid'}
@@ -132,6 +138,7 @@ const StylePanel = ({
           aria-label="Size"
           aria-labelledby="shape-size"
           orientation="horizontal"
+          value={SIZE.find((size) => size.value === style.size)?.name}
           onValueChange={handleSizeSelect}
         >
           <StyleLabel htmlFor="shape-size" css={{ fontSize: '$1' }}>
@@ -142,14 +149,14 @@ const StylePanel = ({
               return (
                 <StyleButton
                   key={size.name}
-                  title={capitalizeFirstLetter(size.name)}
+                  title={size.name}
                   value={size.name}
-                  checked={size.value === style?.size}
+                  checked={size.value === style.size}
                   color={
                     size.value === style?.size ? 'secondary' : 'secondary-light'
                   }
                 >
-                  {size.icon({ size: ICON_SIZES.LARGE })}
+                  {size.icon({ size: ICON_SIZES.SMALL })}
                 </StyleButton>
               );
             })}

@@ -1,8 +1,20 @@
-import type { IconBaseProps } from 'react-icons';
-import { TbLineDashed, TbLineDotted, TbMinus } from 'react-icons/tb';
-import { colors } from 'shared';
+import type { IconBaseProps, IconType } from 'react-icons';
+import {
+  TbCircleFilled,
+  TbLineDashed,
+  TbLineDotted,
+  TbMinus,
+  TbSlash,
+} from 'react-icons/tb';
+import type { NodeLine, NodeSize, NodeColor } from 'shared';
 
-export const LINE = [
+type StyleConst<V> = {
+  value: V;
+  name: string;
+  icon: IconType;
+};
+
+export const LINE: StyleConst<NodeLine>[] = [
   {
     value: 'solid',
     name: 'Solid',
@@ -18,51 +30,49 @@ export const LINE = [
     name: 'Dotted',
     icon: TbLineDotted,
   },
-] as const;
+];
 
 export const ANIMATED = {
   name: 'animated',
   value: 'animated',
 } as const;
 
-const SizeIcon = (props: IconBaseProps) => {
-  return TbMinus({ transform: 'rotate(-45)', ...props });
-};
+export const SIZE: StyleConst<NodeSize>[] = [
+  {
+    value: 'small',
+    name: 'Small',
+    icon: (props: IconBaseProps) => TbSlash({ strokeWidth: 2, ...props }),
+  },
+  {
+    value: 'medium',
+    name: 'Medium',
+    icon: (props: IconBaseProps) => TbSlash({ strokeWidth: 4, ...props }),
+  },
+  {
+    value: 'large',
+    name: 'Large',
+    icon: (props: IconBaseProps) => TbSlash({ strokeWidth: 6, ...props }),
+  },
+  {
+    value: 'extra-large',
+    name: 'Extra Large',
+    icon: (props: IconBaseProps) => TbSlash({ strokeWidth: 8, ...props }),
+  },
+];
 
-export const SIZE = [
-  {
-    value: 2,
-    name: 'small',
-    icon: (props: IconBaseProps) => SizeIcon({ strokeWidth: 2, ...props }),
-  },
-  {
-    value: 4,
-    name: 'medium',
-    icon: (props: IconBaseProps) => SizeIcon({ strokeWidth: 4, ...props }),
-  },
-  {
-    value: 6,
-    name: 'large',
-    icon: (props: IconBaseProps) => SizeIcon({ strokeWidth: 6, ...props }),
-  },
-  {
-    value: 8,
-    name: 'extra large',
-    icon: (props: IconBaseProps) => SizeIcon({ strokeWidth: 8, ...props }),
-  },
-] as const;
-
-export const COLOR = [
-  { name: 'red', value: colors.red600 },
-  { name: 'pink', value: colors.pink600 },
-  { name: 'deep orange', value: colors['deep-orange600'] },
-  { name: 'yellow', value: colors.yellow600 },
-  { name: 'green', value: colors.green600 },
-  { name: 'teal', value: colors.teal600 },
-  { name: 'light blue', value: colors['light-blue600'] },
-  { name: 'blue', value: colors.blue600 },
-  { name: 'deep purple', value: colors['deep-purple600'] },
-  { name: 'indigo', value: colors.indigo600 },
-  { name: 'black', value: colors.black },
-  { name: 'gray', value: colors.gray600 },
-] as const;
+export const COLOR: StyleConst<NodeColor>[] = [
+  { name: 'Red', value: 'red600' },
+  { name: 'Pink', value: 'pink600' },
+  { name: 'Deep Orange', value: 'deep-orange600' },
+  { name: 'Yellow', value: 'yellow600' },
+  { name: 'Green', value: 'green600' },
+  { name: 'Teal', value: 'teal600' },
+  { name: 'Light Blue', value: 'light-blue600' },
+  { name: 'Blue', value: 'blue600' },
+  { name: 'Deep Purple', value: 'deep-purple600' },
+  { name: 'Indigo', value: 'indigo600' },
+  { name: 'Black', value: 'black' },
+  { name: 'Gray', value: 'gray600' },
+].map((color) => {
+  return { ...color, icon: TbCircleFilled };
+}) as StyleConst<NodeColor>[];

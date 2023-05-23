@@ -10,7 +10,8 @@ import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
-import { calculatePerimeter, getDashValue } from '@/utils/shape';
+import { calculatePerimeter } from '@/utils/math';
+import { getDashValue, getSizeValue } from '@/utils/shape';
 import { getRectSize } from './helpers/calc';
 
 const RectDrawable = memo<NodeComponentProps>(
@@ -70,7 +71,7 @@ const RectDrawable = memo<NodeComponentProps>(
 
         const dash = getDashValue(
           totalLength,
-          node.style.size,
+          getSizeValue(node.style.size),
           node.style.line,
         );
 

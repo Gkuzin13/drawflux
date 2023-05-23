@@ -15,9 +15,9 @@ import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
-import { getValueFromRatio } from '@/utils/math';
+import { calculateLengthFromPoints, getValueFromRatio } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
-import { calculateLengthFromPoints, getDashValue } from '@/utils/shape';
+import { getDashValue, getSizeValue } from '@/utils/shape';
 import ArrowTransformer from './ArrowTransformer';
 import { calculateMinMaxMovementPoints } from './helpers/calc';
 import { drawArrowHead, drawLine } from './helpers/draw';
@@ -128,7 +128,11 @@ const ArrowDrawable = memo(
         setBendValue(bend ?? bendValue);
 
         const lineLength = calculateLengthFromPoints(updatedPoints);
-        const dash = getDashValue(lineLength, node.style.size, node.style.line);
+        const dash = getDashValue(
+          lineLength,
+          getSizeValue(node.style.size),
+          node.style.line,
+        );
 
         lineRef.current?.dash(dash.map((d) => d * stageConfig.scale));
       },

@@ -9,7 +9,8 @@ import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
-import { getDashValue, calculateCircumference } from '@/utils/shape';
+import { calculateCircumference } from '@/utils/math';
+import { getDashValue, getSizeValue } from '@/utils/shape';
 import { getEllipseRadius } from './helpers/calc';
 
 const EllipseDrawable = memo<NodeComponentProps>(
@@ -63,7 +64,7 @@ const EllipseDrawable = memo<NodeComponentProps>(
 
         const dash = getDashValue(
           totalLength,
-          node.style.size,
+          getSizeValue(node.style.size),
           node.style.line,
         );
 

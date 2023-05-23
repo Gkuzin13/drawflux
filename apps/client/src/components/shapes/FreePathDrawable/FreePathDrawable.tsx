@@ -8,8 +8,9 @@ import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
+import { calculateLengthFromPoints } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
-import { calculateLengthFromPoints, getDashValue } from '@/utils/shape';
+import { getDashValue, getSizeValue } from '@/utils/shape';
 import NodeTransformer from '../../NodeTransformer';
 import { pairPoints } from './helpers/points';
 
@@ -89,7 +90,7 @@ const FreePathDrawable = memo(
 
         const dash = getDashValue(
           totalLength,
-          node.style.size,
+          getSizeValue(node.style.size),
           node.style.line,
         );
 

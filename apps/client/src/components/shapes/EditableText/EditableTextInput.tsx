@@ -3,6 +3,7 @@ import { Html } from 'react-konva-utils';
 import type { NodeColor, NodeObject } from 'shared';
 import { KEYS } from '@/constants/keys';
 import { useClickAway } from '@/hooks/useClickAway/useClickAway';
+import { getSizeValue } from '@/utils/shape';
 import type { OnTextSaveArgs } from './EditableText';
 
 type Props = {
@@ -60,12 +61,16 @@ const EditableTextInput = ({ node, initialValue, onTextSave }: Props) => {
     }
   }, [ref.current]);
 
-  const { nodeProps } = node;
+  const {
+    nodeProps: { width, height },
+  } = node;
+
+  const size = getSizeValue(node.style.size);
 
   const style = getStyle(
-    nodeProps.width ? `${nodeProps.width}px` : `${Math.max(value.length, 1)}ch`,
-    nodeProps.height ? `${nodeProps.height}px` : `${node.style.size}`,
-    node.style.size,
+    width ? `${width}px` : `${Math.max(value.length, 1)}ch`,
+    height ? `${height}px` : `${size}`,
+    size,
     node.style.color,
   );
 
@@ -103,9 +108,9 @@ const EditableTextInput = ({ node, initialValue, onTextSave }: Props) => {
   return (
     <Html
       groupProps={{
-        x: nodeProps.point[0],
-        y: nodeProps.point[1],
-        rotation: nodeProps.rotation,
+        x: node.nodeProps.point[0],
+        y: node.nodeProps.point[1],
+        rotation: node.nodeProps.rotation,
       }}
     >
       <textarea

@@ -55,13 +55,3 @@ export const StyleButton = styled(RadioGroup.Item, ButtonStyled, {
     squared: true,
   },
 });
-
-export const ColorButton = styled(StyleButton, {
-  '&::after': {
-    content: '',
-    borderRadius: '$round',
-    minWidth: '$3',
-    minHeight: '$3',
-    backgroundColor: 'currentColor',
-  },
-});

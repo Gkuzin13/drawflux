@@ -1,7 +1,8 @@
 import type Konva from 'konva';
 import { useMemo } from 'react';
-import type { NodeObject, StageConfig } from 'shared';
-import { getDashValue, getShapeLength } from '@/utils/shape';
+import type { NodeColor, NodeObject, StageConfig, colors } from 'shared';
+import { getShapeLength } from '@/utils/math';
+import { getColorValue, getDashValue, getSizeValue } from '@/utils/shape';
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
@@ -10,13 +11,14 @@ type UseNodeShapeConfig = {
   id: string;
   visible: boolean;
   rotation: number;
-  stroke: string;
+  stroke: (typeof colors)[NodeColor];
   strokeWidth: number;
   dash: number[];
   listening: boolean;
 };
-type UseNodeConfig = typeof baseConfig &
-  WithRequired<Config, keyof UseNodeShapeConfig>;
+
+type UseNodeConfig = WithRequired<Config, keyof UseNodeShapeConfig> &
+  typeof baseConfig;
 
 type UseNodeReturn = {
   config: UseNodeConfig;
@@ -39,12 +41,14 @@ function useNode(
   const { scale: stageScale } = stageConfig;
 
   const config = useMemo(() => {
-    const shapeConfig: UseNodeConfig = {
+    const size = getSizeValue(node.style.size);
+
+    const shapeConfig: UseNodeShapeConfig & Config = {
       id: node.nodeProps.id,
       visible: node.nodeProps.visible,
       rotation: node.nodeProps.rotation,
-      stroke: node.style.color,
-      strokeWidth: node.style.size * stageScale,
+      stroke: getColorValue(node.style.color),
+      strokeWidth: size * stageScale,
       opacity: node.style.opacity,
       dash: [],
       listening: node.nodeProps.visible,
@@ -52,7 +56,7 @@ function useNode(
 
     if (!configOverrides || 'dash' in configOverrides === false) {
       const shapeLength = getShapeLength(node);
-      const dash = getDashValue(shapeLength, node.style.size, node.style.line);
+      const dash = getDashValue(shapeLength, size, node.style.line);
 
       shapeConfig.dash = dash.map((d) => d * stageScale);
     }

@@ -7,7 +7,7 @@ import useNode, { baseConfig } from './useNode';
 describe('useNode', () => {
   const node = createNode('arrow', [0, 0]);
   node.style.line = 'dotted';
-  node.style.size = 8;
+  node.style.size = 'extra-large';
 
   const stageConfig: StageConfig = {
     position: { x: 0, y: 0 },

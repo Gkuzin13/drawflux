@@ -1,5 +1,5 @@
-import type { NodeLine, NodeObject, Point } from 'shared';
-import { RECT } from '@/constants/node';
+import type { NodeColor, NodeLine, NodeSize } from 'shared';
+import { colors } from 'shared';
 
 export function getDashValue(
   shapeLength: number,
@@ -31,60 +31,25 @@ export function getDashValue(
   return [dashLength, dashGap];
 }
 
-export function calculateLengthFromPoints(points: Point[]) {
-  let length = 0;
-
-  for (let i = 0; i < points.length - 1; i++) {
-    const [x1, y1] = points[i];
-    const [x2, y2] = points[i + 1];
-    const deltaX = x2 - x1;
-    const deltaY = y2 - y1;
-
-    length += Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+export function getSizeValue(key: NodeSize) {
+  switch (key) {
+    case 'small':
+      return 2;
+    case 'medium':
+      return 4;
+    case 'large':
+      return 6;
+    case 'extra-large':
+      return 8;
+    default:
+      return 4;
   }
-
-  return length;
 }
 
-export function calculatePerimeter(
-  width: number,
-  height: number,
-  cornerRadius: number,
-) {
-  return 2 * (height + width - cornerRadius * (4 - Math.PI));
-}
-
-export function calculateCircumference(rx: number, ry: number): number {
-  const a = rx;
-  const b = ry;
-  const h = Math.pow(a - b, 2) / Math.pow(a + b, 2);
-
-  return Math.PI * (a + b) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
-}
-
-export function getShapeLength(node: NodeObject): number {
-  if (Array.isArray(node.nodeProps.points)) {
-    return calculateLengthFromPoints([
-      node.nodeProps.point,
-      ...node.nodeProps.points,
-    ]);
+export function getColorValue(key: NodeColor): (typeof colors)[NodeColor] {
+  if (key in colors) {
+    return colors[key];
   }
 
-  if (node.nodeProps.width && node.nodeProps.height) {
-    if (node.type === 'ellipse') {
-      return calculateCircumference(
-        node.nodeProps.width,
-        node.nodeProps.height,
-      );
-    }
-    if (node.type === 'rectangle') {
-      return calculatePerimeter(
-        node.nodeProps.width,
-        node.nodeProps.height,
-        RECT.CORNER_RADIUS,
-      );
-    }
-  }
-
-  return 0;
+  return '#000000';
 }

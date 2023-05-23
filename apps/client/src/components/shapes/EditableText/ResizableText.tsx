@@ -7,6 +7,7 @@ import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
+import { getSizeValue } from '@/utils/shape';
 import NodeTransformer from '../../NodeTransformer';
 
 type Props = {
@@ -28,7 +29,7 @@ const ResizableText = ({
   const { config } = useNode(node, stageConfig, {
     fillEnabled: true,
     strokeWidth: 0,
-    fontSize: node.style.size * 8,
+    fontSize: getSizeValue(node.style.size) * 8,
     width: node.nodeProps.width,
     fill: node.style.color,
     dash: [],
