@@ -143,6 +143,7 @@ const Canvas = forwardRef<Ref, Props>(
 
         if (resetToolType) {
           dispatch(canvasActions.setToolType('select'));
+          dispatch(canvasActions.setSelectedNodesIds([node.nodeProps.id]));
         }
       },
       [dispatch],
