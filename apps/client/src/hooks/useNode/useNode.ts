@@ -54,7 +54,10 @@ function useNode(
       listening: node.nodeProps.visible,
     };
 
-    if (!configOverrides || 'dash' in configOverrides === false) {
+    if (
+      !configOverrides ||
+      ('dash' in configOverrides === false && node.style.line !== 'solid')
+    ) {
       const shapeLength = getShapeLength(node);
       const dash = getDashValue(shapeLength, size, node.style.line);
 
