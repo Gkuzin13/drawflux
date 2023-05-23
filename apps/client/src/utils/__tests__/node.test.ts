@@ -1,5 +1,3 @@
-import { colors } from 'shared';
-import { LINE, SIZE } from '@/constants/style';
 import { nodesGenerator } from '@/test/data-generators';
 import { createNode, reorderNodes } from '../node';
 
@@ -10,9 +8,9 @@ describe('createNode', () => {
     expect(node.type).toBe('arrow');
     expect(node.nodeProps.point).toEqual([180, 100]);
     expect(node.text).toBeNull();
-    expect(node.style.line).toBe(LINE[0].value);
-    expect(node.style.color).toBe(colors.black);
-    expect(node.style.size).toBe(SIZE[1].value);
+    expect(node.style.line).toBe('solid');
+    expect(node.style.color).toBe('black');
+    expect(node.style.size).toBe('medium');
     expect(node.style.animated).toBe(false);
     expect(node.nodeProps.id).toBeTruthy();
     expect(node.nodeProps.rotation).toBe(0);

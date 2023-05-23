@@ -11,7 +11,12 @@ import { queries } from '../../db/queries/index';
 
 const mockNode: NodeObject = {
   nodeProps: { id: 'node-id', point: [0, 0], rotation: 0, visible: true },
-  style: { size: 8, animated: false, color: '#000000', line: [0, 12] },
+  style: {
+    size: 'extra-large',
+    animated: false,
+    color: 'black',
+    line: 'solid',
+  },
   type: 'arrow',
   text: null,
 };
