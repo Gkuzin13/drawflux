@@ -9,27 +9,21 @@ import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
+import { getDashValue, calculateCircumference } from '@/utils/shape';
+import { getEllipseRadius } from './helpers/calc';
 
-const EllipseDrawable = memo(
-  ({
-    node,
-    selected,
-    draggable,
-    onNodeChange,
-    onPress,
-  }: NodeComponentProps) => {
+const EllipseDrawable = memo<NodeComponentProps>(
+  ({ node, selected, draggable, onNodeChange, onPress }) => {
     const { nodeRef, transformerRef } = useTransformer<Konva.Ellipse>([
       selected,
     ]);
 
     const { stageConfig } = useAppSelector(selectCanvas);
-
-    const { totalDashLength, config } = useNode(node, stageConfig);
-
-    useAnimatedDash({
+    const { config } = useNode(node, stageConfig);
+    const { animation } = useAnimatedDash({
       enabled: node.style.animated,
       elementRef: nodeRef,
-      totalDashLength,
+      totalDashLength: config.dash[0] + config.dash[1],
     });
 
     const handleDragEnd = useCallback(
@@ -46,12 +40,43 @@ const EllipseDrawable = memo(
       [node, onNodeChange, onPress],
     );
 
+    const handleTransformStart = useCallback(
+      (event: KonvaEventObject<Event>) => {
+        const ellipse = event.target as Konva.Ellipse;
+
+        ellipse.dashOffset(0);
+
+        if (node.style.animated && animation) {
+          animation.stop();
+        }
+      },
+      [node.style.animated, animation],
+    );
+
+    const handlTransform = useCallback(
+      (event: KonvaEventObject<Event>) => {
+        const ellipse = event.target as Konva.Ellipse;
+
+        const { radiusX, radiusY } = getEllipseRadius(ellipse);
+
+        const totalLength = calculateCircumference(radiusX, radiusY);
+
+        const dash = getDashValue(
+          totalLength,
+          node.style.size,
+          node.style.line,
+        );
+
+        ellipse.dash(dash.map((d) => d * stageConfig.scale));
+      },
+      [node.style.size, node.style.line, stageConfig.scale],
+    );
+
     const handleTransformEnd = useCallback(
       (event: KonvaEventObject<Event>) => {
         const ellipse = event.target as Konva.Ellipse;
 
-        const radiusX = (ellipse.width() * ellipse.scaleX()) / 2;
-        const radiusY = (ellipse.height() * ellipse.scaleY()) / 2;
+        const { radiusX, radiusY } = getEllipseRadius(ellipse);
 
         onNodeChange({
           ...node,
@@ -64,9 +89,13 @@ const EllipseDrawable = memo(
           },
         });
 
+        if (node.style.animated && animation && !animation.isRunning()) {
+          animation.start();
+        }
+
         ellipse.scale({ x: 1, y: 1 });
       },
-      [node, onNodeChange],
+      [node, animation, onNodeChange],
     );
 
     return (
@@ -80,11 +109,18 @@ const EllipseDrawable = memo(
           {...config}
           draggable={draggable}
           onDragEnd={handleDragEnd}
+          onTransformStart={handleTransformStart}
+          onTransform={handlTransform}
           onTransformEnd={handleTransformEnd}
           onTap={() => onPress(node.nodeProps.id)}
           onClick={() => onPress(node.nodeProps.id)}
         />
-        {selected && <NodeTransformer ref={transformerRef} />}
+        {selected && (
+          <NodeTransformer
+            ref={transformerRef}
+            transformerConfig={{ keepRatio: false }}
+          />
+        )}
       </>
     );
   },

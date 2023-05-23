@@ -4,27 +4,26 @@ import { memo, useCallback } from 'react';
 import { Rect } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import NodeTransformer from '@/components/NodeTransformer';
+import { RECT } from '@/constants/node';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
+import { calculatePerimeter, getDashValue } from '@/utils/shape';
+import { getRectSize } from './helpers/calc';
 
-const RectDrawable = memo(
-  ({
-    node,
-    selected,
-    draggable,
-    onNodeChange,
-    onPress,
-  }: NodeComponentProps) => {
+const RectDrawable = memo<NodeComponentProps>(
+  ({ node, selected, draggable, onNodeChange, onPress }) => {
     const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
-
     const { stageConfig } = useAppSelector(selectCanvas);
+    const { config } = useNode(node, stageConfig);
 
-    const { totalDashLength, config } = useNode(node, stageConfig);
+    const totalDashLength = config.dash.length
+      ? config.dash[0] + config.dash[1]
+      : 0;
 
-    useAnimatedDash({
+    const { animation } = useAnimatedDash({
       enabled: node.style.animated,
       elementRef: nodeRef,
       totalDashLength,
@@ -44,44 +43,85 @@ const RectDrawable = memo(
       [node, onNodeChange, onPress],
     );
 
+    const handleTransformStart = useCallback(
+      (event: KonvaEventObject<Event>) => {
+        const rect = event.target as Konva.Rect;
+
+        rect.dashOffset(0);
+
+        if (node.style.animated && animation) {
+          animation.stop();
+        }
+      },
+      [node.style.animated, animation],
+    );
+
+    const handlTransform = useCallback(
+      (event: KonvaEventObject<Event>) => {
+        const rect = event.target as Konva.Rect;
+
+        const { width, height } = getRectSize(rect);
+
+        const totalLength = calculatePerimeter(
+          width,
+          height,
+          RECT.CORNER_RADIUS,
+        );
+
+        const dash = getDashValue(
+          totalLength,
+          node.style.size,
+          node.style.line,
+        );
+
+        rect.dash(dash.map((d) => d * stageConfig.scale));
+      },
+      [node.style.size, node.style.line, stageConfig.scale],
+    );
+
     const handleTransformEnd = useCallback(
       (event: KonvaEventObject<Event>) => {
         if (!event.target) return;
 
         const rect = event.target as Konva.Rect;
 
-        const scaleX = rect.scaleX();
-        const scaleY = rect.scaleY();
-
-        rect.scaleX(1);
-        rect.scaleY(1);
+        const { width, height } = getRectSize(rect);
 
         onNodeChange({
           ...node,
           nodeProps: {
             ...node.nodeProps,
             point: [rect.x(), rect.y()],
-            width: Math.max(5, rect.width() * scaleX),
-            height: Math.max(rect.height() * scaleY),
+            width,
+            height,
             rotation: rect.rotation(),
           },
         });
+
+        if (node.style.animated && animation && !animation.isRunning()) {
+          animation.start();
+        }
+
+        rect.scaleX(1);
+        rect.scaleY(1);
       },
-      [node, onNodeChange],
+      [node, animation, onNodeChange],
     );
 
     return (
       <>
         <Rect
           ref={nodeRef}
+          {...config}
           x={node.nodeProps.point[0]}
           y={node.nodeProps.point[1]}
           width={node.nodeProps.width}
           height={node.nodeProps.height}
-          cornerRadius={8}
-          {...config}
+          cornerRadius={RECT.CORNER_RADIUS}
           draggable={draggable}
           onDragEnd={handleDragEnd}
+          onTransformStart={handleTransformStart}
+          onTransform={handlTransform}
           onTransformEnd={handleTransformEnd}
           onTap={() => onPress(node.nodeProps.id)}
           onClick={() => onPress(node.nodeProps.id)}
@@ -89,7 +129,7 @@ const RectDrawable = memo(
         {selected && (
           <NodeTransformer
             ref={transformerRef}
-            transformerConfig={{ id: node.nodeProps.id }}
+            transformerConfig={{ id: node.nodeProps.id, keepRatio: false }}
           />
         )}
       </>

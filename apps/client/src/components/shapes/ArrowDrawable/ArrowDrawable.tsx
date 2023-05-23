@@ -1,18 +1,26 @@
 import type Konva from 'konva';
 import { type KonvaEventObject } from 'konva/lib/Node';
-import { memo, useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { Group } from 'react-konva';
+import {
+  memo,
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Group, Line, Shape } from 'react-konva';
 import type { Point, NodeProps } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
+import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
 import { getValueFromRatio } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
-import ArrowHead from './ArrowHead';
-import ArrowLine from './ArrowLine';
+import { calculateLengthFromPoints, getDashValue } from '@/utils/shape';
 import ArrowTransformer from './ArrowTransformer';
 import { calculateMinMaxMovementPoints } from './helpers/calc';
+import { drawArrowHead, drawLine } from './helpers/draw';
 
 const defaultBend = 0.5;
 
@@ -28,15 +36,20 @@ const ArrowDrawable = memo(
       node.nodeProps.point,
       ...(node.nodeProps?.points || [node.nodeProps.point]),
     ]);
-    const [bendValue, setBendValue] = useState<number>(
+    const [bendValue, setBendValue] = useState(
       node.nodeProps.bend ?? defaultBend,
     );
     const [dragging, setDragging] = useState(false);
 
     const { stageConfig } = useAppSelector(selectCanvas);
+    const { config } = useNode(node, stageConfig);
 
-    const { scaledLine, config } = useNode(node, stageConfig, {
-      dash: undefined,
+    const lineRef = useRef<Konva.Line>(null);
+
+    const { animation } = useAnimatedDash({
+      enabled: node.style.animated,
+      elementRef: lineRef,
+      totalDashLength: config.dash[0] + config.dash[1],
     });
 
     useLayoutEffect(() => {
@@ -54,12 +67,14 @@ const ArrowDrawable = memo(
       return calculateMinMaxMovementPoints(start, end);
     }, [start, end]);
 
-    const control = useMemo(() => {
-      return {
-        x: getValueFromRatio(bendValue, minPoint.x, maxPoint.x),
-        y: getValueFromRatio(bendValue, minPoint.y, maxPoint.y),
-      };
+    const control = useMemo((): Point => {
+      return [
+        getValueFromRatio(bendValue, minPoint.x, maxPoint.x),
+        getValueFromRatio(bendValue, minPoint.y, maxPoint.y),
+      ];
     }, [bendValue, minPoint, maxPoint]);
+
+    const flattenedPoints = useMemo(() => points.flat(), [points]);
 
     const handleDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
@@ -93,6 +108,33 @@ const ArrowDrawable = memo(
       [node, points, selected, onNodeChange, onPress],
     );
 
+    const handleTransformStart = useCallback(() => {
+      if (!lineRef.current) {
+        return;
+      }
+
+      const line = lineRef.current;
+
+      line.dashOffset(0);
+
+      if (node.style.animated && animation) {
+        animation.stop();
+      }
+    }, [node.style.animated, animation]);
+
+    const handleTransform = useCallback(
+      (updatedPoints: Point[], bend: NodeProps['bend']) => {
+        setPoints(updatedPoints);
+        setBendValue(bend ?? bendValue);
+
+        const lineLength = calculateLengthFromPoints(updatedPoints);
+        const dash = getDashValue(lineLength, node.style.size, node.style.line);
+
+        lineRef.current?.dash(dash.map((d) => d * stageConfig.scale));
+      },
+      [bendValue, node.style.line, node.style.size, stageConfig.scale],
+    );
+
     const handleTransformEnd = useCallback(
       (updatedPoints: Point[], bend: NodeProps['bend']) => {
         setPoints(updatedPoints);
@@ -108,14 +150,6 @@ const ArrowDrawable = memo(
         });
       },
       [node, bendValue, onNodeChange],
-    );
-
-    const handleTransform = useCallback(
-      (updatedPoints: Point[], bend: NodeProps['bend']) => {
-        setPoints(updatedPoints);
-        setBendValue(bend ?? bendValue);
-      },
-      [bendValue],
     );
 
     const shouldTransformerRender = useMemo(() => {
@@ -134,17 +168,20 @@ const ArrowDrawable = memo(
           onTap={() => onPress(node.nodeProps.id)}
           onClick={() => onPress(node.nodeProps.id)}
         >
-          <ArrowHead
-            control={[control.x, control.y]}
-            end={end}
-            config={config}
+          <Shape
+            {...config}
+            x={end[0]}
+            y={end[1]}
+            dash={[]}
+            sceneFunc={(ctx, shape) =>
+              drawArrowHead(ctx, shape, control, end, config.strokeWidth)
+            }
           />
-          <ArrowLine
-            points={[start, end]}
-            control={[control.x, control.y]}
-            dash={scaledLine}
-            animated={node.style.animated}
-            config={config}
+          <Line
+            ref={lineRef}
+            {...config}
+            points={flattenedPoints}
+            sceneFunc={(ctx, shape) => drawLine(ctx, shape, points, control)}
           />
         </Group>
         {shouldTransformerRender && (
@@ -152,9 +189,10 @@ const ArrowDrawable = memo(
             draggable={draggable}
             start={start}
             end={end}
-            bendPoint={[control.x, control.y]}
+            bendPoint={control}
             bendMovement={{ min: minPoint, max: maxPoint }}
             stageScale={stageConfig.scale}
+            onTranformStart={handleTransformStart}
             onTransform={handleTransform}
             onTransformEnd={handleTransformEnd}
           />

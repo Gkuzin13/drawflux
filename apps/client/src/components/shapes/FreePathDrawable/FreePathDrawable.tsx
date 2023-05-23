@@ -9,7 +9,9 @@ import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
 import { getPointsAbsolutePosition } from '@/utils/position';
+import { calculateLengthFromPoints, getDashValue } from '@/utils/shape';
 import NodeTransformer from '../../NodeTransformer';
+import { pairPoints } from './helpers/points';
 
 const FreePathDrawable = memo(
   ({
@@ -21,13 +23,12 @@ const FreePathDrawable = memo(
   }: NodeComponentProps) => {
     const { nodeRef, transformerRef } = useTransformer<Konva.Line>([selected]);
     const { stageConfig } = useAppSelector(selectCanvas);
+    const { config } = useNode(node, stageConfig);
 
-    const { totalDashLength, config } = useNode(node, stageConfig);
-
-    useAnimatedDash({
+    const { animation } = useAnimatedDash({
       enabled: node.style.animated,
       elementRef: nodeRef,
-      totalDashLength,
+      totalDashLength: config.dash[0] + config.dash[1],
     });
 
     const flattenedPoints = useMemo(() => {
@@ -56,6 +57,45 @@ const FreePathDrawable = memo(
         onPress(node.nodeProps.id);
       },
       [node, onNodeChange, onPress],
+    );
+
+    const handleTransformStart = useCallback(
+      (event: KonvaEventObject<Event>) => {
+        const line = event.target as Konva.Line;
+
+        line.dashOffset(0);
+
+        if (node.style.animated && animation) {
+          animation.stop();
+        }
+      },
+      [node.style.animated, animation],
+    );
+
+    const handlTransform = useCallback(
+      (event: KonvaEventObject<Event>) => {
+        const line = event.target as Konva.Line;
+        const stage = line.getStage() as Konva.Stage;
+        const points = [line.x(), line.y(), ...line.points()];
+
+        const pairedPoints = pairPoints(points);
+        const updatedPoints = getPointsAbsolutePosition(
+          pairedPoints,
+          line,
+          stage,
+        );
+
+        const totalLength = calculateLengthFromPoints(updatedPoints);
+
+        const dash = getDashValue(
+          totalLength,
+          node.style.size,
+          node.style.line,
+        );
+
+        line.dash(dash.map((d) => d * stageConfig.scale));
+      },
+      [node.style.size, node.style.line, stageConfig.scale],
     );
 
     const handleTransformEnd = useCallback(
@@ -89,6 +129,8 @@ const FreePathDrawable = memo(
           {...config}
           draggable={draggable}
           onDragEnd={handleDragEnd}
+          onTransformStart={handleTransformStart}
+          onTransform={handlTransform}
           onTransformEnd={handleTransformEnd}
           onTap={() => onPress(node.nodeProps.id)}
           onClick={() => onPress(node.nodeProps.id)}

@@ -18,6 +18,7 @@ type Props = {
   };
   draggable: boolean;
   stageScale: number;
+  onTranformStart: () => void;
   onTransform: (updatedPoints: Point[], bend?: number) => void;
   onTransformEnd: (updatedPoints: Point[], bend?: number) => void;
 };
@@ -31,6 +32,7 @@ const ArrowTransformer = ({
   bendMovement,
   draggable,
   stageScale,
+  onTranformStart,
   onTransform,
   onTransformEnd,
 }: Props) => {
@@ -61,13 +63,15 @@ const ArrowTransformer = ({
   );
 
   const handleDragStart = useCallback(() => {
+    onTranformStart();
+
     if (!transformerRef.current) {
       return;
     }
 
     const transformer = transformerRef.current;
     transformer.visible(false);
-  }, [transformerRef]);
+  }, [transformerRef, onTranformStart]);
 
   const handleDragMove = useCallback(
     (event: KonvaEventObject<DragEvent>, index: number) => {
