@@ -4,18 +4,18 @@ import { colors } from 'shared';
 
 export const LINE = [
   {
-    value: [0, 0],
-    name: 'solid',
+    value: 'solid',
+    name: 'Solid',
     icon: TbMinus,
   },
   {
-    value: [16, 12],
-    name: 'dashed',
+    value: 'dashed',
+    name: 'Dashed',
     icon: TbLineDashed,
   },
   {
-    value: [1, 12],
-    name: 'dotted',
+    value: 'dotted',
+    name: 'Dotted',
     icon: TbLineDotted,
   },
 ] as const;

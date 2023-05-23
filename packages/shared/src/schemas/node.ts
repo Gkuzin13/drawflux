@@ -10,11 +10,12 @@ const Type = z.union([
   z.literal('text'),
 ]);
 
-const SizeStyle = z.union([
-  z.literal(2),
-  z.literal(4),
-  z.literal(6),
-  z.literal(8),
+const Size = z.union([z.literal(2), z.literal(4), z.literal(6), z.literal(8)]);
+
+const Line = z.union([
+  z.literal('solid'),
+  z.literal('dashed'),
+  z.literal('dotted'),
 ]);
 
 const NodePoint = z.tuple([z.number(), z.number()]);
@@ -32,8 +33,8 @@ const NodeProps = z.object({
 
 const Style = z.object({
   color: createUnionSchema(Object.values(colors)),
-  line: z.tuple([z.number(), z.number()]),
-  size: SizeStyle,
+  line: Line,
+  size: Size,
   animated: z.boolean().optional(),
   opacity: z.number().optional(),
 });

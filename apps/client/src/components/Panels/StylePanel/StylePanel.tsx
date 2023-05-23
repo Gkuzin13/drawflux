@@ -1,5 +1,4 @@
-import { useCallback, useMemo } from 'react';
-import type { NodeColor, NodeLine, NodeStyle } from 'shared';
+import type { NodeColor, NodeStyle } from 'shared';
 import { ICON_SIZES } from '@/constants/icon';
 import { ANIMATED, COLOR, LINE, SIZE } from '@/constants/style';
 import { capitalizeFirstLetter } from '@/utils/string';
@@ -33,43 +32,22 @@ const StylePanel = ({
     onStyleChange({ color });
   };
 
-  const handleLineSelect = useCallback(
-    (lineName: (typeof LINE)[number]['name']) => {
-      const value = LINE.find((l) => l.name === lineName)?.value;
+  const handleLineSelect = (value: (typeof LINE)[number]['value']) => {
+    onStyleChange({
+      animated: style.animated && value !== 'solid' ? true : false,
+      line: value,
+    });
+  };
 
-      onStyleChange({
-        animated: style.animated && lineName !== 'solid' ? true : false,
-        line: value as NodeLine,
-      });
-    },
-    [style.animated, onStyleChange],
-  );
-
-  const handleAnimatedSelect = useCallback(() => {
+  const handleAnimatedSelect = () => {
     onStyleChange({ animated: !style.animated });
-  }, [style.animated, onStyleChange]);
+  };
 
-  const handleSizeSelect = useCallback(
-    (sizeName: (typeof SIZE)[number]['name']) => {
-      const value = SIZE.find((s) => s.name === sizeName)?.value;
+  const handleSizeSelect = (sizeName: (typeof SIZE)[number]['name']) => {
+    const value = SIZE.find((s) => s.name === sizeName)?.value;
 
-      onStyleChange({ size: value });
-    },
-    [onStyleChange],
-  );
-
-  const isLineStyleActive = useCallback(
-    (value: Readonly<NodeLine>) => {
-      return style.line
-        ? value.every((line, index) => line === style.line?.[index])
-        : false;
-    },
-    [style.line],
-  );
-
-  const animatedStyleDisabled = useMemo(() => {
-    return style.line ? style.line.every((l) => l === 0) : false;
-  }, [style.line]);
+    onStyleChange({ size: value });
+  };
 
   return (
     <StyleContainer active={active}>
@@ -88,7 +66,6 @@ const StylePanel = ({
             return (
               <ColorButton
                 key={color.value}
-                id={color.value}
                 title={capitalizeFirstLetter(color.name)}
                 value={color.value}
                 checked={color.value === style.color}
@@ -116,13 +93,13 @@ const StylePanel = ({
               {LINE.map((line) => {
                 return (
                   <StyleButton
-                    key={line.name}
-                    id={line.name}
-                    value={line.name}
-                    title={capitalizeFirstLetter(line.name)}
-                    checked={isLineStyleActive(line.value)}
+                    aria-label="Select Line"
+                    key={line.value}
+                    value={line.value}
+                    title={line.name}
+                    checked={line.value === style.line}
                     color={
-                      isLineStyleActive(line.value)
+                      line.value === style.line
                         ? 'secondary'
                         : 'secondary-light'
                     }
@@ -142,7 +119,7 @@ const StylePanel = ({
               title={capitalizeFirstLetter(ANIMATED.value)}
               pressed={style.animated}
               color={style.animated ? 'primary' : 'secondary-light'}
-              disabled={animatedStyleDisabled}
+              disabled={style.line === 'solid'}
               onPressedChange={handleAnimatedSelect}
             >
               {style.animated ? 'On' : 'Off'}

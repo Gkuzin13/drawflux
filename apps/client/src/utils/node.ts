@@ -1,8 +1,8 @@
 import type { IRect } from 'konva/lib/types';
-import type { NodeLine, NodeType, Point, NodeObject, NodeProps } from 'shared';
+import type { NodeType, Point, NodeObject, NodeProps } from 'shared';
 import { colors } from 'shared';
 import { v4 as uuid } from 'uuid';
-import { LINE, SIZE } from '../constants/style';
+import { SIZE } from '../constants/style';
 import { getNodeRect, isNodePartiallyInView } from './position';
 
 export const createNode = (type: NodeType, point: Point): NodeObject => {
@@ -10,7 +10,7 @@ export const createNode = (type: NodeType, point: Point): NodeObject => {
     type,
     text: null,
     style: {
-      line: LINE[0].value as NodeLine,
+      line: 'solid',
       color: colors.black,
       size: SIZE[1].value,
       animated: false,

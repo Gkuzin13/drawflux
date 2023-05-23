@@ -6,25 +6,13 @@ import useNode, { baseConfig } from './useNode';
 
 describe('useNode', () => {
   const node = createNode('arrow', [0, 0]);
-  node.style.line = [1, 1];
+  node.style.line = 'dotted';
   node.style.size = 8;
 
   const stageConfig: StageConfig = {
     position: { x: 0, y: 0 },
     scale: 1.5,
   };
-
-  it('should calculate scaled line correctly', () => {
-    const { result } = renderHook(() => useNode(node, stageConfig));
-
-    expect(result.current.scaledLine).toEqual([1.5, 1.5]);
-  });
-
-  it('should calculate the total dash length correctly', () => {
-    const { result } = renderHook(() => useNode(node, stageConfig));
-
-    expect(result.current.totalDashLength).toEqual(3);
-  });
 
   it('should return computed config correctly', () => {
     const { result } = renderHook(() => useNode(node, stageConfig));

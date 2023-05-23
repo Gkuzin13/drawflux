@@ -69,14 +69,14 @@ const Panels = ({
     const styles: NodeStyle[] = selectedNodes.map(({ style }) => style);
 
     const colors = new Set(styles.map(({ color }) => color));
-    const lines = new Map(styles.map(({ line }) => [`${line}`, line]));
+    const lines = new Set(styles.map(({ line }) => line));
     const sizes = new Set(styles.map(({ size }) => size));
     const opacities = new Set(styles.map(({ opacity }) => opacity));
     const animated = styles.every(({ animated }) => animated);
 
     return {
       color: colors.size > 1 ? undefined : Array.from(colors)[0],
-      line: lines.size > 1 ? undefined : Array.from(lines.values())[0],
+      line: lines.size > 1 ? undefined : Array.from(lines)[0],
       size: sizes.size > 1 ? undefined : Array.from(sizes)[0],
       opacity: opacities.size > 1 ? undefined : Array.from(opacities)[0],
       animated,
