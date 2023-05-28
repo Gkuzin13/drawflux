@@ -1,7 +1,7 @@
 import type {
   NodeObject,
-  SharePageParams,
-  SharedPage,
+  SharePageRequestBody,
+  GetPageResponse,
   StageConfig,
 } from 'shared';
 import request from 'supertest';
@@ -50,7 +50,7 @@ describe('db queries', () => {
 
   describe('POST /p', () => {
     it('should return the page', async () => {
-      const mockPage: SharePageParams = {
+      const mockPage: SharePageRequestBody = {
         page: {
           stageConfig: mockStageConfig,
           nodes: [mockNode],
@@ -66,7 +66,7 @@ describe('db queries', () => {
 
   describe('GET /p', () => {
     it('should return the page', async () => {
-      const mockPage: SharePageParams = {
+      const mockPage: SharePageRequestBody = {
         page: {
           stageConfig: mockStageConfig,
           nodes: [mockNode],
@@ -78,7 +78,7 @@ describe('db queries', () => {
         .get(`/p/${postResponse.body.data.id}`)
         .send();
 
-      const returnedPage: SharedPage = {
+      const returnedPage: GetPageResponse = {
         page: {
           ...mockPage.page,
           id: postResponse.body.data.id,

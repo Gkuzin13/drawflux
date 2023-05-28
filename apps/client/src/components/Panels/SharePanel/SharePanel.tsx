@@ -1,7 +1,7 @@
 import * as Popover from '@radix-ui/react-popover';
 import { useEffect, useState } from 'react';
 import { TbClipboardCheck, TbCopy, TbLink } from 'react-icons/tb';
-import type { GetQRCodeResponse, SharePageParams } from 'shared';
+import type { QRCodeResponse, SharePageRequestBody } from 'shared';
 import Button from '@/components/core/Button/Button';
 import { Divider } from '@/components/core/Divider/Divider';
 import Loader from '@/components/core/Loader/Loader';
@@ -19,17 +19,17 @@ import {
 } from './SharePanelStyled';
 
 type Props = {
-  pageState: SharePageParams;
+  pageState: SharePageRequestBody;
   isPageShared: boolean;
 };
 
 type ShareablePageProps = {
-  page: SharePageParams['page'];
+  page: SharePageRequestBody['page'];
 };
 
 type SharedPageContentProps = {
-  qrCode?: GetQRCodeResponse;
-  onQRCodeFetchSuccess: (data: GetQRCodeResponse) => void;
+  qrCode?: QRCodeResponse;
+  onQRCodeFetchSuccess: (data: QRCodeResponse) => void;
 };
 
 const SharedPageContent = ({
@@ -130,7 +130,7 @@ const SharablePageContent = ({ page }: ShareablePageProps) => {
 };
 
 const SharePanel = ({ pageState, isPageShared }: Props) => {
-  const [linkQRCode, setLinkQRCode] = useState<GetQRCodeResponse>();
+  const [linkQRCode, setLinkQRCode] = useState<QRCodeResponse>();
 
   return (
     <Popover.Root>

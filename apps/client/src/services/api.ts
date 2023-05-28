@@ -1,12 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type {
-  GetPageParams,
-  SharePageParams,
+  SharePageRequestBody,
   ServerResponse,
-  SharedPage,
+  GetPageResponse,
   SharePageResponse,
-  GetQRCodeResponse,
-  PostQRCodeBody,
+  QRCodeResponse,
+  QRCodeRequestBody,
 } from 'shared';
 import { BASE_URL } from '@/constants/app';
 
@@ -19,7 +18,7 @@ export const api = createApi({
         : 'http://localhost:7456/',
   }),
   endpoints: (builder) => ({
-    getPage: builder.query<ServerResponse<SharedPage>, GetPageParams>({
+    getPage: builder.query<ServerResponse<GetPageResponse>, { id: string }>({
       query(params) {
         return {
           url: `/p/${params.id}`,
@@ -28,7 +27,7 @@ export const api = createApi({
     }),
     sharePage: builder.mutation<
       ServerResponse<SharePageResponse>,
-      SharePageParams
+      SharePageRequestBody
     >({
       query(body) {
         return {
@@ -39,8 +38,8 @@ export const api = createApi({
       },
     }),
     getQRCode: builder.mutation<
-      ServerResponse<GetQRCodeResponse>,
-      PostQRCodeBody
+      ServerResponse<QRCodeResponse>,
+      QRCodeRequestBody
     >({
       query(body) {
         return {
