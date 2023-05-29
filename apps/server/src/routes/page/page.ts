@@ -1,9 +1,9 @@
 import Router from 'express-promise-router';
 import type { QueryResult } from 'pg';
 import pg from 'pg';
-import type { SharePageParams, SharePageResponse } from 'shared';
+import type { SharePageResponse } from 'shared';
 import { BadRequestError, Schemas } from 'shared';
-import { ZodError } from 'zod';
+import { zodParse } from 'src/utils/parse/zod-parse';
 import * as db from '../../db/index';
 import { queries } from '../../db/queries/index';
 import type {
@@ -18,12 +18,14 @@ const pageRouter = Router();
 pageRouter.get(
   '/:id',
   loadRoute(async (req) => {
+    const params = await zodParse(Schemas.SharePageResponse, req.params);
+
     const client = await db.getClient();
 
     try {
       const { rows }: QueryResult<PageRowObject> = await db.query<GetPageArgs>(
         queries.getPage,
-        [req.params.id],
+        [params.id],
       );
 
       if (!rows.length) {
@@ -46,24 +48,20 @@ pageRouter.get(
 pageRouter.post(
   '/',
   loadRoute(async (req) => {
+    const body = await zodParse(Schemas.SharePageRequestBody, req.body);
+
     const client = await db.getClient();
 
     try {
-      const { page }: SharePageParams = req.body;
-
-      await Schemas.StageConfig.parseAsync(page.stageConfig);
-      await Schemas.Node.array().parseAsync(page.nodes);
-
       const { rows }: QueryResult<SharePageResponse> =
         await db.query<SharePageArgs>(queries.sharePage, [
-          JSON.stringify(page.stageConfig),
-          JSON.stringify(page.nodes),
+          JSON.stringify(body.page.stageConfig),
+          JSON.stringify(body.page.nodes),
         ]);
 
       return { id: rows[0].id };
     } catch (error) {
-      if (error instanceof pg.DatabaseError || error instanceof ZodError) {
-        console.log(error);
+      if (error instanceof pg.DatabaseError) {
         throw new BadRequestError('Invalid request body', 400);
       }
     } finally {

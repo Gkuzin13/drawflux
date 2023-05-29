@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as QRCode from 'qrcode';
-import { BadRequestError, type GetQRCodeResponse } from 'shared';
+import { BadRequestError, Schemas, type QRCodeResponse } from 'shared';
+import { zodParse } from 'src/utils/parse/zod-parse';
 import { loadRoute } from '../../utils/route/route';
 
 const qrCodeRouter = Router();
@@ -8,14 +9,14 @@ const qrCodeRouter = Router();
 qrCodeRouter.post(
   '/',
   loadRoute(async (req) => {
-    const url = req.body?.url as string;
+    const body = await zodParse(Schemas.QRCodeRequestBody, req.body);
 
     try {
-      const dataUrl = await QRCode.toDataURL(url);
+      const dataUrl = await QRCode.toDataURL(body.url);
 
-      return { dataUrl } as GetQRCodeResponse;
+      return { dataUrl } as QRCodeResponse;
     } catch (error) {
-      throw new BadRequestError(error as string, 400);
+      throw new BadRequestError(JSON.stringify(error), 400);
     }
   }),
 );

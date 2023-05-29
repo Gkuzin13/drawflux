@@ -1,9 +1,9 @@
 import { type ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Html } from 'react-konva-utils';
-import type { NodeColor, NodeObject } from 'shared';
+import type { NodeObject } from 'shared';
 import { KEYS } from '@/constants/keys';
 import { useClickAway } from '@/hooks/useClickAway/useClickAway';
-import { getSizeValue } from '@/utils/shape';
+import { getColorValue, getSizeValue } from '@/utils/shape';
 import type { OnTextSaveArgs } from './EditableText';
 
 type Props = {
@@ -16,7 +16,7 @@ const getStyle = (
   width: string,
   height: string,
   fontSize: number,
-  color: NodeColor,
+  color: string,
 ): React.CSSProperties => {
   const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
@@ -71,7 +71,7 @@ const EditableTextInput = ({ node, initialValue, onTextSave }: Props) => {
     width ? `${width}px` : `${Math.max(value.length, 1)}ch`,
     height ? `${height}px` : `${size}`,
     size,
-    node.style.color,
+    getColorValue(node.style.color),
   );
 
   const handleTextChange = (text: string) => {

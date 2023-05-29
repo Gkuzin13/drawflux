@@ -1,4 +1,3 @@
-import bodyParser from 'body-parser';
 import compression from 'compression';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
@@ -23,8 +22,8 @@ app.use(
     origin: isProduction ? process.env.ORIGIN_URL : 'http://localhost:5174',
   }),
 );
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 mountRoutes(app);
 

@@ -21,7 +21,7 @@ const useAnimatedDash = ({
   totalDashLength,
 }: UseAnimatedDashArgs) => {
   const animation = useMemo(() => {
-    if (!elementRef.current) {
+    if (!elementRef.current || !enabled) {
       return null;
     }
 
@@ -36,19 +36,15 @@ const useAnimatedDash = ({
 
       element.dashOffset(-offset);
     }, element.getLayer());
-  }, [elementRef.current, totalDashLength]);
+  }, [elementRef.current, totalDashLength, enabled]);
 
   useEffect(() => {
     if (!animation) {
       return;
     }
 
-    if (enabled && !animation.isRunning()) {
+    if (enabled) {
       animation.start();
-    }
-
-    if (!enabled && animation.isRunning()) {
-      animation.stop();
     }
 
     return () => {
