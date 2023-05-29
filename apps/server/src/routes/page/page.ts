@@ -3,7 +3,6 @@ import type { QueryResult } from 'pg';
 import pg from 'pg';
 import type { SharePageResponse } from 'shared';
 import { BadRequestError, Schemas } from 'shared';
-import { zodParse } from 'src/utils/parse/zod-parse';
 import * as db from '../../db/index';
 import { queries } from '../../db/queries/index';
 import type {
@@ -11,6 +10,7 @@ import type {
   GetPageArgs,
   PageRowObject,
 } from '../../db/queries/types';
+import { zodParse } from '../../utils/parse/zod-parse';
 import { loadRoute } from '../../utils/route/route';
 
 const pageRouter = Router();

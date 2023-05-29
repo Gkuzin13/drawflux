@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as QRCode from 'qrcode';
 import { BadRequestError, Schemas, type QRCodeResponse } from 'shared';
-import { zodParse } from 'src/utils/parse/zod-parse';
+import { zodParse } from '../../utils/parse/zod-parse';
 import { loadRoute } from '../../utils/route/route';
 
 const qrCodeRouter = Router();
