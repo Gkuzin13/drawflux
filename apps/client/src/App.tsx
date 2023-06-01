@@ -28,14 +28,13 @@ import { urlSearchParam } from './utils/url';
 
 const App = () => {
   const [intersectedNodesIds, setIntersectedNodesIds] = useState<string[]>([]);
-
-  const id = useMemo(() => urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY), []);
+  const pageId = urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY);
 
   const { isLoading, isError, isSuccess } = useGetPageQuery(
     {
-      id: id as string,
+      id: pageId as string,
     },
-    { skip: !id },
+    { skip: !pageId },
   );
 
   const { stageConfig, selectedNodesIds, nodes } = useAppSelector(selectCanvas);
@@ -54,7 +53,7 @@ const App = () => {
   }, [selectedNodesIds]);
 
   useEffect(() => {
-    if (id) {
+    if (pageId) {
       return;
     }
 
@@ -69,7 +68,7 @@ const App = () => {
 
       dispatch(canvasActions.set(stateFromStorage.page));
     }
-  }, [id, dispatch]);
+  }, [pageId, dispatch]);
 
   useEffect(() => {
     if (isError) {
