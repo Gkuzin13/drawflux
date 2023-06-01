@@ -60,27 +60,27 @@ const NodeGroupTransformer = ({ nodes, draggable, onDragEnd }: Props) => {
     const stage = group.getStage() as Konva.Stage;
     const children = group.getChildren();
 
+    const nodesMap = new Map<string, NodeObject>(
+      nodes.map((node) => [node.nodeProps.id, node]),
+    );
+
     const updatedNodes = children
       .map((child) => {
-        const node = nodes.find((node) => node.nodeProps.id === child.id());
+        const node = nodesMap.get(child.id());
 
         if (!node) return;
 
         if (node.nodeProps.points) {
           const points = [node.nodeProps.point, ...node.nodeProps.points];
 
-          const [firstPoint, ...restPoints] = getPointsAbsolutePosition(
-            points,
-            child,
-            stage,
-          );
+          const updatedPoints = getPointsAbsolutePosition(points, child, stage);
 
           return {
             ...node,
             nodeProps: {
               ...node.nodeProps,
-              point: firstPoint,
-              points: restPoints,
+              point: updatedPoints[0],
+              points: updatedPoints.slice(1),
             },
           };
         }

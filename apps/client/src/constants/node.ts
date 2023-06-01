@@ -1,5 +1,3 @@
-export const BACKGROUND_LAYER_ID = 'BackgroundLayerRect';
-
 export const TRANSFORMER = {
   MIN_SIZE: 5,
   ROTATION_SNAPS: [0, 90, 180, 270],

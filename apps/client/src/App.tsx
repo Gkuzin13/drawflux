@@ -4,7 +4,6 @@ import type { StageConfig } from 'shared';
 import Canvas from '@/components/Canvas/Canvas';
 import {
   getIntersectingNodes,
-  getLayerChildren,
   getPointerRect,
 } from '@/components/Canvas/helpers/stage';
 import ContextMenu from '@/components/ContextMenu/ContextMenu';
@@ -114,7 +113,7 @@ const App = () => {
     const pointerRect = getPointerRect(pointerPosition, stageConfig.scale);
     const multipleNodesSelected = Object.keys(selectedNodesIds).length > 1;
 
-    const children = getLayerChildren(stage.getLayers()[0]);
+    const children = stage.getLayers()[0].getChildren((child) => !!child.id());
 
     const nodesInClickArea = getIntersectingNodes(children, pointerRect);
     const clickedOnNodes = nodesInClickArea.length > 0;

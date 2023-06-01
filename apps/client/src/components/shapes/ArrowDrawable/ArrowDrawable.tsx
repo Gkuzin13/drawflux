@@ -41,6 +41,8 @@ const ArrowDrawable = memo(
     );
     const [dragging, setDragging] = useState(false);
 
+    const [start, end] = points.length > 1 ? points : [points[0], points[0]];
+
     const { stageConfig } = useAppSelector(selectCanvas);
     const { config } = useNode(node, stageConfig);
 
@@ -60,8 +62,6 @@ const ArrowDrawable = memo(
 
       setBendValue(node.nodeProps.bend ?? defaultBend);
     }, [node.nodeProps.point, node.nodeProps.points, node.nodeProps.bend]);
-
-    const [start, end] = points;
 
     const { minPoint, maxPoint } = useMemo(() => {
       return calculateMinMaxMovementPoints(start, end);
@@ -97,6 +97,7 @@ const ArrowDrawable = memo(
             points: restPoints,
           },
         });
+
         group.position({ x: 0, y: 0 });
 
         setDragging(false);
@@ -109,15 +110,7 @@ const ArrowDrawable = memo(
     );
 
     const handleTransformStart = useCallback(() => {
-      if (!lineRef.current) {
-        return;
-      }
-
-      const line = lineRef.current;
-
-      line.dashOffset(0);
-
-      if (node.style.animated && animation) {
+      if (node.style.animated && animation && animation?.isRunning()) {
         animation.stop();
       }
     }, [node.style.animated, animation]);
@@ -152,8 +145,12 @@ const ArrowDrawable = memo(
             points: [updatedPoints[1]],
           },
         });
+
+        if (node.style.animated && animation && !animation?.isRunning()) {
+          animation.start();
+        }
       },
-      [node, bendValue, onNodeChange],
+      [node, bendValue, animation, onNodeChange],
     );
 
     const shouldTransformerRender = useMemo(() => {
@@ -185,7 +182,9 @@ const ArrowDrawable = memo(
             ref={lineRef}
             {...config}
             points={flattenedPoints}
-            sceneFunc={(ctx, shape) => drawLine(ctx, shape, points, control)}
+            sceneFunc={(ctx, shape) =>
+              drawLine(ctx, shape, [start, end], control)
+            }
           />
         </Group>
         {shouldTransformerRender && (

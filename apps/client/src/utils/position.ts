@@ -124,3 +124,12 @@ export function getCenterPosition(
     y: -position.y * scale + height / 2,
   };
 }
+
+export function getNormalizedInvertedRect(rect: IRect, scale: number): IRect {
+  return {
+    x: -rect.x / scale,
+    y: -rect.y / scale,
+    width: rect.width / scale,
+    height: rect.width / scale,
+  };
+}
