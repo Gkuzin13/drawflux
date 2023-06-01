@@ -97,6 +97,7 @@ const ArrowDrawable = memo(
             points: restPoints,
           },
         });
+
         group.position({ x: 0, y: 0 });
 
         setDragging(false);
@@ -109,15 +110,7 @@ const ArrowDrawable = memo(
     );
 
     const handleTransformStart = useCallback(() => {
-      if (!lineRef.current) {
-        return;
-      }
-
-      const line = lineRef.current;
-
-      line.dashOffset(0);
-
-      if (node.style.animated && animation) {
+      if (node.style.animated && animation && animation?.isRunning()) {
         animation.stop();
       }
     }, [node.style.animated, animation]);
@@ -152,8 +145,12 @@ const ArrowDrawable = memo(
             points: [updatedPoints[1]],
           },
         });
+
+        if (node.style.animated && animation && !animation?.isRunning()) {
+          animation.start();
+        }
       },
-      [node, bendValue, onNodeChange],
+      [node, bendValue, animation, onNodeChange],
     );
 
     const shouldTransformerRender = useMemo(() => {
