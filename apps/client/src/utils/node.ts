@@ -8,6 +8,7 @@ export const createNode = (type: NodeType, point: Point): NodeObject => {
     type,
     text: null,
     style: {
+      opacity: 1,
       line: 'solid',
       color: 'black',
       size: 'medium',

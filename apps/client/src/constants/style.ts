@@ -7,6 +7,7 @@ import {
   TbSlash,
 } from 'react-icons/tb';
 import type { NodeLine, NodeSize, NodeColor } from 'shared';
+import { Schemas } from 'shared';
 
 type StyleConst<V> = {
   value: V;
@@ -32,8 +33,14 @@ export const LINE: StyleConst<NodeLine>[] = [
   },
 ];
 
+export const OPACITY = {
+  minValue: Schemas.Node.shape.style.shape.opacity.minValue || 0.2,
+  maxValue: Schemas.Node.shape.style.shape.opacity.maxValue || 1,
+  step: 0.1,
+} as const;
+
 export const ANIMATED = {
-  name: 'animated',
+  name: 'Animated',
   value: 'animated',
 } as const;
 

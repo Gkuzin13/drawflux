@@ -41,7 +41,7 @@ const Style = z.object({
   line: Line,
   size: Size,
   animated: z.boolean().optional(),
-  opacity: z.number().optional(),
+  opacity: z.number().min(0.2).max(1),
 });
 
 export const Node = z.object({
