@@ -16,6 +16,7 @@ const mockNode: NodeObject = {
     animated: false,
     color: 'black',
     line: 'solid',
+    opacity: 1,
   },
   type: 'arrow',
   text: null,
