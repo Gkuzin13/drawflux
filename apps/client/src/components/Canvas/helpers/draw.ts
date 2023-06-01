@@ -1,21 +1,27 @@
-import type { NodeObject, Point } from 'shared';
+import type { NodeObject, NodeType, Point } from 'shared';
 import { normalizePoints } from '@/utils/draw';
 
-export const drawArrow = (node: NodeObject, position: Point) => {
+export function drawArrow(
+  node: NodeObject,
+  startPosition: Point,
+  currentPosition: Point,
+): NodeObject {
   return {
     ...node,
     nodeProps: {
       ...node.nodeProps,
-      points: [position],
+      point: startPosition,
+      points: [currentPosition],
     },
   };
-};
+}
 
-export const drawEllipse = (node: NodeObject, position: Point) => {
-  const [p1, p2] = normalizePoints(node.nodeProps.point, [
-    position[0],
-    position[1],
-  ]);
+export function drawEllipse(
+  node: NodeObject,
+  startPosition: Point,
+  currentPosition: Point,
+): NodeObject {
+  const [p1, p2] = normalizePoints(startPosition, currentPosition);
 
   return {
     ...node,
@@ -25,22 +31,30 @@ export const drawEllipse = (node: NodeObject, position: Point) => {
       height: p2[1] - p1[1],
     },
   };
-};
+}
 
-export const drawFreePath = (node: NodeObject, position: Point) => {
+export function drawFreePath(
+  node: NodeObject,
+  startPosition: Point,
+  currentPosition: Point,
+): NodeObject {
   const points = node.nodeProps?.points || [];
 
   return {
     ...node,
-    nodeProps: { ...node.nodeProps, points: [...points, position] },
+    nodeProps: {
+      ...node.nodeProps,
+      point: startPosition,
+      points: [...points, currentPosition],
+    },
   };
-};
+}
 
-export const drawRect = (
+export function drawRect(
   node: NodeObject,
   startPosition: Point,
   currentPosition: Point,
-) => {
+): NodeObject {
   const [p1, p2] = normalizePoints(startPosition, [
     currentPosition[0],
     currentPosition[1],
@@ -55,4 +69,21 @@ export const drawRect = (
       height: p2[1] - p1[1],
     },
   };
+}
+
+export type DrawableType = Exclude<NodeType, 'text'>;
+
+type DrawType = {
+  [key in DrawableType]: (
+    node: NodeObject,
+    startPosition: Point,
+    currentPosition: Point,
+  ) => NodeObject;
+};
+
+export const drawTypes: DrawType = {
+  arrow: drawArrow,
+  ellipse: drawEllipse,
+  rectangle: drawRect,
+  draw: drawFreePath,
 };

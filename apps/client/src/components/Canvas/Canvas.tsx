@@ -1,27 +1,27 @@
 import type Konva from 'konva';
 import { type KonvaEventObject, type NodeConfig } from 'konva/lib/Node';
-import type { IRect } from 'konva/lib/types';
 import {
   type PropsWithRef,
   forwardRef,
   useMemo,
-  useRef,
   useState,
   useCallback,
   useEffect,
+  useRef,
 } from 'react';
 import { Stage } from 'react-konva';
 import type { NodeObject, Point, StageConfig } from 'shared';
 import { CURSOR } from '@/constants/cursor';
-import { BACKGROUND_LAYER_ID } from '@/constants/node';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { uniq } from '@/utils/array';
 import { createNode } from '@/utils/node';
-import BackgroundRect from '../BackgroundRect';
+import { getNormalizedInvertedRect } from '@/utils/position';
+import BackgroundRect from '../BackgroundRect/BackgroundRect';
 import NodesLayer from '../NodesLayer';
 import SelectRect from '../SelectRect';
-import { drawArrow, drawEllipse, drawFreePath, drawRect } from './helpers/draw';
-import { getIntersectingNodes } from './helpers/stage';
+import { type DrawableType, drawTypes } from './helpers/draw';
+import { getNodesIntersectingWithRect } from './helpers/stage';
 import {
   calcNewStagePositionAndScale,
   isScaleOutOfRange,
@@ -37,16 +37,6 @@ type Props = PropsWithRef<{
 
 type Ref = Konva.Stage;
 
-type DrawPosition = {
-  start: Point;
-  current: Point;
-};
-
-const initialDrawPosition: DrawPosition = {
-  start: [0, 0],
-  current: [0, 0],
-};
-
 const Canvas = forwardRef<Ref, Props>(
   (
     {
@@ -60,7 +50,7 @@ const Canvas = forwardRef<Ref, Props>(
   ) => {
     const [draftNode, setDraftNode] = useState<NodeObject | null>(null);
     const [drawing, setDrawing] = useState(false);
-    const [drawPosition, setDrawPosition] = useState(initialDrawPosition);
+    const [drawPosition, setDrawPosition] = useState<Point>([0, 0]);
     const [draggingStage, setDraggingStage] = useState(false);
 
     const { stageConfig, toolType, selectedNodesIds, nodes } =
@@ -69,6 +59,8 @@ const Canvas = forwardRef<Ref, Props>(
     const dispatch = useAppDispatch();
 
     const selectRectRef = useRef<Konva.Rect>(null);
+    const backgroundRectRef = useRef<Konva.Rect>(null);
+    const drawStartPosition = useRef<Point>([0, 0]);
 
     const cursorStyle = useMemo(() => {
       switch (toolType) {
@@ -91,45 +83,6 @@ const Canvas = forwardRef<Ref, Props>(
       container.focus();
     }, [ref, toolType, selectedNodesIds, stageConfig]);
 
-    const getIntersectedNodes = useCallback(
-      (stage: Konva.Stage, rect: IRect) => {
-        const layer = stage.getLayers()[0];
-        const children = layer.getChildren((child) =>
-          nodes.some((node) => node.nodeProps.id === child.id()),
-        );
-
-        if (!children.length) return [];
-
-        const intersectedChildren = getIntersectingNodes(children, rect);
-
-        return [...new Set(intersectedChildren.map((child) => child.id()))];
-      },
-      [nodes],
-    );
-
-    const drawNodeByType = useCallback(
-      (node: NodeObject, position: Point): NodeObject => {
-        switch (node.type) {
-          case 'draw': {
-            return drawFreePath(node, position);
-          }
-          case 'arrow': {
-            return drawArrow(node, position);
-          }
-          case 'rectangle': {
-            return drawRect(node, drawPosition?.start, position);
-          }
-          case 'ellipse': {
-            return drawEllipse(node, position);
-          }
-          default: {
-            return node;
-          }
-        }
-      },
-      [drawPosition],
-    );
-
     const handleDraftEnd = useCallback(
       (node: NodeObject, resetToolType = true) => {
         setDraftNode(null);
@@ -149,6 +102,25 @@ const Canvas = forwardRef<Ref, Props>(
       [dispatch],
     );
 
+    const handleSelectDraw = useCallback(
+      (stage: Konva.Stage) => {
+        if (!selectRectRef.current) {
+          return;
+        }
+
+        const nodesIntersectedWithSelectRect = getNodesIntersectingWithRect(
+          stage,
+          nodes,
+          selectRectRef.current.getClientRect(),
+        );
+
+        onNodesIntersection(
+          uniq(nodesIntersectedWithSelectRect.map((node) => node.id())),
+        );
+      },
+      [selectRectRef, nodes, onNodesIntersection],
+    );
+
     const onStagePress = useCallback(
       (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
         const isMouseEvent = event.type === 'mousedown';
@@ -166,21 +138,24 @@ const Canvas = forwardRef<Ref, Props>(
         }
 
         const { x, y } = stage.getRelativePointerPosition();
+        const currentPoint: Point = [x, y];
 
-        setDrawPosition({ start: [x, y], current: [x, y] });
+        drawStartPosition.current = currentPoint;
 
         switch (toolType) {
           case 'hand':
             return;
           case 'select':
             setDrawing(true);
+            setDrawPosition(currentPoint);
             break;
           case 'text':
-            setDraftNode(createNode(toolType, [x, y]));
+            setDraftNode(createNode(toolType, currentPoint));
             break;
           default:
-            setDraftNode(createNode(toolType, [x, y]));
             setDrawing(true);
+            setDrawPosition(currentPoint);
+            setDraftNode(createNode(toolType, currentPoint));
             break;
         }
 
@@ -198,68 +173,40 @@ const Canvas = forwardRef<Ref, Props>(
         if (!drawing || !stage) return;
 
         const { x, y } = stage.getRelativePointerPosition();
+        const currentPoint: Point = [x, y];
 
-        setDrawPosition((prevState) => {
-          return { start: prevState.start, current: [x, y] };
-        });
-
-        if (toolType === 'select' && drawing && selectRectRef.current) {
-          const selectRect = selectRectRef.current.getClientRect();
-
-          onNodesIntersection(getIntersectedNodes(stage, selectRect));
+        if (toolType === 'select') {
+          setDrawPosition(currentPoint);
+          handleSelectDraw(stage);
           return;
         }
 
-        setDraftNode((prevNode) => {
-          return prevNode ? drawNodeByType(prevNode, [x, y]) : prevNode;
-        });
+        if (draftNode && draftNode.type !== 'text') {
+          const drawFn = drawTypes[draftNode.type as DrawableType];
+          const updatedNode = drawFn(
+            draftNode,
+            drawStartPosition.current,
+            currentPoint,
+          );
+          setDraftNode(updatedNode);
+        }
       },
-      [
-        drawing,
-        toolType,
-        drawNodeByType,
-        getIntersectedNodes,
-        selectRectRef,
-        onNodesIntersection,
-      ],
+      [drawing, toolType, draftNode, handleSelectDraw],
     );
 
     const onStageMoveEnd = useCallback(() => {
-      switch (toolType) {
-        case 'select': {
-          dispatch(canvasActions.setSelectedNodesIds(intersectedNodesIds));
-          setDrawing(false);
-          break;
-        }
-        case 'draw':
-          if (!draftNode) return;
-          handleDraftEnd(draftNode, false);
-          break;
-        case 'text':
-          break;
-        case 'arrow':
-          if (!draftNode || !drawing) return;
+      setDrawing(false);
 
-          if (!draftNode.nodeProps.points) {
-            setDrawing(false);
-            setDraftNode(null);
-            break;
-          }
-          handleDraftEnd(draftNode);
-          break;
-        default: {
-          if (!draftNode || !drawing) return;
-          handleDraftEnd(draftNode);
-        }
+      if (toolType === 'select') {
+        dispatch(canvasActions.setSelectedNodesIds(intersectedNodesIds));
+        return;
       }
-    }, [
-      draftNode,
-      drawing,
-      toolType,
-      intersectedNodesIds,
-      dispatch,
-      handleDraftEnd,
-    ]);
+
+      if (draftNode) {
+        const shouldResetToolType = toolType !== 'draw';
+        handleDraftEnd(draftNode, shouldResetToolType);
+      }
+    }, [draftNode, toolType, intersectedNodesIds, dispatch, handleDraftEnd]);
 
     const zoomStageRelativeToPointerPosition = useCallback(
       (stage: Konva.Stage, event: WheelEvent) => {
@@ -291,28 +238,29 @@ const Canvas = forwardRef<Ref, Props>(
 
     const handleStageDragMove = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
-        if (event.target !== event.target.getStage()) {
+        if (
+          event.target !== event.target.getStage() ||
+          !backgroundRectRef.current
+        ) {
           return;
         }
-        const stage = event.target;
-        const layer = stage.getLayers()[0];
 
-        const BackgroundRectRect = layer.children?.find(
-          (child) => child.id() === BACKGROUND_LAYER_ID,
+        const stage = event.target;
+        const backgroundRect = backgroundRectRef.current;
+
+        const updatedPosition = getNormalizedInvertedRect(
+          {
+            x: stage.x(),
+            y: stage.y(),
+            width: stage.width(),
+            height: stage.height(),
+          },
+          stage.scaleX(),
         );
 
-        if (!BackgroundRectRect) {
-          return;
-        }
-
-        const { scale } = stageConfig;
-
-        BackgroundRectRect.position({
-          x: -stage.x() / scale,
-          y: -stage.y() / scale,
-        });
+        backgroundRect.position({ x: updatedPosition.x, y: updatedPosition.y });
       },
-      [stageConfig],
+      [backgroundRectRef],
     );
 
     const handleStageDragEnd = useCallback(
@@ -373,12 +321,16 @@ const Canvas = forwardRef<Ref, Props>(
           onNodesChange={handleNodesChange}
           onDraftEnd={handleDraftEnd}
         >
-          <BackgroundRect stageRef={ref} stageConfig={stageConfig} />
+          <BackgroundRect
+            ref={backgroundRectRef}
+            stageRef={ref}
+            stageConfig={stageConfig}
+          />
           {drawing && toolType === 'select' && (
             <SelectRect
               ref={selectRectRef}
-              startPoint={drawPosition.start}
-              currentPoint={drawPosition.current}
+              startPoint={drawStartPosition.current}
+              currentPoint={drawPosition}
             />
           )}
         </NodesLayer>
