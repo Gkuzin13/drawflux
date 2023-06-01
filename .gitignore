@@ -1,5 +1,6 @@
 node_modules
 dist
+dev-dist
 .env
 *.tsbuildinfo
 vite.config.ts.timestamp-*.mjs
