@@ -1,6 +1,8 @@
 import type { NodeColor, NodeStyle } from 'shared';
+import Slider from '@/components/core/Slider/Slider';
 import { ICON_SIZES } from '@/constants/icon';
-import { ANIMATED, COLOR, LINE, SIZE } from '@/constants/style';
+import { ANIMATED, COLOR, LINE, OPACITY, SIZE } from '@/constants/style';
+import { clamp } from '@/utils/math';
 import { getColorValue } from '@/utils/shape';
 import {
   StyleButton,
@@ -48,6 +50,11 @@ const StylePanel = ({
     onStyleChange({ size: value });
   };
 
+  const handleOpacityChange = (value: number) => {
+    const clampedOpacity = clamp(value, OPACITY.minValue, OPACITY.maxValue);
+    onStyleChange({ opacity: clampedOpacity });
+  };
+
   return (
     <StyleContainer active={active}>
       <StyleRadioGroup
@@ -83,6 +90,17 @@ const StylePanel = ({
           })}
         </StyleGrid>
       </StyleRadioGroup>
+      <div aria-labelledby="Opacity">
+        <StyleLabel css={{ fontSize: '$1' }}>Opacity</StyleLabel>
+        <Slider
+          value={[style.opacity ?? OPACITY.maxValue]}
+          min={OPACITY.minValue}
+          max={OPACITY.maxValue}
+          step={OPACITY.step}
+          label="Opacity"
+          onValueChange={(values) => handleOpacityChange(values[0])}
+        />
+      </div>
       {enabledOptions.line && (
         <>
           <StyleRadioGroup

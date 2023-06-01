@@ -76,6 +76,7 @@ export const { theme, styled, css } = createStitches({
     },
     shadows: {
       small: '0px 2px 8px 0px $colors$gray300',
+      medium: '0px 4px 10px 0px $colors$gray300',
     },
     lineHeights: {
       normal: 1.5,

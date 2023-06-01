@@ -8,6 +8,7 @@ describe('createNode', () => {
     expect(node.type).toBe('arrow');
     expect(node.nodeProps.point).toEqual([180, 100]);
     expect(node.text).toBeNull();
+    expect(node.style.opacity).toBe(1);
     expect(node.style.line).toBe('solid');
     expect(node.style.color).toBe('black');
     expect(node.style.size).toBe('medium');
