@@ -8,6 +8,7 @@
     "g:lint": "pnpm -r lint",
     "g:fix-all-files": "pnpm -r fix-all-files",
     "g:test": "pnpm -r test",
+    "g:build": "pnpm -r build",
     "g:typecheck": "pnpm -r typecheck",
     "packages:build": "pnpm --filter '{./packages/**}' build",
     "packages:lint": "pnpm --filter '{./packages/**}' lint",
