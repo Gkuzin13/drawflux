@@ -5,6 +5,8 @@
   "sideEffects": false,
   "scripts": {
     "dev:app": "pnpm --filter ./apps/client --filter ./apps/server --stream dev",
+    "dev:client": "pnpm --filter ./apps/client dev",
+    "dev:server": "pnpm --filter ./apps/server dev",
     "g:lint": "pnpm -r lint",
     "g:fix-all-files": "pnpm -r fix-all-files",
     "g:test": "pnpm -r test",
