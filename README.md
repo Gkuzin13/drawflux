@@ -17,9 +17,41 @@
 - Export to PNG / JSON.
 - Offline support.
 
-# Structure
+# Local development
 
-This repository is a monorepo:
+### Requirements
+
+[PostgreSQL 15](https://www.postgresql.org/download/)
+
+### Install
+
+Clone the repository to your local machine.
+
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+### Development Mode
+
+Make sure to build packages before starting the development mode:
+
+```bash
+pnpm packages:build
+```
+
+Run client and server in development mode:
+
+```bash
+pnpm dev:app
+```
+
+You can find the rest of the scripts below.
+
+# Monorepo Essentials
+
+## Structure
 
 ```
 ├── apps
@@ -30,34 +62,20 @@ This repository is a monorepo:
     └── shared              (utils, types, schemas, themes)
 ```
 
-# Local development
+## Scripts
 
-### Requirements
+Some handy scripts that can be run from any directory.
 
-[PostgreSQL 15](https://www.postgresql.org/download/)
-
-### Install
-
-To run the local dev clone the repo.
-
-Install dependencies:
-
-```bash
-pnpm install
-```
-
-## Monorepo scripts
-
-Some handy scripts that can be run from any directory
-
-| Name                      | Description                                               |
-| ------------------------- | --------------------------------------------------------- |
-| `pnpm dev:app`            | Run both server and client in dev mode with --stream flag |
-| `pnpm g:build`            | Run build in all workspaces                               |
-| `pnpm g:test`             | Run tests in all workspaces                               |
-| `pnpm g:typecheck`        | Run typechecks in all workspaces                          |
-| `pnpm g:lint`             | Display linter issues in all workspaces                   |
-| `pnpm g:fix-all-files`    | Attempt to run linter auto-fix in all workspaces          |
-| `pnpm packages:build`     | Build all packages workspaces                             |
-| `pnpm packages:lint`      | Display packages linter issues                            |
-| `pnpm packages:typecheck` | Run packages typechecks                                   |
+| Name                      | Description                                          |
+| ------------------------- | ---------------------------------------------------- |
+| `pnpm dev:app`            | Run server and client in dev mode with --stream flag |
+| `pnpm dev:client`         | Run react client in dev mode                         |
+| `pnpm dev:server`         | Run express server in dev mode                       |
+| `pnpm g:build`            | Run build in all workspaces                          |
+| `pnpm g:test`             | Run tests in all workspaces                          |
+| `pnpm g:typecheck`        | Run typechecks in all workspaces                     |
+| `pnpm g:lint`             | Display linter issues in all workspaces              |
+| `pnpm g:fix-all-files`    | Attempt to run linter auto-fix in all workspaces     |
+| `pnpm packages:build`     | Build all packages workspaces                        |
+| `pnpm packages:lint`      | Display packages linter issues                       |
+| `pnpm packages:typecheck` | Run packages typechecks                              |
