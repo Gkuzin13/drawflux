@@ -2,6 +2,7 @@
   <h1>
     drawflux
   </h1>
+  <p><strong>A virtual whiteboard web app</strong></p>
 </div>
 
 ![drawflux web app screenshot](./assets/screenshot.png)
@@ -23,15 +24,23 @@ This repository is a monorepo:
 ```
 ├── apps
 │   ├── client (react codebase)
-│   └── server (the api)
+│   └── server (express api)
 └── packages
-    ├── eslint-config-bases (shared eslint configs)
-    └── shared              (shared utils, types, schemas, themes)
+    ├── eslint-config-bases (eslint configs)
+    └── shared              (utils, types, schemas, themes)
 ```
 
-# Usage
+# Local development
 
-## Install
+### Requirements
+
+[PostgreSQL 15](https://www.postgresql.org/download/)
+
+### Install
+
+To run the local dev clone the repo.
+
+Install dependencies:
 
 ```bash
 pnpm install
