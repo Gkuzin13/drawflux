@@ -6,6 +6,7 @@ import { z } from 'zod';
 import type { ControlAction } from '@/constants/control';
 import { type MenuPanelActionType } from '@/constants/menu';
 import { type Tool } from '@/constants/tool';
+import useNetworkState from '@/hooks/useNetworkState/useNetworkState';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
   canvasActions,
@@ -43,6 +44,8 @@ const Panels = ({
   const { past, future } = useAppSelector(selectHistory);
 
   const dispatch = useAppDispatch();
+
+  const { online } = useNetworkState();
 
   const selectedNodes = useMemo(() => {
     const nodesIds = new Set(intersectedNodesIds);
@@ -186,10 +189,12 @@ const Panels = ({
         />
         <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
         <TopPanelRightContainer>
-          <SharePanel
-            isPageShared={isPageShared}
-            pageState={{ page: { nodes, stageConfig } }}
-          />
+          {online && (
+            <SharePanel
+              isPageShared={isPageShared}
+              pageState={{ page: { nodes, stageConfig } }}
+            />
+          )}
           <MenuPanel onAction={handleMenuAction} />
         </TopPanelRightContainer>
       </TopPanel>
