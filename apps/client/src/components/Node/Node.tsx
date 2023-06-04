@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { NodeObject, NodeType } from 'shared';
 import ArrowDrawable from '@/components/shapes/ArrowDrawable/ArrowDrawable';
 import EllipseDrawable from '@/components/shapes/EllipseDrawable/EllipseDrawable';
@@ -13,25 +14,18 @@ export type NodeComponentProps = {
   onNodeChange: (node: NodeObject) => void;
 };
 
-const getElement = (element: NodeType) => {
-  switch (element) {
-    case 'arrow':
-      return ArrowDrawable;
-    case 'rectangle':
-      return RectDrawable;
-    case 'ellipse':
-      return EllipseDrawable;
-    case 'draw':
-      return FreePathDrawable;
-    case 'text':
-      return EditableText;
-  }
+const elements: Record<NodeType, React.FC<NodeComponentProps>> = {
+  arrow: ArrowDrawable,
+  rectangle: RectDrawable,
+  ellipse: EllipseDrawable,
+  draw: FreePathDrawable,
+  text: EditableText,
 };
 
 const Node = ({ node, ...restProps }: NodeComponentProps) => {
-  const Element = getElement(node.type);
+  const Element = elements[node.type];
 
   return <Element node={node} {...restProps} />;
 };
 
-export default Node;
+export default memo(Node);

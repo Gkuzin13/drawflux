@@ -6,12 +6,12 @@ import {
   useMemo,
   useState,
   useCallback,
-  useEffect,
   useRef,
 } from 'react';
-import { Stage } from 'react-konva';
+import { Layer, Stage } from 'react-konva';
 import type { NodeObject, Point, StageConfig } from 'shared';
 import { CURSOR } from '@/constants/cursor';
+import { NODES_LAYER_INDEX } from '@/constants/node';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { uniq } from '@/utils/array';
@@ -35,9 +35,12 @@ type Props = PropsWithRef<{
   onConfigChange: (config: Partial<StageConfig>) => void;
 }>;
 
-type Ref = Konva.Stage;
+const initialDrawingPosition: Record<string, Point> = {
+  start: [0, 0],
+  current: [0, 0],
+};
 
-const Canvas = forwardRef<Ref, Props>(
+const Canvas = forwardRef<Konva.Stage, Props>(
   (
     {
       config,
@@ -50,17 +53,15 @@ const Canvas = forwardRef<Ref, Props>(
   ) => {
     const [draftNode, setDraftNode] = useState<NodeObject | null>(null);
     const [drawing, setDrawing] = useState(false);
-    const [drawPosition, setDrawPosition] = useState<Point>([0, 0]);
     const [draggingStage, setDraggingStage] = useState(false);
 
-    const { stageConfig, toolType, selectedNodesIds, nodes } =
-      useAppSelector(selectCanvas);
+    const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
 
     const dispatch = useAppDispatch();
 
+    const drawingPositionRef = useRef(initialDrawingPosition);
     const selectRectRef = useRef<Konva.Rect>(null);
     const backgroundRectRef = useRef<Konva.Rect>(null);
-    const drawStartPosition = useRef<Point>([0, 0]);
 
     const cursorStyle = useMemo(() => {
       switch (toolType) {
@@ -73,16 +74,6 @@ const Canvas = forwardRef<Ref, Props>(
       }
     }, [drawing, toolType, draggingStage]);
 
-    useEffect(() => {
-      if (typeof ref === 'function' || !ref?.current) {
-        return;
-      }
-      const container = ref.current.container();
-
-      container.tabIndex = 1;
-      container.focus();
-    }, [ref, toolType, selectedNodesIds, stageConfig]);
-
     const handleDraftEnd = useCallback(
       (node: NodeObject, resetToolType = true) => {
         setDraftNode(null);
@@ -91,8 +82,11 @@ const Canvas = forwardRef<Ref, Props>(
           return;
         }
 
+        if (node.type === 'arrow' && !node.nodeProps.points) {
+          return;
+        }
+
         dispatch(canvasActions.addNodes([node]));
-        setDrawing(false);
 
         if (resetToolType) {
           dispatch(canvasActions.setToolType('select'));
@@ -108,10 +102,13 @@ const Canvas = forwardRef<Ref, Props>(
           return;
         }
 
+        const layer = stage.getLayers()[NODES_LAYER_INDEX];
+        const selectClientRect = selectRectRef.current.getClientRect();
+
         const nodesIntersectedWithSelectRect = getNodesIntersectingWithRect(
-          stage,
+          layer,
           nodes,
-          selectRectRef.current.getClientRect(),
+          selectClientRect,
         );
 
         onNodesIntersection(
@@ -140,21 +137,21 @@ const Canvas = forwardRef<Ref, Props>(
         const { x, y } = stage.getRelativePointerPosition();
         const currentPoint: Point = [x, y];
 
-        drawStartPosition.current = currentPoint;
+        drawingPositionRef.current.start = currentPoint;
 
         switch (toolType) {
           case 'hand':
             return;
           case 'select':
             setDrawing(true);
-            setDrawPosition(currentPoint);
+            drawingPositionRef.current.current = currentPoint;
             break;
           case 'text':
             setDraftNode(createNode(toolType, currentPoint));
             break;
           default:
             setDrawing(true);
-            setDrawPosition(currentPoint);
+            drawingPositionRef.current.current = currentPoint;
             setDraftNode(createNode(toolType, currentPoint));
             break;
         }
@@ -176,7 +173,7 @@ const Canvas = forwardRef<Ref, Props>(
         const currentPoint: Point = [x, y];
 
         if (toolType === 'select') {
-          setDrawPosition(currentPoint);
+          drawingPositionRef.current.current = currentPoint;
           handleSelectDraw(stage);
           return;
         }
@@ -185,7 +182,7 @@ const Canvas = forwardRef<Ref, Props>(
           const drawFn = drawTypes[draftNode.type as DrawableType];
           const updatedNode = drawFn(
             draftNode,
-            drawStartPosition.current,
+            drawingPositionRef.current.start,
             currentPoint,
           );
           setDraftNode(updatedNode);
@@ -195,6 +192,8 @@ const Canvas = forwardRef<Ref, Props>(
     );
 
     const onStageMoveEnd = useCallback(() => {
+      if (!drawing) return;
+
       setDrawing(false);
 
       if (toolType === 'select') {
@@ -206,7 +205,14 @@ const Canvas = forwardRef<Ref, Props>(
         const shouldResetToolType = toolType !== 'draw';
         handleDraftEnd(draftNode, shouldResetToolType);
       }
-    }, [draftNode, toolType, intersectedNodesIds, dispatch, handleDraftEnd]);
+    }, [
+      draftNode,
+      toolType,
+      drawing,
+      intersectedNodesIds,
+      handleDraftEnd,
+      dispatch,
+    ]);
 
     const zoomStageRelativeToPointerPosition = useCallback(
       (stage: Konva.Stage, event: WheelEvent) => {
@@ -311,29 +317,31 @@ const Canvas = forwardRef<Ref, Props>(
         onDragMove={handleStageDragMove}
         onDragEnd={handleStageDragEnd}
       >
-        <NodesLayer
-          nodes={nodes}
-          draftNode={draftNode}
-          toolType={toolType}
-          config={{ ...config, listening: !drawing || toolType !== 'select' }}
-          selectedNodesIds={intersectedNodesIds}
-          onNodePress={handleNodePress}
-          onNodesChange={handleNodesChange}
-          onDraftEnd={handleDraftEnd}
-        >
+        <Layer listening={false}>
           <BackgroundRect
             ref={backgroundRectRef}
             stageRef={ref}
             stageConfig={stageConfig}
           />
-          {drawing && toolType === 'select' && (
-            <SelectRect
-              ref={selectRectRef}
-              startPoint={drawStartPosition.current}
-              currentPoint={drawPosition}
-            />
-          )}
-        </NodesLayer>
+        </Layer>
+        <NodesLayer
+          nodes={nodes}
+          draftNode={draftNode}
+          toolType={toolType}
+          config={{ ...config, listening: !drawing }}
+          selectedNodesIds={intersectedNodesIds}
+          onNodePress={handleNodePress}
+          onNodesChange={handleNodesChange}
+          onDraftEnd={handleDraftEnd}
+        />
+        <Layer listening={false}>
+          <SelectRect
+            ref={selectRectRef}
+            startPoint={drawingPositionRef.current.start}
+            currentPoint={drawingPositionRef.current.current}
+            active={drawing && toolType === 'select'}
+          />
+        </Layer>
       </Stage>
     );
   },

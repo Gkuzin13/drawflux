@@ -1,14 +1,15 @@
 import { useCallback, useEffect } from 'react';
 import { KEYS } from '@/constants/keys';
-import { TOOLS } from '@/constants/tool';
-import { useAppDispatch, useAppSelector } from '@/stores/hooks';
+import { TOOLS, type Tool } from '@/constants/tool';
+import { useAppDispatch } from '@/stores/hooks';
 import { historyActions } from '@/stores/reducers/history';
-import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { canvasActions } from '@/stores/slices/canvas';
 
-function useKbdShortcuts(element: HTMLElement | null) {
-  const { selectedNodesIds } = useAppSelector(selectCanvas);
-  const { toolType } = useAppSelector(selectCanvas);
-
+function useKbdShortcuts(
+  element: HTMLElement | null,
+  selectedNodesIds: string[],
+  toolType: Tool['value'],
+) {
   const dispatch = useAppDispatch();
 
   const dispatchActionsOnCtrlCombo = useCallback(
@@ -24,9 +25,8 @@ function useKbdShortcuts(element: HTMLElement | null) {
         }
         case KEYS.D: {
           event.preventDefault();
-          const nodesToDuplicate = Object.keys(selectedNodesIds);
 
-          dispatch(canvasActions.duplicateNodes(nodesToDuplicate));
+          dispatch(canvasActions.duplicateNodes(selectedNodesIds));
         }
       }
     },
@@ -47,7 +47,7 @@ function useKbdShortcuts(element: HTMLElement | null) {
       }
 
       if (key === KEYS.DELETE) {
-        dispatch(canvasActions.deleteNodes(Object.keys(selectedNodesIds)));
+        dispatch(canvasActions.deleteNodes(selectedNodesIds));
         return;
       }
 
