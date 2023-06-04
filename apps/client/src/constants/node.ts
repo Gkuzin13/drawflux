@@ -12,3 +12,5 @@ export const RECT = {
   CORNER_RADIUS: 8,
   MIN_SIZE: 5,
 };
+
+export const NODES_LAYER_INDEX = 1;
