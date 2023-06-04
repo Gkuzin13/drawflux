@@ -1,20 +1,17 @@
 import * as RadixContextMenu from '@radix-ui/react-context-menu';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
-import {
-  type PropsWithChildren,
-  type ReactNode,
-  useCallback,
-  useMemo,
-} from 'react';
+import { type PropsWithChildren, type ReactNode, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { Divider } from '../core/Divider/Divider';
 import Kbd from '../core/Kbd/Kbd';
 import { ContextMenuContent, ContextMenuItem } from './ContextMenuStyled';
 
+export type ContextMenuType = 'node-menu' | 'canvas-menu';
 type Props = PropsWithChildren<{
-  children: ReactNode;
+  type: ContextMenuType;
   onContextMenuOpen: (open: boolean) => void;
+  children: ReactNode;
 }>;
 
 const CanvasMenu = () => {
@@ -92,14 +89,13 @@ const NodeMenu = () => {
   );
 };
 
-const ContextMenu = ({ onContextMenuOpen, children }: Props) => {
-  const { selectedNodesIds } = useAppSelector(selectCanvas);
+const menus: Record<ContextMenuType, React.FC> = {
+  'node-menu': NodeMenu,
+  'canvas-menu': CanvasMenu,
+};
 
-  const ActiveMenu = useMemo(() => {
-    const nodesSelected = Object.keys(selectedNodesIds).length > 0;
-
-    return nodesSelected ? NodeMenu : CanvasMenu;
-  }, [selectedNodesIds]);
+const ContextMenu = ({ type, onContextMenuOpen, children }: Props) => {
+  const ActiveMenu = menus[type] || CanvasMenu;
 
   return (
     <RadixContextMenu.Root onOpenChange={onContextMenuOpen}>

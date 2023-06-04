@@ -5,12 +5,13 @@ import { type Point, theme } from 'shared';
 import { drawRectangle } from '@/utils/draw';
 
 type Props = PropsWithRef<{
+  active: boolean;
   startPoint: Point;
   currentPoint: Point;
 }>;
 
 const SelectRect = forwardRef<Konva.Rect, Props>(
-  ({ startPoint, currentPoint }, ref) => {
+  ({ active, startPoint, currentPoint }, ref) => {
     const rect = useMemo(() => {
       return drawRectangle([startPoint, currentPoint]);
     }, [startPoint, currentPoint]);
@@ -18,10 +19,12 @@ const SelectRect = forwardRef<Konva.Rect, Props>(
     return (
       <Rect
         ref={ref}
+        {...rect}
         stroke={theme.colors.gray600.value}
         fill={theme.colors.gray400.value}
         opacity={0.1}
-        {...rect}
+        visible={active}
+        listening={false}
       />
     );
   },
