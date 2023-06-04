@@ -11,6 +11,6 @@ describe('useWindowSize', () => {
       window.dispatchEvent(new Event('resize'));
     });
 
-    expect(result.current).toEqual([800, 600]);
+    expect(result.current).toEqual({ width: 800, height: 600 });
   });
 });
