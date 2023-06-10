@@ -2,7 +2,7 @@
   <h1>
     drawflux
   </h1>
-  <p><strong>A virtual whiteboard web app</strong></p>
+  <p><strong>A whiteboard web app</strong></p>
 </div>
 
 ![drawflux web app screenshot](./assets/screenshot.png)
