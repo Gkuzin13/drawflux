@@ -1,9 +1,6 @@
-<div align="center">
-  <h1>
-    drawflux
-  </h1>
-  <p><strong>A virtual whiteboard tool for sketching diagrams</strong></p>
-</div>
+# drawflux
+
+**A virtual whiteboard tool for sketching diagrams.**
 
 ![drawflux web app screenshot](./assets/screenshot.png)
 
@@ -79,3 +76,14 @@ Some handy scripts that can be run from any directory.
 | `pnpm packages:build`     | Build all packages workspaces                        |
 | `pnpm packages:lint`      | Display packages linter issues                       |
 | `pnpm packages:typecheck` | Run packages typechecks                              |
+
+# Acknowledgments
+
+Awesome open-source packages used in this project:
+
+- [React Konva](https://konvajs.org/docs/react/Intro.html)
+- [Radix UI](https://www.radix-ui.com)
+- [Stitches](https://stitches.dev)
+- [zod](https://zod.dev)
+- [node-postgres](https://node-postgres.com)
+- [qr-code](https://github.com/soldair/node-qrcode)
