@@ -49,18 +49,11 @@ const RectDrawable = ({
     [node, onNodeChange, onPress],
   );
 
-  const handleTransformStart = useCallback(
-    (event: KonvaEventObject<Event>) => {
-      const rect = event.target as Konva.Rect;
-
-      rect.dashOffset(0);
-
-      if (node.style.animated && animation) {
-        animation.stop();
-      }
-    },
-    [node.style.animated, animation],
-  );
+  const handleTransformStart = useCallback(() => {
+    if (node.style.animated && animation) {
+      animation.stop();
+    }
+  }, [node.style.animated, animation]);
 
   const handlTransform = useCallback(
     (event: KonvaEventObject<Event>) => {
@@ -83,8 +76,6 @@ const RectDrawable = ({
 
   const handleTransformEnd = useCallback(
     (event: KonvaEventObject<Event>) => {
-      if (!event.target) return;
-
       const rect = event.target as Konva.Rect;
 
       const { width, height } = getRectSize(rect);
@@ -100,12 +91,12 @@ const RectDrawable = ({
         },
       });
 
-      if (node.style.animated && animation && !animation.isRunning()) {
-        animation.start();
-      }
-
       rect.scaleX(1);
       rect.scaleY(1);
+
+      if (node.style.animated && animation?.isRunning() === false) {
+        animation.start();
+      }
     },
     [node, animation, onNodeChange],
   );

@@ -44,18 +44,11 @@ const EllipseDrawable = ({
     [node, onNodeChange, onPress],
   );
 
-  const handleTransformStart = useCallback(
-    (event: KonvaEventObject<Event>) => {
-      const ellipse = event.target as Konva.Ellipse;
-
-      ellipse.dashOffset(0);
-
-      if (node.style.animated && animation) {
-        animation.stop();
-      }
-    },
-    [node.style.animated, animation],
-  );
+  const handleTransformStart = useCallback(() => {
+    if (node.style.animated && animation) {
+      animation.stop();
+    }
+  }, [node.style.animated, animation]);
 
   const handlTransform = useCallback(
     (event: KonvaEventObject<Event>) => {
@@ -93,7 +86,7 @@ const EllipseDrawable = ({
         },
       });
 
-      if (node.style.animated && animation && !animation.isRunning()) {
+      if (node.style.animated && animation?.isRunning() === false) {
         animation.start();
       }
 
