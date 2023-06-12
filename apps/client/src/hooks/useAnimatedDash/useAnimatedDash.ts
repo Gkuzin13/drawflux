@@ -26,7 +26,7 @@ const useAnimatedDash = ({
     }
 
     const element = elementRef.current;
-    const speedFactor = clamp(35 * totalDashLength, 600, 750);
+    const speedFactor = clamp(35 * totalDashLength, 650, 750);
 
     return new Animation((frame) => {
       if (!frame) return;
@@ -43,7 +43,7 @@ const useAnimatedDash = ({
       return;
     }
 
-    if (enabled) {
+    if (enabled && !animation.isRunning()) {
       animation.start();
     }
 

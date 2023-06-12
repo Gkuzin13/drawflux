@@ -59,18 +59,11 @@ const FreePathDrawable = ({
     [node, onNodeChange, onPress],
   );
 
-  const handleTransformStart = useCallback(
-    (event: KonvaEventObject<Event>) => {
-      const line = event.target as Konva.Line;
-
-      line.dashOffset(0);
-
-      if (node.style.animated && animation) {
-        animation.stop();
-      }
-    },
-    [node.style.animated, animation],
-  );
+  const handleTransformStart = useCallback(() => {
+    if (node.style.animated && animation?.isRunning()) {
+      animation.stop();
+    }
+  }, [node.style.animated, animation]);
 
   const handlTransform = useCallback(
     (event: KonvaEventObject<Event>) => {
@@ -117,8 +110,12 @@ const FreePathDrawable = ({
 
       line.scale({ x: 1, y: 1 });
       line.position({ x: 0, y: 0 });
+
+      if (node.style.animated && animation?.isRunning() === false) {
+        animation.stop();
+      }
     },
-    [node, onNodeChange],
+    [node, animation, onNodeChange],
   );
 
   return (

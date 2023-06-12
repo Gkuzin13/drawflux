@@ -102,7 +102,7 @@ const ArrowDrawable = ({
   );
 
   const handleTransformStart = useCallback(() => {
-    if (node.style.animated && animation && animation?.isRunning()) {
+    if (node.style.animated && animation?.isRunning()) {
       animation.stop();
     }
   }, [node.style.animated, animation]);
@@ -138,7 +138,7 @@ const ArrowDrawable = ({
         },
       });
 
-      if (node.style.animated && animation && !animation?.isRunning()) {
+      if (node.style.animated && animation?.isRunning() === false) {
         animation.start();
       }
     },
