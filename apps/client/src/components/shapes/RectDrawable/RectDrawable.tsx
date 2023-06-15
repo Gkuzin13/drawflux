@@ -69,6 +69,10 @@ const RectDrawable = ({
         node.style.line,
       );
 
+      rect.scale({ x: 1, y: 1 });
+
+      rect.width(width);
+      rect.height(height);
       rect.dash(dash.map((d) => d * stageConfig.scale));
     },
     [node.style.size, node.style.line, stageConfig.scale],
@@ -91,8 +95,7 @@ const RectDrawable = ({
         },
       });
 
-      rect.scaleX(1);
-      rect.scaleY(1);
+      rect.scale({ x: 1, y: 1 });
 
       if (node.style.animated && animation?.isRunning() === false) {
         animation.start();
@@ -122,7 +125,10 @@ const RectDrawable = ({
       {selected && (
         <NodeTransformer
           ref={transformerRef}
-          transformerConfig={{ id: node.nodeProps.id, keepRatio: false }}
+          transformerConfig={{
+            id: node.nodeProps.id,
+            keepRatio: false,
+          }}
         />
       )}
     </>
