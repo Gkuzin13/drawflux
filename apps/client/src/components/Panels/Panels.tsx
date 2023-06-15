@@ -2,7 +2,6 @@ import type Konva from 'konva';
 import { type RefObject, useMemo } from 'react';
 import type { NodeStyle, NodeObject, StageConfig } from 'shared';
 import { Schemas } from 'shared';
-import { z } from 'zod';
 import type { ControlAction } from '@/constants/control';
 import { type MenuPanelActionType } from '@/constants/menu';
 import { type Tool } from '@/constants/tool';
@@ -73,25 +72,33 @@ const Panels = ({
     return { line: true, size: true };
   }, [selectedNodes]);
 
-  const selectedNodesStyle = useMemo<Partial<NodeStyle>>(() => {
+  const selectedNodesStyle = useMemo(() => {
     const styles: NodeStyle[] = selectedNodes.map(({ style }) => style);
 
     const colors = new Set(styles.map(({ color }) => color));
     const lines = new Set(styles.map(({ line }) => line));
     const sizes = new Set(styles.map(({ size }) => size));
     const opacities = new Set(styles.map(({ opacity }) => opacity));
-    const animated = styles.every(({ animated }) => animated);
+    const allShapesAnimated = styles.every(({ animated }) => animated);
+
+    const getValueIfAllIdentical = <T extends string | number | boolean>(
+      set: Set<T>,
+    ): T | undefined => {
+      return set.size === 1 ? [...set][0] : undefined;
+    };
 
     return {
-      color: colors.size > 1 ? undefined : Array.from(colors)[0],
-      line: lines.size > 1 ? undefined : Array.from(lines)[0],
-      size: sizes.size > 1 ? undefined : Array.from(sizes)[0],
-      opacity: opacities.size > 1 ? undefined : Array.from(opacities)[0],
-      animated,
+      color: getValueIfAllIdentical(colors),
+      line: getValueIfAllIdentical(lines),
+      size: getValueIfAllIdentical(sizes),
+      opacity: getValueIfAllIdentical(opacities),
+      animated: allShapesAnimated,
     };
   }, [selectedNodes]);
 
-  const onToolTypeChange = (type: Tool['value']) => {
+  const isStylePanelActive = selectedNodes.length > 0;
+
+  const handleToolSelect = (type: Tool['value']) => {
     dispatch(canvasActions.setToolType(type));
   };
 
@@ -103,7 +110,7 @@ const Panels = ({
     dispatch(canvasActions.updateNodes(updatedNodes));
   };
 
-  const handleMenuAction = (type: MenuPanelActionType) => {
+  const handleMenuAction = async (type: MenuPanelActionType) => {
     switch (type) {
       case 'export-as-image': {
         const dataUrl = stageRef.current?.toDataURL();
@@ -131,26 +138,29 @@ const Panels = ({
         break;
       }
       case 'import-json': {
-        const schema = z.object({
-          nodes: Schemas.Node.array(),
-          stageConfig: z.unknown(),
-        });
+        try {
+          const jsonData = await loadJsonFile<{
+            nodes: NodeObject[];
+            stageConfig: StageConfig;
+          }>(Schemas.Page.shape.page);
 
-        loadJsonFile<{ nodes: NodeObject[]; stageConfig: StageConfig }>(
-          schema,
-        ).then((state) => {
-          if (!state) {
+          if (!jsonData) {
+            throw new Error('Could not load file');
+          }
+
+          dispatch(
+            canvasActions.set({ ...jsonData, toolType, selectedNodesIds: {} }),
+          );
+        } catch (error) {
+          if (error instanceof Error) {
             dispatch(
               uiActions.openDialog({
                 title: 'Error',
-                description: 'Could not load file',
+                description: error.message as string,
               }),
             );
-            return;
           }
-          dispatch(canvasActions.setNodes(state.nodes));
-          dispatch(canvasActions.setStageConfig(state.stageConfig));
-        });
+        }
         break;
       }
     }
@@ -164,7 +174,6 @@ const Panels = ({
     switch (action.type) {
       case 'canvas/deleteNodes': {
         dispatch(canvasActions.deleteNodes(intersectedNodesIds));
-        dispatch(canvasActions.setSelectedNodesIds([]));
         break;
       }
       default: {
@@ -182,7 +191,7 @@ const Panels = ({
           enabledControls={enabledControls}
         />
         <StylePanel
-          active={selectedNodes.length > 0}
+          active={isStylePanelActive}
           style={selectedNodesStyle}
           enabledOptions={stylePanelEnabledOptions}
           onStyleChange={handleStyleChange}
@@ -199,7 +208,7 @@ const Panels = ({
         </TopPanelRightContainer>
       </TopPanel>
       <BottomPanel>
-        <ToolsPanel activeTool={toolType} onToolSelect={onToolTypeChange} />
+        <ToolsPanel activeTool={toolType} onToolSelect={handleToolSelect} />
       </BottomPanel>
     </PanelsContainer>
   );

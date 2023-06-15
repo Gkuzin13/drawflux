@@ -1,4 +1,4 @@
-import { createElement, Fragment } from 'react';
+import { Fragment } from 'react';
 import { Divider } from '@/components/core/Divider/Divider';
 import { ICON_SIZES } from '@/constants/icon';
 import { TOOLS, type Tool } from '@/constants/tool';
@@ -19,10 +19,10 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
             <PanelButton
               size="small"
               color={activeTool === tool.value ? 'primary' : 'secondary'}
-              title={getKeyTitle(tool.value, [tool.key.replace(/Key/i, '')])}
+              title={getKeyTitle(tool.value, [tool.key])}
               onClick={() => onToolSelect(tool.value)}
             >
-              {createElement(tool.icon, { size: ICON_SIZES.SMALL })}
+              {tool.icon({ size: ICON_SIZES.MEDIUM })}
             </PanelButton>
             {index === 1 && <Divider orientation="vertical" />}
           </Fragment>

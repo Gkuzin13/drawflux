@@ -62,7 +62,6 @@ export const canvasSlice = createSlice({
       const ids = new Set<string>(action.payload);
 
       state.nodes = state.nodes.filter((node) => !ids.has(node.nodeProps.id));
-      state.selectedNodesIds = {};
     },
     duplicateNodes: (state, action: PayloadAction<string[]>) => {
       const ids = new Set<string>(action.payload);
@@ -164,6 +163,9 @@ export const canvasSlice = createSlice({
           const { x, y } = getNodeRect(getMiddleNode(duplicatedNodes));
           caseReducers.focusStage(state, actions.focusStage({ x, y }));
         }
+      })
+      .addMatcher(canvasSlice.actions.deleteNodes.match, (state) => {
+        state.selectedNodesIds = {};
       });
   },
 });

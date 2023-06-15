@@ -74,6 +74,9 @@ const Canvas = forwardRef<Konva.Stage, Props>(
       }
     }, [drawing, toolType, draggingStage]);
 
+    const isStageDraggable = toolType === 'hand';
+    const isSelectRectActive = drawing && toolType === 'select';
+
     const handleDraftEnd = useCallback(
       (node: NodeObject, resetToolType = true) => {
         setDraftNode(null);
@@ -242,6 +245,10 @@ const Canvas = forwardRef<Konva.Stage, Props>(
       [zoomStageRelativeToPointerPosition],
     );
 
+    const handleStageDragStart = useCallback(() => {
+      setDraggingStage(true);
+    }, []);
+
     const handleStageDragMove = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
         if (
@@ -305,7 +312,7 @@ const Canvas = forwardRef<Konva.Stage, Props>(
         {...config}
         tabIndex={0}
         style={{ ...containerStyle, cursor: cursorStyle }}
-        draggable={toolType === 'hand'}
+        draggable={isStageDraggable}
         onMouseDown={onStagePress}
         onMouseMove={onStageMove}
         onMouseUp={onStageMoveEnd}
@@ -313,7 +320,7 @@ const Canvas = forwardRef<Konva.Stage, Props>(
         onTouchMove={onStageMove}
         onTouchEnd={onStageMoveEnd}
         onWheel={handleStageOnWheel}
-        onDragStart={() => setDraggingStage(true)}
+        onDragStart={handleStageDragStart}
         onDragMove={handleStageDragMove}
         onDragEnd={handleStageDragEnd}
       >
@@ -322,6 +329,12 @@ const Canvas = forwardRef<Konva.Stage, Props>(
             ref={backgroundRectRef}
             stageRef={ref}
             stageConfig={stageConfig}
+          />
+          <SelectRect
+            ref={selectRectRef}
+            startPoint={drawingPositionRef.current.start}
+            currentPoint={drawingPositionRef.current.current}
+            active={isSelectRectActive}
           />
         </Layer>
         <NodesLayer
@@ -334,14 +347,6 @@ const Canvas = forwardRef<Konva.Stage, Props>(
           onNodesChange={handleNodesChange}
           onDraftEnd={handleDraftEnd}
         />
-        <Layer listening={false}>
-          <SelectRect
-            ref={selectRectRef}
-            startPoint={drawingPositionRef.current.start}
-            currentPoint={drawingPositionRef.current.current}
-            active={drawing && toolType === 'select'}
-          />
-        </Layer>
       </Stage>
     );
   },
