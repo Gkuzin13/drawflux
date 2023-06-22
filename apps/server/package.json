@@ -23,7 +23,8 @@
     "express-promise-router": "^4.1.1",
     "pg": "^8.10.0",
     "qrcode": "^1.5.3",
-    "shared": "workspace:^"
+    "shared": "workspace:^",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.2",
@@ -35,6 +36,7 @@
     "@types/pg": "^8.6.6",
     "@types/qrcode": "^1.5.0",
     "@types/supertest": "^2.0.12",
+    "@types/ws": "^8.5.5",
     "dotenv": "^16.0.3",
     "eslint-config-bases": "workspace:eslint-config-bases@latest",
     "helmet": "^6.1.5",

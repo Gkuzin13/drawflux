@@ -174,6 +174,9 @@ importers:
       shared:
         specifier: workspace:^
         version: link:../../packages/shared
+      ws:
+        specifier: ^8.13.0
+        version: 8.13.0
     devDependencies:
       '@types/body-parser':
         specifier: ^1.19.2
@@ -202,6 +205,9 @@ importers:
       '@types/supertest':
         specifier: ^2.0.12
         version: 2.0.12
+      '@types/ws':
+        specifier: ^8.5.5
+        version: 8.5.5
       dotenv:
         specifier: ^16.0.3
         version: 16.0.3
@@ -3262,6 +3268,12 @@ packages:
 
   /@types/uuid@9.0.1:
     resolution: {integrity: sha512-rFT3ak0/2trgvp4yYZo5iKFEPsET7vKydKF+VRCxlQ9bpheehyAJH89dAkaLEq/j/RZXJIqcgsmPJKUP1Z28HA==}
+    dev: true
+
+  /@types/ws@8.5.5:
+    resolution: {integrity: sha512-lwhs8hktwxSjf9UaZ9tG5M03PGogvFaH8gUgLNbN9HKIg0dvv6q+gkSuJ8HN4/VbyxkuLzCjlN7GquQ0gUJfIg==}
+    dependencies:
+      '@types/node': 18.15.11
     dev: true
 
   /@types/yargs-parser@21.0.0:
@@ -8349,7 +8361,6 @@ packages:
         optional: true
       utf-8-validate:
         optional: true
-    dev: true
 
   /xml-name-validator@4.0.0:
     resolution: {integrity: sha512-ICP2e+jsHvAj2E2lIHxa5tjXRlKDJo4IdvPvCXbXQGdzSfmSpNVyIKMvoZHjDY9DP0zV17iI85o90vRFXNccRw==}
