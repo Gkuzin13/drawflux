@@ -23,10 +23,10 @@ const Line = z.union([
   z.literal('dotted'),
 ]);
 
-const NodePoint = z.tuple([z.number(), z.number()]);
+export const NodePoint = z.tuple([z.number(), z.number()]);
 
 const NodeProps = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
   point: NodePoint,
   points: NodePoint.array().optional(),
   width: z.number().optional(),

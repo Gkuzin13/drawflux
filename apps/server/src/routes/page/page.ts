@@ -1,7 +1,7 @@
 import Router from 'express-promise-router';
 import type { QueryResult } from 'pg';
 import pg from 'pg';
-import type { SharePageResponse } from 'shared';
+import type { GetPageResponse, SharePageResponse } from 'shared';
 import { BadRequestError, Schemas } from 'shared';
 import * as db from '../../db/index';
 import { queries } from '../../db/queries/index';
@@ -23,16 +23,16 @@ pageRouter.get(
     const client = await db.getClient();
 
     try {
-      const { rows }: QueryResult<PageRowObject> = await db.query<GetPageArgs>(
+      const result: QueryResult<PageRowObject[]> = await db.query<GetPageArgs>(
         queries.getPage,
         [params.id],
       );
 
-      if (!rows.length) {
+      if (!result.rows.length) {
         throw new BadRequestError('Entry not found', 404);
       }
 
-      return { page: rows[0] };
+      return { page: result.rows[0] };
     } catch (error) {
       if (error instanceof pg.DatabaseError) {
         throw new BadRequestError('Entry not found', 404);
@@ -53,13 +53,13 @@ pageRouter.post(
     const client = await db.getClient();
 
     try {
-      const { rows }: QueryResult<SharePageResponse> =
+      const result: QueryResult<SharePageResponse> =
         await db.query<SharePageArgs>(queries.sharePage, [
           JSON.stringify(body.page.stageConfig),
           JSON.stringify(body.page.nodes),
         ]);
 
-      return { id: rows[0].id };
+      return { id: result.rows[0].id };
     } catch (error) {
       if (error instanceof pg.DatabaseError) {
         throw new BadRequestError('Invalid request body', 400);

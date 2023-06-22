@@ -7,6 +7,8 @@ import type {
   StageConfig,
 } from '../schemas/page';
 import type { QRCodeRequestBody, QRCodeResponse } from '../schemas/qrcode';
+import type { Room, User } from '../schemas/share';
+import type { MessageSchemas } from '../schemas/ws';
 import type { BadRequestError } from '../utils/errors';
 
 const { nodeProps, style, type } = Node.shape;
@@ -35,3 +37,10 @@ export type ServerResponse<T> = {
   error?: typeof BadRequestError;
   data?: T;
 };
+
+export type WSMessage<
+  K extends keyof typeof MessageSchemas = keyof typeof MessageSchemas,
+> = z.infer<(typeof MessageSchemas)[K]>;
+
+export type CollabRoom = z.infer<typeof Room>;
+export type CollabUser = z.infer<typeof User>;

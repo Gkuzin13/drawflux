@@ -9,7 +9,13 @@ import {
   useRef,
 } from 'react';
 import { Layer, Stage } from 'react-konva';
-import type { NodeObject, Point, StageConfig } from 'shared';
+import type {
+  CollabUser,
+  NodeObject,
+  Point,
+  StageConfig,
+  WSMessage,
+} from 'shared';
 import { CURSOR } from '@/constants/cursor';
 import { NODES_LAYER_INDEX } from '@/constants/node';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
@@ -17,7 +23,9 @@ import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { uniq } from '@/utils/array';
 import { createNode } from '@/utils/node';
 import { getNormalizedInvertedRect } from '@/utils/position';
+import { useWebSocket } from '@/webSocketContext';
 import BackgroundRect from '../BackgroundRect/BackgroundRect';
+import CollaboratorCursor from '../CollaboratorCursor';
 import NodesLayer from '../NodesLayer';
 import SelectRect from '../SelectRect';
 import { type DrawableType, drawTypes } from './helpers/draw';
@@ -31,6 +39,8 @@ type Props = PropsWithRef<{
   config: NodeConfig;
   containerStyle?: React.CSSProperties;
   intersectedNodesIds: string[];
+  users: CollabUser[];
+  onPointerMove: (point: Point) => void;
   onNodesIntersection: (nodesIds: string[]) => void;
   onConfigChange: (config: Partial<StageConfig>) => void;
 }>;
@@ -46,6 +56,8 @@ const Canvas = forwardRef<Konva.Stage, Props>(
       config,
       containerStyle,
       intersectedNodesIds,
+      users,
+      onPointerMove,
       onNodesIntersection,
       onConfigChange,
     },
@@ -58,6 +70,8 @@ const Canvas = forwardRef<Konva.Stage, Props>(
     const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
 
     const dispatch = useAppDispatch();
+
+    const ws = useWebSocket();
 
     const drawingPositionRef = useRef(initialDrawingPosition);
     const selectRectRef = useRef<Konva.Rect>(null);
@@ -91,12 +105,19 @@ const Canvas = forwardRef<Konva.Stage, Props>(
 
         dispatch(canvasActions.addNodes([node]));
 
+        ws?.send(
+          JSON.stringify({
+            type: 'nodes-add',
+            data: { nodes: [node] },
+          } as WSMessage<'nodesAddUpdate'>),
+        );
+
         if (resetToolType) {
           dispatch(canvasActions.setToolType('select'));
           dispatch(canvasActions.setSelectedNodesIds([node.nodeProps.id]));
         }
       },
-      [dispatch],
+      [ws, dispatch],
     );
 
     const handleSelectDraw = useCallback(
@@ -170,10 +191,16 @@ const Canvas = forwardRef<Konva.Stage, Props>(
       (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
         const stage = event.target.getStage();
 
-        if (!drawing || !stage) return;
+        if (!stage) return;
 
         const { x, y } = stage.getRelativePointerPosition();
+        onPointerMove([x, y]);
+
         const currentPoint: Point = [x, y];
+
+        if (!drawing) {
+          return;
+        }
 
         if (toolType === 'select') {
           drawingPositionRef.current.current = currentPoint;
@@ -191,7 +218,7 @@ const Canvas = forwardRef<Konva.Stage, Props>(
           setDraftNode(updatedNode);
         }
       },
-      [drawing, toolType, draftNode, handleSelectDraw],
+      [drawing, toolType, draftNode, handleSelectDraw, onPointerMove],
     );
 
     const onStageMoveEnd = useCallback(() => {
@@ -298,6 +325,12 @@ const Canvas = forwardRef<Konva.Stage, Props>(
 
     const handleNodesChange = (nodes: NodeObject[]) => {
       dispatch(canvasActions.updateNodes(nodes));
+      ws?.send(
+        JSON.stringify({
+          type: 'nodes-update',
+          data: { nodes },
+        } as WSMessage<'nodesAddUpdate'>),
+      );
     };
 
     const handleNodePress = (nodeId: string) => {
@@ -347,6 +380,19 @@ const Canvas = forwardRef<Konva.Stage, Props>(
           onNodesChange={handleNodesChange}
           onDraftEnd={handleDraftEnd}
         />
+        {users.length > 0 && (
+          <Layer>
+            {users.map((user) => {
+              return (
+                <CollaboratorCursor
+                  key={user.id}
+                  user={user}
+                  stageScale={stageConfig.scale}
+                />
+              );
+            })}
+          </Layer>
+        )}
       </Stage>
     );
   },

@@ -4,13 +4,16 @@ import { Provider as StoreProvider } from 'react-redux';
 import App from './App';
 import { store } from './stores/store';
 import { globalStyle } from './styles/global';
+import { WebSocketProvider } from './webSocketContext';
 
 globalStyle();
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <StoreProvider store={store}>
-      <App />
+      <WebSocketProvider>
+        <App />
+      </WebSocketProvider>
     </StoreProvider>
   </React.StrictMode>,
 );

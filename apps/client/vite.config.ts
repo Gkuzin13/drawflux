@@ -5,7 +5,16 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  server: { port: 5174 },
+  server: {
+    port: 5174,
+    proxy: {
+      '/share': {
+        target: 'ws://localhost:7456',
+        ws: true,
+        secure: false,
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({
