@@ -29,3 +29,9 @@ export const GetPageResponse = z.object({
 export const SharePageResponse = z.object({
   id: z.string().uuid(),
 });
+export const UpdatePageResponse = z.object({
+  id: z.string().uuid(),
+});
+export const UpdatePageBody = z.object({
+  nodes: Node.array(),
+});

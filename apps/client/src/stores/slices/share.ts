@@ -1,16 +1,14 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { CollabUser } from 'shared';
+import type { User } from 'shared';
 import { type RootState } from '../store';
 
 export type ShareState = {
   userId: string | null;
-  users: CollabUser[];
-  isConnected: boolean;
+  users: User[];
 };
 
 export const initialState: ShareState = {
   userId: null,
-  isConnected: false,
   users: [],
 };
 
@@ -18,13 +16,17 @@ export const shareSlice = createSlice({
   name: 'share',
   initialState,
   reducers: {
-    connect: (state, action: PayloadAction<ShareState>) => {
-      return action.payload;
+    init: (state, action: PayloadAction<{ users: User[]; userId: string }>) => {
+      state.userId = action.payload.userId;
+      state.users = action.payload.users;
     },
-    addUser: (state, action: PayloadAction<CollabUser>) => {
+    addUser: (state, action: PayloadAction<User>) => {
       state.users.push(action.payload);
     },
-    updateUser: (state, action: PayloadAction<Partial<CollabUser>>) => {
+    updateUser: (
+      state,
+      action: PayloadAction<Partial<User> & { id: string }>,
+    ) => {
       const index = state.users.findIndex((u) => u.id === action.payload.id);
 
       if (index === -1) {

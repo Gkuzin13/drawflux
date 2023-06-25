@@ -6,6 +6,8 @@ import type {
   SharePageResponse,
   QRCodeResponse,
   QRCodeRequestBody,
+  UpdatePageResponse,
+  UpdatePageRequestBody,
 } from 'shared';
 import { BASE_URL } from '@/constants/app';
 
@@ -22,6 +24,18 @@ export const api = createApi({
       query(params) {
         return {
           url: `/p/${params.id}`,
+        };
+      },
+    }),
+    updatePage: builder.mutation<
+      ServerResponse<UpdatePageResponse>,
+      UpdatePageRequestBody
+    >({
+      query(body) {
+        return {
+          url: `/p/ca5cf3c5-2ba3-4f6b-8d58-2cd6b7ceae85`,
+          method: 'PATCH',
+          body,
         };
       },
     }),
@@ -52,5 +66,9 @@ export const api = createApi({
   }),
 });
 
-export const { useSharePageMutation, useGetPageQuery, useGetQRCodeMutation } =
-  api;
+export const {
+  useSharePageMutation,
+  useGetPageQuery,
+  useGetQRCodeMutation,
+  useUpdatePageMutation,
+} = api;

@@ -5,10 +5,10 @@ import type {
   SharePageRequestBody,
   SharePageResponse,
   StageConfig,
+  UpdatePageBody,
+  UpdatePageResponse,
 } from '../schemas/page';
 import type { QRCodeRequestBody, QRCodeResponse } from '../schemas/qrcode';
-import type { Room, User } from '../schemas/share';
-import type { MessageSchemas } from '../schemas/ws';
 import type { BadRequestError } from '../utils/errors';
 
 const { nodeProps, style, type } = Node.shape;
@@ -27,8 +27,12 @@ export type Point = z.infer<(typeof nodeProps)['shape']['point']>;
 export type StageConfig = z.infer<typeof StageConfig>;
 
 export type SharePageRequestBody = z.infer<typeof SharePageRequestBody>;
-export type GetPageResponse = z.infer<typeof GetPageResponse>;
 export type SharePageResponse = z.infer<typeof SharePageResponse>;
+
+export type GetPageResponse = z.infer<typeof GetPageResponse>;
+
+export type UpdatePageRequestBody = z.infer<typeof UpdatePageBody>;
+export type UpdatePageResponse = z.infer<typeof UpdatePageResponse>;
 
 export type QRCodeRequestBody = z.infer<typeof QRCodeRequestBody>;
 export type QRCodeResponse = z.infer<typeof QRCodeResponse>;
@@ -38,9 +42,4 @@ export type ServerResponse<T> = {
   data?: T;
 };
 
-export type WSMessage<
-  K extends keyof typeof MessageSchemas = keyof typeof MessageSchemas,
-> = z.infer<(typeof MessageSchemas)[K]>;
-
-export type CollabRoom = z.infer<typeof Room>;
-export type CollabUser = z.infer<typeof User>;
+export * from './ws';

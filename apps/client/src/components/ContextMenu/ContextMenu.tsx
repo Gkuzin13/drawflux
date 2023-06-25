@@ -1,18 +1,35 @@
 import * as RadixContextMenu from '@radix-ui/react-context-menu';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import { type PropsWithChildren, type ReactNode, useCallback } from 'react';
+import { type WSMessage } from 'shared';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { sendMessage } from '@/utils/websocket';
+import { useWebSocket } from '@/webSocketContext';
 import { Divider } from '../core/Divider/Divider';
 import Kbd from '../core/Kbd/Kbd';
 import { ContextMenuContent, ContextMenuItem } from './ContextMenuStyled';
 
 export type ContextMenuType = 'node-menu' | 'canvas-menu';
+
 type Props = PropsWithChildren<{
   type: ContextMenuType;
   onContextMenuOpen: (open: boolean) => void;
   children: ReactNode;
 }>;
+
+const WSNodesActionMap: Partial<
+  Record<
+    (typeof canvasActions)[keyof typeof canvasActions]['type'],
+    WSMessage['type']
+  >
+> = {
+  'canvas/duplicateNodes': 'nodes-duplicate',
+  'canvas/moveNodesToStart': 'nodes-move-to-start',
+  'canvas/moveNodesToEnd': 'nodes-move-to-end',
+  'canvas/moveNodesBackward': 'nodes-move-backward',
+  'canvas/moveNodesForward': 'nodes-move-forward',
+};
 
 const CanvasMenu = () => {
   const { nodes } = useAppSelector(selectCanvas);
@@ -35,13 +52,28 @@ const CanvasMenu = () => {
 const NodeMenu = () => {
   const { selectedNodesIds } = useAppSelector(selectCanvas);
 
+  const ws = useWebSocket();
+
   const dispatch = useAppDispatch();
 
   const dispatchNodesAction = useCallback(
     (action: ActionCreatorWithPayload<string[]>) => {
-      dispatch(action(Object.keys(selectedNodesIds)));
+      const nodesIds = Object.keys(selectedNodesIds);
+
+      dispatch(action(nodesIds));
+
+      if (ws?.isConnected) {
+        const messageType =
+          WSNodesActionMap[action.type as keyof typeof WSNodesActionMap];
+
+        const message =
+          messageType &&
+          ({ type: messageType, data: { nodesIds } } as WSMessage);
+
+        message && sendMessage(ws.connection, message);
+      }
     },
-    [dispatch, selectedNodesIds],
+    [ws, selectedNodesIds, dispatch],
   );
 
   const handleSelectNone = useCallback(() => {

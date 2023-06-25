@@ -1,19 +1,18 @@
 import { randomUUID } from 'node:crypto';
 import { URLSearchParams } from 'node:url';
-import type { QueryResult } from 'pg';
 import type {
-  CollabRoom,
-  CollabUser,
-  NodeObject,
+  Room as CollabRoom,
+  User as CollabUser,
   Point,
   WSMessage,
 } from 'shared';
-import { WebSocketServer, type WebSocket, type RawData } from 'ws';
+import { WSMessageUtil } from 'shared';
+import { WebSocketServer, type WebSocket } from 'ws';
 import app from './app';
 import * as db from './db/index';
 import jobs from './db/jobs';
 import { queries } from './db/queries/index';
-import type { GetPageArgs, PageRowObject } from './db/queries/types';
+import type { GetPageReturn, GetPageValues } from './db/queries/types';
 
 (async () => {
   const client = await db.getClient();
@@ -50,39 +49,10 @@ const colorsSet: CollabUser['color'][] = [
 class Room implements CollabRoom {
   id;
   users;
-  nodes: NodeObject[];
 
-  constructor(
-    id: string,
-    user: InstanceType<typeof User>,
-    nodes: NodeObject[],
-  ) {
+  constructor(id: string, user: InstanceType<typeof User>) {
     this.id = id;
-    this.nodes = nodes;
     this.users = [user];
-  }
-
-  addNodes(nodes: NodeObject[]) {
-    this.nodes.push(...nodes);
-  }
-
-  updateNodes(nodes: NodeObject[]) {
-    const nodesMap = new Map<string, NodeObject>(
-      nodes.map((node) => [node.nodeProps.id, node]),
-    );
-
-    this.nodes = this.nodes.map((node) => {
-      if (nodesMap.has(node.nodeProps.id)) {
-        return nodesMap.get(node.nodeProps.id) as NodeObject;
-      }
-      return node;
-    });
-  }
-
-  removeNodes(nodesIds: string[]) {
-    const ids = new Set<string>(nodesIds);
-
-    this.nodes = this.nodes.filter((node) => !ids.has(node.nodeProps.id));
   }
 
   addUser(user: InstanceType<typeof User>) {
@@ -91,7 +61,7 @@ class Room implements CollabRoom {
     return this;
   }
 
-  updateUser(user: WSMessage<'userChange'>['data']['user']) {
+  updateUser(user: CollabUser) {
     const userIndex = this.users.findIndex((u) => u.id === user?.id);
 
     if (userIndex <= -1) {
@@ -134,13 +104,14 @@ class User implements CollabUser {
   }
 }
 
-async function getPage(id: string): Promise<PageRowObject | null> {
+async function getPage(id: string) {
   const client = await db.getClient();
 
   try {
-    const { rows }: QueryResult = await db.query<GetPageArgs>(queries.getPage, [
-      id,
-    ]);
+    const { rows } = await db.query<GetPageReturn, GetPageValues>(
+      queries.getPage,
+      [id],
+    );
 
     return rows[0] ?? null;
   } catch (error) {
@@ -188,20 +159,35 @@ wss.on('connection', async (ws, req) => {
 
   if (room) {
     const updatedRoom = room.addUser(user);
+    const page = roomId ? await getPage(roomId) : null;
 
-    const roomJoinedMessage: WSMessage<'roomJoined'> = {
+    if (!page) {
+      ws.terminate();
+      return;
+    }
+
+    const roomJoinedMessage: WSMessage = {
       type: 'room-joined',
-      data: { room: updatedRoom, userId: user.id },
+      data: { users: updatedRoom.users, userId: user.id, nodes: page.nodes },
     };
 
-    const userJoinedMessage: WSMessage<'userJoined'> = {
+    const userJoinedMessage: WSMessage = {
       type: 'user-joined',
       data: { user },
     };
 
-    ws.send(createJsonWSMessage(roomJoinedMessage));
+    const serializedRoomJoinedMessage =
+      WSMessageUtil.serialize(roomJoinedMessage);
+    const serializedUserJoinedMessage =
+      WSMessageUtil.serialize(userJoinedMessage);
 
-    broadcast(roomId, user.id, createJsonWSMessage(userJoinedMessage));
+    if (!serializedRoomJoinedMessage || !serializedUserJoinedMessage) {
+      return;
+    }
+
+    ws.send(serializedRoomJoinedMessage);
+
+    broadcast(roomId, user.id, serializedUserJoinedMessage);
 
     rooms.set(roomId, updatedRoom);
   } else {
@@ -212,16 +198,19 @@ wss.on('connection', async (ws, req) => {
       return;
     }
 
-    const newRoom = new Room(roomId, user, page.nodes);
+    const newRoom = new Room(roomId, user);
 
-    const roomJoinedMessage: WSMessage<'roomJoined'> = {
+    const roomJoinedMessage: WSMessage = {
       type: 'room-joined',
-      data: { room: newRoom, userId: user.id },
+      data: { users: newRoom.users, userId: user.id, nodes: page.nodes },
     };
 
-    ws.send(createJsonWSMessage(roomJoinedMessage));
+    const message = WSMessageUtil.serialize(roomJoinedMessage);
 
-    rooms.set(roomId, newRoom);
+    if (message) {
+      ws.send(message);
+      rooms.set(roomId, newRoom);
+    }
   }
 
   ws.on('error', console.error);
@@ -237,12 +226,18 @@ wss.on('connection', async (ws, req) => {
 
     rooms.set(roomId, roomToUpdate);
 
-    const userLeftMessage: WSMessage<'userLeft'> = {
+    const userLeftMessage: WSMessage = {
       type: 'user-left',
-      data: { userId: user.id },
+      data: { id: user.id },
     };
 
-    broadcast(roomId, user.id, createJsonWSMessage(userLeftMessage));
+    const message = WSMessageUtil.serialize(userLeftMessage);
+
+    if (!message) {
+      return;
+    }
+
+    broadcast(roomId, user.id, message);
 
     if (roomToUpdate.users.length <= 0) {
       ws.terminate();
@@ -250,85 +245,26 @@ wss.on('connection', async (ws, req) => {
     }
   });
 
-  ws.on('message', (message) => {
-    const parsedMessage = parseWSMessage(message);
+  ws.on('message', (rawMessage) => {
+    const message = rawMessage.toString();
+    const deserializedMessage = WSMessageUtil.deserialize(message);
     const roomToUpdate = rooms.get(roomId);
 
-    if (!parsedMessage || !roomToUpdate) {
+    if (!deserializedMessage || !roomToUpdate) {
       return;
     }
 
-    switch (parsedMessage.type) {
+    switch (deserializedMessage.type) {
       case 'user-change': {
-        const data = parsedMessage.data as WSMessage<'userChange'>['data'];
+        broadcast(roomId, user.id, message);
 
-        const userChangeMessage: WSMessage<'userChange'> = {
-          type: 'user-change',
-          data,
-        };
-
-        broadcast(roomId, user.id, createJsonWSMessage(userChangeMessage));
-
-        roomToUpdate.updateUser(data.user);
-        rooms.set(roomId, roomToUpdate);
-
-        break;
-      }
-      case 'nodes-add': {
-        const data = parsedMessage.data as WSMessage<'nodesAddUpdate'>['data'];
-
-        const nodesAddUpdateMessage: WSMessage<'nodesAddUpdate'> = {
-          type: 'nodes-add',
-          data,
-        };
-
-        broadcast(roomId, user.id, createJsonWSMessage(nodesAddUpdateMessage));
-
-        roomToUpdate.addNodes(data.nodes);
+        roomToUpdate.updateUser(deserializedMessage.data.user);
         rooms.set(roomId, roomToUpdate);
         break;
       }
-      case 'nodes-update': {
-        const data = parsedMessage.data as WSMessage<'nodesAddUpdate'>['data'];
-
-        const nodesUpdateMessage: WSMessage<'nodesAddUpdate'> = {
-          type: 'nodes-update',
-          data,
-        };
-
-        broadcast(roomId, user.id, createJsonWSMessage(nodesUpdateMessage));
-
-        roomToUpdate.updateNodes(data.nodes);
-        rooms.set(roomId, roomToUpdate);
-        break;
-      }
-      case 'nodes-delete': {
-        const data = parsedMessage.data as WSMessage<'nodesDelete'>['data'];
-
-        const nodesUpdateMessage: WSMessage<'nodesDelete'> = {
-          type: 'nodes-delete',
-          data,
-        };
-
-        broadcast(roomId, user.id, createJsonWSMessage(nodesUpdateMessage));
-
-        roomToUpdate.removeNodes(data.nodesIds);
-        rooms.set(roomId, roomToUpdate);
-        break;
+      default: {
+        broadcast(roomId, user.id, message);
       }
     }
   });
 });
-
-function parseWSMessage(data: RawData): WSMessage | null {
-  try {
-    return JSON.parse(data.toString());
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
-
-function createJsonWSMessage(message: WSMessage): string {
-  return JSON.stringify(message);
-}

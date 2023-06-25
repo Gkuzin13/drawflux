@@ -8,9 +8,12 @@ const poolClient = new pg.Pool({
       : undefined,
 });
 
-export async function query<T extends [...T]>(text: string, params?: T) {
+export async function query<
+  Return extends pg.QueryResultRow,
+  Values extends string[],
+>(text: string, values?: Values) {
   const start = new Date().getTime();
-  const res = await poolClient.query(text, params);
+  const res = await poolClient.query<Return, Values>(text, values);
   const duration = new Date().getTime() - start;
 
   console.log('Executed query', { text, duration, rows: res.rows });

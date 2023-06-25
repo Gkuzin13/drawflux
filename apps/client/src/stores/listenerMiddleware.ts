@@ -7,10 +7,10 @@ import {
   type TypedAddListener,
 } from '@reduxjs/toolkit';
 import { LOCAL_STORAGE, type PageStateType } from '@/constants/app';
-import { api } from '@/services/api';
 import { storage } from '@/utils/storage';
 import { historyActions } from './reducers/history';
 import { canvasActions } from './slices/canvas';
+import { shareActions } from './slices/share';
 import type { RootState, AppDispatch } from './store';
 
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
@@ -43,21 +43,16 @@ const actionsToListenTo = [
   canvasActions.setSelectedNodesIds,
   canvasActions.setStageConfig,
   canvasActions.setToolType,
-  api.endpoints.getPage.matchRejected,
-  api.endpoints.getPage.matchFulfilled,
+  shareActions.init,
 ];
 
 startAppListening({
   matcher: isAnyOf(...actionsToListenTo),
   effect: (action, listenerApi) => {
-    if (
-      api.endpoints.getPage.matchFulfilled(action) ||
-      api.endpoints.getPage.matchRejected(action)
-    ) {
+    if (shareActions.init.match(action)) {
       listenerApi.unsubscribe();
       return;
     }
-
     const canvas = listenerApi.getState().canvas.present;
     storage.set<PageStateType>(LOCAL_STORAGE.KEY, { page: { ...canvas } });
   },

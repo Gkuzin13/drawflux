@@ -1,10 +1,12 @@
 import type Konva from 'konva';
 import { memo, useRef } from 'react';
 import { Arrow, Group, Text } from 'react-konva';
-import { type CollabUser, colors } from 'shared';
+import { type User, colors } from 'shared';
+
+type ColorValue = (typeof colors)[keyof typeof colors];
 
 type Props = {
-  user: CollabUser;
+  user: User;
   stageScale: number;
 };
 
@@ -16,11 +18,7 @@ const baseConfig: Konva.ShapeConfig = {
 const CollaboratorCursor = ({ user, stageScale }: Props) => {
   const ref = useRef<Konva.Arrow>(null);
 
-  function getColor(name: CollabUser['color']) {
-    return colors[name];
-  }
-
-  const colorValue = getColor(user.color);
+  const colorValue: ColorValue = colors[user.color] || '#000000';
 
   return (
     <Group

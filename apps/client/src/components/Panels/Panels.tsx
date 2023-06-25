@@ -1,7 +1,7 @@
 import type Konva from 'konva';
 import { type RefObject, useMemo } from 'react';
-import type { NodeStyle, NodeObject, StageConfig } from 'shared';
-import { Schemas } from 'shared';
+import type { NodeStyle, NodeObject, StageConfig, WSMessage } from 'shared';
+import { Schemas, WSMessageUtil } from 'shared';
 import type { ControlAction } from '@/constants/control';
 import { type MenuPanelActionType } from '@/constants/menu';
 import { type Tool } from '@/constants/tool';
@@ -11,10 +11,13 @@ import {
   canvasActions,
   selectCanvas,
   selectHistory,
+  updatePage,
 } from '@/stores/slices/canvas';
 import { uiActions } from '@/stores/slices/ui';
 import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
+import { sendMessage } from '@/utils/websocket';
+import { useWebSocket } from '@/webSocketContext';
 import ControlPanel from './ControlPanel/ControlPanel';
 import MenuPanel from './MenuPanel/MenuPanel';
 import {
@@ -44,6 +47,7 @@ const Panels = ({
 
   const dispatch = useAppDispatch();
 
+  const ws = useWebSocket();
   const { online } = useNetworkState();
 
   const selectedNodes = useMemo(() => {
@@ -108,6 +112,18 @@ const Panels = ({
     });
 
     dispatch(canvasActions.updateNodes(updatedNodes));
+
+    if (ws?.isConnected) {
+      const message: WSMessage = {
+        type: 'nodes-update',
+        data: { nodes: updatedNodes },
+      };
+
+      sendMessage(ws.connection, message);
+
+      const currentNodes = store.getState().canvas.present.nodes;
+      dispatch(updatePage({ id: ws.pageId, body: { nodes: currentNodes } }));
+    }
   };
 
   const handleMenuAction = async (type: MenuPanelActionType) => {
@@ -174,10 +190,28 @@ const Panels = ({
     switch (action.type) {
       case 'canvas/deleteNodes': {
         dispatch(canvasActions.deleteNodes(intersectedNodesIds));
+
+        if (ws?.isConnected) {
+          const message: WSMessage = {
+            type: 'nodes-delete',
+            data: { nodesIds: intersectedNodesIds },
+          };
+
+          sendMessage(ws.connection, message);
+        }
         break;
       }
       default: {
         dispatch(action());
+        if (ws?.isConnected) {
+          const currentNodes = store.getState().canvas.present.nodes;
+          const message: WSMessage = {
+            type: 'nodes-set',
+            data: { nodes: currentNodes },
+          };
+
+          sendMessage(ws.connection, message);
+        }
         break;
       }
     }

@@ -1,9 +1,21 @@
-import { createSlice, isAnyOf, type PayloadAction } from '@reduxjs/toolkit';
+import {
+  createAsyncThunk,
+  createSlice,
+  isAnyOf,
+  type PayloadAction,
+} from '@reduxjs/toolkit';
 import type { Vector2d } from 'konva/lib/types';
-import type { NodeObject, StageConfig } from 'shared';
+import type {
+  NodeObject,
+  StageConfig,
+  GetPageResponse,
+  UpdatePageResponse,
+  UpdatePageRequestBody,
+} from 'shared';
 import type { SelectedNodesIds } from '@/constants/app';
 import type { Tool } from '@/constants/tool';
 import { api } from '@/services/api';
+import { fetchData } from '@/utils/fetch';
 import { allNodesInView, duplicateNodes, reorderNodes } from '@/utils/node';
 import {
   getCenterPosition,
@@ -22,6 +34,37 @@ export type CanvasSliceState = {
 
 export type CanvasAcionType =
   (typeof canvasActions)[keyof typeof canvasActions]['type'];
+
+export const getPage = createAsyncThunk<
+  GetPageResponse,
+  string,
+  { rejectValue: string }
+>('canvas/getPage', async (id, { rejectWithValue }) => {
+  const { data, error } = await fetchData<GetPageResponse>(`/p/${id}`);
+
+  if (error) {
+    return rejectWithValue(error.message);
+  }
+
+  return data as GetPageResponse;
+});
+
+export const updatePage = createAsyncThunk<
+  UpdatePageResponse,
+  { id: string; body: UpdatePageRequestBody },
+  { rejectValue: string }
+>('canvas/getPage', async ({ id, body }, { rejectWithValue }) => {
+  const { data, error } = await fetchData<UpdatePageResponse>(`/p/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  });
+
+  if (error) {
+    return rejectWithValue(error.message);
+  }
+
+  return data as UpdatePageResponse;
+});
 
 export const initialState: CanvasSliceState = {
   nodes: [],
