@@ -125,6 +125,11 @@ const Panels = ({
     dispatch(canvasActions.setToolType(type));
   };
 
+  const handleUpdatePage = () => {
+    const currentNodes = store.getState().canvas.present.nodes;
+    updatePage({ nodes: currentNodes });
+  };
+
   const handleStyleChange = (style: Partial<NodeStyle>) => {
     const updatedNodes = selectedNodes.map((node) => {
       return { ...node, style: { ...node.style, ...style } };
@@ -140,8 +145,7 @@ const Panels = ({
 
       sendMessage(ws.connection, message);
 
-      const currentNodes = store.getState().canvas.present.nodes;
-      updatePage({ nodes: currentNodes });
+      handleUpdatePage();
     }
   };
 
@@ -230,6 +234,7 @@ const Panels = ({
       };
 
       sendMessage(ws.connection, message);
+      handleUpdatePage();
     }
   };
 

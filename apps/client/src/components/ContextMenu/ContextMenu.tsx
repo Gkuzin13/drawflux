@@ -1,10 +1,16 @@
 import * as RadixContextMenu from '@radix-ui/react-context-menu';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import { type PropsWithChildren, type ReactNode, useCallback } from 'react';
-import { type WSMessage } from 'shared';
+import {
+  type UpdatePageRequestBody,
+  type UpdatePageResponse,
+  type WSMessage,
+} from 'shared';
 import { useWebSocket } from '@/contexts/websocket';
+import useFetch from '@/hooks/useFetch';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { store } from '@/stores/store';
 import { sendMessage } from '@/utils/websocket';
 import { Divider } from '../core/Divider/Divider';
 import Kbd from '../core/Kbd/Kbd';
@@ -50,9 +56,20 @@ const CanvasMenu = () => {
 };
 
 const NodeMenu = () => {
-  const { selectedNodesIds } = useAppSelector(selectCanvas);
-
   const ws = useWebSocket();
+
+  const [{ error }, updatePage] = useFetch<
+    UpdatePageResponse,
+    UpdatePageRequestBody
+  >(
+    `/p/${ws?.pageId}`,
+    {
+      method: 'PATCH',
+    },
+    { skip: true },
+  );
+
+  const { selectedNodesIds } = useAppSelector(selectCanvas);
 
   const dispatch = useAppDispatch();
 
@@ -71,9 +88,12 @@ const NodeMenu = () => {
           ({ type: messageType, data: { nodesIds } } as WSMessage);
 
         message && sendMessage(ws.connection, message);
+
+        const currentNodes = store.getState().canvas.present.nodes;
+        updatePage({ nodes: currentNodes });
       }
     },
-    [ws, selectedNodesIds, dispatch],
+    [ws, selectedNodesIds, dispatch, updatePage],
   );
 
   const handleSelectNone = useCallback(() => {
