@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type {
   NodeObject,
   SharePageRequestBody,
@@ -10,7 +11,7 @@ import * as db from '../../db/index';
 import { queries } from '../../db/queries/index';
 
 const mockNode: NodeObject = {
-  nodeProps: { id: 'node-id', point: [0, 0], rotation: 0, visible: true },
+  nodeProps: { id: randomUUID(), point: [0, 0], rotation: 0, visible: true },
   style: {
     size: 'extra-large',
     animated: false,
@@ -49,6 +50,25 @@ describe('db queries', () => {
     }
   });
 
+  describe('PATCH /p/:id', () => {
+    it('should patch correctly', async () => {
+      const mockPage: SharePageRequestBody = {
+        page: {
+          stageConfig: mockStageConfig,
+          nodes: [mockNode],
+        },
+      };
+
+      const postResponse = await request(app).post('/p').send(mockPage);
+      const response = await request(app)
+        .patch(`/p/${postResponse.body.data.id}`)
+        .send({ nodes: mockPage.page.nodes });
+
+      expect(response.status).toBe(200);
+      expect(typeof response.body.data.id).toBe('string');
+    });
+  });
+
   describe('POST /p', () => {
     it('should return the page', async () => {
       const mockPage: SharePageRequestBody = {
@@ -65,7 +85,7 @@ describe('db queries', () => {
     });
   });
 
-  describe('GET /p', () => {
+  describe('GET /p/:id', () => {
     it('should return the page', async () => {
       const mockPage: SharePageRequestBody = {
         page: {
