@@ -39,7 +39,8 @@ type DraftNodeAdd = Message<'draft-add', { node: NodeObject }>;
 type DraftNodeDraw = Message<
   'draft-draw',
   {
-    id: string;
+    nodeId: string;
+    userId: string;
     type: Omit<NodeType, 'text'>;
     position: { start: Point; current: Point };
   }
@@ -49,6 +50,7 @@ type DraftTextNodeUpdate = Message<
   'draft-text-update',
   { id: string; text: string }
 >;
+type HistoryChange = Message<'history-change', { action: 'undo' | 'redo' }>;
 
 export type WSMessage =
   | RoomJoined
@@ -68,4 +70,5 @@ export type WSMessage =
   | DraftNodeAdd
   | DraftNodeDraw
   | DraftNodeEnd
-  | DraftTextNodeUpdate;
+  | DraftTextNodeUpdate
+  | HistoryChange;
