@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
+import type { WSMessage } from 'shared';
 import type { NodeComponentProps } from '@/components/Node/Node';
+import { useWebSocket } from '@/contexts/websocket';
+import { sendMessage } from '@/utils/websocket';
 import EditableTextInput from './EditableTextInput';
 import ResizableText from './ResizableText';
 
@@ -16,6 +19,8 @@ const EditableText = ({
   onPress,
 }: NodeComponentProps) => {
   const [editing, setEditing] = useState(false);
+
+  const ws = useWebSocket();
 
   useEffect(() => {
     if (!node.text) {
@@ -40,12 +45,24 @@ const EditableText = ({
     setEditing(false);
   };
 
+  const handleTextUpdate = (text: string) => {
+    if (ws?.isConnected) {
+      const message: WSMessage = {
+        type: 'draft-text-update',
+        data: { id: node.nodeProps.id, text },
+      };
+
+      sendMessage(ws.connection, message);
+    }
+  };
+
   if (editing) {
     return (
       <EditableTextInput
         node={node}
         initialValue={node.text || ''}
-        onTextSave={handleTextSave}
+        onChange={handleTextSave}
+        onUpdate={handleTextUpdate}
       />
     );
   }

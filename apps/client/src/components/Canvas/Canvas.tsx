@@ -9,21 +9,26 @@ import {
   useRef,
 } from 'react';
 import { Layer, Stage } from 'react-konva';
-import type { NodeObject, Point, StageConfig, WSMessage } from 'shared';
+import type {
+  NodeObject,
+  Point,
+  StageConfig,
+  UpdatePageRequestBody,
+  UpdatePageResponse,
+  WSMessage,
+} from 'shared';
 import { CURSOR } from '@/constants/cursor';
 import { NODES_LAYER_INDEX } from '@/constants/node';
+import { useWebSocket } from '@/contexts/websocket';
+import useFetch from '@/hooks/useFetch';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import {
-  canvasActions,
-  selectCanvas,
-  updatePage,
-} from '@/stores/slices/canvas';
+import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { selectShare } from '@/stores/slices/share';
 import { store } from '@/stores/store';
 import { uniq } from '@/utils/array';
 import { createNode } from '@/utils/node';
 import { getNormalizedInvertedRect } from '@/utils/position';
 import { sendMessage } from '@/utils/websocket';
-import { useWebSocket } from '@/webSocketContext';
 import BackgroundRect from '../BackgroundRect/BackgroundRect';
 import CollabLayer from '../CollabLayer';
 import NodesLayer from '../NodesLayer';
@@ -62,12 +67,16 @@ const Canvas = forwardRef<Konva.Stage, Props>(
     const [draftNode, setDraftNode] = useState<NodeObject | null>(null);
     const [drawing, setDrawing] = useState(false);
     const [draggingStage, setDraggingStage] = useState(false);
+    const ws = useWebSocket();
+    const [{ error }, updatePage] = useFetch<
+      UpdatePageResponse,
+      UpdatePageRequestBody
+    >(`/p/${ws?.pageId}`, { method: 'PATCH' }, { skip: true });
 
     const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
+    const { userId } = useAppSelector(selectShare);
 
     const dispatch = useAppDispatch();
-
-    const ws = useWebSocket();
 
     const drawingPositionRef = useRef(initialDrawingPosition);
     const selectRectRef = useRef<Konva.Rect>(null);
@@ -115,9 +124,7 @@ const Canvas = forwardRef<Konva.Stage, Props>(
           sendMessage(ws.connection, nodeAddMessage);
           sendMessage(ws.connection, draftEndMessage);
 
-          dispatch(
-            updatePage({ id: ws.pageId, body: { nodes: [...nodes, node] } }),
-          );
+          updatePage({ nodes: [...nodes, node] });
         }
 
         if (resetToolType) {
@@ -125,7 +132,7 @@ const Canvas = forwardRef<Konva.Stage, Props>(
           dispatch(canvasActions.setSelectedNodesIds([node.nodeProps.id]));
         }
       },
-      [ws, nodes, dispatch],
+      [ws, nodes, updatePage, dispatch],
     );
 
     const handleSelectDraw = useCallback(
@@ -252,11 +259,12 @@ const Canvas = forwardRef<Konva.Stage, Props>(
 
           setDraftNode(updatedNode);
 
-          if (ws?.isConnected) {
+          if (ws?.isConnected && userId) {
             const message: WSMessage = {
               type: 'draft-draw',
               data: {
-                id: updatedNode.nodeProps.id,
+                userId,
+                nodeId: updatedNode.nodeProps.id,
                 type: updatedNode.type,
                 position: {
                   start: drawingPositionRef.current.start,
@@ -269,7 +277,7 @@ const Canvas = forwardRef<Konva.Stage, Props>(
           }
         }
       },
-      [drawing, toolType, draftNode, ws, handleSelectDraw],
+      [drawing, toolType, draftNode, ws, userId, handleSelectDraw],
     );
 
     const onStageMoveEnd = useCallback(() => {
@@ -386,7 +394,7 @@ const Canvas = forwardRef<Konva.Stage, Props>(
         sendMessage(ws.connection, message);
 
         const currentNodes = store.getState().canvas.present.nodes;
-        dispatch(updatePage({ id: ws.pageId, body: { nodes: currentNodes } }));
+        updatePage({ nodes: currentNodes });
       }
     };
 
@@ -426,7 +434,9 @@ const Canvas = forwardRef<Konva.Stage, Props>(
             currentPoint={drawingPositionRef.current.current}
             active={isSelectRectActive}
           />
-          {ws?.isConnected && <CollabLayer stageScale={stageConfig.scale} />}
+          {ws?.isConnected && (
+            <CollabLayer stageScale={stageConfig.scale} stageRef={ref} />
+          )}
         </Layer>
         <NodesLayer
           nodes={nodes}

@@ -1,23 +1,30 @@
 import type Konva from 'konva';
 import { type RefObject, useMemo } from 'react';
-import type { NodeStyle, NodeObject, StageConfig, WSMessage } from 'shared';
-import { Schemas, WSMessageUtil } from 'shared';
+import type {
+  NodeStyle,
+  NodeObject,
+  StageConfig,
+  WSMessage,
+  UpdatePageResponse,
+  UpdatePageRequestBody,
+} from 'shared';
+import { Schemas } from 'shared';
 import type { ControlAction } from '@/constants/control';
 import { type MenuPanelActionType } from '@/constants/menu';
 import { type Tool } from '@/constants/tool';
+import { useWebSocket } from '@/contexts/websocket';
+import useFetch from '@/hooks/useFetch';
 import useNetworkState from '@/hooks/useNetworkState/useNetworkState';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
   canvasActions,
   selectCanvas,
   selectHistory,
-  updatePage,
 } from '@/stores/slices/canvas';
 import { uiActions } from '@/stores/slices/ui';
 import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
 import { sendMessage } from '@/utils/websocket';
-import { useWebSocket } from '@/webSocketContext';
 import ControlPanel from './ControlPanel/ControlPanel';
 import MenuPanel from './MenuPanel/MenuPanel';
 import {
@@ -42,13 +49,25 @@ const Panels = ({
   intersectedNodesIds,
   isPageShared = false,
 }: Props) => {
+  const ws = useWebSocket();
+
+  const [{ error }, updatePage] = useFetch<
+    UpdatePageResponse,
+    UpdatePageRequestBody
+  >(
+    `/p/${ws?.pageId}`,
+    {
+      method: 'PATCH',
+    },
+    { skip: true },
+  );
+
   const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
   const { past, future } = useAppSelector(selectHistory);
 
-  const dispatch = useAppDispatch();
-
-  const ws = useWebSocket();
   const { online } = useNetworkState();
+
+  const dispatch = useAppDispatch();
 
   const selectedNodes = useMemo(() => {
     const nodesIds = new Set(intersectedNodesIds);
@@ -113,7 +132,7 @@ const Panels = ({
 
     dispatch(canvasActions.updateNodes(updatedNodes));
 
-    if (ws?.isConnected) {
+    if (ws?.isConnected && ws.pageId) {
       const message: WSMessage = {
         type: 'nodes-update',
         data: { nodes: updatedNodes },
@@ -122,7 +141,7 @@ const Panels = ({
       sendMessage(ws.connection, message);
 
       const currentNodes = store.getState().canvas.present.nodes;
-      dispatch(updatePage({ id: ws.pageId, body: { nodes: currentNodes } }));
+      updatePage({ nodes: currentNodes });
     }
   };
 
@@ -177,7 +196,6 @@ const Panels = ({
             );
           }
         }
-        break;
       }
     }
   };
@@ -187,33 +205,31 @@ const Panels = ({
   };
 
   const handleControlActions = (action: ControlAction) => {
-    switch (action.type) {
-      case 'canvas/deleteNodes': {
-        dispatch(canvasActions.deleteNodes(intersectedNodesIds));
+    if (action.type === 'canvas/deleteNodes') {
+      dispatch(canvasActions.deleteNodes(intersectedNodesIds));
 
-        if (ws?.isConnected) {
-          const message: WSMessage = {
-            type: 'nodes-delete',
-            data: { nodesIds: intersectedNodesIds },
-          };
+      if (ws?.isConnected) {
+        const message: WSMessage = {
+          type: 'nodes-delete',
+          data: { nodesIds: intersectedNodesIds },
+        };
 
-          sendMessage(ws.connection, message);
-        }
-        break;
+        sendMessage(ws.connection, message);
       }
-      default: {
-        dispatch(action());
-        if (ws?.isConnected) {
-          const currentNodes = store.getState().canvas.present.nodes;
-          const message: WSMessage = {
-            type: 'nodes-set',
-            data: { nodes: currentNodes },
-          };
+      return;
+    }
 
-          sendMessage(ws.connection, message);
-        }
-        break;
-      }
+    dispatch(action());
+
+    if (ws?.isConnected) {
+      const historyAction = action.type === 'history/redo' ? 'redo' : 'undo';
+
+      const message: WSMessage = {
+        type: 'history-change',
+        data: { action: historyAction },
+      };
+
+      sendMessage(ws.connection, message);
     }
   };
 

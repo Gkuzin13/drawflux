@@ -18,12 +18,9 @@ function useWSMessage(
 
     const listener = (event: MessageEvent) => {
       const message = WSMessageUtil.deserialize(event.data);
-
-      if (!message?.data || !message?.type) {
-        return;
+      if (message?.data && message?.type) {
+        onMessage(message);
       }
-
-      onMessage(message);
     };
 
     connection.addEventListener('message', listener);

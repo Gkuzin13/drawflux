@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type StageConfig, type WSMessage } from 'shared';
+import { type StageConfig } from 'shared';
 import Canvas from '@/components/Canvas/Canvas';
 import {
   getIntersectingNodes,
@@ -14,10 +14,7 @@ import { NODES_LAYER_INDEX } from '@/constants/node';
 import useKbdShortcuts from '@/hooks/useKbdShortcuts';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import { selectShare } from '@/stores/slices/share';
 import { selectDialog, uiActions } from '@/stores/slices/ui';
-import { sendMessage } from '@/utils/websocket';
-import { useWebSocket } from '@/webSocketContext';
 import { Container } from './MainContainerStyled';
 
 type Props = {
@@ -34,14 +31,9 @@ const MainContainer = ({ isPageShared, viewportSize }: Props) => {
   const { stageConfig, selectedNodesIds, nodes, toolType } =
     useAppSelector(selectCanvas);
 
-  const { userId } = useAppSelector(selectShare);
-
   const dialog = useAppSelector(selectDialog);
 
-  const ws = useWebSocket();
-
   const stageRef = useRef<Konva.Stage>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useAppDispatch();
 
@@ -63,37 +55,6 @@ const MainContainer = ({ isPageShared, viewportSize }: Props) => {
   useEffect(() => {
     setIntersectedNodesIds(Object.keys(selectedNodesIds));
   }, [selectedNodesIds]);
-
-  useEffect(() => {
-    if (!containerRef.current || !stageRef.current) {
-      return;
-    }
-
-    const container = containerRef.current;
-    const stage = stageRef.current;
-
-    function handleMousemove() {
-      if (!userId || !ws?.isConnected) {
-        return;
-      }
-
-      const { x, y } = stage.getRelativePointerPosition();
-
-      const message: WSMessage = {
-        type: 'user-move',
-        data: { id: userId, position: [x, y] },
-      };
-
-      sendMessage(ws.connection, message);
-    }
-    container.addEventListener('mousemove', handleMousemove);
-    container.addEventListener('touchmove', handleMousemove);
-
-    return () => {
-      container.removeEventListener('mousemove', handleMousemove);
-      container.removeEventListener('touchmove', handleMousemove);
-    };
-  }, [userId, containerRef, stageConfig, ws, dispatch]);
 
   const handleStageConfigChange = (config: Partial<StageConfig>) => {
     dispatch(canvasActions.setStageConfig(config));
@@ -145,7 +106,7 @@ const MainContainer = ({ isPageShared, viewportSize }: Props) => {
   };
 
   return (
-    <Container ref={containerRef} tabIndex={0}>
+    <Container tabIndex={0}>
       <Panels
         intersectedNodesIds={intersectedNodesIds}
         isPageShared={isPageShared}

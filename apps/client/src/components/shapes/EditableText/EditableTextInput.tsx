@@ -9,7 +9,8 @@ import type { OnTextSaveArgs } from './EditableText';
 type Props = {
   node: NodeObject;
   initialValue: string;
-  onTextSave: (args: OnTextSaveArgs) => void;
+  onChange: (args: OnTextSaveArgs) => void;
+  onUpdate: (value: string) => void;
 };
 
 const getStyle = (
@@ -48,7 +49,12 @@ const getStyle = (
 
 const textSaveKeys: string[] = [KEYS.ENTER, KEYS.ESCAPE];
 
-const EditableTextInput = ({ node, initialValue, onTextSave }: Props) => {
+const EditableTextInput = ({
+  node,
+  initialValue,
+  onChange,
+  onUpdate,
+}: Props) => {
   const [value, setValue] = useState(initialValue);
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -59,6 +65,9 @@ const EditableTextInput = ({ node, initialValue, onTextSave }: Props) => {
       ref.current.focus();
       ref.current.setSelectionRange(-1, -1);
     }
+
+    // Temporary fix
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref.current]);
 
   const {
@@ -81,7 +90,7 @@ const EditableTextInput = ({ node, initialValue, onTextSave }: Props) => {
 
     const textAreaElement = ref.current;
 
-    onTextSave({
+    onChange({
       text,
       width: textAreaElement.offsetWidth,
     });
@@ -103,6 +112,7 @@ const EditableTextInput = ({ node, initialValue, onTextSave }: Props) => {
     const { value } = event.target as HTMLTextAreaElement;
 
     setValue(value);
+    onUpdate(value);
   };
 
   return (

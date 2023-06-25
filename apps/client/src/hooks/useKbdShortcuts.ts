@@ -2,12 +2,12 @@ import { useCallback, useEffect } from 'react';
 import { type WSMessage } from 'shared';
 import { KEYS } from '@/constants/keys';
 import { TOOLS, type Tool } from '@/constants/tool';
+import { useWebSocket } from '@/contexts/websocket';
 import { useAppDispatch } from '@/stores/hooks';
 import { historyActions } from '@/stores/reducers/history';
 import { canvasActions } from '@/stores/slices/canvas';
 import { store } from '@/stores/store';
 import { sendMessage } from '@/utils/websocket';
-import { useWebSocket } from '@/webSocketContext';
 
 function useKbdShortcuts(
   element: HTMLElement | null,
@@ -25,9 +25,21 @@ function useKbdShortcuts(
 
       switch (key) {
         case KEYS.Z: {
-          return dispatch(
-            shiftPressed ? historyActions.redo() : historyActions.undo(),
-          );
+          const action = shiftPressed
+            ? historyActions.redo
+            : historyActions.undo;
+
+          dispatch(action());
+
+          if (ws?.isConnected) {
+            const message: WSMessage = {
+              type: 'history-change',
+              data: { action: shiftPressed ? 'redo' : 'undo' },
+            };
+
+            sendMessage(ws.connection, message);
+          }
+          break;
         }
         case KEYS.D: {
           event.preventDefault();
