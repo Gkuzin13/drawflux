@@ -14,6 +14,7 @@ export type HistoryActionType =
 export const historyActions = {
   undo: createAction('history/undo'),
   redo: createAction('history/redo'),
+  reset: createAction('history/reset'),
 };
 
 export type IgnoreActionType = HistoryActionType | CanvasAcionType;
@@ -80,6 +81,9 @@ function undoable(
           present: next,
           future: newFuture,
         };
+      }
+      case 'history/reset': {
+        return { past: [], present, future: [] };
       }
       default: {
         const newPresent = reducer(present, action);

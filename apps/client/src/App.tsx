@@ -31,6 +31,7 @@ const App = () => {
               shareActions.init({ userId: data.userId, users: data.users }),
             );
             dispatch(canvasActions.setNodes(data.nodes));
+            dispatch(historyActions.reset());
             break;
           }
           case 'nodes-set': {
@@ -106,6 +107,7 @@ const App = () => {
       }
 
       dispatch(canvasActions.set(stateFromStorage.page));
+      dispatch(historyActions.reset());
     }
   }, [ws, dispatch]);
 
