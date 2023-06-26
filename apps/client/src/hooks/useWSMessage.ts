@@ -1,23 +1,19 @@
 import { useEffect } from 'react';
 import { type WSMessage, WSMessageUtil } from 'shared';
 
-type UseWSMessageArgs = {
-  connection: WebSocket | null | undefined;
-  isConnected: boolean | undefined;
-  onMessage: (message: WSMessage) => void;
-};
-
 function useWSMessage(
-  { connection, isConnected, onMessage }: UseWSMessageArgs,
+  connection: WebSocket | null | undefined,
+  onMessage: (message: WSMessage) => void,
   deps: unknown[] = [],
 ) {
   useEffect(() => {
-    if (!connection || !isConnected) {
+    if (!connection) {
       return;
     }
 
     const listener = (event: MessageEvent) => {
       const message = WSMessageUtil.deserialize(event.data);
+
       if (message?.data && message?.type) {
         onMessage(message);
       }
@@ -28,7 +24,7 @@ function useWSMessage(
     return () => {
       connection.removeEventListener('message', listener);
     };
-  }, [connection, isConnected, ...deps]);
+  }, [connection, ...deps]);
 }
 
 export default useWSMessage;

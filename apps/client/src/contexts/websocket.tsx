@@ -10,15 +10,17 @@ type WSContextValue = {
   pageId: string | null;
 };
 
+type WSStatus = 'idle' | 'connecting' | 'connected' | 'disconnected';
+
 export const WebSocketContext = createContext<WSContextValue | null>(null);
 
 const pageId = urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY);
+const initialStatus = pageId ? 'connecting' : 'idle';
 
 let attempedConnection = false;
 
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
-  const [isConnected, setIsConnnected] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(!!pageId);
+  const [status, setStatus] = useState<WSStatus>(initialStatus);
 
   const connection = useRef<WebSocket | null>(null);
 
@@ -28,50 +30,48 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     }
 
     const onOpen = () => {
-      setIsConnecting(false);
-      setIsConnnected(true);
+      setStatus('connected');
     };
 
     const onClose = () => {
-      setIsConnnected(false);
-      setIsConnecting(false);
+      setStatus('disconnected');
+    };
+
+    const onError = () => {
+      setStatus('disconnected');
     };
 
     connection.current.addEventListener('open', onOpen);
     connection.current.addEventListener('close', onClose);
+    connection.current.addEventListener('error', onError);
 
     return () => {
       connection.current?.removeEventListener('open', onOpen);
       connection.current?.removeEventListener('close', onClose);
+      connection.current?.removeEventListener('error', onError);
     };
   }, [connection]);
 
   useEffect(() => {
     if (pageId && !attempedConnection) {
-      setIsConnecting(true);
+      setStatus('connecting');
       connection.current = new WebSocket(
         `ws://localhost:7456/page&id=${pageId}`,
       );
+      attempedConnection = true;
     }
 
     return () => {
-      setIsConnecting(false);
-      setIsConnnected(false);
+      setStatus('idle');
     };
-  }, []);
-
-  useEffect(() => {
-    if (connection && !attempedConnection) {
-      attempedConnection = true;
-    }
-  }, [connection]);
+  }, [pageId]);
 
   return (
     <WebSocketContext.Provider
       value={{
         connection: connection.current,
-        isConnected,
-        isConnecting,
+        isConnected: status === 'connected',
+        isConnecting: status === 'connecting',
         pageId,
       }}
     >

@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import type { WSMessage, NodeObject, User } from 'shared';
+import type { WSMessage, NodeObject, Point } from 'shared';
 import { useWebSocket } from '@/contexts/websocket';
 import useWSMessage from '@/hooks/useWSMessage';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
@@ -22,18 +22,31 @@ type Props = {
   stageRef: ForwardedRef<Konva.Stage>;
 };
 
+type UserCursors = {
+  [userId: string]: Point;
+};
+
 const CollabLayer = ({ stageScale, stageRef }: Props) => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [userCursors, setUserCursors] = useState<UserCursors>({});
   const [draftNodes, setDraftNodes] = useState<NodeObject[]>([]);
 
-  const { userId } = useAppSelector(selectShare);
+  const { userId, users } = useAppSelector(selectShare);
+
   const ws = useWebSocket();
 
   const dispatch = useAppDispatch();
 
   const collaborators = useMemo(() => {
-    return users.filter((user) => user.id !== userId);
-  }, [users, userId]);
+    return users
+      .filter((user) => user.id !== userId)
+      .map((user) => {
+        if (user.id in userCursors) {
+          return { ...user, position: userCursors[user.id] };
+        }
+
+        return user;
+      });
+  }, [users, userId, userCursors]);
 
   useEffect(() => {
     if (
@@ -60,33 +73,35 @@ const CollabLayer = ({ stageScale, stageRef }: Props) => {
     };
 
     container.addEventListener('mousemove', handlePointerMove);
-    container.addEventListener('mousemove', handlePointerMove);
+    container.addEventListener('touchmove', handlePointerMove);
 
     return () => {
       container.removeEventListener('mousemove', handlePointerMove);
-      container.removeEventListener('mousemove', handlePointerMove);
+      container.removeEventListener('touchmove', handlePointerMove);
     };
   }, [stageRef, ws, userId]);
 
-  const handleUserMove = useCallback(
-    (data: Extract<WSMessage, { type: 'user-move' }>['data']) => {
-      setUsers((prevUsers) => {
-        const userToUpdate = prevUsers.find((user) => user.id === data.id);
+  useEffect(() => {
+    setUserCursors((prevUsers) => {
+      const updatedUserCursors = { ...prevUsers };
 
-        if (!userToUpdate) {
-          return prevUsers;
+      users.forEach((user) => {
+        if (user.id in prevUsers === false) {
+          updatedUserCursors[user.id] = [0, 0];
         }
+      });
 
-        const updatedUser: User = {
-          id: data.id,
-          position: data.position,
-          color: userToUpdate.color,
-          name: userToUpdate.name,
-        };
+      return updatedUserCursors;
+    });
+  }, [users]);
 
-        return prevUsers.map((user) => {
-          return data.id === user.id ? updatedUser : user;
-        });
+  const handleUserMove = useCallback(
+    (user: Extract<WSMessage, { type: 'user-move' }>['data']) => {
+      setUserCursors((prevUsers) => {
+        if (user.id in prevUsers) {
+          return { ...prevUsers, [user.id]: user.position };
+        }
+        return prevUsers;
       });
     },
     [],
@@ -137,14 +152,7 @@ const CollabLayer = ({ stageScale, stageRef }: Props) => {
           });
           break;
         }
-        case 'room-joined': {
-          setUsers(data.users);
-          break;
-        }
         case 'user-joined': {
-          setUsers((prevUsers) => {
-            return [...prevUsers, data.user];
-          });
           dispatch(shareActions.addUser(data.user));
           break;
         }
@@ -153,35 +161,25 @@ const CollabLayer = ({ stageScale, stageRef }: Props) => {
           break;
         }
         case 'user-left': {
-          setUsers((prevUsers) => {
-            return prevUsers.filter((user) => user.id !== data.id);
+          setUserCursors((prevUsers) => {
+            const userCursorsCopy = { ...prevUsers };
+            delete userCursorsCopy[data.id];
+
+            return userCursorsCopy;
           });
           dispatch(shareActions.removeUser(data));
           break;
         }
         case 'user-change': {
-          setUsers((prevUsers) => {
-            return prevUsers.map((user) => {
-              if (user.id === data.user.id) {
-                return { ...user, ...data.user };
-              }
-              return user;
-            });
-          });
-
           dispatch(shareActions.updateUser(data.user));
           break;
         }
       }
     },
-    [handleUserMove, dispatch],
+    [dispatch, handleUserMove],
   );
 
-  useWSMessage({
-    connection: ws?.connection,
-    isConnected: ws?.isConnected,
-    onMessage: handleMessages,
-  });
+  useWSMessage(ws?.connection, handleMessages, [handleMessages, ws]);
 
   return (
     <>
