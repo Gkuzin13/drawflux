@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import { PAGE_URL_SEARCH_PARAM_KEY } from '@/constants/app';
 import { urlSearchParam } from '@/utils/url';
+import { useModal } from './modal';
 
 type WSContextValue = {
   connection: WebSocket | null;
@@ -12,17 +13,20 @@ type WSContextValue = {
 
 type WSStatus = 'idle' | 'connecting' | 'connected' | 'disconnected';
 
-export const WebSocketContext = createContext<WSContextValue | null>(null);
-
+const serverErrorCodes = [1011];
 const pageId = urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY);
 const initialStatus = pageId ? 'connecting' : 'idle';
 
 let attempedConnection = false;
 
+export const WebSocketContext = createContext<WSContextValue | null>(null);
+
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const [status, setStatus] = useState<WSStatus>(initialStatus);
 
   const connection = useRef<WebSocket | null>(null);
+
+  const modal = useModal();
 
   useEffect(() => {
     if (!connection.current) {
@@ -33,12 +37,19 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       setStatus('connected');
     };
 
-    const onClose = () => {
+    const onClose = (event: CloseEvent) => {
       setStatus('disconnected');
+
+      if (serverErrorCodes.includes(event.code)) {
+        modal.open('Error', event.reason);
+      } else {
+        modal.open('Disconnected', event.reason);
+      }
     };
 
     const onError = () => {
       setStatus('disconnected');
+      modal.open('Error', 'Something went wrong');
     };
 
     connection.current.addEventListener('open', onOpen);
@@ -50,7 +61,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       connection.current?.removeEventListener('close', onClose);
       connection.current?.removeEventListener('error', onError);
     };
-  }, [connection]);
+  }, [connection, modal]);
 
   useEffect(() => {
     if (pageId && !attempedConnection) {
@@ -64,7 +75,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     return () => {
       setStatus('idle');
     };
-  }, [pageId]);
+  }, []);
 
   return (
     <WebSocketContext.Provider
