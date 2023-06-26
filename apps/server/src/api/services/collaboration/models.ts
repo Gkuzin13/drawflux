@@ -29,9 +29,6 @@ export class CollabRoom implements Room {
     if (user.color) {
       this.users[userIndex].color = user.color;
     }
-    if (user.position) {
-      this.users[userIndex].position = user.position;
-    }
   }
 
   removeUser(id: string) {
