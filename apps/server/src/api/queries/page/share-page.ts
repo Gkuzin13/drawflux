@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 import pg from 'pg';
 import { BadRequestError, Schemas } from 'shared';
-import { zodParse } from 'src/utils/parse/zod-parse';
+import { zodParse } from '../../../utils/parse/zod-parse';
 import * as db from '../../database/index';
 
 export type SharePageValues = [StageConfig: string, Nodes: string];

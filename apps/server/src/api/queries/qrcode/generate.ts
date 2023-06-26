@@ -2,7 +2,7 @@ import type { Request } from 'express';
 import * as QRCode from 'qrcode';
 import { BadRequestError, Schemas } from 'shared';
 import type { QRCodeResponse } from 'shared';
-import { zodParse } from 'src/utils/parse/zod-parse';
+import { zodParse } from '../../../utils/parse/zod-parse';
 
 export async function generateQRCode(req: Request) {
   const body = await zodParse(Schemas.QRCodeRequestBody, req.body);
