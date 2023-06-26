@@ -38,13 +38,9 @@ const CollabLayer = ({ stageScale, stageRef }: Props) => {
 
   const collaborators = useMemo(() => {
     return users
-      .filter((user) => user.id !== userId)
+      .filter((user) => user.id !== userId && user.id in userCursors)
       .map((user) => {
-        if (user.id in userCursors) {
-          return { ...user, position: userCursors[user.id] };
-        }
-
-        return user;
+        return { ...user, position: userCursors[user.id] };
       });
   }, [users, userId, userCursors]);
 
@@ -81,27 +77,10 @@ const CollabLayer = ({ stageScale, stageRef }: Props) => {
     };
   }, [stageRef, ws, userId]);
 
-  useEffect(() => {
-    setUserCursors((prevUsers) => {
-      const updatedUserCursors = { ...prevUsers };
-
-      users.forEach((user) => {
-        if (user.id in prevUsers === false) {
-          updatedUserCursors[user.id] = [0, 0];
-        }
-      });
-
-      return updatedUserCursors;
-    });
-  }, [users]);
-
   const handleUserMove = useCallback(
     (user: Extract<WSMessage, { type: 'user-move' }>['data']) => {
       setUserCursors((prevUsers) => {
-        if (user.id in prevUsers) {
-          return { ...prevUsers, [user.id]: user.position };
-        }
-        return prevUsers;
+        return { ...prevUsers, [user.id]: user.position };
       });
     },
     [],
@@ -193,7 +172,15 @@ const CollabLayer = ({ stageScale, stageRef }: Props) => {
         );
       })}
       {collaborators.map((user) => {
-        return <UserCursor key={user.id} user={user} stageScale={stageScale} />;
+        return (
+          <UserCursor
+            key={user.id}
+            name={user.name}
+            color={user.color}
+            position={user.position}
+            stageScale={stageScale}
+          />
+        );
       })}
     </>
   );

@@ -18,74 +18,68 @@ const App = () => {
 
   const dispatch = useAppDispatch();
 
-  useWSMessage(
-    ws?.connection,
-    (message) => {
-      const { type, data } = message;
+  useWSMessage(ws?.connection, (message) => {
+    const { type, data } = message;
 
-      switch (type) {
-        case 'room-joined': {
-          dispatch(
-            shareActions.init({ userId: data.userId, users: data.users }),
-          );
-          dispatch(canvasActions.setNodes(data.nodes));
-          dispatch(historyActions.reset());
-          break;
-        }
-        case 'nodes-set': {
-          dispatch(canvasActions.setNodes(data.nodes));
-          break;
-        }
-        case 'nodes-add': {
-          dispatch(canvasActions.addNodes(data.nodes));
-          break;
-        }
-        case 'nodes-update': {
-          dispatch(canvasActions.updateNodes(data.nodes));
-          break;
-        }
-        case 'nodes-delete': {
-          dispatch(canvasActions.deleteNodes(data.nodesIds));
-          break;
-        }
-        case 'nodes-duplicate': {
-          dispatch(canvasActions.duplicateNodes(data.nodesIds));
-          break;
-        }
-        case 'nodes-move-to-start': {
-          dispatch(canvasActions.moveNodesToStart(data.nodesIds));
-          break;
-        }
-        case 'nodes-move-to-end': {
-          dispatch(canvasActions.moveNodesToEnd(data.nodesIds));
-          break;
-        }
-        case 'nodes-move-forward': {
-          dispatch(canvasActions.moveNodesForward(data.nodesIds));
-          break;
-        }
-        case 'nodes-move-backward': {
-          dispatch(canvasActions.moveNodesBackward(data.nodesIds));
-          break;
-        }
-        case 'draft-text-update': {
-          const textNode = nodes.find((node) => node.nodeProps.id === data.id);
-
-          if (textNode) {
-            dispatch(
-              canvasActions.updateNodes([{ ...textNode, text: data.text }]),
-            );
-          }
-          break;
-        }
-        case 'history-change': {
-          const action = historyActions[data.action];
-          dispatch(action());
-        }
+    switch (type) {
+      case 'room-joined': {
+        dispatch(shareActions.init({ userId: data.userId, users: data.users }));
+        dispatch(canvasActions.setNodes(data.nodes));
+        dispatch(historyActions.reset());
+        break;
       }
-    },
-    [dispatch],
-  );
+      case 'nodes-set': {
+        dispatch(canvasActions.setNodes(data.nodes));
+        break;
+      }
+      case 'nodes-add': {
+        dispatch(canvasActions.addNodes(data.nodes));
+        break;
+      }
+      case 'nodes-update': {
+        dispatch(canvasActions.updateNodes(data.nodes));
+        break;
+      }
+      case 'nodes-delete': {
+        dispatch(canvasActions.deleteNodes(data.nodesIds));
+        break;
+      }
+      case 'nodes-duplicate': {
+        dispatch(canvasActions.duplicateNodes(data.nodesIds));
+        break;
+      }
+      case 'nodes-move-to-start': {
+        dispatch(canvasActions.moveNodesToStart(data.nodesIds));
+        break;
+      }
+      case 'nodes-move-to-end': {
+        dispatch(canvasActions.moveNodesToEnd(data.nodesIds));
+        break;
+      }
+      case 'nodes-move-forward': {
+        dispatch(canvasActions.moveNodesForward(data.nodesIds));
+        break;
+      }
+      case 'nodes-move-backward': {
+        dispatch(canvasActions.moveNodesBackward(data.nodesIds));
+        break;
+      }
+      case 'draft-text-update': {
+        const textNode = nodes.find((node) => node.nodeProps.id === data.id);
+
+        if (textNode) {
+          dispatch(
+            canvasActions.updateNodes([{ ...textNode, text: data.text }]),
+          );
+        }
+        break;
+      }
+      case 'history-change': {
+        const action = historyActions[data.action];
+        dispatch(action());
+      }
+    }
+  });
 
   useEffect(() => {
     if (ws?.pageId) {
