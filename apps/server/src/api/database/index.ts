@@ -1,11 +1,9 @@
 import pg from 'pg';
 import type { PoolClient, QueryConfig } from 'pg';
+import config from '../../config';
 
 const poolClient = new pg.Pool({
-  connectionString:
-    process.env.NODE_ENV === 'production'
-      ? process.env.PG_CONNECTION_URI
-      : undefined,
+  connectionString: config.isProduction ? config.pgConnectionUri : undefined,
 });
 
 export async function query<

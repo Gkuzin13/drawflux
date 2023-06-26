@@ -5,7 +5,6 @@ export type User = {
   id: string;
   name: string;
   color: keyof typeof colors;
-  position: Point;
 };
 
 export type Room = {
@@ -25,7 +24,7 @@ type RoomJoined = Message<
 type UserJoined = Message<'user-joined', { user: User }>;
 type UserLeft = Message<'user-left', { id: string }>;
 type UserChange = Message<'user-change', { user: User }>;
-type UserMove = Message<'user-move', Pick<User, 'id' | 'position'>>;
+type UserMove = Message<'user-move', { id: string; position: Point }>;
 type NodesAdd = Message<'nodes-add', { nodes: NodeObject[] }>;
 type NodesUpdate = Message<'nodes-update', { nodes: NodeObject[] }>;
 type NodesSet = Message<'nodes-set', { nodes: NodeObject[] }>;
