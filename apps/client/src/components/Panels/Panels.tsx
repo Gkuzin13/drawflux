@@ -12,6 +12,7 @@ import { Schemas } from 'shared';
 import type { ControlAction } from '@/constants/control';
 import { type MenuPanelActionType } from '@/constants/menu';
 import { type Tool } from '@/constants/tool';
+import { useModal } from '@/contexts/modal';
 import { useWebSocket } from '@/contexts/websocket';
 import useFetch from '@/hooks/useFetch';
 import useNetworkState from '@/hooks/useNetworkState/useNetworkState';
@@ -21,7 +22,6 @@ import {
   selectCanvas,
   selectHistory,
 } from '@/stores/slices/canvas';
-import { uiActions } from '@/stores/slices/ui';
 import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
 import { sendMessage } from '@/utils/websocket';
@@ -64,8 +64,9 @@ const Panels = ({
 
   const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
   const { past, future } = useAppSelector(selectHistory);
-
   const { online } = useNetworkState();
+
+  const modal = useModal();
 
   const dispatch = useAppDispatch();
 
@@ -192,12 +193,7 @@ const Panels = ({
           );
         } catch (error) {
           if (error instanceof Error) {
-            dispatch(
-              uiActions.openDialog({
-                title: 'Error',
-                description: error.message as string,
-              }),
-            );
+            modal.open('Error', error.message as string);
           }
         }
       }

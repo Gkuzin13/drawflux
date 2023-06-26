@@ -11,10 +11,10 @@ import type { ContextMenuType } from '@/components/ContextMenu/ContextMenu';
 import Dialog from '@/components/core/Dialog/Dialog';
 import Panels from '@/components/Panels/Panels';
 import { NODES_LAYER_INDEX } from '@/constants/node';
+import { useModal } from '@/contexts/modal';
 import useKbdShortcuts from '@/hooks/useKbdShortcuts';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import { selectDialog, uiActions } from '@/stores/slices/ui';
 import { Container } from './MainContainerStyled';
 
 type Props = {
@@ -31,7 +31,7 @@ const MainContainer = ({ isPageShared, viewportSize }: Props) => {
   const { stageConfig, selectedNodesIds, nodes, toolType } =
     useAppSelector(selectCanvas);
 
-  const dialog = useAppSelector(selectDialog);
+  const modal = useModal();
 
   const stageRef = useRef<Konva.Stage>(null);
 
@@ -102,7 +102,7 @@ const MainContainer = ({ isPageShared, viewportSize }: Props) => {
   );
 
   const handleDialogClose = () => {
-    dispatch(uiActions.closeDialog());
+    modal.close();
   };
 
   return (
@@ -124,7 +124,12 @@ const MainContainer = ({ isPageShared, viewportSize }: Props) => {
           onConfigChange={handleStageConfigChange}
         />
       </ContextMenu>
-      <Dialog {...dialog} onClose={handleDialogClose} />
+      <Dialog
+        open={modal.opened}
+        title={modal.title}
+        description={modal.description}
+        onClose={handleDialogClose}
+      />
     </Container>
   );
 };
