@@ -41,7 +41,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const modal = useModal();
 
   useEffect(() => {
-    if (attemptedConnection) {
+    if (attemptedConnection || !pageId) {
       return;
     }
 
