@@ -20,13 +20,14 @@ import UserCursor from './UserCursor';
 type Props = {
   stageScale: number;
   stageRef: ForwardedRef<Konva.Stage>;
+  isDrawing: boolean;
 };
 
 type UserCursors = {
   [userId: string]: Point;
 };
 
-const CollabLayer = ({ stageScale, stageRef }: Props) => {
+const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
   const [userCursors, setUserCursors] = useState<UserCursors>({});
   const [draftNodes, setDraftNodes] = useState<NodeObject[]>([]);
 
@@ -68,14 +69,19 @@ const CollabLayer = ({ stageScale, stageRef }: Props) => {
       sendMessage(ws.connection, message);
     };
 
-    container.addEventListener('mousemove', handlePointerMove);
-    container.addEventListener('touchmove', handlePointerMove);
+    if (!isDrawing) {
+      container.addEventListener('mousemove', handlePointerMove);
+      container.addEventListener('touchmove', handlePointerMove);
+    } else {
+      container.removeEventListener('mousemove', handlePointerMove);
+      container.removeEventListener('touchmove', handlePointerMove);
+    }
 
     return () => {
       container.removeEventListener('mousemove', handlePointerMove);
       container.removeEventListener('touchmove', handlePointerMove);
     };
-  }, [stageRef, ws, userId]);
+  }, [stageRef, ws, userId, isDrawing]);
 
   const handleUserMove = useCallback(
     (user: Extract<WSMessage, { type: 'user-move' }>['data']) => {

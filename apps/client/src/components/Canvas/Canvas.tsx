@@ -435,7 +435,11 @@ const Canvas = forwardRef<Konva.Stage, Props>(
             active={isSelectRectActive}
           />
           {ws?.isConnected && (
-            <CollabLayer stageScale={stageConfig.scale} stageRef={ref} />
+            <CollabLayer
+              isDrawing={drawing}
+              stageScale={stageConfig.scale}
+              stageRef={ref}
+            />
           )}
         </Layer>
         <NodesLayer
