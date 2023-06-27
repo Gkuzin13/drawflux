@@ -1,5 +1,9 @@
 import { useEffect } from 'react';
-import { LOCAL_STORAGE, PageState, type PageStateType } from '@/constants/app';
+import {
+  LOCAL_STORAGE_KEY,
+  PageState,
+  type PageStateType,
+} from '@/constants/app';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { storage } from '@/utils/storage';
@@ -86,7 +90,7 @@ const App = () => {
       return;
     }
 
-    const stateFromStorage = storage.get<PageStateType>(LOCAL_STORAGE.KEY);
+    const stateFromStorage = storage.get<PageStateType>(LOCAL_STORAGE_KEY);
 
     if (stateFromStorage) {
       try {
@@ -103,9 +107,7 @@ const App = () => {
     return <Loader fullScreen={true}>Loading</Loader>;
   }
 
-  return (
-    <MainContainer isPageShared={!!ws?.pageId} viewportSize={windowSize} />
-  );
+  return <MainContainer viewportSize={windowSize} />;
 };
 
 export default App;

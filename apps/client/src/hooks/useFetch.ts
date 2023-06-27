@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { BASE_URL } from '@/constants/app';
+import { BASE_URL, BASE_URL_DEV, IS_PROD } from '@/constants/app';
 
 type Config = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -11,8 +11,6 @@ type UseFetchReturn<Data, Body> = [
   (body: Body) => Promise<void>,
 ];
 
-let fetched = false;
-
 const defaultConfig: RequestInit = {
   headers: {
     'Content-Type': 'application/json',
@@ -23,8 +21,9 @@ const defaultOptions = {
   skip: false,
 };
 
-const baseUrl =
-  process.env.NODE_ENV === 'production' ? BASE_URL : 'http://localhost:7456';
+const baseUrl = IS_PROD ? BASE_URL : BASE_URL_DEV;
+
+let fetched = false;
 
 function useFetch<Data, Body>(
   url: string,
@@ -37,10 +36,10 @@ function useFetch<Data, Body>(
 
   const execute = useCallback(
     async (body?: Body) => {
-      try {
-        setError(null);
-        setStatus('loading');
+      setError(null);
+      setStatus('loading');
 
+      try {
         const response = await window.fetch(`${baseUrl}${url}`, {
           ...defaultConfig,
           ...config,
