@@ -1,5 +1,4 @@
-import type Konva from 'konva';
-import { memo, useRef } from 'react';
+import { memo } from 'react';
 import { Arrow, Group, Text } from 'react-konva';
 import type { User, Point } from 'shared';
 import { colors } from 'shared';
@@ -13,35 +12,27 @@ type Props = {
   stageScale: number;
 };
 
-const baseConfig: Konva.ShapeConfig = {
-  perfectDrawEnabled: false,
-  shadowForStrokeEnabled: false,
-};
-
 const UserCursor = ({ name, color, position, stageScale }: Props) => {
-  const ref = useRef<Konva.Arrow>(null);
-
   const colorValue: ColorValue = colors[color] || '#000000';
+  const normalizedScale = 1 / stageScale;
 
   return (
     <Group
       x={position[0]}
       y={position[1]}
-      scale={{
-        x: 1 / stageScale,
-        y: 1 / stageScale,
-      }}
+      scaleX={normalizedScale}
+      scaleY={normalizedScale}
       listening={false}
       rotation={-130}
+      perfectDrawEnabled={false}
+      shadowForStrokeEnabled={false}
     >
       <Arrow
-        ref={ref}
         points={[0]}
         pointerWidth={12}
         pointerLength={12}
         fill={colorValue}
         listening={false}
-        {...baseConfig}
       />
       <Text
         text={name}
@@ -52,7 +43,6 @@ const UserCursor = ({ name, color, position, stageScale }: Props) => {
         offsetX={-20}
         offsetY={-2}
         opacity={0.5}
-        {...baseConfig}
       />
     </Group>
   );
