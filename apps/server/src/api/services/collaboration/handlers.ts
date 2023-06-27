@@ -51,11 +51,11 @@ wss.on('connection', async (ws, req) => {
   }
 
   const room = rooms.get(pageId);
-  const userName = room ? `User ${room.users?.length + 1}` : 'User';
+
   const usedColors = room?.users.map((user) => user.color) || [];
   const userColor =
     colorsSet.find((color) => !usedColors.includes(color)) || colorsSet[0];
-  const user = new CollabUser(userName, userColor, ws);
+  const user = new CollabUser('New User', userColor, ws);
 
   if (room) {
     room.addUser(user);
@@ -115,11 +115,9 @@ wss.on('connection', async (ws, req) => {
 
     const message = WSMessageUtil.serialize(userLeftMessage);
 
-    if (!message) {
-      return;
+    if (message) {
+      broadcast(roomToUpdate, user.id, message);
     }
-
-    broadcast(roomToUpdate, user.id, message);
 
     if (roomToUpdate.users.length <= 0) {
       ws.terminate();
