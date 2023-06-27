@@ -1,6 +1,11 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
-import { PAGE_URL_SEARCH_PARAM_KEY } from '@/constants/app';
+import {
+  BASE_WS_URL,
+  BASE_WS_URL_DEV,
+  IS_PROD,
+  PAGE_URL_SEARCH_PARAM_KEY,
+} from '@/constants/app';
 import { urlSearchParam } from '@/utils/url';
 import { useModal } from './modal';
 
@@ -13,6 +18,7 @@ type WSContextValue = {
 
 type WSStatus = 'idle' | 'connecting' | 'connected' | 'disconnected';
 
+const wsBaseUrl = IS_PROD ? BASE_WS_URL : BASE_WS_URL_DEV;
 const serverErrorCodes = [1011];
 const pageId = urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY);
 const initialStatus = pageId ? 'connecting' : 'idle';
@@ -66,9 +72,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (pageId && !attempedConnection) {
       setStatus('connecting');
-      connection.current = new WebSocket(
-        `ws://localhost:7456/page&id=${pageId}`,
-      );
+      connection.current = new WebSocket(`${wsBaseUrl}/page&id=${pageId}`);
       attempedConnection = true;
     }
 

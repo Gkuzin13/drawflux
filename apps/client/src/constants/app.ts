@@ -5,6 +5,9 @@ import { ToolType } from './tool';
 export const BASE_URL = 'https://drawflux-api.onrender.com';
 export const BASE_URL_DEV = 'http://localhost:7456';
 
+export const BASE_WS_URL = 'wss://drawflux-api.onrender.com';
+export const BASE_WS_URL_DEV = 'ws://localhost:7456';
+
 export const IS_PROD = process.env.NODE_ENV === 'production';
 
 export const PAGE_URL_SEARCH_PARAM_KEY = 'page';
