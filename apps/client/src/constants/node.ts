@@ -1,5 +1,5 @@
 export const TRANSFORMER = {
-  MIN_SIZE: 5,
+  MIN_SIZE: 10,
   ROTATION_SNAPS: [0, 90, 180, 270],
   ROTATION_ANCHOR_OFFSET: 14,
   PADDING: 6,
@@ -10,7 +10,7 @@ export const TRANSFORMER = {
 
 export const RECT = {
   CORNER_RADIUS: 8,
-  MIN_SIZE: 5,
+  MIN_SIZE: 10,
 };
 
 export const NODES_LAYER_INDEX = 1;

@@ -1,4 +1,5 @@
 import type { NodeObject, NodeType, Point } from 'shared';
+import { RECT } from '@/constants/node';
 import { normalizePoints } from '@/utils/draw';
 
 export function drawArrow(
@@ -65,8 +66,8 @@ export function drawRect(
     nodeProps: {
       ...node.nodeProps,
       point: p1,
-      width: p2[0] - p1[0],
-      height: p2[1] - p1[1],
+      width: Math.max(p2[0] - p1[0], RECT.MIN_SIZE),
+      height: Math.max(p2[1] - p1[1], RECT.MIN_SIZE),
     },
   };
 }

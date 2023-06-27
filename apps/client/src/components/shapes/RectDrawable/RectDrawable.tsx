@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Rect } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Node/Node';
 import NodeTransformer from '@/components/NodeTransformer';
@@ -104,6 +104,20 @@ const RectDrawable = ({
     [node, animation, onNodeChange],
   );
 
+  // Sanitize rect size
+  const { width, height } = useMemo(() => {
+    return {
+      width: Math.max(
+        Number(node.nodeProps.width ?? RECT.MIN_SIZE),
+        RECT.MIN_SIZE,
+      ),
+      height: Math.max(
+        Number(node.nodeProps.height ?? RECT.MIN_SIZE),
+        RECT.MIN_SIZE,
+      ),
+    };
+  }, [node.nodeProps.width, node.nodeProps.height]);
+
   return (
     <>
       <Rect
@@ -111,8 +125,8 @@ const RectDrawable = ({
         {...config}
         x={node.nodeProps.point[0]}
         y={node.nodeProps.point[1]}
-        width={node.nodeProps.width}
-        height={node.nodeProps.height}
+        width={width}
+        height={height}
         cornerRadius={RECT.CORNER_RADIUS}
         draggable={draggable}
         onDragEnd={handleDragEnd}
