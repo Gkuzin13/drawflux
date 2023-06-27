@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import { WSMessageUtil } from 'shared';
 import {
@@ -25,6 +25,7 @@ type WSStatus = 'idle' | 'connecting' | 'connected' | 'disconnected';
 
 const serverErrorCodes = [1011];
 const wsBaseUrl = IS_PROD ? BASE_WS_URL : BASE_WS_URL_DEV;
+let attemptedConnection = false;
 
 export const WebSocketContext = createContext<WSContextValue | null>(null);
 
@@ -32,18 +33,21 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const pageId = urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY);
   const initialStatus = pageId ? 'connecting' : 'idle';
 
+  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
   const [status, setStatus] = useState<WSStatus>(initialStatus);
 
   const dispatch = useAppDispatch();
 
-  const connection = useRef<WebSocket | null>(null);
-
   const modal = useModal();
 
   useEffect(() => {
-    if (!connection.current) {
+    if (attemptedConnection) {
       return;
     }
+
+    attemptedConnection = true;
+
+    const webSocket = new WebSocket(`${wsBaseUrl}/page&id=${pageId}`);
 
     const onMessage = (event: MessageEvent) => {
       const message = WSMessageUtil.deserialize(event.data);
@@ -62,6 +66,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
 
     const onOpen = () => {
       setStatus('connected');
+      setWebSocket(webSocket);
     };
 
     const onClose = (event: CloseEvent) => {
@@ -79,31 +84,21 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       modal.open('Error', 'Something went wrong');
     };
 
-    connection.current.onopen = onOpen;
-    connection.current.onclose = onClose;
-    connection.current.onerror = onError;
-    connection.current.onmessage = onMessage;
+    webSocket.onopen = onOpen;
+    webSocket.onclose = onClose;
+    webSocket.onerror = onError;
+    webSocket.onmessage = onMessage;
 
     return () => {
       setStatus(initialStatus);
+      setWebSocket(null);
     };
-  }, [connection, initialStatus, modal, dispatch]);
-
-  useEffect(() => {
-    if (pageId && !connection.current) {
-      setStatus('connecting');
-      connection.current = new WebSocket(`${wsBaseUrl}/page&id=${pageId}`);
-    }
-
-    return () => {
-      setStatus(initialStatus);
-    };
-  }, [initialStatus, pageId, connection]);
+  }, [initialStatus, modal, pageId, dispatch]);
 
   return (
     <WebSocketContext.Provider
       value={{
-        connection: connection.current,
+        connection: webSocket,
         isConnected: status === 'connected',
         isConnecting: status === 'connecting',
         pageId,
