@@ -3,11 +3,16 @@ import { z } from 'zod';
 import { ToolType } from './tool';
 
 export const BASE_URL = 'https://drawflux-api.onrender.com';
-export const PAGE_URL_SEARCH_PARAM_KEY = 'page';
+export const BASE_URL_DEV = 'http://localhost:7456';
 
-export const LOCAL_STORAGE = {
-  KEY: 'drawflux',
-} as const;
+export const IS_PROD = process.env.NODE_ENV === 'production';
+
+export const PAGE_URL_SEARCH_PARAM_KEY = 'page';
+export const LOCAL_STORAGE_KEY = 'drawflux';
+
+export const USER = {
+  maxNameLength: 10,
+};
 
 export const PageState = z.object({
   page: z.object({

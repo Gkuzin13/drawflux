@@ -5,6 +5,8 @@ import type {
   SharePageRequestBody,
   SharePageResponse,
   StageConfig,
+  UpdatePageBody,
+  UpdatePageResponse,
 } from '../schemas/page';
 import type { QRCodeRequestBody, QRCodeResponse } from '../schemas/qrcode';
 import type { BadRequestError } from '../utils/errors';
@@ -25,8 +27,12 @@ export type Point = z.infer<(typeof nodeProps)['shape']['point']>;
 export type StageConfig = z.infer<typeof StageConfig>;
 
 export type SharePageRequestBody = z.infer<typeof SharePageRequestBody>;
-export type GetPageResponse = z.infer<typeof GetPageResponse>;
 export type SharePageResponse = z.infer<typeof SharePageResponse>;
+
+export type GetPageResponse = z.infer<typeof GetPageResponse>;
+
+export type UpdatePageRequestBody = z.infer<typeof UpdatePageBody>;
+export type UpdatePageResponse = z.infer<typeof UpdatePageResponse>;
 
 export type QRCodeRequestBody = z.infer<typeof QRCodeRequestBody>;
 export type QRCodeResponse = z.infer<typeof QRCodeResponse>;
@@ -35,3 +41,5 @@ export type ServerResponse<T> = {
   error?: typeof BadRequestError;
   data?: T;
 };
+
+export * from './ws';

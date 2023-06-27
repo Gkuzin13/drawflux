@@ -1,10 +1,21 @@
 import type Konva from 'konva';
 import { type RefObject, useMemo } from 'react';
-import type { NodeStyle, NodeObject, StageConfig } from 'shared';
+import type {
+  NodeStyle,
+  NodeObject,
+  StageConfig,
+  WSMessage,
+  UpdatePageResponse,
+  UpdatePageRequestBody,
+  User,
+} from 'shared';
 import { Schemas } from 'shared';
 import type { ControlAction } from '@/constants/control';
 import { type MenuPanelActionType } from '@/constants/menu';
 import { type Tool } from '@/constants/tool';
+import { useModal } from '@/contexts/modal';
+import { useWebSocket } from '@/contexts/websocket';
+import useFetch from '@/hooks/useFetch';
 import useNetworkState from '@/hooks/useNetworkState/useNetworkState';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
@@ -12,9 +23,10 @@ import {
   selectCanvas,
   selectHistory,
 } from '@/stores/slices/canvas';
-import { uiActions } from '@/stores/slices/ui';
+import { shareActions } from '@/stores/slices/share';
 import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
+import { sendMessage } from '@/utils/websocket';
 import ControlPanel from './ControlPanel/ControlPanel';
 import MenuPanel from './MenuPanel/MenuPanel';
 import {
@@ -26,25 +38,35 @@ import {
 import SharePanel from './SharePanel/SharePanel';
 import StylePanel, { type StylePanelProps } from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
+import UsersPanel from './UsersPanel/UsersPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;
   intersectedNodesIds: string[];
-  isPageShared?: boolean;
 };
 
-const Panels = ({
-  stageRef,
-  intersectedNodesIds,
-  isPageShared = false,
-}: Props) => {
+const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
+  const ws = useWebSocket();
+
+  const [{ error }, updatePage] = useFetch<
+    UpdatePageResponse,
+    UpdatePageRequestBody
+  >(
+    `/p/${ws?.pageId}`,
+    {
+      method: 'PATCH',
+    },
+    { skip: true },
+  );
+
   const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
   const { past, future } = useAppSelector(selectHistory);
+  const { online } = useNetworkState();
+
+  const modal = useModal();
 
   const dispatch = useAppDispatch();
-
-  const { online } = useNetworkState();
 
   const selectedNodes = useMemo(() => {
     const nodesIds = new Set(intersectedNodesIds);
@@ -102,12 +124,28 @@ const Panels = ({
     dispatch(canvasActions.setToolType(type));
   };
 
+  const handleUpdatePage = () => {
+    const currentNodes = store.getState().canvas.present.nodes;
+    updatePage({ nodes: currentNodes });
+  };
+
   const handleStyleChange = (style: Partial<NodeStyle>) => {
     const updatedNodes = selectedNodes.map((node) => {
       return { ...node, style: { ...node.style, ...style } };
     });
 
     dispatch(canvasActions.updateNodes(updatedNodes));
+
+    if (ws?.isConnected && ws.pageId) {
+      const message: WSMessage = {
+        type: 'nodes-update',
+        data: { nodes: updatedNodes },
+      };
+
+      sendMessage(ws.connection, message);
+
+      handleUpdatePage();
+    }
   };
 
   const handleMenuAction = async (type: MenuPanelActionType) => {
@@ -153,15 +191,9 @@ const Panels = ({
           );
         } catch (error) {
           if (error instanceof Error) {
-            dispatch(
-              uiActions.openDialog({
-                title: 'Error',
-                description: error.message as string,
-              }),
-            );
+            modal.open('Error', error.message as string);
           }
         }
-        break;
       }
     }
   };
@@ -171,15 +203,45 @@ const Panels = ({
   };
 
   const handleControlActions = (action: ControlAction) => {
-    switch (action.type) {
-      case 'canvas/deleteNodes': {
-        dispatch(canvasActions.deleteNodes(intersectedNodesIds));
-        break;
+    if (action.type === 'canvas/deleteNodes') {
+      dispatch(canvasActions.deleteNodes(intersectedNodesIds));
+
+      if (ws?.isConnected) {
+        const message: WSMessage = {
+          type: 'nodes-delete',
+          data: { nodesIds: intersectedNodesIds },
+        };
+
+        sendMessage(ws.connection, message);
       }
-      default: {
-        dispatch(action());
-        break;
-      }
+      return;
+    }
+
+    dispatch(action());
+
+    if (ws?.isConnected) {
+      const historyAction = action.type === 'history/redo' ? 'redo' : 'undo';
+
+      const message: WSMessage = {
+        type: 'history-change',
+        data: { action: historyAction },
+      };
+
+      sendMessage(ws.connection, message);
+      handleUpdatePage();
+    }
+  };
+
+  const handleUserChange = (user: User) => {
+    if (ws?.isConnected) {
+      const message: WSMessage = {
+        type: 'user-change',
+        data: { user },
+      };
+
+      sendMessage(ws.connection, message);
+
+      dispatch(shareActions.updateUser(user));
     }
   };
 
@@ -197,10 +259,11 @@ const Panels = ({
           onStyleChange={handleStyleChange}
         />
         <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
+        {ws?.isConnected && <UsersPanel onUserChange={handleUserChange} />}
         <TopPanelRightContainer>
           {online && (
             <SharePanel
-              isPageShared={isPageShared}
+              isPageShared={!!ws?.isConnected}
               pageState={{ page: { nodes, stageConfig } }}
             />
           )}

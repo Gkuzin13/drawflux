@@ -23,7 +23,7 @@ const MenuPanel = ({ onAction }: Props) => {
         <IoEllipsisHorizontal size={ICON_SIZES.MEDIUM} />
       </MenuPanelTrigger>
       <DropdownMenu.Portal>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" sideOffset={4}>
           {MENU_PANEL_ACTIONS.map((action) => {
             return (
               <DropdownMenuItem

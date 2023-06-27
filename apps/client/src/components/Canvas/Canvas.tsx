@@ -1,5 +1,5 @@
 import type Konva from 'konva';
-import { type KonvaEventObject, type NodeConfig } from 'konva/lib/Node';
+import type { KonvaEventObject, NodeConfig } from 'konva/lib/Node';
 import {
   type PropsWithRef,
   forwardRef,
@@ -9,15 +9,28 @@ import {
   useRef,
 } from 'react';
 import { Layer, Stage } from 'react-konva';
-import type { NodeObject, Point, StageConfig } from 'shared';
+import type {
+  NodeObject,
+  Point,
+  StageConfig,
+  UpdatePageRequestBody,
+  UpdatePageResponse,
+  WSMessage,
+} from 'shared';
 import { CURSOR } from '@/constants/cursor';
 import { NODES_LAYER_INDEX } from '@/constants/node';
+import { useWebSocket } from '@/contexts/websocket';
+import useFetch from '@/hooks/useFetch';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { selectShare } from '@/stores/slices/share';
+import { store } from '@/stores/store';
 import { uniq } from '@/utils/array';
 import { createNode } from '@/utils/node';
 import { getNormalizedInvertedRect } from '@/utils/position';
+import { sendMessage } from '@/utils/websocket';
 import BackgroundRect from '../BackgroundRect/BackgroundRect';
+import CollabLayer from '../CollabLayer';
 import NodesLayer from '../NodesLayer';
 import SelectRect from '../SelectRect';
 import { type DrawableType, drawTypes } from './helpers/draw';
@@ -54,8 +67,14 @@ const Canvas = forwardRef<Konva.Stage, Props>(
     const [draftNode, setDraftNode] = useState<NodeObject | null>(null);
     const [drawing, setDrawing] = useState(false);
     const [draggingStage, setDraggingStage] = useState(false);
+    const ws = useWebSocket();
+    const [{ error }, updatePage] = useFetch<
+      UpdatePageResponse,
+      UpdatePageRequestBody
+    >(`/p/${ws?.pageId}`, { method: 'PATCH' }, { skip: true });
 
     const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
+    const { userId } = useAppSelector(selectShare);
 
     const dispatch = useAppDispatch();
 
@@ -91,12 +110,29 @@ const Canvas = forwardRef<Konva.Stage, Props>(
 
         dispatch(canvasActions.addNodes([node]));
 
+        if (ws?.isConnected && ws.pageId) {
+          const nodeAddMessage: WSMessage = {
+            type: 'nodes-add',
+            data: { nodes: [node] },
+          };
+
+          const draftEndMessage: WSMessage = {
+            type: 'draft-end',
+            data: { id: node.nodeProps.id },
+          };
+
+          sendMessage(ws.connection, nodeAddMessage);
+          sendMessage(ws.connection, draftEndMessage);
+
+          updatePage({ nodes: [...nodes, node] });
+        }
+
         if (resetToolType) {
           dispatch(canvasActions.setToolType('select'));
           dispatch(canvasActions.setSelectedNodesIds([node.nodeProps.id]));
         }
       },
-      [dispatch],
+      [ws, nodes, updatePage, dispatch],
     );
 
     const handleSelectDraw = useCallback(
@@ -150,30 +186,61 @@ const Canvas = forwardRef<Konva.Stage, Props>(
             drawingPositionRef.current.current = currentPoint;
             break;
           case 'text':
-            setDraftNode(createNode(toolType, currentPoint));
+            {
+              const node = createNode(toolType, currentPoint);
+
+              setDraftNode(node);
+
+              if (ws?.isConnected) {
+                const message: WSMessage = {
+                  type: 'draft-add',
+                  data: { node },
+                };
+
+                sendMessage(ws.connection, message);
+              }
+            }
             break;
-          default:
+          default: {
             setDrawing(true);
             drawingPositionRef.current.current = currentPoint;
-            setDraftNode(createNode(toolType, currentPoint));
+
+            const node = createNode(toolType, currentPoint);
+
+            setDraftNode(node);
+
+            if (ws?.isConnected) {
+              const message: WSMessage = {
+                type: 'draft-add',
+                data: { node },
+              };
+
+              sendMessage(ws.connection, message);
+            }
             break;
+          }
         }
 
         if (Object.keys(intersectedNodesIds).length) {
           onNodesIntersection([]);
         }
       },
-      [toolType, intersectedNodesIds, onNodesIntersection],
+      [toolType, intersectedNodesIds, ws, onNodesIntersection],
     );
 
     const onStageMove = useCallback(
       (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
         const stage = event.target.getStage();
 
-        if (!drawing || !stage) return;
+        if (!stage) return;
 
         const { x, y } = stage.getRelativePointerPosition();
+
         const currentPoint: Point = [x, y];
+
+        if (!drawing) {
+          return;
+        }
 
         if (toolType === 'select') {
           drawingPositionRef.current.current = currentPoint;
@@ -183,15 +250,34 @@ const Canvas = forwardRef<Konva.Stage, Props>(
 
         if (draftNode && draftNode.type !== 'text') {
           const drawFn = drawTypes[draftNode.type as DrawableType];
+
           const updatedNode = drawFn(
             draftNode,
             drawingPositionRef.current.start,
             currentPoint,
           );
+
           setDraftNode(updatedNode);
+
+          if (ws?.isConnected && userId) {
+            const message: WSMessage = {
+              type: 'draft-draw',
+              data: {
+                userId,
+                nodeId: updatedNode.nodeProps.id,
+                type: updatedNode.type,
+                position: {
+                  start: drawingPositionRef.current.start,
+                  current: currentPoint,
+                },
+              },
+            };
+
+            sendMessage(ws.connection, message);
+          }
         }
       },
-      [drawing, toolType, draftNode, handleSelectDraw],
+      [drawing, toolType, draftNode, ws, userId, handleSelectDraw],
     );
 
     const onStageMoveEnd = useCallback(() => {
@@ -298,6 +384,18 @@ const Canvas = forwardRef<Konva.Stage, Props>(
 
     const handleNodesChange = (nodes: NodeObject[]) => {
       dispatch(canvasActions.updateNodes(nodes));
+
+      if (ws?.isConnected && ws?.pageId) {
+        const message: WSMessage = {
+          type: 'nodes-update',
+          data: { nodes },
+        };
+
+        sendMessage(ws.connection, message);
+
+        const currentNodes = store.getState().canvas.present.nodes;
+        updatePage({ nodes: currentNodes });
+      }
     };
 
     const handleNodePress = (nodeId: string) => {
@@ -336,12 +434,19 @@ const Canvas = forwardRef<Konva.Stage, Props>(
             currentPoint={drawingPositionRef.current.current}
             active={isSelectRectActive}
           />
+          {ws?.isConnected && (
+            <CollabLayer
+              isDrawing={drawing}
+              stageScale={stageConfig.scale}
+              stageRef={ref}
+            />
+          )}
         </Layer>
         <NodesLayer
           nodes={nodes}
           draftNode={draftNode}
           toolType={toolType}
-          config={{ ...config, listening: !drawing }}
+          config={{ ...config, listening: !drawing || toolType !== 'hand' }}
           selectedNodesIds={intersectedNodesIds}
           onNodePress={handleNodePress}
           onNodesChange={handleNodesChange}

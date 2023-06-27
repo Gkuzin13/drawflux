@@ -67,7 +67,7 @@ module.exports = {
     'import/no-named-as-default-member': ['off'],
     'import/no-named-as-default': ['warn'],
     'import/order': [
-      'error',
+      'warn',
       {
         groups: [
           'builtin',

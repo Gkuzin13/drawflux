@@ -29,7 +29,7 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
   };
 
   return (
-    <Panel>
+    <Panel css={{ marginRight: 'auto' }}>
       <PanelButton
         disabled={value === 1}
         title={ZOOM.RESET.name}

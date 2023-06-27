@@ -6,6 +6,8 @@ import {
   GetPageResponse,
   SharePageRequestBody,
   SharePageResponse,
+  UpdatePageBody,
+  UpdatePageResponse,
 } from './page';
 import { QRCodeRequestBody, QRCodeResponse } from './qrcode';
 
@@ -19,4 +21,6 @@ export const Schemas = {
   SharePageResponse,
   QRCodeRequestBody,
   QRCodeResponse,
+  UpdatePageBody,
+  UpdatePageResponse,
 };

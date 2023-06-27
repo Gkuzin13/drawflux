@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { StageConfig } from 'shared';
+import { type StageConfig } from 'shared';
 import Canvas from '@/components/Canvas/Canvas';
 import {
   getIntersectingNodes,
@@ -9,36 +9,28 @@ import {
 import ContextMenu from '@/components/ContextMenu/ContextMenu';
 import type { ContextMenuType } from '@/components/ContextMenu/ContextMenu';
 import Dialog from '@/components/core/Dialog/Dialog';
-import Loader from '@/components/core/Loader/Loader';
 import Panels from '@/components/Panels/Panels';
 import { NODES_LAYER_INDEX } from '@/constants/node';
+import { useModal } from '@/contexts/modal';
 import useKbdShortcuts from '@/hooks/useKbdShortcuts';
-import { useGetPageQuery } from '@/services/api';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import { selectDialog, uiActions } from '@/stores/slices/ui';
 import { Container } from './MainContainerStyled';
 
 type Props = {
-  pageId: string | null;
   viewportSize: {
     width: number;
     height: number;
   };
 };
 
-const MainContainer = ({ pageId, viewportSize }: Props) => {
+const MainContainer = ({ viewportSize }: Props) => {
   const [intersectedNodesIds, setIntersectedNodesIds] = useState<string[]>([]);
-  const { isLoading, isError, isSuccess } = useGetPageQuery(
-    {
-      id: pageId as string,
-    },
-    { skip: !pageId },
-  );
 
   const { stageConfig, selectedNodesIds, nodes, toolType } =
     useAppSelector(selectCanvas);
-  const dialog = useAppSelector(selectDialog);
+
+  const modal = useModal();
 
   const stageRef = useRef<Konva.Stage>(null);
 
@@ -62,17 +54,6 @@ const MainContainer = ({ pageId, viewportSize }: Props) => {
   useEffect(() => {
     setIntersectedNodesIds(Object.keys(selectedNodesIds));
   }, [selectedNodesIds]);
-
-  useEffect(() => {
-    if (isError) {
-      dispatch(
-        uiActions.openDialog({
-          title: 'Error',
-          description: 'Error loading page',
-        }),
-      );
-    }
-  }, [isError, dispatch]);
 
   const handleStageConfigChange = (config: Partial<StageConfig>) => {
     dispatch(canvasActions.setStageConfig(config));
@@ -120,20 +101,12 @@ const MainContainer = ({ pageId, viewportSize }: Props) => {
   );
 
   const handleDialogClose = () => {
-    dispatch(uiActions.closeDialog());
+    modal.close();
   };
-
-  if (isLoading) {
-    return <Loader fullScreen={true}>Loading</Loader>;
-  }
 
   return (
     <Container tabIndex={0}>
-      <Panels
-        intersectedNodesIds={intersectedNodesIds}
-        isPageShared={isSuccess}
-        stageRef={stageRef}
-      />
+      <Panels intersectedNodesIds={intersectedNodesIds} stageRef={stageRef} />
       <ContextMenu
         type={contextMenuType}
         onContextMenuOpen={handleContextMenuOpen}
@@ -146,7 +119,12 @@ const MainContainer = ({ pageId, viewportSize }: Props) => {
           onConfigChange={handleStageConfigChange}
         />
       </ContextMenu>
-      <Dialog {...dialog} onClose={handleDialogClose} />
+      <Dialog
+        open={modal.opened}
+        title={modal.title}
+        description={modal.description}
+        onClose={handleDialogClose}
+      />
     </Container>
   );
 };

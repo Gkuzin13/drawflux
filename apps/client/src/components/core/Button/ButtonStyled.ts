@@ -110,6 +110,7 @@ export const ButtonStyled = styled('button', {
         padding: '$1',
         width: '$7',
         height: '$7',
+        flexShrink: 0,
       },
     },
   ],

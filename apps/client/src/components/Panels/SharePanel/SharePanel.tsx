@@ -1,7 +1,12 @@
 import * as Popover from '@radix-ui/react-popover';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { TbClipboardCheck, TbCopy, TbLink } from 'react-icons/tb';
-import type { QRCodeResponse, SharePageRequestBody } from 'shared';
+import type {
+  QRCodeRequestBody,
+  QRCodeResponse,
+  SharePageRequestBody,
+  SharePageResponse,
+} from 'shared';
 import Button from '@/components/core/Button/Button';
 import { Divider } from '@/components/core/Divider/Divider';
 import Loader from '@/components/core/Loader/Loader';
@@ -9,7 +14,7 @@ import QRCode from '@/components/QRCode/QRCode';
 import { PAGE_URL_SEARCH_PARAM_KEY } from '@/constants/app';
 import { ICON_SIZES } from '@/constants/icon';
 import useClipboard from '@/hooks/useClipboard/useClipboard';
-import { useGetQRCodeMutation, useSharePageMutation } from '@/services/api';
+import useFetch from '@/hooks/useFetch';
 import { urlSearchParam } from '@/utils/url';
 import {
   QRCodeContainer,
@@ -29,44 +34,29 @@ type ShareablePageProps = {
 
 type SharedPageContentProps = {
   qrCode?: QRCodeResponse;
-  onQRCodeFetchSuccess: (data: QRCodeResponse) => void;
+  loading: boolean;
+  error: string | null;
 };
 
 const SharedPageContent = ({
   qrCode,
-  onQRCodeFetchSuccess,
+  loading,
+  error,
 }: SharedPageContentProps) => {
-  const [getQRCode, { isLoading, isError }] = useGetQRCodeMutation();
   const { copied, copy } = useClipboard();
 
-  useEffect(() => {
-    async function fetchQRCode(url: string) {
-      const { data } = await getQRCode({ url }).unwrap();
-
-      if (data?.dataUrl) {
-        onQRCodeFetchSuccess(data);
-      }
-    }
-
-    if (!qrCode) {
-      fetchQRCode(window.location.href);
-    }
-  }, [qrCode, getQRCode, onQRCodeFetchSuccess]);
-
   const handleCopyLinkClick = async () => {
-    if (!qrCode) {
-      return;
+    if (qrCode) {
+      copy(window.location.href);
     }
-
-    copy(window.location.href);
   };
 
   return (
     <>
       <QRCodeContainer>
-        {isLoading && <Loader filled />}
+        {loading && <Loader filled />}
         {qrCode && <QRCode dataUrl={qrCode.dataUrl} />}
-        {isError && <p>Error loading QR Code</p>}
+        {error && <p>Error loading QR Code</p>}
       </QRCodeContainer>
       <Button
         title={copied ? 'Link Copied' : 'Copy link'}
@@ -90,15 +80,18 @@ const SharedPageContent = ({
 };
 
 const SharablePageContent = ({ page }: ShareablePageProps) => {
-  const [sharePage, { isLoading, isSuccess }] = useSharePageMutation();
+  const [{ data, status }, sharePage] = useFetch<
+    SharePageResponse,
+    SharePageRequestBody
+  >(
+    '/p',
+    {
+      method: 'POST',
+    },
+    { skip: true },
+  );
 
-  const handlePageShare = async () => {
-    if (!page.nodes.length) {
-      return;
-    }
-
-    const { data } = await sharePage({ page }).unwrap();
-
+  useEffect(() => {
     if (data?.id) {
       const updatedURL = urlSearchParam.set(PAGE_URL_SEARCH_PARAM_KEY, data.id);
 
@@ -106,6 +99,14 @@ const SharablePageContent = ({ page }: ShareablePageProps) => {
       window.location.reload();
       return;
     }
+  }, [data]);
+
+  const handlePageShare = () => {
+    if (!page.nodes.length) {
+      return;
+    }
+
+    sharePage({ page });
   };
 
   return (
@@ -117,8 +118,12 @@ const SharablePageContent = ({ page }: ShareablePageProps) => {
         disabled={!page.nodes.length}
         onClick={handlePageShare}
       >
-        {!isLoading && !isSuccess && <TbLink size={ICON_SIZES.SMALL} />}
-        {isLoading || isSuccess ? <Loader /> : 'Share this page'}
+        {status === 'idle' && <TbLink size={ICON_SIZES.SMALL} />}
+        {status === 'loading' || status === 'success' ? (
+          <Loader />
+        ) : (
+          'Share this page'
+        )}
       </Button>
       <Divider orientation="horizontal" />
       <SharePanelDisclamer>
@@ -130,17 +135,29 @@ const SharablePageContent = ({ page }: ShareablePageProps) => {
 };
 
 const SharePanel = ({ pageState, isPageShared }: Props) => {
-  const [linkQRCode, setLinkQRCode] = useState<QRCodeResponse>();
+  const [{ data, status, error }, getQRCode] = useFetch<
+    QRCodeResponse,
+    QRCodeRequestBody
+  >('/qrcode', { method: 'POST' }, { skip: true });
+
+  const url = window.location.href;
+
+  const handlePopoverOpen = (open: boolean) => {
+    if (isPageShared && !data && open) {
+      getQRCode({ url });
+    }
+  };
 
   return (
-    <Popover.Root>
+    <Popover.Root onOpenChange={handlePopoverOpen}>
       <SharePanelTrigger>Share</SharePanelTrigger>
       <Popover.Portal>
-        <SharePanelContent align="end">
-          {isPageShared ? (
+        <SharePanelContent align="end" sideOffset={4}>
+          {isPageShared && data ? (
             <SharedPageContent
-              qrCode={linkQRCode}
-              onQRCodeFetchSuccess={(data) => setLinkQRCode(data)}
+              qrCode={data}
+              loading={status === 'loading'}
+              error={error}
             />
           ) : (
             <SharablePageContent page={pageState.page} />

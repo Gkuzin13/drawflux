@@ -1,22 +1,18 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { api } from '@/services/api';
 import { listenerMiddleware } from './listenerMiddleware';
 import historyReducer from './reducers/history';
 import canvas from './slices/canvas';
-import ui from './slices/ui';
+import share from './slices/share';
 
 const canvasReducer = historyReducer(canvas);
 
 export const store = configureStore({
   reducer: {
     canvas: canvasReducer,
-    ui,
-    [api.reducerPath]: api.reducer,
+    share,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware()
-      .concat(api.middleware)
-      .prepend(listenerMiddleware.middleware),
+    getDefaultMiddleware().prepend(listenerMiddleware.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

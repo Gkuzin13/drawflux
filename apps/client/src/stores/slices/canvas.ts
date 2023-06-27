@@ -3,7 +3,6 @@ import type { Vector2d } from 'konva/lib/types';
 import type { NodeObject, StageConfig } from 'shared';
 import type { SelectedNodesIds } from '@/constants/app';
 import type { Tool } from '@/constants/tool';
-import { api } from '@/services/api';
 import { allNodesInView, duplicateNodes, reorderNodes } from '@/utils/node';
 import {
   getCenterPosition,
@@ -123,17 +122,6 @@ export const canvasSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addMatcher(
-        api.endpoints.getPage.matchFulfilled,
-        (state, { payload }) => {
-          if (payload.data?.page) {
-            const { stageConfig, nodes } = payload.data.page;
-
-            state.stageConfig = stageConfig;
-            state.nodes = nodes;
-          }
-        },
-      )
       .addMatcher(
         isAnyOf(historyActions.redo.match, historyActions.undo.match),
         (state) => {
