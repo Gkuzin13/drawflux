@@ -18,14 +18,13 @@ import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { Container } from './MainContainerStyled';
 
 type Props = {
-  isPageShared: boolean;
   viewportSize: {
     width: number;
     height: number;
   };
 };
 
-const MainContainer = ({ isPageShared, viewportSize }: Props) => {
+const MainContainer = ({ viewportSize }: Props) => {
   const [intersectedNodesIds, setIntersectedNodesIds] = useState<string[]>([]);
 
   const { stageConfig, selectedNodesIds, nodes, toolType } =
@@ -107,11 +106,7 @@ const MainContainer = ({ isPageShared, viewportSize }: Props) => {
 
   return (
     <Container tabIndex={0}>
-      <Panels
-        intersectedNodesIds={intersectedNodesIds}
-        isPageShared={isPageShared}
-        stageRef={stageRef}
-      />
+      <Panels intersectedNodesIds={intersectedNodesIds} stageRef={stageRef} />
       <ContextMenu
         type={contextMenuType}
         onContextMenuOpen={handleContextMenuOpen}
