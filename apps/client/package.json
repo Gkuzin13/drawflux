@@ -24,6 +24,7 @@
     "@radix-ui/react-separator": "^1.0.2",
     "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-toggle": "^1.0.2",
+    "@radix-ui/react-visually-hidden": "^1.0.3",
     "@reduxjs/toolkit": "^1.9.3",
     "konva": "^8.4.3",
     "react": "^18.2.0",
