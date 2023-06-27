@@ -1,9 +1,9 @@
 import type { NodeColor, NodeStyle } from 'shared';
 import Slider from '@/components/core/Slider/Slider';
 import { ICON_SIZES } from '@/constants/icon';
-import { ANIMATED, COLOR, LINE, OPACITY, SIZE } from '@/constants/style';
+import { ANIMATED, LINE, OPACITY, SIZE } from '@/constants/style';
 import { clamp } from '@/utils/math';
-import { getColorValue } from '@/utils/shape';
+import ColorsGrid from '../../ColorsGrid/ColorsGrid';
 import {
   StyleButton,
   StyleContainer,
@@ -68,27 +68,7 @@ const StylePanel = ({
         <StyleLabel htmlFor="shape-color" css={{ fontSize: '$1' }}>
           Color
         </StyleLabel>
-        <StyleGrid>
-          {COLOR.map((color) => {
-            return (
-              <StyleButton
-                aria-label="Select Color"
-                key={color.value}
-                value={color.value}
-                title={color.name}
-                checked={color.value === style.color}
-                color={
-                  color.value === style.color ? 'secondary' : 'secondary-light'
-                }
-                style={{ color: getColorValue(color.value) }}
-              >
-                {color.icon({
-                  size: ICON_SIZES.LARGE,
-                })}
-              </StyleButton>
-            );
-          })}
-        </StyleGrid>
+        <ColorsGrid value={style.color || ''} onSelect={handleColorSelect} />
       </StyleRadioGroup>
       <div aria-labelledby="Opacity">
         <StyleLabel css={{ fontSize: '$1' }}>Opacity</StyleLabel>

@@ -7,6 +7,7 @@ import type {
   WSMessage,
   UpdatePageResponse,
   UpdatePageRequestBody,
+  User,
 } from 'shared';
 import { Schemas } from 'shared';
 import type { ControlAction } from '@/constants/control';
@@ -22,6 +23,7 @@ import {
   selectCanvas,
   selectHistory,
 } from '@/stores/slices/canvas';
+import { shareActions } from '@/stores/slices/share';
 import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
 import { sendMessage } from '@/utils/websocket';
@@ -36,19 +38,15 @@ import {
 import SharePanel from './SharePanel/SharePanel';
 import StylePanel, { type StylePanelProps } from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
+import UsersPanel from './UsersPanel/UsersPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;
   intersectedNodesIds: string[];
-  isPageShared?: boolean;
 };
 
-const Panels = ({
-  stageRef,
-  intersectedNodesIds,
-  isPageShared = false,
-}: Props) => {
+const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   const ws = useWebSocket();
 
   const [{ error }, updatePage] = useFetch<
@@ -234,6 +232,19 @@ const Panels = ({
     }
   };
 
+  const handleUserChange = (user: User) => {
+    if (ws?.isConnected) {
+      const message: WSMessage = {
+        type: 'user-change',
+        data: { user },
+      };
+
+      sendMessage(ws.connection, message);
+
+      dispatch(shareActions.updateUser(user));
+    }
+  };
+
   return (
     <PanelsContainer>
       <TopPanel>
@@ -248,10 +259,11 @@ const Panels = ({
           onStyleChange={handleStyleChange}
         />
         <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
+        {ws?.isConnected && <UsersPanel onUserChange={handleUserChange} />}
         <TopPanelRightContainer>
           {online && (
             <SharePanel
-              isPageShared={isPageShared}
+              isPageShared={!!ws?.isConnected}
               pageState={{ page: { nodes, stageConfig } }}
             />
           )}

@@ -152,7 +152,7 @@ const SharePanel = ({ pageState, isPageShared }: Props) => {
     <Popover.Root onOpenChange={handlePopoverOpen}>
       <SharePanelTrigger>Share</SharePanelTrigger>
       <Popover.Portal>
-        <SharePanelContent align="end">
+        <SharePanelContent align="end" sideOffset={4}>
           {isPageShared && data ? (
             <SharedPageContent
               qrCode={data}
