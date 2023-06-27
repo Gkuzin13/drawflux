@@ -1,11 +1,16 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
+import { WSMessageUtil } from 'shared';
 import {
   BASE_WS_URL,
   BASE_WS_URL_DEV,
   IS_PROD,
   PAGE_URL_SEARCH_PARAM_KEY,
 } from '@/constants/app';
+import { useAppDispatch } from '@/stores/hooks';
+import { historyActions } from '@/stores/reducers/history';
+import { canvasActions } from '@/stores/slices/canvas';
+import { shareActions } from '@/stores/slices/share';
 import { urlSearchParam } from '@/utils/url';
 import { useModal } from './modal';
 
@@ -18,15 +23,18 @@ type WSContextValue = {
 
 type WSStatus = 'idle' | 'connecting' | 'connected' | 'disconnected';
 
-const wsBaseUrl = IS_PROD ? BASE_WS_URL : BASE_WS_URL_DEV;
 const serverErrorCodes = [1011];
-const pageId = urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY);
-const initialStatus = pageId ? 'connecting' : 'idle';
+const wsBaseUrl = IS_PROD ? BASE_WS_URL : BASE_WS_URL_DEV;
 
 export const WebSocketContext = createContext<WSContextValue | null>(null);
 
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
+  const pageId = urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY);
+  const initialStatus = pageId ? 'connecting' : 'idle';
+
   const [status, setStatus] = useState<WSStatus>(initialStatus);
+
+  const dispatch = useAppDispatch();
 
   const connection = useRef<WebSocket | null>(null);
 
@@ -36,6 +44,21 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     if (!connection.current) {
       return;
     }
+
+    const onMessage = (event: MessageEvent) => {
+      const message = WSMessageUtil.deserialize(event.data);
+
+      if (message?.type === 'room-joined') {
+        dispatch(
+          shareActions.init({
+            userId: message.data.userId,
+            users: message.data.users,
+          }),
+        );
+        dispatch(canvasActions.setNodes(message.data.nodes));
+        dispatch(historyActions.reset());
+      }
+    };
 
     const onOpen = () => {
       setStatus('connected');
@@ -56,16 +79,15 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       modal.open('Error', 'Something went wrong');
     };
 
-    connection.current.addEventListener('open', onOpen);
-    connection.current.addEventListener('close', onClose);
-    connection.current.addEventListener('error', onError);
+    connection.current.onopen = onOpen;
+    connection.current.onclose = onClose;
+    connection.current.onerror = onError;
+    connection.current.onmessage = onMessage;
 
     return () => {
-      connection.current?.removeEventListener('open', onOpen);
-      connection.current?.removeEventListener('close', onClose);
-      connection.current?.removeEventListener('error', onError);
+      setStatus(initialStatus);
     };
-  }, [connection, modal]);
+  }, [connection, initialStatus, modal, dispatch]);
 
   useEffect(() => {
     if (pageId && !connection.current) {
@@ -74,9 +96,9 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     }
 
     return () => {
-      setStatus('idle');
+      setStatus(initialStatus);
     };
-  }, []);
+  }, [initialStatus, pageId]);
 
   return (
     <WebSocketContext.Provider
