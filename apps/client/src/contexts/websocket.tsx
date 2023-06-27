@@ -98,7 +98,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     return () => {
       setStatus(initialStatus);
     };
-  }, [initialStatus, pageId]);
+  }, [initialStatus, pageId, connection]);
 
   return (
     <WebSocketContext.Provider
