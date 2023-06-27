@@ -23,8 +23,6 @@ const serverErrorCodes = [1011];
 const pageId = urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY);
 const initialStatus = pageId ? 'connecting' : 'idle';
 
-let attempedConnection = false;
-
 export const WebSocketContext = createContext<WSContextValue | null>(null);
 
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
@@ -70,10 +68,9 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   }, [connection, modal]);
 
   useEffect(() => {
-    if (pageId && !attempedConnection) {
+    if (pageId && !connection.current) {
       setStatus('connecting');
       connection.current = new WebSocket(`${wsBaseUrl}/page&id=${pageId}`);
-      attempedConnection = true;
     }
 
     return () => {
