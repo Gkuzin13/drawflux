@@ -137,10 +137,6 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
           });
           break;
         }
-        case 'user-joined': {
-          dispatch(shareActions.addUser(data.user));
-          break;
-        }
         case 'user-move': {
           handleUserMove(data);
           break;
@@ -153,10 +149,6 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
             return userCursorsCopy;
           });
           dispatch(shareActions.removeUser(data));
-          break;
-        }
-        case 'user-change': {
-          dispatch(shareActions.updateUser(data.user));
           break;
         }
       }

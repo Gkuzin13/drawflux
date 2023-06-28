@@ -7,6 +7,7 @@ import {
   useState,
   useCallback,
   useRef,
+  useEffect,
 } from 'react';
 import { Layer, Stage } from 'react-konva';
 import type {
@@ -19,6 +20,7 @@ import type {
 } from 'shared';
 import { CURSOR } from '@/constants/cursor';
 import { NODES_LAYER_INDEX } from '@/constants/node';
+import { useNotifications } from '@/contexts/notifications';
 import { useWebSocket } from '@/contexts/websocket';
 import useFetch from '@/hooks/useFetch';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
@@ -76,6 +78,8 @@ const Canvas = forwardRef<Konva.Stage, Props>(
     const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
     const { userId } = useAppSelector(selectShare);
 
+    const notifications = useNotifications();
+
     const dispatch = useAppDispatch();
 
     const drawingPositionRef = useRef(initialDrawingPosition);
@@ -95,6 +99,16 @@ const Canvas = forwardRef<Konva.Stage, Props>(
 
     const isStageDraggable = toolType === 'hand';
     const isSelectRectActive = drawing && toolType === 'select';
+
+    useEffect(() => {
+      if (error) {
+        notifications.add({
+          title: 'Error',
+          description: 'Failed to update the drawing',
+          type: 'error',
+        });
+      }
+    }, [error, notifications]);
 
     const handleDraftEnd = useCallback(
       (node: NodeObject, resetToolType = true) => {

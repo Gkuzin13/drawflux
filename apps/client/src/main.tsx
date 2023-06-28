@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider as StoreProvider } from 'react-redux';
+import { NotificationsProvider } from '@/contexts/notifications';
 import { WebSocketProvider } from '@/contexts/websocket';
 import App from './App';
 import { ModalProvider } from './contexts/modal';
@@ -13,9 +14,11 @@ createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <StoreProvider store={store}>
       <ModalProvider>
-        <WebSocketProvider>
-          <App />
-        </WebSocketProvider>
+        <NotificationsProvider>
+          <WebSocketProvider>
+            <App />
+          </WebSocketProvider>
+        </NotificationsProvider>
       </ModalProvider>
     </StoreProvider>
   </React.StrictMode>,
