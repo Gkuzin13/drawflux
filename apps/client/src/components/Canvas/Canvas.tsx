@@ -30,7 +30,7 @@ import { store } from '@/stores/store';
 import { uniq } from '@/utils/array';
 import { createNode } from '@/utils/node';
 import { getNormalizedInvertedRect } from '@/utils/position';
-import { sendMessage } from '@/utils/websocket';
+import { sendMessage, sendThrottledMessage } from '@/utils/websocket';
 import BackgroundRect from '../BackgroundRect/BackgroundRect';
 import CollabLayer from '../CollabLayer';
 import NodesLayer from '../NodesLayer';
@@ -259,6 +259,15 @@ const Canvas = forwardRef<Konva.Stage, Props>(
         if (toolType === 'select') {
           drawingPositionRef.current.current = currentPoint;
           handleSelectDraw(stage);
+
+          if (ws?.isConnected && userId) {
+            const message: WSMessage = {
+              type: 'user-move',
+              data: { id: userId, position: currentPoint },
+            };
+            sendThrottledMessage(ws.connection, message);
+          }
+
           return;
         }
 
@@ -286,8 +295,7 @@ const Canvas = forwardRef<Konva.Stage, Props>(
                 },
               },
             };
-
-            sendMessage(ws.connection, message);
+            sendThrottledMessage(ws.connection, message);
           }
         }
       },

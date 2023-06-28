@@ -13,6 +13,8 @@ export const IS_PROD = process.env.NODE_ENV === 'production';
 export const PAGE_URL_SEARCH_PARAM_KEY = 'page';
 export const LOCAL_STORAGE_KEY = 'drawflux';
 
+export const WS_THROTTLE_MS = 25;
+
 export const USER = {
   maxNameLength: 10,
 };
