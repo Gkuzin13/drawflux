@@ -56,7 +56,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
 
       if (message?.type === 'room-joined') {
         notifications.add({
-          title: 'Collaborative Drawing',
+          title: 'Live collaboration',
           description: 'You are connected',
           type: 'success',
         });
