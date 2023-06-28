@@ -47,11 +47,9 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       return;
     }
 
-    attemptedConnection = true;
-
     const webSocket = new WebSocket(`${wsBaseUrl}/page&id=${pageId}`);
 
-    webSocket.onmessage = (event: MessageEvent) => {
+    const onMessage = (event: MessageEvent) => {
       const message = WSMessageUtil.deserialize(event.data);
 
       if (message?.type === 'room-joined') {
@@ -72,12 +70,12 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       }
     };
 
-    webSocket.onopen = () => {
+    const onOpen = () => {
       setStatus('connected');
       setWebSocket(webSocket);
     };
 
-    webSocket.onclose = (event: CloseEvent) => {
+    const onClose = (event: CloseEvent) => {
       setStatus('disconnected');
 
       if (serverErrorCodes.includes(event.code)) {
@@ -87,7 +85,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       }
     };
 
-    webSocket.onerror = () => {
+    const onError = () => {
       notifications.add({
         title: 'Connection',
         description: 'Something went wrong',
@@ -96,10 +94,12 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       setStatus('disconnected');
     };
 
-    return () => {
-      setStatus(initialStatus);
-      setWebSocket(null);
-    };
+    webSocket.addEventListener('message', onMessage);
+    webSocket.addEventListener('open', onOpen);
+    webSocket.addEventListener('close', onClose);
+    webSocket.addEventListener('error', onError);
+
+    attemptedConnection = true;
   }, [initialStatus, modal, pageId, notifications, dispatch]);
 
   return (
