@@ -5,12 +5,14 @@ import { WebSocketServer } from 'ws';
 import queries from '../../queries';
 import { CollabRoom, CollabUser } from './models';
 
-export const colorsSet: User['color'][] = [
-  'green600',
-  'pink600',
-  'blue600',
-  'deep-orange600',
-];
+const MAX_USERS = 4;
+
+const colorNames = [
+  'teal600',
+  'light-blue600',
+  'indigo600',
+  'gray600',
+] as User['color'][];
 
 const wss = new WebSocketServer({ noServer: true });
 const rooms = new Map<string, InstanceType<typeof CollabRoom>>();
@@ -52,12 +54,19 @@ wss.on('connection', async (ws, req) => {
 
   const room = rooms.get(pageId);
 
-  const usedColors = room?.users.map((user) => user.color) || [];
-  const userColor =
-    colorsSet.find((color) => !usedColors.includes(color)) || colorsSet[0];
-  const user = new CollabUser('New User', userColor, ws);
+  const usedColors = new Set(room?.users.map((user) => user.color) || []);
+  const userColor = colorNames.find((color) => !usedColors.has(color));
+  const user = new CollabUser('New User', userColor || colorNames[0], ws);
 
   if (room) {
+    if (room.userCount() >= MAX_USERS) {
+      ws.close(
+        1011,
+        'Sorry, the collaborative drawing session has reached its maximum number of users.',
+      );
+      return;
+    }
+
     room.addUser(user);
 
     const roomJoinedMessage: WSMessage = {

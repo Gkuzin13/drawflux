@@ -13,10 +13,12 @@ import { useWebSocket } from './contexts/websocket';
 import useWindowSize from './hooks/useWindowSize/useWindowSize';
 import useWSMessage from './hooks/useWSMessage';
 import { historyActions } from './stores/reducers/history';
+import { shareActions } from './stores/slices/share';
 
 const App = () => {
   const { nodes } = useAppSelector(selectCanvas);
   const windowSize = useWindowSize();
+
   const ws = useWebSocket();
 
   const dispatch = useAppDispatch();
@@ -25,6 +27,14 @@ const App = () => {
     const { type, data } = message;
 
     switch (type) {
+      case 'user-joined': {
+        dispatch(shareActions.addUser(data.user));
+        break;
+      }
+      case 'user-change': {
+        dispatch(shareActions.updateUser(data.user));
+        break;
+      }
       case 'nodes-set': {
         dispatch(canvasActions.setNodes(data.nodes));
         break;

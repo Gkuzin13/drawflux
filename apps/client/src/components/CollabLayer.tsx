@@ -8,10 +8,12 @@ import {
   useState,
 } from 'react';
 import type { WSMessage, NodeObject, Point } from 'shared';
+import { WS_THROTTLE_MS } from '@/constants/app';
 import { useWebSocket } from '@/contexts/websocket';
 import useWSMessage from '@/hooks/useWSMessage';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { selectShare, shareActions } from '@/stores/slices/share';
+import { throttleFn } from '@/utils/throttle';
 import { sendMessage } from '@/utils/websocket';
 import { type DrawableType, drawTypes } from './Canvas/helpers/draw';
 import DraftNode from './Node/DraftNode';
@@ -58,7 +60,7 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
     const stage = stageRef.current;
     const container = stage.container();
 
-    const handlePointerMove = () => {
+    const handlePointerMove = throttleFn(() => {
       const { x, y } = stage.getRelativePointerPosition();
 
       const message: WSMessage = {
@@ -67,7 +69,7 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
       };
 
       sendMessage(ws.connection, message);
-    };
+    }, WS_THROTTLE_MS);
 
     if (!isDrawing) {
       container.addEventListener('mousemove', handlePointerMove);
@@ -137,10 +139,6 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
           });
           break;
         }
-        case 'user-joined': {
-          dispatch(shareActions.addUser(data.user));
-          break;
-        }
         case 'user-move': {
           handleUserMove(data);
           break;
@@ -153,10 +151,6 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
             return userCursorsCopy;
           });
           dispatch(shareActions.removeUser(data));
-          break;
-        }
-        case 'user-change': {
-          dispatch(shareActions.updateUser(data.user));
           break;
         }
       }

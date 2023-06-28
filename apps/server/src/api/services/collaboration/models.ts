@@ -34,6 +34,10 @@ export class CollabRoom implements Room {
   removeUser(id: string) {
     this.users = this.users.filter((user) => user.id !== id);
   }
+
+  userCount() {
+    return this.users.length;
+  }
 }
 
 export class CollabUser implements User {

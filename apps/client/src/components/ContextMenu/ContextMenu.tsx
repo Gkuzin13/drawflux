@@ -1,11 +1,17 @@
 import * as RadixContextMenu from '@radix-ui/react-context-menu';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
-import { type PropsWithChildren, type ReactNode, useCallback } from 'react';
+import {
+  type PropsWithChildren,
+  type ReactNode,
+  useCallback,
+  useEffect,
+} from 'react';
 import {
   type UpdatePageRequestBody,
   type UpdatePageResponse,
   type WSMessage,
 } from 'shared';
+import { useNotifications } from '@/contexts/notifications';
 import { useWebSocket } from '@/contexts/websocket';
 import useFetch from '@/hooks/useFetch';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
@@ -70,8 +76,19 @@ const NodeMenu = () => {
   );
 
   const { selectedNodesIds } = useAppSelector(selectCanvas);
+  const notifications = useNotifications();
 
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (error) {
+      notifications.add({
+        title: 'Error',
+        description: 'Could not update page',
+        type: 'error',
+      });
+    }
+  }, [error, notifications]);
 
   const dispatchNodesAction = useCallback(
     (action: ActionCreatorWithPayload<string[]>) => {

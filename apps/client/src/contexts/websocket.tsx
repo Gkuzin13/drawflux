@@ -13,6 +13,7 @@ import { canvasActions } from '@/stores/slices/canvas';
 import { shareActions } from '@/stores/slices/share';
 import { urlSearchParam } from '@/utils/url';
 import { useModal } from './modal';
+import { useNotifications } from './notifications';
 
 type WSContextValue = {
   connection: WebSocket | null;
@@ -39,6 +40,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const dispatch = useAppDispatch();
 
   const modal = useModal();
+  const notifications = useNotifications();
 
   useEffect(() => {
     if (attemptedConnection || !pageId) {
@@ -49,10 +51,16 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
 
     const webSocket = new WebSocket(`${wsBaseUrl}/page&id=${pageId}`);
 
-    const onMessage = (event: MessageEvent) => {
+    webSocket.onmessage = (event: MessageEvent) => {
       const message = WSMessageUtil.deserialize(event.data);
 
       if (message?.type === 'room-joined') {
+        notifications.add({
+          title: 'Live collaboration',
+          description: 'You are connected',
+          type: 'success',
+        });
+
         dispatch(
           shareActions.init({
             userId: message.data.userId,
@@ -64,12 +72,12 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       }
     };
 
-    const onOpen = () => {
+    webSocket.onopen = () => {
       setStatus('connected');
       setWebSocket(webSocket);
     };
 
-    const onClose = (event: CloseEvent) => {
+    webSocket.onclose = (event: CloseEvent) => {
       setStatus('disconnected');
 
       if (serverErrorCodes.includes(event.code)) {
@@ -79,21 +87,20 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       }
     };
 
-    const onError = () => {
+    webSocket.onerror = () => {
+      notifications.add({
+        title: 'Connection',
+        description: 'Something went wrong',
+        type: 'error',
+      });
       setStatus('disconnected');
-      modal.open('Error', 'Something went wrong');
     };
-
-    webSocket.onopen = onOpen;
-    webSocket.onclose = onClose;
-    webSocket.onerror = onError;
-    webSocket.onmessage = onMessage;
 
     return () => {
       setStatus(initialStatus);
       setWebSocket(null);
     };
-  }, [initialStatus, modal, pageId, dispatch]);
+  }, [initialStatus, modal, pageId, notifications, dispatch]);
 
   return (
     <WebSocketContext.Provider

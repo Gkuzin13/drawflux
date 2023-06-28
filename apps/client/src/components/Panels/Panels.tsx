@@ -1,5 +1,5 @@
 import type Konva from 'konva';
-import { type RefObject, useMemo } from 'react';
+import { type RefObject, useMemo, useEffect } from 'react';
 import type {
   NodeStyle,
   NodeObject,
@@ -14,6 +14,7 @@ import type { ControlAction } from '@/constants/control';
 import { type MenuPanelActionType } from '@/constants/menu';
 import { type Tool } from '@/constants/tool';
 import { useModal } from '@/contexts/modal';
+import { useNotifications } from '@/contexts/notifications';
 import { useWebSocket } from '@/contexts/websocket';
 import useFetch from '@/hooks/useFetch';
 import useNetworkState from '@/hooks/useNetworkState/useNetworkState';
@@ -65,6 +66,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   const { online } = useNetworkState();
 
   const modal = useModal();
+  const notifications = useNotifications();
 
   const dispatch = useAppDispatch();
 
@@ -119,6 +121,16 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   }, [selectedNodes]);
 
   const isStylePanelActive = selectedNodes.length > 0;
+
+  useEffect(() => {
+    if (error) {
+      notifications.add({
+        title: 'Error',
+        description: 'Could not update page',
+        type: 'error',
+      });
+    }
+  }, [error, notifications]);
 
   const handleToolSelect = (type: Tool['value']) => {
     dispatch(canvasActions.setToolType(type));
