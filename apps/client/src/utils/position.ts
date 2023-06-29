@@ -80,12 +80,18 @@ export function isNodePartiallyInView(
   );
 }
 
-export function getMiddleNode(nodes: NodeObject[]): NodeObject {
-  if (nodes.length === 1) {
+export function getMiddleNode(nodes: NodeObject[]): NodeObject | null {
+  if (!nodes.length) {
+    return null;
+  }
+
+  if (nodes.length <= 2) {
     return nodes[0];
   }
 
-  const sortedNodesByPosAsc = nodes.sort((a, b) => {
+  const nodesCopy = [...nodes];
+
+  const sortedNodesByPosAsc = nodesCopy.sort((a, b) => {
     const aMid = calculateMiddlePoint(getNodeRect(a));
     const bMid = calculateMiddlePoint(getNodeRect(b));
 
