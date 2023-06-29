@@ -122,6 +122,16 @@ export const canvasSlice = createSlice({
   },
   extraReducers(builder) {
     builder
+      .addMatcher(canvasSlice.actions.setNodes.match, (state, action) => {
+        const middleNode = getMiddleNode(action.payload);
+
+        if (middleNode) {
+          const { caseReducers, actions } = canvasSlice;
+
+          const focusPoint = getNodeRect(middleNode);
+          caseReducers.focusStage(state, actions.focusStage(focusPoint));
+        }
+      })
       .addMatcher(
         isAnyOf(historyActions.redo.match, historyActions.undo.match),
         (state) => {
@@ -147,8 +157,14 @@ export const canvasSlice = createSlice({
           height: window.innerHeight,
         };
 
-        if (!allNodesInView(duplicatedNodes, stageRect, stageConfig.scale)) {
-          const { x, y } = getNodeRect(getMiddleNode(duplicatedNodes));
+        if (allNodesInView(duplicatedNodes, stageRect, stageConfig.scale)) {
+          return;
+        }
+
+        const nodeInMiddle = getMiddleNode(duplicatedNodes);
+
+        if (nodeInMiddle) {
+          const { x, y } = getNodeRect(nodeInMiddle);
           caseReducers.focusStage(state, actions.focusStage({ x, y }));
         }
       })
