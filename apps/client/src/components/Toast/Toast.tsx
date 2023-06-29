@@ -1,8 +1,8 @@
 import type { ComponentProps } from '@stitches/react';
 import type { PropsWithChildren } from 'react';
 import { IoCloseOutline } from 'react-icons/io5';
+import Button from '@/components/Elements/Button/Button';
 import { ICON_SIZES } from '@/constants/icon';
-import Button from '../core/Button/Button';
 import {
   ToastRoot,
   ToastDescription,

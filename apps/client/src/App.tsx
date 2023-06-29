@@ -7,8 +7,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { storage } from '@/utils/storage';
-import Loader from './components/core/Loader/Loader';
-import MainContainer from './components/MainContainer/MainContainer';
+import MainLayout from './components/Layout/MainLayout/MainLayout';
 import { useWebSocket } from './contexts/websocket';
 import useWindowSize from './hooks/useWindowSize/useWindowSize';
 import useWSMessage from './hooks/useWSMessage';
@@ -106,11 +105,7 @@ const App = () => {
     }
   }, [ws?.pageId, dispatch]);
 
-  if (ws?.isConnecting) {
-    return <Loader fullScreen={true}>Loading</Loader>;
-  }
-
-  return <MainContainer viewportSize={windowSize} />;
+  return <MainLayout viewportSize={windowSize} />;
 };
 
 export default App;

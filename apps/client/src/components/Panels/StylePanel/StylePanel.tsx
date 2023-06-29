@@ -1,9 +1,9 @@
 import type { NodeColor, NodeStyle } from 'shared';
-import Slider from '@/components/core/Slider/Slider';
+import ColorsGrid from '@/components/Elements/ColorsGrid/ColorsGrid';
+import Slider from '@/components/Elements/Slider/Slider';
 import { ICON_SIZES } from '@/constants/icon';
 import { ANIMATED, LINE, OPACITY, SIZE } from '@/constants/style';
 import { clamp } from '@/utils/math';
-import ColorsGrid from '../../ColorsGrid/ColorsGrid';
 import {
   StyleButton,
   StyleContainer,

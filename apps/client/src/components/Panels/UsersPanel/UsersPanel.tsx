@@ -2,14 +2,14 @@ import * as Popover from '@radix-ui/react-popover';
 import { useEffect, useRef, useState } from 'react';
 import { TbCheck, TbPencil, TbUsers } from 'react-icons/tb';
 import { type User, colors } from 'shared';
-import Button from '@/components/core/Button/Button';
-import TextInput from '@/components/core/TextInput/TextInput';
+import Button from '@/components/Elements/Button/Button';
+import ColorsGrid from '@/components/Elements/ColorsGrid/ColorsGrid';
+import TextInput from '@/components/Elements/TextInput/TextInput';
 import { USER } from '@/constants/app';
 import { ICON_SIZES } from '@/constants/icon';
 import { KEYS } from '@/constants/keys';
 import { useAppSelector } from '@/stores/hooks';
 import { selectShare } from '@/stores/slices/share';
-import ColorsGrid from '../../ColorsGrid/ColorsGrid';
 import {
   UsersPanelContainer,
   UsersPanelContent,

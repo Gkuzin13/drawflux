@@ -11,6 +11,8 @@ import {
   type UpdatePageResponse,
   type WSMessage,
 } from 'shared';
+import { Divider } from '@/components/Elements/Divider/Divider';
+import Kbd from '@/components/Elements/Kbd/Kbd';
 import { useNotifications } from '@/contexts/notifications';
 import { useWebSocket } from '@/contexts/websocket';
 import useFetch from '@/hooks/useFetch';
@@ -18,8 +20,6 @@ import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { store } from '@/stores/store';
 import { sendMessage } from '@/utils/websocket';
-import { Divider } from '../core/Divider/Divider';
-import Kbd from '../core/Kbd/Kbd';
 import { ContextMenuContent, ContextMenuItem } from './ContextMenuStyled';
 
 export type ContextMenuType = 'node-menu' | 'canvas-menu';

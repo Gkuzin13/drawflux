@@ -1,6 +1,6 @@
 import * as ContextMenu from '@radix-ui/react-context-menu';
 import { styled } from 'shared';
-import { ButtonStyled } from '../core/Button/ButtonStyled';
+import { ButtonStyled } from '@/components/Elements/Button/ButtonStyled';
 
 export const ContextMenuContent = styled(ContextMenu.Content, {
   display: 'flex',
