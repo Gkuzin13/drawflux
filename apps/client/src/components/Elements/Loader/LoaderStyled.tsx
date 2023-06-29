@@ -10,13 +10,13 @@ const dash = keyframes({
   },
 
   '50%': {
-    strokeDasharray: '89, 200',
+    strokeDasharray: '100, 100',
     strokeDashoffset: '-15',
   },
 
   '100%': {
     strokeDasharray: '0, 200',
-    strokeDashoffset: '-100',
+    strokeDashoffset: '-75',
   },
 });
 
@@ -30,8 +30,9 @@ export const LoaderContainer = styled('div', {
         inset: 0,
         width: '100vw',
         height: '100vh',
-        backgroundColor: '$white50',
+        backgroundColor: 'rgba(255, 255, 255, 0.25)',
         zIndex: 1050,
+        backdropFilter: 'blur(5px)',
       },
     },
     filled: {
@@ -47,13 +48,13 @@ export const LoaderContainer = styled('div', {
 
 export const LoaderInnerContainer = styled('div', {
   display: 'flex',
-  placeItems: 'center',
-  gap: '$2',
+  alignItems: 'center',
+  gap: '$3',
 });
 
-export const LoaderSinner = styled(TbLoader2, {
+export const LoaderSpinner = styled(TbLoader2, {
   '& path:nth-of-type(2)': {
     transformOrigin: 'center',
-    animation: `${dash} 1s cubic-bezier(0.5, 0.46, 0.45, 0.25) infinite`,
+    animation: `${dash} 1.5s linear infinite`,
   },
 });

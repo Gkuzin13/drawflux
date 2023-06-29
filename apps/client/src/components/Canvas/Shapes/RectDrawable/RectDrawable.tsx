@@ -1,33 +1,38 @@
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { useCallback } from 'react';
-import { Ellipse } from 'react-konva';
-import type { NodeComponentProps } from '@/components/Node/Node';
-import NodeTransformer from '@/components/NodeTransformer';
+import { useCallback, useMemo } from 'react';
+import { Rect } from 'react-konva';
+import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
+import NodeTransformer from '@/components/Canvas/NodeTransformer';
+import { RECT } from '@/constants/node';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
-import { calculateCircumference } from '@/utils/math';
+import { calculatePerimeter } from '@/utils/math';
 import { getDashValue, getSizeValue } from '@/utils/shape';
-import { getEllipseRadius } from './helpers/calc';
+import { getRectSize } from './helpers/calc';
 
-const EllipseDrawable = ({
+const RectDrawable = ({
   node,
   selected,
   draggable,
   onNodeChange,
   onPress,
 }: NodeComponentProps) => {
-  const { nodeRef, transformerRef } = useTransformer<Konva.Ellipse>([selected]);
-
+  const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
   const { stageConfig } = useAppSelector(selectCanvas);
   const { config } = useNode(node, stageConfig);
+
+  const totalDashLength = config.dash.length
+    ? config.dash[0] + config.dash[1]
+    : 0;
+
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
     elementRef: nodeRef,
-    totalDashLength: config.dash[0] + config.dash[1],
+    totalDashLength,
   });
 
   const handleDragEnd = useCallback(
@@ -52,11 +57,11 @@ const EllipseDrawable = ({
 
   const handlTransform = useCallback(
     (event: KonvaEventObject<Event>) => {
-      const ellipse = event.target as Konva.Ellipse;
+      const rect = event.target as Konva.Rect;
 
-      const { radiusX, radiusY } = getEllipseRadius(ellipse);
+      const { width, height } = getRectSize(rect);
 
-      const totalLength = calculateCircumference(radiusX, radiusY);
+      const totalLength = calculatePerimeter(width, height, RECT.CORNER_RADIUS);
 
       const dash = getDashValue(
         totalLength,
@@ -64,46 +69,65 @@ const EllipseDrawable = ({
         node.style.line,
       );
 
-      ellipse.dash(dash.map((d) => d * stageConfig.scale));
+      rect.scale({ x: 1, y: 1 });
+
+      rect.width(width);
+      rect.height(height);
+      rect.dash(dash.map((d) => d * stageConfig.scale));
     },
     [node.style.size, node.style.line, stageConfig.scale],
   );
 
   const handleTransformEnd = useCallback(
     (event: KonvaEventObject<Event>) => {
-      const ellipse = event.target as Konva.Ellipse;
+      const rect = event.target as Konva.Rect;
 
-      const { radiusX, radiusY } = getEllipseRadius(ellipse);
+      const { width, height } = getRectSize(rect);
 
       onNodeChange({
         ...node,
         nodeProps: {
           ...node.nodeProps,
-          point: [ellipse.x(), ellipse.y()],
-          width: radiusX,
-          height: radiusY,
-          rotation: ellipse.rotation(),
+          point: [rect.x(), rect.y()],
+          width,
+          height,
+          rotation: rect.rotation(),
         },
       });
+
+      rect.scale({ x: 1, y: 1 });
 
       if (node.style.animated && animation?.isRunning() === false) {
         animation.start();
       }
-
-      ellipse.scale({ x: 1, y: 1 });
     },
     [node, animation, onNodeChange],
   );
 
+  // Sanitize rect size
+  const { width, height } = useMemo(() => {
+    return {
+      width: Math.max(
+        Number(node.nodeProps.width ?? RECT.MIN_SIZE),
+        RECT.MIN_SIZE,
+      ),
+      height: Math.max(
+        Number(node.nodeProps.height ?? RECT.MIN_SIZE),
+        RECT.MIN_SIZE,
+      ),
+    };
+  }, [node.nodeProps.width, node.nodeProps.height]);
+
   return (
     <>
-      <Ellipse
+      <Rect
         ref={nodeRef}
-        radiusX={node.nodeProps.width || 0}
-        radiusY={node.nodeProps.height || 0}
+        {...config}
         x={node.nodeProps.point[0]}
         y={node.nodeProps.point[1]}
-        {...config}
+        width={width}
+        height={height}
+        cornerRadius={RECT.CORNER_RADIUS}
         draggable={draggable}
         onDragEnd={handleDragEnd}
         onTransformStart={handleTransformStart}
@@ -115,11 +139,14 @@ const EllipseDrawable = ({
       {selected && (
         <NodeTransformer
           ref={transformerRef}
-          transformerConfig={{ keepRatio: false }}
+          transformerConfig={{
+            id: node.nodeProps.id,
+            keepRatio: false,
+          }}
         />
       )}
     </>
   );
 };
 
-export default EllipseDrawable;
+export default RectDrawable;

@@ -2,7 +2,7 @@ import type Konva from 'konva';
 import { useCallback } from 'react';
 import { Group } from 'react-konva';
 import type { NodeObject } from 'shared';
-import Node from '@/components/Node/Node';
+import Node from '@/components/Canvas/Node/Node';
 import useForceUpdate from '@/hooks/useForceUpdate/useForceUpdate';
 import useTransformer from '@/hooks/useTransformer';
 import { getPointsAbsolutePosition } from '@/utils/position';

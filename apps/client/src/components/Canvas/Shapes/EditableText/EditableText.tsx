@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { WSMessage } from 'shared';
-import type { NodeComponentProps } from '@/components/Node/Node';
+import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import { useWebSocket } from '@/contexts/websocket';
 import { sendMessage } from '@/utils/websocket';
 import EditableTextInput from './EditableTextInput';

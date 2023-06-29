@@ -2,7 +2,7 @@ import { Root as LabelRoot } from '@radix-ui/react-label';
 import * as RadioGroup from '@radix-ui/react-radio-group';
 import * as Toggle from '@radix-ui/react-toggle';
 import { styled } from 'shared';
-import { ButtonStyled } from '@/components/core/Button/ButtonStyled';
+import { ButtonStyled } from '@/components/Elements/Button/ButtonStyled';
 import { Panel } from '../PanelsStyled';
 
 export const StyleContainer = styled(Panel, {

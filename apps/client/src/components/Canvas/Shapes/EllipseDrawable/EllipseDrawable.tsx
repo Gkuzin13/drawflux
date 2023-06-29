@@ -1,84 +1,62 @@
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { useCallback, useMemo } from 'react';
-import { Line } from 'react-konva';
-import type { NodeComponentProps } from '@/components/Node/Node';
+import { useCallback } from 'react';
+import { Ellipse } from 'react-konva';
+import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
+import NodeTransformer from '@/components/Canvas/NodeTransformer';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
-import { calculateLengthFromPoints } from '@/utils/math';
-import { getPointsAbsolutePosition } from '@/utils/position';
+import { calculateCircumference } from '@/utils/math';
 import { getDashValue, getSizeValue } from '@/utils/shape';
-import NodeTransformer from '../../NodeTransformer';
-import { pairPoints } from './helpers/points';
+import { getEllipseRadius } from './helpers/calc';
 
-const FreePathDrawable = ({
+const EllipseDrawable = ({
   node,
-  draggable,
   selected,
+  draggable,
   onNodeChange,
   onPress,
 }: NodeComponentProps) => {
-  const { nodeRef, transformerRef } = useTransformer<Konva.Line>([selected]);
+  const { nodeRef, transformerRef } = useTransformer<Konva.Ellipse>([selected]);
+
   const { stageConfig } = useAppSelector(selectCanvas);
   const { config } = useNode(node, stageConfig);
-
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
     elementRef: nodeRef,
     totalDashLength: config.dash[0] + config.dash[1],
   });
 
-  const flattenedPoints = useMemo(() => {
-    return node.nodeProps.points?.flat() || [];
-  }, [node.nodeProps.points]);
-
   const handleDragEnd = useCallback(
     (event: KonvaEventObject<DragEvent>) => {
-      const line = event.target as Konva.Line;
-      const stage = line.getStage() as Konva.Stage;
-
-      const points = node.nodeProps.points || [];
-
-      const updatedPoints = getPointsAbsolutePosition(points, line, stage);
-
       onNodeChange({
         ...node,
         nodeProps: {
           ...node.nodeProps,
-          points: updatedPoints,
+          point: [event.target.x(), event.target.y()],
         },
       });
-
-      line.position({ x: 0, y: 0 });
-
       onPress(node.nodeProps.id);
     },
     [node, onNodeChange, onPress],
   );
 
   const handleTransformStart = useCallback(() => {
-    if (node.style.animated && animation?.isRunning()) {
+    if (node.style.animated && animation) {
       animation.stop();
     }
   }, [node.style.animated, animation]);
 
   const handlTransform = useCallback(
     (event: KonvaEventObject<Event>) => {
-      const line = event.target as Konva.Line;
-      const stage = line.getStage() as Konva.Stage;
-      const points = [line.x(), line.y(), ...line.points()];
+      const ellipse = event.target as Konva.Ellipse;
 
-      const pairedPoints = pairPoints(points);
-      const updatedPoints = getPointsAbsolutePosition(
-        pairedPoints,
-        line,
-        stage,
-      );
+      const { radiusX, radiusY } = getEllipseRadius(ellipse);
 
-      const totalLength = calculateLengthFromPoints(updatedPoints);
+      const totalLength = calculateCircumference(radiusX, radiusY);
 
       const dash = getDashValue(
         totalLength,
@@ -86,43 +64,45 @@ const FreePathDrawable = ({
         node.style.line,
       );
 
-      line.dash(dash.map((d) => d * stageConfig.scale));
+      ellipse.dash(dash.map((d) => d * stageConfig.scale));
     },
     [node.style.size, node.style.line, stageConfig.scale],
   );
 
   const handleTransformEnd = useCallback(
     (event: KonvaEventObject<Event>) => {
-      const line = event.target as Konva.Line;
-      const stage = line.getStage() as Konva.Stage;
+      const ellipse = event.target as Konva.Ellipse;
 
-      const points = node.nodeProps.points || [];
-
-      const updatedPoints = getPointsAbsolutePosition(points, line, stage);
+      const { radiusX, radiusY } = getEllipseRadius(ellipse);
 
       onNodeChange({
         ...node,
         nodeProps: {
           ...node.nodeProps,
-          points: updatedPoints,
+          point: [ellipse.x(), ellipse.y()],
+          width: radiusX,
+          height: radiusY,
+          rotation: ellipse.rotation(),
         },
       });
 
-      line.scale({ x: 1, y: 1 });
-      line.position({ x: 0, y: 0 });
-
       if (node.style.animated && animation?.isRunning() === false) {
-        animation.stop();
+        animation.start();
       }
+
+      ellipse.scale({ x: 1, y: 1 });
     },
     [node, animation, onNodeChange],
   );
 
   return (
     <>
-      <Line
+      <Ellipse
         ref={nodeRef}
-        points={flattenedPoints}
+        radiusX={node.nodeProps.width || 0}
+        radiusY={node.nodeProps.height || 0}
+        x={node.nodeProps.point[0]}
+        y={node.nodeProps.point[1]}
         {...config}
         draggable={draggable}
         onDragEnd={handleDragEnd}
@@ -135,11 +115,11 @@ const FreePathDrawable = ({
       {selected && (
         <NodeTransformer
           ref={transformerRef}
-          transformerConfig={{ rotateEnabled: false }}
+          transformerConfig={{ keepRatio: false }}
         />
       )}
     </>
   );
 };
 
-export default FreePathDrawable;
+export default EllipseDrawable;

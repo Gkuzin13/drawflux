@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Divider } from '@/components/core/Divider/Divider';
+import { Divider } from '@/components/Elements/Divider/Divider';
 import { ICON_SIZES } from '@/constants/icon';
 import { TOOLS, type Tool } from '@/constants/tool';
 import { getKeyTitle } from '@/utils/string';

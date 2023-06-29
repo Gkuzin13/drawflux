@@ -32,7 +32,7 @@ import { createNode } from '@/utils/node';
 import { getNormalizedInvertedRect } from '@/utils/position';
 import { sendMessage, sendThrottledMessage } from '@/utils/websocket';
 import BackgroundRect from '../BackgroundRect/BackgroundRect';
-import CollabLayer from '../CollabLayer';
+import CollabLayer from '../Collaboration/CollabLayer';
 import NodesLayer from '../NodesLayer';
 import SelectRect from '../SelectRect';
 import { type DrawableType, drawTypes } from './helpers/draw';
@@ -55,7 +55,7 @@ const initialDrawingPosition: Record<string, Point> = {
   current: [0, 0],
 };
 
-const Canvas = forwardRef<Konva.Stage, Props>(
+const DrawingCanvas = forwardRef<Konva.Stage, Props>(
   (
     {
       config,
@@ -479,6 +479,6 @@ const Canvas = forwardRef<Konva.Stage, Props>(
   },
 );
 
-Canvas.displayName = 'Canvas';
+DrawingCanvas.displayName = 'Canvas';
 
-export default Canvas;
+export default DrawingCanvas;

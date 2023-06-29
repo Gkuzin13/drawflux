@@ -7,9 +7,9 @@ import type {
   SharePageRequestBody,
   SharePageResponse,
 } from 'shared';
-import Button from '@/components/core/Button/Button';
-import { Divider } from '@/components/core/Divider/Divider';
-import Loader from '@/components/core/Loader/Loader';
+import Button from '@/components/Elements/Button/Button';
+import { Divider } from '@/components/Elements/Divider/Divider';
+import Loader from '@/components/Elements/Loader/Loader';
 import QRCode from '@/components/QRCode/QRCode';
 import { PAGE_URL_SEARCH_PARAM_KEY } from '@/constants/app';
 import { ICON_SIZES } from '@/constants/icon';

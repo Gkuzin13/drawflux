@@ -3,7 +3,7 @@ import { type KonvaEventObject } from 'konva/lib/Node';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Group, Line, Shape } from 'react-konva';
 import type { Point, NodeProps } from 'shared';
-import type { NodeComponentProps } from '@/components/Node/Node';
+import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import { useAppSelector } from '@/stores/hooks';

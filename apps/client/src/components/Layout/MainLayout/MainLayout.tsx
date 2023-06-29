@@ -1,21 +1,21 @@
 import type Konva from 'konva';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type StageConfig } from 'shared';
-import Canvas from '@/components/Canvas/Canvas';
+import DrawingCanvas from '@/components/Canvas/DrawingCanvas/DrawingCanvas';
 import {
   getIntersectingNodes,
   getPointerRect,
-} from '@/components/Canvas/helpers/stage';
-import ContextMenu from '@/components/ContextMenu/ContextMenu';
+} from '@/components/Canvas/DrawingCanvas/helpers/stage';
 import type { ContextMenuType } from '@/components/ContextMenu/ContextMenu';
-import Dialog from '@/components/core/Dialog/Dialog';
+import ContextMenu from '@/components/ContextMenu/ContextMenu';
+import Dialog from '@/components/Elements/Dialog/Dialog';
 import Panels from '@/components/Panels/Panels';
 import { NODES_LAYER_INDEX } from '@/constants/node';
 import { useModal } from '@/contexts/modal';
 import useKbdShortcuts from '@/hooks/useKbdShortcuts';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import { Container } from './MainContainerStyled';
+import { Container } from './MainLayoutStyled';
 
 type Props = {
   viewportSize: {
@@ -24,7 +24,7 @@ type Props = {
   };
 };
 
-const MainContainer = ({ viewportSize }: Props) => {
+const MainLayout = ({ viewportSize }: Props) => {
   const [intersectedNodesIds, setIntersectedNodesIds] = useState<string[]>([]);
 
   const { stageConfig, selectedNodesIds, nodes, toolType } =
@@ -111,7 +111,7 @@ const MainContainer = ({ viewportSize }: Props) => {
         type={contextMenuType}
         onContextMenuOpen={handleContextMenuOpen}
       >
-        <Canvas
+        <DrawingCanvas
           ref={stageRef}
           config={canvasConfig}
           intersectedNodesIds={intersectedNodesIds}
@@ -129,4 +129,4 @@ const MainContainer = ({ viewportSize }: Props) => {
   );
 };
 
-export default MainContainer;
+export default MainLayout;

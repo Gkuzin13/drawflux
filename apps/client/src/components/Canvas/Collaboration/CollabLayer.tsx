@@ -15,8 +15,8 @@ import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { selectShare, shareActions } from '@/stores/slices/share';
 import { throttleFn } from '@/utils/throttle';
 import { sendMessage } from '@/utils/websocket';
-import { type DrawableType, drawTypes } from './Canvas/helpers/draw';
-import DraftNode from './Node/DraftNode';
+import { type DrawableType, drawTypes } from '../DrawingCanvas/helpers/draw';
+import DraftNode from '../Node/DraftNode';
 import UserCursor from './UserCursor';
 
 type Props = {

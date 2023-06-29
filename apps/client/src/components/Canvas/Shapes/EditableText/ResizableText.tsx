@@ -2,7 +2,7 @@ import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { useCallback } from 'react';
 import { Text } from 'react-konva';
-import type { NodeComponentProps } from '@/components/Node/Node';
+import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';

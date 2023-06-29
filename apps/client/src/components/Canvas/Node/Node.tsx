@@ -1,10 +1,10 @@
 import { memo } from 'react';
 import type { NodeObject, NodeType } from 'shared';
-import ArrowDrawable from '@/components/shapes/ArrowDrawable/ArrowDrawable';
-import EllipseDrawable from '@/components/shapes/EllipseDrawable/EllipseDrawable';
-import FreePathDrawable from '@/components/shapes/FreePathDrawable/FreePathDrawable';
-import RectDrawable from '@/components/shapes/RectDrawable/RectDrawable';
-import EditableText from '../shapes/EditableText/EditableText';
+import ArrowDrawable from '@/components/Canvas/Shapes/ArrowDrawable/ArrowDrawable';
+import EllipseDrawable from '@/components/Canvas/Shapes/EllipseDrawable/EllipseDrawable';
+import FreePathDrawable from '@/components/Canvas/Shapes/FreePathDrawable/FreePathDrawable';
+import RectDrawable from '@/components/Canvas/Shapes/RectDrawable/RectDrawable';
+import EditableText from '../Shapes/EditableText/EditableText';
 
 export type NodeComponentProps = {
   node: NodeObject;

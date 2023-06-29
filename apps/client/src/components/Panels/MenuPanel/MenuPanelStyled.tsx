@@ -1,6 +1,6 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { styled } from 'shared';
-import { ButtonStyled } from '@/components/core/Button/ButtonStyled';
+import { ButtonStyled } from '@/components/Elements/Button/ButtonStyled';
 import { PanelButton } from '../PanelsStyled';
 
 export const MenuPanelTrigger = styled(DropdownMenu.Trigger, PanelButton, {

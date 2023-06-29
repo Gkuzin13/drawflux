@@ -1,6 +1,6 @@
 import * as Popover from '@radix-ui/react-popover';
 import { styled } from 'shared';
-import { ButtonStyled } from '@/components/core/Button/ButtonStyled';
+import { ButtonStyled } from '@/components/Elements/Button/ButtonStyled';
 
 export const SharePanelContent = styled(Popover.Content, {
   padding: '$2',

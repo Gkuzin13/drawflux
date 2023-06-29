@@ -1,67 +1,84 @@
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { useCallback, useMemo } from 'react';
-import { Rect } from 'react-konva';
-import type { NodeComponentProps } from '@/components/Node/Node';
-import NodeTransformer from '@/components/NodeTransformer';
-import { RECT } from '@/constants/node';
+import { Line } from 'react-konva';
+import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
-import { calculatePerimeter } from '@/utils/math';
+import { calculateLengthFromPoints } from '@/utils/math';
+import { getPointsAbsolutePosition } from '@/utils/position';
 import { getDashValue, getSizeValue } from '@/utils/shape';
-import { getRectSize } from './helpers/calc';
+import NodeTransformer from '../../NodeTransformer';
+import { pairPoints } from './helpers/points';
 
-const RectDrawable = ({
+const FreePathDrawable = ({
   node,
-  selected,
   draggable,
+  selected,
   onNodeChange,
   onPress,
 }: NodeComponentProps) => {
-  const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
+  const { nodeRef, transformerRef } = useTransformer<Konva.Line>([selected]);
   const { stageConfig } = useAppSelector(selectCanvas);
   const { config } = useNode(node, stageConfig);
-
-  const totalDashLength = config.dash.length
-    ? config.dash[0] + config.dash[1]
-    : 0;
 
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
     elementRef: nodeRef,
-    totalDashLength,
+    totalDashLength: config.dash[0] + config.dash[1],
   });
+
+  const flattenedPoints = useMemo(() => {
+    return node.nodeProps.points?.flat() || [];
+  }, [node.nodeProps.points]);
 
   const handleDragEnd = useCallback(
     (event: KonvaEventObject<DragEvent>) => {
+      const line = event.target as Konva.Line;
+      const stage = line.getStage() as Konva.Stage;
+
+      const points = node.nodeProps.points || [];
+
+      const updatedPoints = getPointsAbsolutePosition(points, line, stage);
+
       onNodeChange({
         ...node,
         nodeProps: {
           ...node.nodeProps,
-          point: [event.target.x(), event.target.y()],
+          points: updatedPoints,
         },
       });
+
+      line.position({ x: 0, y: 0 });
+
       onPress(node.nodeProps.id);
     },
     [node, onNodeChange, onPress],
   );
 
   const handleTransformStart = useCallback(() => {
-    if (node.style.animated && animation) {
+    if (node.style.animated && animation?.isRunning()) {
       animation.stop();
     }
   }, [node.style.animated, animation]);
 
   const handlTransform = useCallback(
     (event: KonvaEventObject<Event>) => {
-      const rect = event.target as Konva.Rect;
+      const line = event.target as Konva.Line;
+      const stage = line.getStage() as Konva.Stage;
+      const points = [line.x(), line.y(), ...line.points()];
 
-      const { width, height } = getRectSize(rect);
+      const pairedPoints = pairPoints(points);
+      const updatedPoints = getPointsAbsolutePosition(
+        pairedPoints,
+        line,
+        stage,
+      );
 
-      const totalLength = calculatePerimeter(width, height, RECT.CORNER_RADIUS);
+      const totalLength = calculateLengthFromPoints(updatedPoints);
 
       const dash = getDashValue(
         totalLength,
@@ -69,65 +86,44 @@ const RectDrawable = ({
         node.style.line,
       );
 
-      rect.scale({ x: 1, y: 1 });
-
-      rect.width(width);
-      rect.height(height);
-      rect.dash(dash.map((d) => d * stageConfig.scale));
+      line.dash(dash.map((d) => d * stageConfig.scale));
     },
     [node.style.size, node.style.line, stageConfig.scale],
   );
 
   const handleTransformEnd = useCallback(
     (event: KonvaEventObject<Event>) => {
-      const rect = event.target as Konva.Rect;
+      const line = event.target as Konva.Line;
+      const stage = line.getStage() as Konva.Stage;
 
-      const { width, height } = getRectSize(rect);
+      const points = node.nodeProps.points || [];
+
+      const updatedPoints = getPointsAbsolutePosition(points, line, stage);
 
       onNodeChange({
         ...node,
         nodeProps: {
           ...node.nodeProps,
-          point: [rect.x(), rect.y()],
-          width,
-          height,
-          rotation: rect.rotation(),
+          points: updatedPoints,
         },
       });
 
-      rect.scale({ x: 1, y: 1 });
+      line.scale({ x: 1, y: 1 });
+      line.position({ x: 0, y: 0 });
 
       if (node.style.animated && animation?.isRunning() === false) {
-        animation.start();
+        animation.stop();
       }
     },
     [node, animation, onNodeChange],
   );
 
-  // Sanitize rect size
-  const { width, height } = useMemo(() => {
-    return {
-      width: Math.max(
-        Number(node.nodeProps.width ?? RECT.MIN_SIZE),
-        RECT.MIN_SIZE,
-      ),
-      height: Math.max(
-        Number(node.nodeProps.height ?? RECT.MIN_SIZE),
-        RECT.MIN_SIZE,
-      ),
-    };
-  }, [node.nodeProps.width, node.nodeProps.height]);
-
   return (
     <>
-      <Rect
+      <Line
         ref={nodeRef}
+        points={flattenedPoints}
         {...config}
-        x={node.nodeProps.point[0]}
-        y={node.nodeProps.point[1]}
-        width={width}
-        height={height}
-        cornerRadius={RECT.CORNER_RADIUS}
         draggable={draggable}
         onDragEnd={handleDragEnd}
         onTransformStart={handleTransformStart}
@@ -139,14 +135,11 @@ const RectDrawable = ({
       {selected && (
         <NodeTransformer
           ref={transformerRef}
-          transformerConfig={{
-            id: node.nodeProps.id,
-            keepRatio: false,
-          }}
+          transformerConfig={{ rotateEnabled: false }}
         />
       )}
     </>
   );
 };
 
-export default RectDrawable;
+export default FreePathDrawable;

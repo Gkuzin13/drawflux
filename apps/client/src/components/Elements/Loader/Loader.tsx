@@ -3,7 +3,7 @@ import { ICON_SIZES } from '@/constants/icon';
 import {
   LoaderContainer,
   LoaderInnerContainer,
-  LoaderSinner,
+  LoaderSpinner,
 } from './LoaderStyled';
 
 type Props = PropsWithChildren<(typeof LoaderContainer)['defaultProps']>;
@@ -13,7 +13,7 @@ const Loader = ({ children, ...restProps }: Props) => {
     <LoaderContainer {...restProps}>
       <LoaderInnerContainer>
         {children}
-        <LoaderSinner size={ICON_SIZES.LARGE} />
+        <LoaderSpinner size={ICON_SIZES.MEDIUM} />
       </LoaderInnerContainer>
     </LoaderContainer>
   );
