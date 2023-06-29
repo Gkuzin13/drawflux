@@ -7,7 +7,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { storage } from '@/utils/storage';
-import MainContainer from './components/Layout/MainLayout/MainLayout';
+import MainLayout from './components/Layout/MainLayout/MainLayout';
 import { useWebSocket } from './contexts/websocket';
 import useWindowSize from './hooks/useWindowSize/useWindowSize';
 import useWSMessage from './hooks/useWSMessage';
@@ -105,7 +105,7 @@ const App = () => {
     }
   }, [ws?.pageId, dispatch]);
 
-  return <MainContainer viewportSize={windowSize} />;
+  return <MainLayout viewportSize={windowSize} />;
 };
 
 export default App;

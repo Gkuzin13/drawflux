@@ -8,6 +8,8 @@ import {
   useCallback,
   useRef,
   useEffect,
+  lazy,
+  Suspense,
 } from 'react';
 import { Layer, Stage } from 'react-konva';
 import type {
@@ -32,7 +34,6 @@ import { createNode } from '@/utils/node';
 import { getNormalizedInvertedRect } from '@/utils/position';
 import { sendMessage, sendThrottledMessage } from '@/utils/websocket';
 import BackgroundRect from '../BackgroundRect/BackgroundRect';
-import CollabLayer from '../Collaboration/CollabLayer';
 import NodesLayer from '../NodesLayer';
 import SelectRect from '../SelectRect';
 import { type DrawableType, drawTypes } from './helpers/draw';
@@ -49,6 +50,8 @@ type Props = PropsWithRef<{
   onNodesIntersection: (nodesIds: string[]) => void;
   onConfigChange: (config: Partial<StageConfig>) => void;
 }>;
+
+const CollabLayer = lazy(() => import('../Collaboration/CollabLayer'));
 
 const initialDrawingPosition: Record<string, Point> = {
   start: [0, 0],
@@ -457,11 +460,13 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
             active={isSelectRectActive}
           />
           {ws?.isConnected && (
-            <CollabLayer
-              isDrawing={drawing}
-              stageScale={stageConfig.scale}
-              stageRef={ref}
-            />
+            <Suspense>
+              <CollabLayer
+                isDrawing={drawing}
+                stageScale={stageConfig.scale}
+                stageRef={ref}
+              />
+            </Suspense>
           )}
         </Layer>
         <NodesLayer

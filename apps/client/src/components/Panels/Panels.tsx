@@ -1,5 +1,5 @@
 import type Konva from 'konva';
-import { type RefObject, useMemo, useEffect } from 'react';
+import { type RefObject, useMemo, useEffect, lazy, Suspense } from 'react';
 import type {
   NodeStyle,
   NodeObject,
@@ -39,13 +39,14 @@ import {
 import SharePanel from './SharePanel/SharePanel';
 import StylePanel, { type StylePanelProps } from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
-import UsersPanel from './UsersPanel/UsersPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;
   intersectedNodesIds: string[];
 };
+
+const UsersPanel = lazy(() => import('./UsersPanel/UsersPanel'));
 
 const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   const ws = useWebSocket();
@@ -271,7 +272,11 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
           onStyleChange={handleStyleChange}
         />
         <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
-        {ws?.isConnected && <UsersPanel onUserChange={handleUserChange} />}
+        {ws?.isConnected && (
+          <Suspense>
+            <UsersPanel onUserChange={handleUserChange} />
+          </Suspense>
+        )}
         <TopPanelRightContainer>
           {online && (
             <SharePanel
