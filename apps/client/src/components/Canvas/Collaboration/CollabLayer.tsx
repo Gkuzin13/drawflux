@@ -12,7 +12,10 @@ import { WS_THROTTLE_MS } from '@/constants/app';
 import { useWebSocket } from '@/contexts/websocket';
 import useWSMessage from '@/hooks/useWSMessage';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { selectShare, shareActions } from '@/stores/slices/share';
+import {
+  selectCollaboration,
+  collaborationActions,
+} from '@/stores/slices/collaboration';
 import { throttleFn } from '@/utils/throttle';
 import { sendMessage } from '@/utils/websocket';
 import { type DrawableType, drawTypes } from '../DrawingCanvas/helpers/draw';
@@ -33,7 +36,7 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
   const [userCursors, setUserCursors] = useState<UserCursors>({});
   const [draftNodes, setDraftNodes] = useState<NodeObject[]>([]);
 
-  const { userId, users } = useAppSelector(selectShare);
+  const { userId, users } = useAppSelector(selectCollaboration);
 
   const ws = useWebSocket();
 
@@ -150,7 +153,7 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
 
             return userCursorsCopy;
           });
-          dispatch(shareActions.removeUser(data));
+          dispatch(collaborationActions.removeUser(data));
           break;
         }
       }

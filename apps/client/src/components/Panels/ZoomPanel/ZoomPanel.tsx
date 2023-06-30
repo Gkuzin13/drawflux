@@ -1,5 +1,6 @@
+import { ZOOM_RANGE } from '@/constants/app';
 import { ICON_SIZES } from '@/constants/icon';
-import { ZOOM, ZOOM_RANGE, type ZoomAction } from '@/constants/zoom';
+import { ZOOM, type ZoomAction } from '@/constants/panels/zoom';
 import { PanelButton, Panel } from '../PanelsStyled';
 
 type Props = {

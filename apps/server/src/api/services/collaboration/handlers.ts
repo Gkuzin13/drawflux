@@ -44,7 +44,12 @@ async function findPage(id: string) {
 }
 
 wss.on('connection', async (ws, req) => {
-  const pageId = new URLSearchParams(req.url).get('id');
+  if (!req.url || !req.headers.origin) {
+    ws.close(1011, 'Bad request');
+    return;
+  }
+
+  const pageId = new URL(req.url, req.headers.origin).searchParams.get('id');
   const page = pageId ? await findPage(pageId) : null;
 
   if (!page || !pageId) {

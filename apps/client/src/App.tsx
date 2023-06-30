@@ -1,9 +1,5 @@
 import { useEffect } from 'react';
-import {
-  LOCAL_STORAGE_KEY,
-  PageState,
-  type PageStateType,
-} from '@/constants/app';
+import { type AppState, LOCAL_STORAGE_KEY, appState } from '@/constants/app';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { storage } from '@/utils/storage';
@@ -12,7 +8,7 @@ import { useWebSocket } from './contexts/websocket';
 import useWindowSize from './hooks/useWindowSize/useWindowSize';
 import useWSMessage from './hooks/useWSMessage';
 import { historyActions } from './stores/reducers/history';
-import { shareActions } from './stores/slices/share';
+import { collaborationActions } from './stores/slices/collaboration';
 
 const App = () => {
   const { nodes } = useAppSelector(selectCanvas);
@@ -27,11 +23,11 @@ const App = () => {
 
     switch (type) {
       case 'user-joined': {
-        dispatch(shareActions.addUser(data.user));
+        dispatch(collaborationActions.addUser(data.user));
         break;
       }
       case 'user-change': {
-        dispatch(shareActions.updateUser(data.user));
+        dispatch(collaborationActions.updateUser(data.user));
         break;
       }
       case 'nodes-set': {
@@ -92,16 +88,16 @@ const App = () => {
       return;
     }
 
-    const stateFromStorage = storage.get<PageStateType>(LOCAL_STORAGE_KEY);
+    const state = storage.get<AppState>(LOCAL_STORAGE_KEY);
 
-    if (stateFromStorage) {
+    if (state) {
       try {
-        PageState.parse(stateFromStorage);
+        appState.parse(state);
       } catch (error) {
         return;
       }
 
-      dispatch(canvasActions.set(stateFromStorage.page));
+      dispatch(canvasActions.set(state.page));
     }
   }, [ws?.pageId, dispatch]);
 

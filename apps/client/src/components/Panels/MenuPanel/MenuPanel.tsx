@@ -1,7 +1,10 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { IoEllipsisHorizontal } from 'react-icons/io5';
 import { ICON_SIZES } from '@/constants/icon';
-import { type MenuPanelActionType, MENU_PANEL_ACTIONS } from '@/constants/menu';
+import {
+  type MenuPanelActionType,
+  MENU_PANEL_ACTIONS,
+} from '@/constants/panels/menu';
 import {
   DropdownMenuItem,
   MenuPanelTrigger,

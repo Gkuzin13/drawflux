@@ -2,7 +2,7 @@ import type { LayerConfig } from 'konva/lib/Layer';
 import { useMemo, memo } from 'react';
 import { Layer } from 'react-konva';
 import type { NodeObject } from 'shared';
-import type { Tool } from '@/constants/tool';
+import type { Tool } from '@/constants/panels/tools';
 import DraftNode from './Node/DraftNode';
 import Node from './Node/Node';
 import NodeGroupTransformer from './NodeGroupTransformer/NodeGroupTransformer';

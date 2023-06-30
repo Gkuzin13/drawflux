@@ -9,13 +9,13 @@ import {
 import type { NodeLine, NodeSize, NodeColor } from 'shared';
 import { Schemas } from 'shared';
 
-type StyleConst<V> = {
-  value: V;
+export type Style<Value> = {
+  value: Value;
   name: string;
   icon: IconType;
 };
 
-export const LINE: StyleConst<NodeLine>[] = [
+export const LINE: Style<NodeLine>[] = [
   {
     value: 'solid',
     name: 'Solid',
@@ -44,7 +44,7 @@ export const ANIMATED = {
   value: 'animated',
 } as const;
 
-export const SIZE: StyleConst<NodeSize>[] = [
+export const SIZE: Style<NodeSize>[] = [
   {
     value: 'small',
     name: 'Small',
@@ -67,7 +67,7 @@ export const SIZE: StyleConst<NodeSize>[] = [
   },
 ];
 
-export const COLOR: StyleConst<NodeColor>[] = [
+export const COLOR: Style<NodeColor>[] = [
   { name: 'Red', value: 'red600' },
   { name: 'Pink', value: 'pink600' },
   { name: 'Deep Orange', value: 'deep-orange600' },
@@ -82,4 +82,4 @@ export const COLOR: StyleConst<NodeColor>[] = [
   { name: 'Gray', value: 'gray600' },
 ].map((color) => {
   return { ...color, icon: TbCircleFilled };
-}) as StyleConst<NodeColor>[];
+}) as Style<NodeColor>[];

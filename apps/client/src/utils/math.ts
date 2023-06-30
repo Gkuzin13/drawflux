@@ -1,6 +1,6 @@
 import type { IRect, Vector2d } from 'konva/lib/types';
 import type { NodeObject, Point } from 'shared';
-import { RECT } from '@/constants/node';
+import { RECT } from '@/constants/shape';
 
 export function getRatioFromValue(value: number, min: number, max: number) {
   return max === min ? 1 : (value - min) / (max - min);

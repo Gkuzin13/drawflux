@@ -1,5 +1,5 @@
-import { CONTROL, type ControlAction } from '@/constants/control';
 import { ICON_SIZES } from '@/constants/icon';
+import { CONTROL, type ControlAction } from '@/constants/panels/control';
 import { getKeyTitle } from '@/utils/string';
 import { Panel, PanelButton } from '../PanelsStyled';
 

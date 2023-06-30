@@ -21,13 +21,13 @@ import type {
   WSMessage,
 } from 'shared';
 import { CURSOR } from '@/constants/cursor';
-import { NODES_LAYER_INDEX } from '@/constants/node';
+import { NODES_LAYER_INDEX } from '@/constants/shape';
 import { useNotifications } from '@/contexts/notifications';
 import { useWebSocket } from '@/contexts/websocket';
 import useFetch from '@/hooks/useFetch';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import { selectShare } from '@/stores/slices/share';
+import { selectCollaboration } from '@/stores/slices/collaboration';
 import { store } from '@/stores/store';
 import { uniq } from '@/utils/array';
 import { createNode } from '@/utils/node';
@@ -79,7 +79,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     >(`/p/${ws?.pageId}`, { method: 'PATCH' }, { skip: true });
 
     const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
-    const { userId } = useAppSelector(selectShare);
+    const { userId } = useAppSelector(selectCollaboration);
 
     const notifications = useNotifications();
 

@@ -14,4 +14,4 @@ export default {
     prod: process.env.ORIGIN_URL,
     dev: 'http://localhost:5174',
   },
-};
+} as const;

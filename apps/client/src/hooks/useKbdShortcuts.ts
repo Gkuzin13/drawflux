@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { type WSMessage } from 'shared';
 import { KEYS } from '@/constants/keys';
-import { TOOLS, type Tool } from '@/constants/tool';
+import { TOOLS, type Tool } from '@/constants/panels/tools';
 import { useWebSocket } from '@/contexts/websocket';
 import { useAppDispatch } from '@/stores/hooks';
 import { historyActions } from '@/stores/reducers/history';

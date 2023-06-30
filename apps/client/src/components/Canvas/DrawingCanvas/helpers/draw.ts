@@ -1,5 +1,5 @@
 import type { NodeObject, NodeType, Point } from 'shared';
-import { RECT } from '@/constants/node';
+import { RECT } from '@/constants/shape';
 import { normalizePoints } from '@/utils/draw';
 
 export function drawArrow(

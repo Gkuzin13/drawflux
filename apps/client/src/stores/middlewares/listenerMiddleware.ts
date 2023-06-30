@@ -6,12 +6,12 @@ import {
   type TypedStartListening,
   type TypedAddListener,
 } from '@reduxjs/toolkit';
-import { LOCAL_STORAGE_KEY, type PageStateType } from '@/constants/app';
+import { type AppState, LOCAL_STORAGE_KEY } from '@/constants/app';
 import { storage } from '@/utils/storage';
-import { historyActions } from './reducers/history';
-import { canvasActions } from './slices/canvas';
-import { shareActions } from './slices/share';
-import type { RootState, AppDispatch } from './store';
+import { historyActions } from '../reducers/history';
+import { canvasActions } from '../slices/canvas';
+import { collaborationActions } from '../slices/collaboration';
+import type { RootState, AppDispatch } from '../store';
 
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
 export type AppStopListening = TypedStopListening<RootState, AppDispatch>;
@@ -43,17 +43,17 @@ const actionsToListenTo = [
   canvasActions.setSelectedNodesIds,
   canvasActions.setStageConfig,
   canvasActions.setToolType,
-  shareActions.init,
+  collaborationActions.init,
 ];
 
 startAppListening({
   matcher: isAnyOf(...actionsToListenTo),
   effect: (action, listenerApi) => {
-    if (shareActions.init.match(action)) {
+    if (collaborationActions.init.match(action)) {
       listenerApi.unsubscribe();
       return;
     }
     const canvas = listenerApi.getState().canvas.present;
-    storage.set<PageStateType>(LOCAL_STORAGE_KEY, { page: { ...canvas } });
+    storage.set<AppState>(LOCAL_STORAGE_KEY, { page: { ...canvas } });
   },
 });

@@ -1,6 +1,5 @@
 import { Schemas } from 'shared';
 import { z } from 'zod';
-import { ToolType } from './tool';
 
 export const BASE_URL = 'https://drawflux-api.onrender.com';
 export const BASE_URL_DEV = 'http://localhost:7456';
@@ -19,16 +18,21 @@ export const USER = {
   maxNameLength: 10,
 };
 
-export const PageState = z.object({
+export const ZOOM_RANGE = {
+  MIN: 0.1,
+  MAX: 2.5,
+};
+
+export const appState = z.object({
   page: z.object({
-    stageConfig: Schemas.StageConfig,
-    nodes: Schemas.Node.array(),
-    toolType: ToolType,
+    ...Schemas.Page.shape.page.shape,
+    toolType: z.union([
+      ...Schemas.Node.shape.type.options,
+      z.literal('hand'),
+      z.literal('select'),
+    ]),
     selectedNodesIds: z.record(z.string(), z.boolean()),
   }),
 });
 
-export type PageStateType = z.infer<typeof PageState>;
-export type SelectedNodesIds = z.infer<
-  (typeof PageState)['shape']['page']['shape']['selectedNodesIds']
->;
+export type AppState = z.infer<typeof appState>;

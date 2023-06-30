@@ -2,7 +2,7 @@ import type { NodeColor, NodeStyle } from 'shared';
 import ColorsGrid from '@/components/Elements/ColorsGrid/ColorsGrid';
 import Slider from '@/components/Elements/Slider/Slider';
 import { ICON_SIZES } from '@/constants/icon';
-import { ANIMATED, LINE, OPACITY, SIZE } from '@/constants/style';
+import { ANIMATED, LINE, OPACITY, SIZE } from '@/constants/panels/style';
 import { clamp } from '@/utils/math';
 import {
   StyleButton,

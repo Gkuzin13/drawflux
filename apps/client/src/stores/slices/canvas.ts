@@ -1,8 +1,7 @@
 import { createSlice, isAnyOf, type PayloadAction } from '@reduxjs/toolkit';
 import type { Vector2d } from 'konva/lib/types';
-import type { NodeObject, StageConfig } from 'shared';
-import type { SelectedNodesIds } from '@/constants/app';
-import type { Tool } from '@/constants/tool';
+import type { NodeObject } from 'shared';
+import type { AppState } from '@/constants/app';
 import { allNodesInView, duplicateNodes, reorderNodes } from '@/utils/node';
 import {
   getCenterPosition,
@@ -12,12 +11,7 @@ import {
 import { historyActions } from '../reducers/history';
 import { type RootState } from '../store';
 
-export type CanvasSliceState = {
-  nodes: NodeObject[];
-  stageConfig: StageConfig;
-  toolType: Tool['value'];
-  selectedNodesIds: SelectedNodesIds;
-};
+export type CanvasSliceState = AppState['page'];
 
 export type CanvasAcionType =
   (typeof canvasActions)[keyof typeof canvasActions]['type'];
@@ -100,7 +94,7 @@ export const canvasSlice = createSlice({
         state.selectedNodesIds = {};
         return;
       }
-      const newSelectedNodes: SelectedNodesIds = {};
+      const newSelectedNodes: CanvasSliceState['selectedNodesIds'] = {};
 
       for (const nodeId of action.payload) {
         newSelectedNodes[nodeId] = true;

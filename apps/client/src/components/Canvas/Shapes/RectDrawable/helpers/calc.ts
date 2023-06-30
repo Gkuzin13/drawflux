@@ -1,5 +1,5 @@
 import type Konva from 'konva';
-import { RECT } from '@/constants/node';
+import { RECT } from '@/constants/shape';
 
 export function getRectSize(rect: Konva.Rect) {
   return {
