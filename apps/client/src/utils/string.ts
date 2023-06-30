@@ -25,16 +25,3 @@ export const getKeyTitle = (name: string, keys: string[]) => {
     .map((key) => capitalizeFirstLetter(`${key}`))
     .join(' + ')}`;
 };
-
-export function isJsonString(string: string) {
-  if (typeof string !== 'string') {
-    return false;
-  }
-
-  try {
-    JSON.parse(string);
-    return true;
-  } catch (error) {
-    return false;
-  }
-}

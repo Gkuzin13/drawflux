@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { listenerMiddleware } from './listenerMiddleware';
+import { listenerMiddleware } from './middlewares/listenerMiddleware';
 import historyReducer from './reducers/history';
 import canvas from './slices/canvas';
 import collaboration from './slices/collaboration';

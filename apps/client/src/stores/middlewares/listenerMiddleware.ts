@@ -8,10 +8,10 @@ import {
 } from '@reduxjs/toolkit';
 import { type AppState, LOCAL_STORAGE_KEY } from '@/constants/app';
 import { storage } from '@/utils/storage';
-import { historyActions } from './reducers/history';
-import { canvasActions } from './slices/canvas';
-import { collaborationActions } from './slices/collaboration';
-import type { RootState, AppDispatch } from './store';
+import { historyActions } from '../reducers/history';
+import { canvasActions } from '../slices/canvas';
+import { collaborationActions } from '../slices/collaboration';
+import type { RootState, AppDispatch } from '../store';
 
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
 export type AppStopListening = TypedStopListening<RootState, AppDispatch>;

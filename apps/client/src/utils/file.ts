@@ -1,5 +1,4 @@
 import { type ZodSchema } from 'zod';
-import { isJsonString } from './string';
 
 export type ImportFileType = 'json';
 
@@ -57,5 +56,18 @@ export async function loadJsonFile<T>(schema: ZodSchema) {
     return data as T;
   } catch (error) {
     return null;
+  }
+}
+
+export function isJsonString(string: string) {
+  if (typeof string !== 'string') {
+    return false;
+  }
+
+  try {
+    JSON.parse(string);
+    return true;
+  } catch (error) {
+    return false;
   }
 }
