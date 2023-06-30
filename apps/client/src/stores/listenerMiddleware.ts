@@ -6,7 +6,7 @@ import {
   type TypedStartListening,
   type TypedAddListener,
 } from '@reduxjs/toolkit';
-import { LOCAL_STORAGE_KEY, type PageStateType } from '@/constants/app';
+import { type AppState, LOCAL_STORAGE_KEY } from '@/constants/app';
 import { storage } from '@/utils/storage';
 import { historyActions } from './reducers/history';
 import { canvasActions } from './slices/canvas';
@@ -54,6 +54,6 @@ startAppListening({
       return;
     }
     const canvas = listenerApi.getState().canvas.present;
-    storage.set<PageStateType>(LOCAL_STORAGE_KEY, { page: { ...canvas } });
+    storage.set<AppState>(LOCAL_STORAGE_KEY, { page: { ...canvas } });
   },
 });

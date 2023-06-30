@@ -1,9 +1,5 @@
 import { useEffect } from 'react';
-import {
-  LOCAL_STORAGE_KEY,
-  PageState,
-  type PageStateType,
-} from '@/constants/app';
+import { type AppState, LOCAL_STORAGE_KEY, appState } from '@/constants/app';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { storage } from '@/utils/storage';
@@ -92,16 +88,16 @@ const App = () => {
       return;
     }
 
-    const stateFromStorage = storage.get<PageStateType>(LOCAL_STORAGE_KEY);
+    const state = storage.get<AppState>(LOCAL_STORAGE_KEY);
 
-    if (stateFromStorage) {
+    if (state) {
       try {
-        PageState.parse(stateFromStorage);
+        appState.parse(state);
       } catch (error) {
         return;
       }
 
-      dispatch(canvasActions.set(stateFromStorage.page));
+      dispatch(canvasActions.set(state.page));
     }
   }, [ws?.pageId, dispatch]);
 

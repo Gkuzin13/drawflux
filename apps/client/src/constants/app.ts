@@ -19,16 +19,12 @@ export const USER = {
   maxNameLength: 10,
 };
 
-export const PageState = z.object({
+export const appState = z.object({
   page: z.object({
-    stageConfig: Schemas.StageConfig,
-    nodes: Schemas.Node.array(),
+    ...Schemas.Page.shape.page.shape,
     toolType: ToolType,
     selectedNodesIds: z.record(z.string(), z.boolean()),
   }),
 });
 
-export type PageStateType = z.infer<typeof PageState>;
-export type SelectedNodesIds = z.infer<
-  (typeof PageState)['shape']['page']['shape']['selectedNodesIds']
->;
+export type AppState = z.infer<typeof appState>;
