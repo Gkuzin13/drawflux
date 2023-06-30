@@ -9,7 +9,7 @@ import { USER } from '@/constants/app';
 import { ICON_SIZES } from '@/constants/icon';
 import { KEYS } from '@/constants/keys';
 import { useAppSelector } from '@/stores/hooks';
-import { selectShare } from '@/stores/slices/share';
+import { selectCollaboration } from '@/stores/slices/collaboration';
 import {
   UsersPanelContainer,
   UsersPanelContent,
@@ -27,7 +27,7 @@ type Props = {
 const UsersPanel = ({ onUserChange }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
 
-  const { users, userId } = useAppSelector(selectShare);
+  const { users, userId } = useAppSelector(selectCollaboration);
 
   const inputRef = useRef<HTMLInputElement>(null);
 

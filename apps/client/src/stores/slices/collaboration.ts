@@ -2,18 +2,18 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { User } from 'shared';
 import { type RootState } from '../store';
 
-export type ShareState = {
+export type CollaborationSliceState = {
   userId: string | null;
   users: User[];
 };
 
-export const initialState: ShareState = {
+export const initialState: CollaborationSliceState = {
   userId: null,
   users: [],
 };
 
-export const shareSlice = createSlice({
-  name: 'share',
+export const collaborationSlice = createSlice({
+  name: 'collaboration',
   initialState,
   reducers: {
     init: (state, action: PayloadAction<{ users: User[]; userId: string }>) => {
@@ -41,7 +41,7 @@ export const shareSlice = createSlice({
   },
 });
 
-export const selectShare = (state: RootState) => state.share;
+export const selectCollaboration = (state: RootState) => state.collaboration;
 
-export const shareActions = shareSlice.actions;
-export default shareSlice.reducer;
+export const collaborationActions = collaborationSlice.actions;
+export default collaborationSlice.reducer;

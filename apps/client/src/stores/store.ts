@@ -2,14 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import { listenerMiddleware } from './listenerMiddleware';
 import historyReducer from './reducers/history';
 import canvas from './slices/canvas';
-import share from './slices/share';
+import collaboration from './slices/collaboration';
 
 const canvasReducer = historyReducer(canvas);
 
 export const store = configureStore({
   reducer: {
     canvas: canvasReducer,
-    share,
+    collaboration,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(listenerMiddleware.middleware),

@@ -10,7 +10,7 @@ import {
 import { useAppDispatch } from '@/stores/hooks';
 import { historyActions } from '@/stores/reducers/history';
 import { canvasActions } from '@/stores/slices/canvas';
-import { shareActions } from '@/stores/slices/share';
+import { collaborationActions } from '@/stores/slices/collaboration';
 import { urlSearchParam } from '@/utils/url';
 import { useModal } from './modal';
 import { useNotifications } from './notifications';
@@ -60,7 +60,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
         });
 
         dispatch(
-          shareActions.init({
+          collaborationActions.init({
             userId: message.data.userId,
             users: message.data.users,
           }),

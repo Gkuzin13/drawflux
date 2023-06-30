@@ -24,7 +24,7 @@ import {
   selectCanvas,
   selectHistory,
 } from '@/stores/slices/canvas';
-import { shareActions } from '@/stores/slices/share';
+import { collaborationActions } from '@/stores/slices/collaboration';
 import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
 import { sendMessage } from '@/utils/websocket';
@@ -254,7 +254,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
       sendMessage(ws.connection, message);
 
-      dispatch(shareActions.updateUser(user));
+      dispatch(collaborationActions.updateUser(user));
     }
   };
 
