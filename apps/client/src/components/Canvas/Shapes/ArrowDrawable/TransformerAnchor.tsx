@@ -4,7 +4,7 @@ import { type Vector2d } from 'konva/lib/types';
 import { useCallback } from 'react';
 import { Circle } from 'react-konva';
 import { theme } from 'shared';
-import { TRANSFORMER } from '@/constants/node';
+import { TRANSFORMER } from '@/constants/shape';
 
 export type TransformerAnchorProps = {
   draggable: boolean;

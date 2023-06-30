@@ -6,23 +6,14 @@ import {
 } from 'react-icons/io5';
 import { RxCursorArrow } from 'react-icons/rx';
 import { TbArrowUpRight, TbScribble, TbTypography } from 'react-icons/tb';
-import { Schemas } from 'shared';
-import { z } from 'zod';
-import { KEYS } from './keys';
+import type { AppState } from '../app';
+import { KEYS } from '../keys';
 
 export type Tool = {
   icon: IconType;
-  value: z.infer<typeof ToolType>;
+  value: AppState['page']['toolType'];
   key: (typeof KEYS)[keyof typeof KEYS];
 };
-
-const NodeType = Schemas.Node.shape.type.options;
-
-export const ToolType = z.union([
-  ...NodeType,
-  z.literal('hand'),
-  z.literal('select'),
-]);
 
 export const TOOLS: Tool[] = [
   {

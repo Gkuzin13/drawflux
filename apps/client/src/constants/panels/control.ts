@@ -5,7 +5,7 @@ import {
 } from 'react-icons/io5';
 import { historyActions } from '@/stores/reducers/history';
 import { canvasActions } from '@/stores/slices/canvas';
-import { KEYS } from './keys.js';
+import { KEYS } from '../keys.js';
 
 export type ControlAction = (typeof CONTROL)[number]['value'];
 

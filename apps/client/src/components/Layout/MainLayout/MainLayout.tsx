@@ -10,7 +10,7 @@ import type { ContextMenuType } from '@/components/ContextMenu/ContextMenu';
 import ContextMenu from '@/components/ContextMenu/ContextMenu';
 import Dialog from '@/components/Elements/Dialog/Dialog';
 import Panels from '@/components/Panels/Panels';
-import { NODES_LAYER_INDEX } from '@/constants/node';
+import { NODES_LAYER_INDEX } from '@/constants/shape';
 import { useModal } from '@/contexts/modal';
 import useKbdShortcuts from '@/hooks/useKbdShortcuts';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';

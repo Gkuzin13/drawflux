@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react';
 import { Rect } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import NodeTransformer from '@/components/Canvas/NodeTransformer';
-import { RECT } from '@/constants/node';
+import { RECT } from '@/constants/shape';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';

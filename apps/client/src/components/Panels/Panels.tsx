@@ -10,9 +10,9 @@ import type {
   User,
 } from 'shared';
 import { Schemas } from 'shared';
-import type { ControlAction } from '@/constants/control';
-import { type MenuPanelActionType } from '@/constants/menu';
-import { type Tool } from '@/constants/tool';
+import type { ControlAction } from '@/constants/panels/control';
+import { type MenuPanelActionType } from '@/constants/panels/menu';
+import { type Tool } from '@/constants/panels/tools';
 import { useModal } from '@/contexts/modal';
 import { useNotifications } from '@/contexts/notifications';
 import { useWebSocket } from '@/contexts/websocket';

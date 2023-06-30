@@ -21,7 +21,7 @@ import type {
   WSMessage,
 } from 'shared';
 import { CURSOR } from '@/constants/cursor';
-import { NODES_LAYER_INDEX } from '@/constants/node';
+import { NODES_LAYER_INDEX } from '@/constants/shape';
 import { useNotifications } from '@/contexts/notifications';
 import { useWebSocket } from '@/contexts/websocket';
 import useFetch from '@/hooks/useFetch';

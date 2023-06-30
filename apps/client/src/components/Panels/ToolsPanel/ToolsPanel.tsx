@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import { Divider } from '@/components/Elements/Divider/Divider';
 import { ICON_SIZES } from '@/constants/icon';
-import { TOOLS, type Tool } from '@/constants/tool';
+import { TOOLS, type Tool } from '@/constants/panels/tools';
 import { getKeyTitle } from '@/utils/string';
 import { Panel, PanelButton } from '../PanelsStyled';
 

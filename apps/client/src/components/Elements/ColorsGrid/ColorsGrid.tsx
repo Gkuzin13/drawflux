@@ -1,7 +1,7 @@
 import * as RadioGroup from '@radix-ui/react-radio-group';
 import { StyleLabel } from '@/components/Panels/StylePanel/StylePanelStyled';
 import { ICON_SIZES } from '@/constants/icon';
-import { COLOR } from '@/constants/style';
+import { COLOR } from '@/constants/panels/style';
 import { getColorValue } from '@/utils/shape';
 import { ColorButton, ContentGrid } from './ColorsGridStyled';
 
