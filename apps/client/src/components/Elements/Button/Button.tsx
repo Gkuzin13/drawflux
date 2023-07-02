@@ -1,13 +1,13 @@
 import type { PropsWithChildren } from 'react';
-import { ButtonStyled } from './ButtonStyled';
+import * as Styled from './Button.styled';
 
-type Props = typeof ButtonStyled.defaultProps & PropsWithChildren;
+type Props = typeof Styled.Button.defaultProps & PropsWithChildren;
 
 const Button = ({ children, type = 'button', ...props }: Props) => {
   return (
-    <ButtonStyled type={type} {...props}>
+    <Styled.Button type={type} {...props}>
       {children}
-    </ButtonStyled>
+    </Styled.Button>
   );
 };
 

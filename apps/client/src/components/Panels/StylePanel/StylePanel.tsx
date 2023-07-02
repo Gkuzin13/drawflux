@@ -4,14 +4,7 @@ import Slider from '@/components/Elements/Slider/Slider';
 import { ICON_SIZES } from '@/constants/icon';
 import { ANIMATED, LINE, OPACITY, SIZE } from '@/constants/panels/style';
 import { clamp } from '@/utils/math';
-import {
-  StyleButton,
-  StyleContainer,
-  StyleGrid,
-  StyleRadioGroup,
-  ToggleButton,
-  StyleLabel,
-} from './StylePanelStyled';
+import * as Styled from './StylePanel.styled';
 
 export type StylePanelProps = {
   active: boolean;
@@ -56,8 +49,8 @@ const StylePanel = ({
   };
 
   return (
-    <StyleContainer active={active}>
-      <StyleRadioGroup
+    <Styled.Container active={active}>
+      <Styled.InnerContainer
         defaultValue={style.color}
         aria-label="Color"
         aria-labelledby="shape-color"
@@ -65,13 +58,13 @@ const StylePanel = ({
         value={style.color}
         onValueChange={handleColorSelect}
       >
-        <StyleLabel htmlFor="shape-color" css={{ fontSize: '$1' }}>
+        <Styled.Label htmlFor="shape-color" css={{ fontSize: '$1' }}>
           Color
-        </StyleLabel>
+        </Styled.Label>
         <ColorsGrid value={style.color || ''} onSelect={handleColorSelect} />
-      </StyleRadioGroup>
+      </Styled.InnerContainer>
       <div aria-labelledby="Opacity">
-        <StyleLabel css={{ fontSize: '$1' }}>Opacity</StyleLabel>
+        <Styled.Label css={{ fontSize: '$1' }}>Opacity</Styled.Label>
         <Slider
           value={[style.opacity ?? OPACITY.maxValue]}
           min={OPACITY.minValue}
@@ -83,20 +76,20 @@ const StylePanel = ({
       </div>
       {enabledOptions.line && (
         <>
-          <StyleRadioGroup
+          <Styled.InnerContainer
             aria-label="Line"
             aria-labelledby="shape-line"
             orientation="horizontal"
             value={style.line}
             onValueChange={handleLineSelect}
           >
-            <StyleLabel htmlFor="shape-line" css={{ fontSize: '$1' }}>
+            <Styled.Label htmlFor="shape-line" css={{ fontSize: '$1' }}>
               Line
-            </StyleLabel>
-            <StyleGrid>
+            </Styled.Label>
+            <Styled.Grid>
               {LINE.map((line) => {
                 return (
-                  <StyleButton
+                  <Styled.Item
                     aria-label="Select Line"
                     key={line.value}
                     value={line.value}
@@ -109,16 +102,16 @@ const StylePanel = ({
                     }
                   >
                     {line.icon({ size: ICON_SIZES.LARGE })}
-                  </StyleButton>
+                  </Styled.Item>
                 );
               })}
-            </StyleGrid>
-          </StyleRadioGroup>
+            </Styled.Grid>
+          </Styled.InnerContainer>
           <div aria-labelledby="shape-animated">
-            <StyleLabel htmlFor="shape-animated" css={{ fontSize: '$1' }}>
+            <Styled.Label htmlFor="shape-animated" css={{ fontSize: '$1' }}>
               Animated
-            </StyleLabel>
-            <ToggleButton
+            </Styled.Label>
+            <Styled.Toggle
               aria-label="Toggle Animated"
               title={ANIMATED.name}
               pressed={style.animated}
@@ -127,25 +120,25 @@ const StylePanel = ({
               onPressedChange={handleAnimatedSelect}
             >
               {style.animated ? 'On' : 'Off'}
-            </ToggleButton>
+            </Styled.Toggle>
           </div>
         </>
       )}
       {enabledOptions.size && (
-        <StyleRadioGroup
+        <Styled.InnerContainer
           aria-label="Size"
           aria-labelledby="shape-size"
           orientation="horizontal"
           value={SIZE.find((size) => size.value === style.size)?.name}
           onValueChange={handleSizeSelect}
         >
-          <StyleLabel htmlFor="shape-size" css={{ fontSize: '$1' }}>
+          <Styled.Label htmlFor="shape-size" css={{ fontSize: '$1' }}>
             Size
-          </StyleLabel>
-          <StyleGrid>
+          </Styled.Label>
+          <Styled.Grid>
             {SIZE.map((size) => {
               return (
-                <StyleButton
+                <Styled.Item
                   key={size.name}
                   title={size.name}
                   value={size.name}
@@ -155,13 +148,13 @@ const StylePanel = ({
                   }
                 >
                   {size.icon({ size: ICON_SIZES.SMALL })}
-                </StyleButton>
+                </Styled.Item>
               );
             })}
-          </StyleGrid>
-        </StyleRadioGroup>
+          </Styled.Grid>
+        </Styled.InnerContainer>
       )}
-    </StyleContainer>
+    </Styled.Container>
   );
 };
 

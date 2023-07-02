@@ -1,9 +1,9 @@
-import * as RadioGroup from '@radix-ui/react-radio-group';
-import { StyleLabel } from '@/components/Panels/StylePanel/StylePanelStyled';
+import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import * as PanelStyled from '@/components/Panels/StylePanel/StylePanel.styled';
 import { ICON_SIZES } from '@/constants/icon';
 import { COLOR } from '@/constants/panels/style';
 import { getColorValue } from '@/utils/shape';
-import { ColorButton, ContentGrid } from './ColorsGridStyled';
+import * as Styled from './ColorsGridStyled';
 
 type Props = {
   value: string;
@@ -13,7 +13,7 @@ type Props = {
 
 const ColorsGrid = ({ withLabel = false, value, onSelect }: Props) => {
   return (
-    <RadioGroup.Root
+    <RadioGroupPrimitive.Root
       defaultValue={value}
       aria-label="Color"
       aria-labelledby="shape-color"
@@ -22,14 +22,14 @@ const ColorsGrid = ({ withLabel = false, value, onSelect }: Props) => {
       onValueChange={onSelect}
     >
       {withLabel && (
-        <StyleLabel htmlFor="shape-color" css={{ fontSize: '$1' }}>
+        <PanelStyled.Label htmlFor="shape-color" css={{ fontSize: '$1' }}>
           Color
-        </StyleLabel>
+        </PanelStyled.Label>
       )}
-      <ContentGrid>
+      <Styled.Grid>
         {COLOR.map((color) => {
           return (
-            <ColorButton
+            <Styled.Color
               key={color.value}
               checked={color.value === value}
               value={color.value}
@@ -39,11 +39,11 @@ const ColorsGrid = ({ withLabel = false, value, onSelect }: Props) => {
               style={{ color: getColorValue(color.value) }}
             >
               {color.icon({ size: ICON_SIZES.LARGE })}
-            </ColorButton>
+            </Styled.Color>
           );
         })}
-      </ContentGrid>
-    </RadioGroup.Root>
+      </Styled.Grid>
+    </RadioGroupPrimitive.Root>
   );
 };
 

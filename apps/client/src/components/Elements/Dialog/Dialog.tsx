@@ -1,13 +1,7 @@
-import { Root, Portal } from '@radix-ui/react-dialog';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { IoCloseOutline } from 'react-icons/io5';
 import { ICON_SIZES } from '@/constants/icon';
-import {
-  DialogCloseButton,
-  DialogContent,
-  DialogDescription,
-  DialogOverlay,
-  DialogTitle,
-} from './DialogStyled';
+import * as Styled from './Dialog.styled';
 
 type Props = {
   title: string;
@@ -24,18 +18,18 @@ const Dialog = ({ title, description, open, onClose }: Props) => {
   };
 
   return (
-    <Root open={open} onOpenChange={handleOpenChange}>
-      <Portal>
-        <DialogOverlay />
-        <DialogContent>
-          <DialogCloseButton>
+    <DialogPrimitive.Root open={open} onOpenChange={handleOpenChange}>
+      <DialogPrimitive.Portal>
+        <Styled.Overlay />
+        <Styled.Content>
+          <Styled.Close>
             <IoCloseOutline size={ICON_SIZES.LARGE} />
-          </DialogCloseButton>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogContent>
-      </Portal>
-    </Root>
+          </Styled.Close>
+          <Styled.Title>{title}</Styled.Title>
+          <Styled.Description>{description}</Styled.Description>
+        </Styled.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 };
 

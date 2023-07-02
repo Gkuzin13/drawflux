@@ -1,10 +1,10 @@
-import * as Label from '@radix-ui/react-label';
-import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
+import * as LabelPrimitive from '@radix-ui/react-label';
+import * as VisuallyHiddenPrimitive from '@radix-ui/react-visually-hidden';
 import type { ComponentProps } from '@stitches/react';
 import { forwardRef } from 'react';
-import { Input, TextInputContainer } from './TextInputStyled';
+import * as Styled from './TextInput.styled';
 
-type Props = ComponentProps<typeof Input> & {
+type Props = ComponentProps<typeof Styled.Input> & {
   label: string;
   visuallyHiddenLabel?: boolean;
 };
@@ -12,16 +12,18 @@ type Props = ComponentProps<typeof Input> & {
 const TextInput = forwardRef<HTMLInputElement, Props>(
   ({ label, visuallyHiddenLabel = true, ...props }, ref) => {
     return (
-      <TextInputContainer>
+      <Styled.Container>
         {visuallyHiddenLabel ? (
-          <VisuallyHidden.Root>
-            <Label.Root htmlFor={props.id}>{label}</Label.Root>
-          </VisuallyHidden.Root>
+          <VisuallyHiddenPrimitive.Root>
+            <LabelPrimitive.Root htmlFor={props.id}>
+              {label}
+            </LabelPrimitive.Root>
+          </VisuallyHiddenPrimitive.Root>
         ) : (
-          <Label.Root htmlFor={props.id}>{label}</Label.Root>
+          <LabelPrimitive.Root htmlFor={props.id}>{label}</LabelPrimitive.Root>
         )}
-        <Input ref={ref} {...props} type="text" />
-      </TextInputContainer>
+        <Styled.Input ref={ref} {...props} type="text" />
+      </Styled.Container>
     );
   },
 );

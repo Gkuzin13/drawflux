@@ -1,11 +1,11 @@
 import * as Popover from '@radix-ui/react-popover';
 import { TbCircleFilled } from 'react-icons/tb';
 import { styled } from 'shared';
-import { Panel, PanelButton } from '../PanelsStyled';
+import * as PanelStyled from '../Panels.styled';
 
-export const UsersPanelContainer = styled(Panel, {});
+export const Container = styled(PanelStyled.Panel, {});
 
-export const UsersPanelContent = styled(Popover.Content, {
+export const Content = styled(Popover.Content, {
   padding: '$2',
   display: 'flex',
   gap: '$1',
@@ -16,9 +16,9 @@ export const UsersPanelContent = styled(Popover.Content, {
   backgroundColor: '$white50',
 });
 
-export const UsersPanelTrigger = styled(Popover.Trigger, PanelButton);
+export const Trigger = styled(Popover.Trigger, PanelStyled.Button);
 
-export const UserInfo = styled('div', {
+export const Info = styled('div', {
   display: 'flex',
   alignItems: 'center',
   gap: '$2',
@@ -27,13 +27,13 @@ export const UserInfo = styled('div', {
   minHeight: '$5',
 });
 
-export const UserIndicator = styled('span', {
+export const Indicator = styled('span', {
   color: '$gray500',
   paddingRight: '$2',
 });
 
-export const UserName = styled('span', {});
+export const Name = styled('span', {});
 
-export const UserColor = styled(TbCircleFilled, {
+export const Color = styled(TbCircleFilled, {
   flexShrink: 0,
 });

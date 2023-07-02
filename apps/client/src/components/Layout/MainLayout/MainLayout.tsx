@@ -14,7 +14,7 @@ import { useModal } from '@/contexts/modal';
 import useKbdShortcuts from '@/hooks/useKbdShortcuts';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import { Container } from './MainLayoutStyled';
+import * as Styled from './MainLayout.styled';
 
 type Props = {
   viewportSize: {
@@ -96,7 +96,7 @@ const MainLayout = ({ viewportSize }: Props) => {
   );
 
   return (
-    <Container tabIndex={0}>
+    <Styled.Container tabIndex={0}>
       <Panels intersectedNodesIds={intersectedNodesIds} stageRef={stageRef} />
       <ContextMenu
         selectedNodesCount={Object.keys(selectedNodesIds).length}
@@ -116,7 +116,7 @@ const MainLayout = ({ viewportSize }: Props) => {
         description={modal.description}
         onClose={modal.close}
       />
-    </Container>
+    </Styled.Container>
   );
 };
 

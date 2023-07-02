@@ -30,12 +30,7 @@ import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
 import { sendMessage } from '@/utils/websocket';
 import ControlPanel from './ControlPanel/ControlPanel';
 import MenuPanel from './MenuPanel/MenuPanel';
-import {
-  BottomPanel,
-  PanelsContainer,
-  TopPanel,
-  TopPanelRightContainer,
-} from './PanelsStyled';
+import * as Styled from './Panels.styled';
 import SharePanel from './SharePanel/SharePanel';
 import StylePanel, { type StylePanelProps } from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
@@ -259,8 +254,8 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   };
 
   return (
-    <PanelsContainer>
-      <TopPanel>
+    <Styled.Container>
+      <Styled.TopPanel>
         <ControlPanel
           onControl={handleControlActions}
           enabledControls={enabledControls}
@@ -277,7 +272,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
             <UsersPanel onUserChange={handleUserChange} />
           </Suspense>
         )}
-        <TopPanelRightContainer>
+        <Styled.TopPanelRightContainer>
           {online && (
             <SharePanel
               isPageShared={!!ws?.isConnected}
@@ -285,12 +280,12 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
             />
           )}
           <MenuPanel onAction={handleMenuAction} />
-        </TopPanelRightContainer>
-      </TopPanel>
-      <BottomPanel>
+        </Styled.TopPanelRightContainer>
+      </Styled.TopPanel>
+      <Styled.BottomPanel>
         <ToolsPanel activeTool={toolType} onToolSelect={handleToolSelect} />
-      </BottomPanel>
-    </PanelsContainer>
+      </Styled.BottomPanel>
+    </Styled.Container>
   );
 };
 

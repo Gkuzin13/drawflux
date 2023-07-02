@@ -1,12 +1,12 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import { KbdStyled } from './KbdStyled';
+import * as Styled from './Kbd.styled';
 
 type Props = PropsWithChildren<{
   children: ReactNode;
 }>;
 
 const Kbd = ({ children }: Props) => {
-  return <KbdStyled>{children}</KbdStyled>;
+  return <Styled.Root>{children}</Styled.Root>;
 };
 
 export default Kbd;

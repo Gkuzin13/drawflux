@@ -1,15 +1,11 @@
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { IoEllipsisHorizontal } from 'react-icons/io5';
 import { ICON_SIZES } from '@/constants/icon';
 import {
   type MenuPanelActionType,
   MENU_PANEL_ACTIONS,
 } from '@/constants/panels/menu';
-import {
-  DropdownMenuItem,
-  MenuPanelTrigger,
-  DropdownMenuContent,
-} from './MenuPanelStyled';
+import * as Styled from './MenuPanel.styled';
 
 type Props = {
   onAction: (type: MenuPanelActionType) => void;
@@ -21,27 +17,27 @@ const MenuPanel = ({ onAction }: Props) => {
   };
 
   return (
-    <DropdownMenu.Root>
-      <MenuPanelTrigger aria-label="Open Menu">
+    <DropdownMenuPrimitive.Root>
+      <Styled.Trigger aria-label="Open Menu">
         <IoEllipsisHorizontal size={ICON_SIZES.MEDIUM} />
-      </MenuPanelTrigger>
-      <DropdownMenu.Portal>
-        <DropdownMenuContent align="end" sideOffset={4}>
+      </Styled.Trigger>
+      <DropdownMenuPrimitive.Portal>
+        <Styled.Content align="end" sideOffset={4}>
           {MENU_PANEL_ACTIONS.map((action) => {
             return (
-              <DropdownMenuItem
+              <Styled.Item
                 key={action.key}
                 title={action.name}
                 onSelect={() => handleOnClick(action.key)}
               >
                 {action.icon({ size: ICON_SIZES.MEDIUM })}
                 {action.name}
-              </DropdownMenuItem>
+              </Styled.Item>
             );
           })}
-        </DropdownMenuContent>
-      </DropdownMenu.Portal>
-    </DropdownMenu.Root>
+        </Styled.Content>
+      </DropdownMenuPrimitive.Portal>
+    </DropdownMenuPrimitive.Root>
   );
 };
 

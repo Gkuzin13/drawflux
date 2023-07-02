@@ -1,5 +1,5 @@
 import { styled } from 'shared';
 
-export const KbdStyled = styled('kbd', {
+export const Root = styled('kbd', {
   color: '$gray600',
 });

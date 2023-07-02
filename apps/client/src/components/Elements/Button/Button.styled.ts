@@ -1,6 +1,6 @@
 import { styled } from 'shared';
 
-export const ButtonStyled = styled('button', {
+export const Button = styled('button', {
   display: 'flex',
   alignItems: 'center',
   borderRadius: '$1',

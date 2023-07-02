@@ -12,7 +12,7 @@ import {
   type UpdatePageResponse,
   type WSMessage,
 } from 'shared';
-import { Divider } from '@/components/Elements/Divider/Divider';
+import Divider from '@/components/Elements/Divider/Divider';
 import Kbd from '@/components/Elements/Kbd/Kbd';
 import { useNotifications } from '@/contexts/notifications';
 import { useWebSocket } from '@/contexts/websocket';
@@ -21,7 +21,7 @@ import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { store } from '@/stores/store';
 import { sendMessage } from '@/utils/websocket';
-import { ContextMenuContent, ContextMenuItem } from './ContextMenuStyled';
+import * as Styled from './ContextMenu.styled';
 
 export type ContextMenuType = 'node-menu' | 'canvas-menu';
 
@@ -57,7 +57,7 @@ const CanvasMenu = () => {
 
   return (
     <>
-      <ContextMenuItem onSelect={handleSelectAll}>Select All</ContextMenuItem>
+      <Styled.Item onSelect={handleSelectAll}>Select All</Styled.Item>
     </>
   );
 };
@@ -120,41 +120,41 @@ const NodeMenu = () => {
 
   return (
     <>
-      <ContextMenuItem
+      <Styled.Item
         onSelect={() => dispatchNodesAction(canvasActions.duplicateNodes)}
       >
         Duplicate <Kbd>Ctrl + D</Kbd>
-      </ContextMenuItem>
+      </Styled.Item>
       <Divider orientation="horizontal" />
-      <ContextMenuItem
+      <Styled.Item
         onSelect={() => dispatchNodesAction(canvasActions.moveNodesToEnd)}
       >
         Bring to front
-      </ContextMenuItem>
-      <ContextMenuItem
+      </Styled.Item>
+      <Styled.Item
         onSelect={() => dispatchNodesAction(canvasActions.moveNodesForward)}
       >
         Bring forward
-      </ContextMenuItem>
-      <ContextMenuItem
+      </Styled.Item>
+      <Styled.Item
         onSelect={() => dispatchNodesAction(canvasActions.moveNodesBackward)}
       >
         Send backward
-      </ContextMenuItem>
-      <ContextMenuItem
+      </Styled.Item>
+      <Styled.Item
         onSelect={() => dispatchNodesAction(canvasActions.moveNodesToStart)}
       >
         Send to back
-      </ContextMenuItem>
+      </Styled.Item>
       <Divider orientation="horizontal" />
-      <ContextMenuItem onSelect={handleSelectNone}>Select None</ContextMenuItem>
+      <Styled.Item onSelect={handleSelectNone}>Select None</Styled.Item>
       <Divider orientation="horizontal" />
-      <ContextMenuItem
+      <Styled.Item
         onSelect={() => dispatchNodesAction(canvasActions.deleteNodes)}
       >
         Delete
         <Kbd>Del</Kbd>
-      </ContextMenuItem>
+      </Styled.Item>
     </>
   );
 };
@@ -181,9 +181,9 @@ const ContextMenu = ({
         <div>{children}</div>
       </ContextMenuPrimitive.Trigger>
       <ContextMenuPrimitive.Portal>
-        <ContextMenuContent>
+        <Styled.Content>
           <ActiveMenu />
-        </ContextMenuContent>
+        </Styled.Content>
       </ContextMenuPrimitive.Portal>
     </ContextMenuPrimitive.Root>
   );

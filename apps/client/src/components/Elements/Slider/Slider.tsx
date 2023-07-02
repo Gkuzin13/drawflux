@@ -1,9 +1,4 @@
-import {
-  SliderContainer,
-  SliderRange,
-  SliderThumb,
-  SliderTrack,
-} from './SliderStyled';
+import * as Styled from './Slider.styled';
 
 type Props = {
   value: number[];
@@ -23,18 +18,18 @@ const Slider = ({
   onValueChange,
 }: Props) => {
   return (
-    <SliderContainer
+    <Styled.Container
       value={value}
       min={min}
       max={max}
       step={step}
       onValueChange={onValueChange}
     >
-      <SliderTrack>
-        <SliderRange />
-      </SliderTrack>
-      <SliderThumb aria-label={label} />
-    </SliderContainer>
+      <Styled.Track>
+        <Styled.Range />
+      </Styled.Track>
+      <Styled.Thumb aria-label={label} />
+    </Styled.Container>
   );
 };
 

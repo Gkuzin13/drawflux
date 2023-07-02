@@ -2,13 +2,13 @@ import { useEffect } from 'react';
 import { TbLink } from 'react-icons/tb';
 import type { SharePageRequestBody, SharePageResponse } from 'shared';
 import Button from '@/components/Elements/Button/Button';
-import { Divider } from '@/components/Elements/Divider/Divider';
+import Divider from '@/components/Elements/Divider/Divider';
 import Loader from '@/components/Elements/Loader/Loader';
 import { PAGE_URL_SEARCH_PARAM_KEY } from '@/constants/app';
 import { ICON_SIZES } from '@/constants/icon';
 import useFetch from '@/hooks/useFetch';
 import { urlSearchParam } from '@/utils/url';
-import { SharePanelInfo } from './SharePanelStyled';
+import * as Styled from './SharePanel.styled';
 
 type Props = {
   page: SharePageRequestBody['page'];
@@ -61,10 +61,10 @@ const SharablePageContent = ({ page }: Props) => {
         )}
       </Button>
       <Divider orientation="horizontal" />
-      <SharePanelInfo>
+      <Styled.Info>
         Sharing this project will make it available for 24 hours publicly to
         anyone who has access to the provided URL.
-      </SharePanelInfo>
+      </Styled.Info>
     </>
   );
 };

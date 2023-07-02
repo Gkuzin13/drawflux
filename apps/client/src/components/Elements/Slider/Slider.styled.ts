@@ -1,7 +1,7 @@
-import * as Slider from '@radix-ui/react-slider';
+import * as SliderPrimitive from '@radix-ui/react-slider';
 import { styled } from 'shared';
 
-export const SliderContainer = styled(Slider.Root, {
+export const Container = styled(SliderPrimitive.Root, {
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
@@ -12,7 +12,7 @@ export const SliderContainer = styled(Slider.Root, {
   padding: '$1 0',
 });
 
-export const SliderTrack = styled(Slider.Track, {
+export const Track = styled(SliderPrimitive.Track, {
   backgroundColor: '$gray200',
   position: 'relative',
   flexGrow: 1,
@@ -20,14 +20,14 @@ export const SliderTrack = styled(Slider.Track, {
   height: '$1',
 });
 
-export const SliderRange = styled(Slider.Range, {
+export const Range = styled(SliderPrimitive.Range, {
   position: 'absolute',
   backgroundColor: '$green400',
   borderRadius: '$1',
   height: '100%',
 });
 
-export const SliderThumb = styled(Slider.Thumb, {
+export const Thumb = styled(SliderPrimitive.Thumb, {
   display: 'block',
   width: '$3',
   height: '$3',
