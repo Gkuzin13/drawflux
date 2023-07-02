@@ -37,6 +37,7 @@ export const TopPanel = styled('div', {
   position: 'relative',
   display: 'flex',
   justifyContent: 'space-between',
+  flexWrap: 'wrap',
   width: '100%',
   gap: '$2',
 });

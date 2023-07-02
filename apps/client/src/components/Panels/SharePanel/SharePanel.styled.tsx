@@ -21,7 +21,6 @@ export const Info = styled('p', {
 });
 
 export const Trigger = styled(PopoverPrimitive.Trigger, ButtonStyled.Button, {
-  width: 'calc($5 * 2)',
   defaultVariants: {
     color: 'primary',
     size: 'small',

@@ -6,7 +6,7 @@ import * as PanelStyled from '../Panels.styled';
 export const Container = styled(PanelStyled.Panel, {});
 
 export const Content = styled(Popover.Content, {
-  padding: '$2',
+  padding: '$1',
   display: 'flex',
   gap: '$1',
   flexDirection: 'column',
@@ -25,6 +25,7 @@ export const Info = styled('div', {
   fontSize: '$1',
   flexShrink: 0,
   minHeight: '$5',
+  marginLeft: '$2',
 });
 
 export const Indicator = styled('span', {

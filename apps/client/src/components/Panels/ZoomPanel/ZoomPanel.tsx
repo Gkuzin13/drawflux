@@ -2,6 +2,7 @@ import { ZOOM_RANGE } from '@/constants/app';
 import { ICON_SIZES } from '@/constants/icon';
 import { ZOOM, type ZoomAction } from '@/constants/panels/zoom';
 import * as PanelStyled from '../Panels.styled';
+import * as Styled from './ZoomPanel.styled';
 
 type Props = {
   value: number;
@@ -30,7 +31,7 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
   };
 
   return (
-    <PanelStyled.Panel css={{ marginRight: 'auto' }}>
+    <Styled.Container>
       <PanelStyled.Button
         disabled={value === 1}
         title={ZOOM.RESET.name}
@@ -54,7 +55,7 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
       >
         {ZOOM.OUT.icon({ size: ICON_SIZES.SMALL })}
       </PanelStyled.Button>
-    </PanelStyled.Panel>
+    </Styled.Container>
   );
 };
 
