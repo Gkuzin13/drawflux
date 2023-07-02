@@ -9,7 +9,7 @@ export const Grid = styled('div', {
   gap: '$1',
 });
 
-export const Color = styled(RadioGroupPrimitive.Item, ButtonStyled, {
+export const Color = styled(RadioGroupPrimitive.Item, ButtonStyled.Button, {
   defaultVariants: {
     size: 'extra-small',
     color: 'secondary',

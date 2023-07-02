@@ -40,7 +40,7 @@ export const Label = styled(LabelPrimitive.Root, {
   color: '$gray700',
 });
 
-export const Toggle = styled(TogglePrimitive.Root, ButtonStyled, {
+export const Toggle = styled(TogglePrimitive.Root, ButtonStyled.Button, {
   defaultVariants: {
     size: 'extra-small',
     color: 'secondary',
@@ -48,7 +48,7 @@ export const Toggle = styled(TogglePrimitive.Root, ButtonStyled, {
   },
 });
 
-export const Item = styled(RadioGroupPrimitive.Item, ButtonStyled, {
+export const Item = styled(RadioGroupPrimitive.Item, ButtonStyled.Button, {
   defaultVariants: {
     size: 'extra-small',
     color: 'secondary',
