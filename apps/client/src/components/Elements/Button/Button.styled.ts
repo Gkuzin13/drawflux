@@ -8,7 +8,7 @@ export const Button = styled('button', {
   transitionProperty: 'background-color, color',
   transition: '$fast',
   lineHeight: '$normal',
-  '&[disabled]': {
+  '&[disabled], &[data-disabled]': {
     opacity: 0.5,
     cursor: 'revert',
     backgroundColor: '$gray100',
