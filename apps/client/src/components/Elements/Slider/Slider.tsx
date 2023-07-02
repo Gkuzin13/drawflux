@@ -7,6 +7,7 @@ type Props = {
   label: string;
   step?: number;
   onValueChange: (value: number[]) => void;
+  onValueCommit: (value: number[]) => void;
 };
 
 const Slider = ({
@@ -16,6 +17,7 @@ const Slider = ({
   step = 1,
   label,
   onValueChange,
+  onValueCommit,
 }: Props) => {
   return (
     <Styled.Container
@@ -24,6 +26,7 @@ const Slider = ({
       max={max}
       step={step}
       onValueChange={onValueChange}
+      onValueCommit={onValueCommit}
     >
       <Styled.Track>
         <Styled.Range />

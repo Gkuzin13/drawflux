@@ -144,7 +144,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
     updatePage({ nodes: currentNodes });
   };
 
-  const handleStyleChange = (style: Partial<NodeStyle>) => {
+  const handleStyleChange = (style: Partial<NodeStyle>, updateAsync = true) => {
     const updatedNodes = selectedNodes.map((node) => {
       return { ...node, style: { ...node.style, ...style } };
     });
@@ -159,7 +159,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
       sendMessage(ws.connection, message);
 
-      handleUpdatePage();
+      updateAsync && handleUpdatePage();
     }
   };
 

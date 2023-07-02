@@ -13,7 +13,10 @@ export type StylePanelProps = {
     line: boolean;
     size: boolean;
   };
-  onStyleChange: (updatedStyle: Partial<NodeStyle>) => void;
+  onStyleChange: (
+    updatedStyle: Partial<NodeStyle>,
+    updateAsync?: boolean,
+  ) => void;
 };
 
 const StylePanel = ({
@@ -43,9 +46,9 @@ const StylePanel = ({
     onStyleChange({ size: value });
   };
 
-  const handleOpacityChange = (value: number) => {
+  const handleOpacityChange = (value: number, updateAsync = true) => {
     const clampedOpacity = clamp(value, OPACITY.minValue, OPACITY.maxValue);
-    onStyleChange({ opacity: clampedOpacity });
+    onStyleChange({ opacity: clampedOpacity }, updateAsync);
   };
 
   return (
@@ -71,7 +74,8 @@ const StylePanel = ({
           max={OPACITY.maxValue}
           step={OPACITY.step}
           label="Opacity"
-          onValueChange={(values) => handleOpacityChange(values[0])}
+          onValueChange={(values) => handleOpacityChange(values[0], false)}
+          onValueCommit={(values) => handleOpacityChange(values[0])}
         />
       </div>
       {enabledOptions.line && (
