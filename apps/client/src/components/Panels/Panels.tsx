@@ -29,7 +29,7 @@ import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
 import { sendMessage } from '@/utils/websocket';
 import ControlPanel from './ControlPanel/ControlPanel';
-import MenuPanel from './MenuPanel/MenuPanel';
+import MenuPanel, { type MenuKey } from './MenuPanel/MenuPanel';
 import * as Styled from './Panels.styled';
 import SharePanel from './SharePanel/SharePanel';
 import StylePanel, { type StylePanelProps } from './StylePanel/StylePanel';
@@ -117,6 +117,13 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   }, [selectedNodes]);
 
   const isStylePanelActive = selectedNodes.length > 0;
+
+  const disabledMenuItems = useMemo((): MenuKey[] | null => {
+    if (ws?.isConnected) {
+      return ['import-json'];
+    }
+    return null;
+  }, [ws]);
 
   useEffect(() => {
     if (error) {
@@ -279,7 +286,10 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
               pageState={{ page: { nodes, stageConfig } }}
             />
           )}
-          <MenuPanel onAction={handleMenuAction} />
+          <MenuPanel
+            disabledItems={disabledMenuItems}
+            onAction={handleMenuAction}
+          />
         </Styled.TopPanelRightContainer>
       </Styled.TopPanel>
       <Styled.BottomPanel>

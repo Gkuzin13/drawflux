@@ -7,15 +7,14 @@ import {
 } from '@/constants/panels/menu';
 import * as Styled from './MenuPanel.styled';
 
+export type MenuKey = (typeof MENU_PANEL_ACTIONS)[number]['key'];
+
 type Props = {
+  disabledItems: MenuKey[] | null;
   onAction: (type: MenuPanelActionType) => void;
 };
 
-const MenuPanel = ({ onAction }: Props) => {
-  const handleOnClick = (type: MenuPanelActionType) => {
-    onAction(type);
-  };
-
+const MenuPanel = ({ disabledItems, onAction }: Props) => {
   return (
     <DropdownMenuPrimitive.Root>
       <Styled.Trigger aria-label="Open Menu">
@@ -28,7 +27,8 @@ const MenuPanel = ({ onAction }: Props) => {
               <Styled.Item
                 key={action.key}
                 title={action.name}
-                onSelect={() => handleOnClick(action.key)}
+                onSelect={() => onAction(action.key)}
+                disabled={disabledItems?.includes(action.key)}
               >
                 {action.icon({ size: ICON_SIZES.MEDIUM })}
                 {action.name}
