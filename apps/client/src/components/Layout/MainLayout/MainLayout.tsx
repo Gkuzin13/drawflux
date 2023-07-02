@@ -6,7 +6,6 @@ import {
   getIntersectingNodes,
   getPointerRect,
 } from '@/components/Canvas/DrawingCanvas/helpers/stage';
-import type { ContextMenuType } from '@/components/ContextMenu/ContextMenu';
 import ContextMenu from '@/components/ContextMenu/ContextMenu';
 import Dialog from '@/components/Elements/Dialog/Dialog';
 import Panels from '@/components/Panels/Panels';
@@ -40,10 +39,6 @@ const MainLayout = ({ viewportSize }: Props) => {
     const scale = { x: stageConfig.scale, y: stageConfig.scale };
     return { scale, ...stageConfig.position, ...viewportSize };
   }, [stageConfig, viewportSize]);
-
-  const contextMenuType: ContextMenuType = useMemo(() => {
-    return intersectedNodesIds.length ? 'node-menu' : 'canvas-menu';
-  }, [intersectedNodesIds.length]);
 
   useKbdShortcuts(
     stageRef.current?.container() || null,
@@ -100,15 +95,11 @@ const MainLayout = ({ viewportSize }: Props) => {
     [nodes, stageConfig.scale, intersectedNodesIds, dispatch],
   );
 
-  const handleDialogClose = () => {
-    modal.close();
-  };
-
   return (
     <Container tabIndex={0}>
       <Panels intersectedNodesIds={intersectedNodesIds} stageRef={stageRef} />
       <ContextMenu
-        type={contextMenuType}
+        selectedNodesCount={Object.keys(selectedNodesIds).length}
         onContextMenuOpen={handleContextMenuOpen}
       >
         <DrawingCanvas
@@ -123,7 +114,7 @@ const MainLayout = ({ viewportSize }: Props) => {
         open={modal.opened}
         title={modal.title}
         description={modal.description}
-        onClose={handleDialogClose}
+        onClose={modal.close}
       />
     </Container>
   );

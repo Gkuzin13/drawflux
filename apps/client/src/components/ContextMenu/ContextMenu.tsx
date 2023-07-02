@@ -1,10 +1,11 @@
-import * as RadixContextMenu from '@radix-ui/react-context-menu';
+import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import {
   type PropsWithChildren,
   type ReactNode,
   useCallback,
   useEffect,
+  useMemo,
 } from 'react';
 import {
   type UpdatePageRequestBody,
@@ -25,9 +26,9 @@ import { ContextMenuContent, ContextMenuItem } from './ContextMenuStyled';
 export type ContextMenuType = 'node-menu' | 'canvas-menu';
 
 type Props = PropsWithChildren<{
-  type: ContextMenuType;
-  onContextMenuOpen: (open: boolean) => void;
+  selectedNodesCount: number;
   children: ReactNode;
+  onContextMenuOpen: (open: boolean) => void;
 }>;
 
 const WSNodesActionMap: Partial<
@@ -163,27 +164,28 @@ const menus: Record<ContextMenuType, React.FC> = {
   'canvas-menu': CanvasMenu,
 };
 
-const ContextMenu = ({ type, onContextMenuOpen, children }: Props) => {
-  const ActiveMenu = menus[type] || CanvasMenu;
+const ContextMenu = ({
+  selectedNodesCount,
+  onContextMenuOpen,
+  children,
+}: Props) => {
+  const contextMenuType: ContextMenuType = useMemo(() => {
+    return selectedNodesCount ? 'node-menu' : 'canvas-menu';
+  }, [selectedNodesCount]);
+
+  const ActiveMenu = menus[contextMenuType];
 
   return (
-    <RadixContextMenu.Root onOpenChange={onContextMenuOpen}>
-      <RadixContextMenu.Trigger
-        asChild={true}
-        style={{
-          userSelect: 'none',
-          display: 'block',
-          position: 'relative',
-        }}
-      >
+    <ContextMenuPrimitive.Root onOpenChange={onContextMenuOpen}>
+      <ContextMenuPrimitive.Trigger asChild>
         <div>{children}</div>
-      </RadixContextMenu.Trigger>
-      <RadixContextMenu.Portal>
+      </ContextMenuPrimitive.Trigger>
+      <ContextMenuPrimitive.Portal>
         <ContextMenuContent>
           <ActiveMenu />
         </ContextMenuContent>
-      </RadixContextMenu.Portal>
-    </RadixContextMenu.Root>
+      </ContextMenuPrimitive.Portal>
+    </ContextMenuPrimitive.Root>
   );
 };
 
