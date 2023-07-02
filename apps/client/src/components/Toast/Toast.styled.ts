@@ -1,7 +1,7 @@
 import * as ToastPrimitive from '@radix-ui/react-toast';
 import { duration, easing, hide, slideLeft, styled } from 'shared';
 
-export const ToastRoot = styled(ToastPrimitive.Root, {
+export const Container = styled(ToastPrimitive.Root, {
   backgroundColor: '$white',
   borderRadius: '$1',
   boxShadow: '$small',
@@ -19,23 +19,23 @@ export const ToastRoot = styled(ToastPrimitive.Root, {
   },
 });
 
-export const ToastTitle = styled(ToastPrimitive.Title, {
+export const Title = styled(ToastPrimitive.Title, {
   gridArea: 'title',
   fontWeight: 'bold',
   color: '$black',
 });
 
-export const ToastDescription = styled(ToastPrimitive.Description, {
+export const Description = styled(ToastPrimitive.Description, {
   gridArea: 'description',
   color: '$gray800',
   fontSize: '$1',
 });
 
-export const ToastClose = styled(ToastPrimitive.Close, {
+export const Close = styled(ToastPrimitive.Close, {
   gridArea: 'close',
 });
 
-export const ToastViewport = styled(ToastPrimitive.Viewport, {
+export const Viewport = styled(ToastPrimitive.Viewport, {
   position: 'fixed',
   bottom: 0,
   right: 0,

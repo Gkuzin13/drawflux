@@ -29,13 +29,8 @@ import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
 import { sendMessage } from '@/utils/websocket';
 import ControlPanel from './ControlPanel/ControlPanel';
-import MenuPanel from './MenuPanel/MenuPanel';
-import {
-  BottomPanel,
-  PanelsContainer,
-  TopPanel,
-  TopPanelRightContainer,
-} from './PanelsStyled';
+import MenuPanel, { type MenuKey } from './MenuPanel/MenuPanel';
+import * as Styled from './Panels.styled';
 import SharePanel from './SharePanel/SharePanel';
 import StylePanel, { type StylePanelProps } from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
@@ -123,6 +118,13 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
   const isStylePanelActive = selectedNodes.length > 0;
 
+  const disabledMenuItems = useMemo((): MenuKey[] | null => {
+    if (ws?.isConnected) {
+      return ['import-json'];
+    }
+    return null;
+  }, [ws]);
+
   useEffect(() => {
     if (error) {
       notifications.add({
@@ -142,7 +144,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
     updatePage({ nodes: currentNodes });
   };
 
-  const handleStyleChange = (style: Partial<NodeStyle>) => {
+  const handleStyleChange = (style: Partial<NodeStyle>, updateAsync = true) => {
     const updatedNodes = selectedNodes.map((node) => {
       return { ...node, style: { ...node.style, ...style } };
     });
@@ -157,7 +159,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
       sendMessage(ws.connection, message);
 
-      handleUpdatePage();
+      updateAsync && handleUpdatePage();
     }
   };
 
@@ -259,8 +261,8 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   };
 
   return (
-    <PanelsContainer>
-      <TopPanel>
+    <Styled.Container>
+      <Styled.TopPanel>
         <ControlPanel
           onControl={handleControlActions}
           enabledControls={enabledControls}
@@ -277,20 +279,23 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
             <UsersPanel onUserChange={handleUserChange} />
           </Suspense>
         )}
-        <TopPanelRightContainer>
+        <Styled.TopPanelRightContainer>
           {online && (
             <SharePanel
               isPageShared={!!ws?.isConnected}
               pageState={{ page: { nodes, stageConfig } }}
             />
           )}
-          <MenuPanel onAction={handleMenuAction} />
-        </TopPanelRightContainer>
-      </TopPanel>
-      <BottomPanel>
+          <MenuPanel
+            disabledItems={disabledMenuItems}
+            onAction={handleMenuAction}
+          />
+        </Styled.TopPanelRightContainer>
+      </Styled.TopPanel>
+      <Styled.BottomPanel>
         <ToolsPanel activeTool={toolType} onToolSelect={handleToolSelect} />
-      </BottomPanel>
-    </PanelsContainer>
+      </Styled.BottomPanel>
+    </Styled.Container>
   );
 };
 

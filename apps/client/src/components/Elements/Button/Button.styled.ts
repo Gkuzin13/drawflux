@@ -1,6 +1,6 @@
 import { styled } from 'shared';
 
-export const ButtonStyled = styled('button', {
+export const Button = styled('button', {
   display: 'flex',
   alignItems: 'center',
   borderRadius: '$1',
@@ -8,7 +8,7 @@ export const ButtonStyled = styled('button', {
   transitionProperty: 'background-color, color',
   transition: '$fast',
   lineHeight: '$normal',
-  '&[disabled]': {
+  '&[disabled], &[data-disabled]': {
     opacity: 0.5,
     cursor: 'revert',
     backgroundColor: '$gray100',

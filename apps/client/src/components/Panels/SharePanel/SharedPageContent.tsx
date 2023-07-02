@@ -5,7 +5,7 @@ import Button from '@/components/Elements/Button/Button';
 import Loader from '@/components/Elements/Loader/Loader';
 import { ICON_SIZES } from '@/constants/icon';
 import useClipboard from '@/hooks/useClipboard/useClipboard';
-import { QRCodeContainer, SharePanelInfo } from './SharePanelStyled';
+import * as Styled from './SharePanel.styled';
 
 type Props = {
   qrCode: QRCodeResponse | null;
@@ -25,12 +25,12 @@ const SharedPageContent = ({ qrCode, error }: Props) => {
 
   return (
     <>
-      <QRCodeContainer>
+      <Styled.QRCodeContainer>
         <Suspense fallback={<Loader filled />}>
           {qrCode && <QRCode dataUrl={qrCode.dataUrl} />}
           {error && <p>Error loading QR Code</p>}
         </Suspense>
-      </QRCodeContainer>
+      </Styled.QRCodeContainer>
       <Button
         title={copied ? 'Link Copied' : 'Copy link'}
         align="between"
@@ -45,9 +45,9 @@ const SharedPageContent = ({ qrCode, error }: Props) => {
           <TbClipboardCheck size={ICON_SIZES.MEDIUM} />
         )}
       </Button>
-      <SharePanelInfo>
+      <Styled.Info>
         Anyone with the link has access to this page for 24 hours since sharing.
-      </SharePanelInfo>
+      </Styled.Info>
     </>
   );
 };

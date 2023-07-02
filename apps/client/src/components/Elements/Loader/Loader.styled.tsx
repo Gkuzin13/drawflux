@@ -20,7 +20,7 @@ const dash = keyframes({
   },
 });
 
-export const LoaderContainer = styled('div', {
+export const Container = styled('div', {
   display: 'grid',
   placeItems: 'center',
   variants: {
@@ -46,13 +46,13 @@ export const LoaderContainer = styled('div', {
   },
 });
 
-export const LoaderInnerContainer = styled('div', {
+export const InnerContainer = styled('div', {
   display: 'flex',
   alignItems: 'center',
   gap: '$3',
 });
 
-export const LoaderSpinner = styled(TbLoader2, {
+export const Spinner = styled(TbLoader2, {
   '& path:nth-of-type(2)': {
     transformOrigin: 'center',
     animation: `${dash} 1.5s linear infinite`,

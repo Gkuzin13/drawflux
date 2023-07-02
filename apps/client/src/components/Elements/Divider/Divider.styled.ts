@@ -1,7 +1,7 @@
 import * as Seperator from '@radix-ui/react-separator';
 import { styled } from 'shared';
 
-export const Divider = styled(Seperator.Root, {
+export const Root = styled(Seperator.Root, {
   backgroundColor: '$gray200',
   '&[data-orientation=horizontal]': {
     height: '1px',

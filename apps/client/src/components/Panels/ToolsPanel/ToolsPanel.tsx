@@ -1,9 +1,9 @@
 import { Fragment } from 'react';
-import { Divider } from '@/components/Elements/Divider/Divider';
+import Divider from '@/components/Elements/Divider/Divider';
 import { ICON_SIZES } from '@/constants/icon';
 import { TOOLS, type Tool } from '@/constants/panels/tools';
 import { getKeyTitle } from '@/utils/string';
-import { Panel, PanelButton } from '../PanelsStyled';
+import * as Styled from '../Panels.styled';
 
 type Props = {
   activeTool: Tool['value'];
@@ -12,23 +12,23 @@ type Props = {
 
 const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
   return (
-    <Panel>
+    <Styled.Panel>
       {TOOLS.map((tool, index) => {
         return (
           <Fragment key={tool.value}>
-            <PanelButton
+            <Styled.Button
               size="small"
               color={activeTool === tool.value ? 'primary' : 'secondary'}
               title={getKeyTitle(tool.value, [tool.key])}
               onClick={() => onToolSelect(tool.value)}
             >
               {tool.icon({ size: ICON_SIZES.MEDIUM })}
-            </PanelButton>
+            </Styled.Button>
             {index === 1 && <Divider orientation="vertical" />}
           </Fragment>
         );
       })}
-    </Panel>
+    </Styled.Panel>
   );
 };
 

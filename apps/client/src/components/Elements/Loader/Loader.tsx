@@ -1,21 +1,17 @@
 import type { PropsWithChildren } from 'react';
 import { ICON_SIZES } from '@/constants/icon';
-import {
-  LoaderContainer,
-  LoaderInnerContainer,
-  LoaderSpinner,
-} from './LoaderStyled';
+import * as Styled from './Loader.styled';
 
-type Props = PropsWithChildren<(typeof LoaderContainer)['defaultProps']>;
+type Props = PropsWithChildren<(typeof Styled.Container)['defaultProps']>;
 
 const Loader = ({ children, ...restProps }: Props) => {
   return (
-    <LoaderContainer {...restProps}>
-      <LoaderInnerContainer>
+    <Styled.Container {...restProps}>
+      <Styled.InnerContainer>
         {children}
-        <LoaderSpinner size={ICON_SIZES.MEDIUM} />
-      </LoaderInnerContainer>
-    </LoaderContainer>
+        <Styled.Spinner size={ICON_SIZES.MEDIUM} />
+      </Styled.InnerContainer>
+    </Styled.Container>
   );
 };
 

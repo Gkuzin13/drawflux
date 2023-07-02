@@ -1,6 +1,6 @@
 import { type ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Html } from 'react-konva-utils';
-import type { NodeObject } from 'shared';
+import { styled, type NodeObject } from 'shared';
 import { KEYS } from '@/constants/keys';
 import { useClickAway } from '@/hooks/useClickAway/useClickAway';
 import { getColorValue, getSizeValue } from '@/utils/shape';
@@ -12,6 +12,18 @@ type Props = {
   onChange: (args: OnTextSaveArgs) => void;
   onUpdate: (value: string) => void;
 };
+
+const TextArea = styled('textarea', {
+  border: 'none',
+  padding: '0px',
+  margin: '0px',
+  background: 'none',
+  lineHeight: 1.5,
+  overflow: 'hidden',
+  outline: 'none',
+  resize: 'none',
+  fontFamily: 'sans-serif',
+});
 
 const getStyle = (
   width: string,
@@ -25,15 +37,6 @@ const getStyle = (
     width,
     height,
     color,
-    border: 'none',
-    padding: '0px',
-    margin: '0px',
-    background: 'none',
-    lineHeight: 1.5,
-    overflow: 'hidden',
-    outline: 'none',
-    resize: 'none',
-    fontFamily: 'sans-serif',
     fontSize: `${fontSize * 8}px`,
   };
 
@@ -47,7 +50,7 @@ const getStyle = (
   };
 };
 
-const textSaveKeys: string[] = [KEYS.ENTER, KEYS.ESCAPE];
+const textSaveKeys = [KEYS.ENTER, KEYS.ESCAPE] as string[];
 
 const EditableTextInput = ({
   node,
@@ -109,7 +112,7 @@ const EditableTextInput = ({
   };
 
   const handleValueChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    const { value } = event.target as HTMLTextAreaElement;
+    const { value } = event.target;
 
     setValue(value);
     onUpdate(value);
@@ -123,12 +126,12 @@ const EditableTextInput = ({
         rotation: node.nodeProps.rotation,
       }}
     >
-      <textarea
+      <TextArea
         ref={ref}
         value={value}
+        style={style}
         onChange={handleValueChange}
         onKeyDown={handleKeyDown}
-        style={style}
       />
     </Html>
   );

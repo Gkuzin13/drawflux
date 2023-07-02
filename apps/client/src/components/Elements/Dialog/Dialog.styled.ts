@@ -1,7 +1,7 @@
-import * as Dialog from '@radix-ui/react-dialog';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { styled } from 'shared';
 
-export const DialogOverlay = styled(Dialog.Overlay, {
+export const Overlay = styled(DialogPrimitive.Overlay, {
   backgroundColor: 'rgba(0, 0, 0, 0.125)',
   position: 'fixed',
   inset: 0,
@@ -13,7 +13,7 @@ export const DialogOverlay = styled(Dialog.Overlay, {
   },
 });
 
-export const DialogContent = styled(Dialog.Content, {
+export const Content = styled(DialogPrimitive.Content, {
   backgroundColor: '$white',
   borderRadius: '$1',
   boxShadow: '$small',
@@ -34,19 +34,19 @@ export const DialogContent = styled(Dialog.Content, {
   },
 });
 
-export const DialogCloseButton = styled(Dialog.Close, {
+export const Close = styled(DialogPrimitive.Close, {
   position: 'absolute',
   right: '$3',
   top: '$3',
 });
 
-export const DialogTitle = styled(Dialog.Title, {
+export const Title = styled(DialogPrimitive.Title, {
   fontSize: '$3',
   fontWeight: 'bold',
   paddingBottom: '$2',
 });
 
-export const DialogDescription = styled(Dialog.Description, {
+export const Description = styled(DialogPrimitive.Description, {
   fontSize: '$2',
   color: '$gray700',
 });

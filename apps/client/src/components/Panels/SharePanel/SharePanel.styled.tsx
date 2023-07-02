@@ -1,8 +1,8 @@
-import * as Popover from '@radix-ui/react-popover';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { styled } from 'shared';
-import { ButtonStyled } from '@/components/Elements/Button/ButtonStyled';
+import * as ButtonStyled from '@/components/Elements/Button/Button.styled';
 
-export const SharePanelContent = styled(Popover.Content, {
+export const Content = styled(PopoverPrimitive.Content, {
   padding: '$2',
   display: 'flex',
   gap: '$2',
@@ -14,14 +14,13 @@ export const SharePanelContent = styled(Popover.Content, {
   backgroundColor: '$white50',
 });
 
-export const SharePanelInfo = styled('p', {
+export const Info = styled('p', {
   padding: '0 $1 $1 $1',
   fontSize: '$1',
   color: '$gray600',
 });
 
-export const SharePanelTrigger = styled(Popover.Trigger, ButtonStyled, {
-  width: 'calc($5 * 2)',
+export const Trigger = styled(PopoverPrimitive.Trigger, ButtonStyled.Button, {
   defaultVariants: {
     color: 'primary',
     size: 'small',

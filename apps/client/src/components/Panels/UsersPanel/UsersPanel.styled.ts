@@ -1,12 +1,12 @@
 import * as Popover from '@radix-ui/react-popover';
 import { TbCircleFilled } from 'react-icons/tb';
 import { styled } from 'shared';
-import { Panel, PanelButton } from '../PanelsStyled';
+import * as PanelStyled from '../Panels.styled';
 
-export const UsersPanelContainer = styled(Panel, {});
+export const Container = styled(PanelStyled.Panel, {});
 
-export const UsersPanelContent = styled(Popover.Content, {
-  padding: '$2',
+export const Content = styled(Popover.Content, {
+  padding: '$1',
   display: 'flex',
   gap: '$1',
   flexDirection: 'column',
@@ -16,24 +16,25 @@ export const UsersPanelContent = styled(Popover.Content, {
   backgroundColor: '$white50',
 });
 
-export const UsersPanelTrigger = styled(Popover.Trigger, PanelButton);
+export const Trigger = styled(Popover.Trigger, PanelStyled.Button);
 
-export const UserInfo = styled('div', {
+export const Info = styled('div', {
   display: 'flex',
   alignItems: 'center',
   gap: '$2',
   fontSize: '$1',
   flexShrink: 0,
   minHeight: '$5',
+  marginLeft: '$2',
 });
 
-export const UserIndicator = styled('span', {
+export const Indicator = styled('span', {
   color: '$gray500',
   paddingRight: '$2',
 });
 
-export const UserName = styled('span', {});
+export const Name = styled('span', {});
 
-export const UserColor = styled(TbCircleFilled, {
+export const Color = styled(TbCircleFilled, {
   flexShrink: 0,
 });

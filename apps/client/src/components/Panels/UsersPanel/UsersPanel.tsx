@@ -1,4 +1,4 @@
-import * as Popover from '@radix-ui/react-popover';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { useEffect, useRef, useState } from 'react';
 import { TbCheck, TbPencil, TbUsers } from 'react-icons/tb';
 import { type User, colors } from 'shared';
@@ -10,15 +10,7 @@ import { ICON_SIZES } from '@/constants/icon';
 import { KEYS } from '@/constants/keys';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCollaboration } from '@/stores/slices/collaboration';
-import {
-  UsersPanelContainer,
-  UsersPanelContent,
-  UserInfo,
-  UserIndicator,
-  UsersPanelTrigger,
-  UserName,
-  UserColor,
-} from './UsersPanelStyled';
+import * as Styled from './UsersPanel.styled';
 
 type Props = {
   onUserChange: (user: User) => void;
@@ -68,29 +60,29 @@ const UsersPanel = ({ onUserChange }: Props) => {
   }
 
   return (
-    <Popover.Root onOpenChange={() => setIsEditing(false)}>
-      <UsersPanelContainer>
-        <UsersPanelTrigger>
+    <PopoverPrimitive.Root onOpenChange={() => setIsEditing(false)}>
+      <Styled.Container>
+        <Styled.Trigger>
           <TbUsers size={ICON_SIZES.SMALL} />
-        </UsersPanelTrigger>
-      </UsersPanelContainer>
-      <Popover.Portal>
-        <UsersPanelContent align="end" sideOffset={4} css={{ minWidth: '$11' }}>
+        </Styled.Trigger>
+      </Styled.Container>
+      <PopoverPrimitive.Portal>
+        <Styled.Content align="end" sideOffset={4} css={{ minWidth: '$11' }}>
           {users.map((user) => {
             const isCurrentUser = user.id === userId;
 
             return (
-              <UserInfo key={user.id}>
+              <Styled.Info key={user.id}>
                 {isCurrentUser ? (
-                  <Popover.Root>
-                    <Popover.Trigger title="Change user color">
-                      <UserColor
+                  <PopoverPrimitive.Root>
+                    <PopoverPrimitive.Trigger title="Change user color">
+                      <Styled.Color
                         color={colors[user.color]}
                         size={ICON_SIZES.LARGE}
                       />
-                    </Popover.Trigger>
-                    <Popover.Portal>
-                      <UsersPanelContent
+                    </PopoverPrimitive.Trigger>
+                    <PopoverPrimitive.Portal>
+                      <Styled.Content
                         side="left"
                         align="start"
                         sideOffset={16}
@@ -100,11 +92,11 @@ const UsersPanel = ({ onUserChange }: Props) => {
                           value={currentUser.color}
                           onSelect={handleColorSelect}
                         />
-                      </UsersPanelContent>
-                    </Popover.Portal>
-                  </Popover.Root>
+                      </Styled.Content>
+                    </PopoverPrimitive.Portal>
+                  </PopoverPrimitive.Root>
                 ) : (
-                  <UserColor
+                  <Styled.Color
                     color={colors[user.color]}
                     size={ICON_SIZES.LARGE}
                   />
@@ -121,11 +113,11 @@ const UsersPanel = ({ onUserChange }: Props) => {
                     onKeyDown={handleInputKeyDown}
                   />
                 ) : (
-                  <UserName>{user.name}</UserName>
+                  <Styled.Name>{user.name}</Styled.Name>
                 )}
                 {isCurrentUser && (
                   <>
-                    {!isEditing && <UserIndicator>You</UserIndicator>}
+                    {!isEditing && <Styled.Indicator>You</Styled.Indicator>}
                     <Button
                       aria-label="Change username"
                       size="extra-small"
@@ -142,12 +134,12 @@ const UsersPanel = ({ onUserChange }: Props) => {
                     </Button>
                   </>
                 )}
-              </UserInfo>
+              </Styled.Info>
             );
           })}
-        </UsersPanelContent>
-      </Popover.Portal>
-    </Popover.Root>
+        </Styled.Content>
+      </PopoverPrimitive.Portal>
+    </PopoverPrimitive.Root>
   );
 };
 

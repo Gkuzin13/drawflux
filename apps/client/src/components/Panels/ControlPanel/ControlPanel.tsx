@@ -1,7 +1,7 @@
 import { ICON_SIZES } from '@/constants/icon';
 import { CONTROL, type ControlAction } from '@/constants/panels/control';
 import { getKeyTitle } from '@/utils/string';
-import { Panel, PanelButton } from '../PanelsStyled';
+import * as PanelStyled from '../Panels.styled';
 
 type Props = {
   onControl: (type: ControlAction) => void;
@@ -26,10 +26,10 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
     }
   };
   return (
-    <Panel>
+    <PanelStyled.Panel>
       {CONTROL.map((control) => {
         return (
-          <PanelButton
+          <PanelStyled.Button
             key={control.name}
             title={getKeyTitle(control.name, [
               ...control.modifierKeys.map((key) => key.replace(/key/i, '')),
@@ -39,10 +39,10 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
             onClick={() => onControl(control.value)}
           >
             {control.icon({ size: ICON_SIZES.SMALL })}
-          </PanelButton>
+          </PanelStyled.Button>
         );
       })}
-    </Panel>
+    </PanelStyled.Panel>
   );
 };
 

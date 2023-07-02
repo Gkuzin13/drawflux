@@ -1,7 +1,8 @@
 import { ZOOM_RANGE } from '@/constants/app';
 import { ICON_SIZES } from '@/constants/icon';
 import { ZOOM, type ZoomAction } from '@/constants/panels/zoom';
-import { PanelButton, Panel } from '../PanelsStyled';
+import * as PanelStyled from '../Panels.styled';
+import * as Styled from './ZoomPanel.styled';
 
 type Props = {
   value: number;
@@ -30,8 +31,8 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
   };
 
   return (
-    <Panel css={{ marginRight: 'auto' }}>
-      <PanelButton
+    <Styled.Container>
+      <PanelStyled.Button
         disabled={value === 1}
         title={ZOOM.RESET.name}
         css={{ fontSize: '$1', width: 'calc($5 * 2)' }}
@@ -39,22 +40,22 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
         onClick={() => handleZoomAction(ZOOM.RESET.value)}
       >
         {stageScalePercent}
-      </PanelButton>
-      <PanelButton
+      </PanelStyled.Button>
+      <PanelStyled.Button
         disabled={value === ZOOM_RANGE.MAX}
         title={ZOOM.IN.name}
         onClick={() => handleZoomAction(ZOOM.IN.value)}
       >
         {ZOOM.IN.icon({ size: ICON_SIZES.SMALL })}
-      </PanelButton>
-      <PanelButton
+      </PanelStyled.Button>
+      <PanelStyled.Button
         disabled={value === ZOOM_RANGE.MIN}
         title={ZOOM.OUT.name}
         onClick={() => handleZoomAction(ZOOM.OUT.value)}
       >
         {ZOOM.OUT.icon({ size: ICON_SIZES.SMALL })}
-      </PanelButton>
-    </Panel>
+      </PanelStyled.Button>
+    </Styled.Container>
   );
 };
 

@@ -1,4 +1,4 @@
-import * as Popover from '@radix-ui/react-popover';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
 import type {
   QRCodeRequestBody,
   QRCodeResponse,
@@ -7,7 +7,7 @@ import type {
 import useFetch from '@/hooks/useFetch';
 import ShareablePageContent from './ShareablePageContent';
 import SharedPageContent from './SharedPageContent';
-import { SharePanelContent, SharePanelTrigger } from './SharePanelStyled';
+import * as Styled from './SharePanel.styled';
 
 type Props = {
   pageState: SharePageRequestBody;
@@ -29,18 +29,18 @@ const SharePanel = ({ pageState, isPageShared }: Props) => {
   };
 
   return (
-    <Popover.Root onOpenChange={handlePopoverOpen}>
-      <SharePanelTrigger>Share</SharePanelTrigger>
-      <Popover.Portal>
-        <SharePanelContent align="end" sideOffset={4}>
+    <PopoverPrimitive.Root onOpenChange={handlePopoverOpen}>
+      <Styled.Trigger>Share</Styled.Trigger>
+      <PopoverPrimitive.Portal>
+        <Styled.Content align="end" sideOffset={4}>
           {isPageShared ? (
             <SharedPageContent qrCode={data} error={error} />
           ) : (
             <ShareablePageContent page={pageState.page} />
           )}
-        </SharePanelContent>
-      </Popover.Portal>
-    </Popover.Root>
+        </Styled.Content>
+      </PopoverPrimitive.Portal>
+    </PopoverPrimitive.Root>
   );
 };
 

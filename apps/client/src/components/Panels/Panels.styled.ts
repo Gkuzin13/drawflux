@@ -1,7 +1,7 @@
 import { styled } from 'shared';
-import { ButtonStyled } from '@/components/Elements/Button/ButtonStyled';
+import * as ButtonStyled from '@/components/Elements/Button/Button.styled';
 
-export const PanelsContainer = styled('div', {
+export const Container = styled('div', {
   position: 'fixed',
   display: 'flex',
   justifyContent: 'space-between',
@@ -25,7 +25,7 @@ export const Panel = styled('div', {
   backgroundColor: '$white50',
 });
 
-export const PanelButton = styled(ButtonStyled, {
+export const Button = styled(ButtonStyled.Button, {
   defaultVariants: {
     size: 'extra-small',
     color: 'secondary',
@@ -37,6 +37,7 @@ export const TopPanel = styled('div', {
   position: 'relative',
   display: 'flex',
   justifyContent: 'space-between',
+  flexWrap: 'wrap',
   width: '100%',
   gap: '$2',
 });

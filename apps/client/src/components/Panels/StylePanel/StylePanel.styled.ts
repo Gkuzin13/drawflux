@@ -1,11 +1,11 @@
-import { Root as LabelRoot } from '@radix-ui/react-label';
-import * as RadioGroup from '@radix-ui/react-radio-group';
-import * as Toggle from '@radix-ui/react-toggle';
+import * as LabelPrimitive from '@radix-ui/react-label';
+import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import * as TogglePrimitive from '@radix-ui/react-toggle';
 import { styled } from 'shared';
-import { ButtonStyled } from '@/components/Elements/Button/ButtonStyled';
-import { Panel } from '../PanelsStyled';
+import * as ButtonStyled from '@/components/Elements/Button/Button.styled';
+import { Panel } from '../Panels.styled';
 
-export const StyleContainer = styled(Panel, {
+export const Container = styled(Panel, {
   position: 'absolute',
   top: '100%',
   marginTop: '$2',
@@ -22,25 +22,25 @@ export const StyleContainer = styled(Panel, {
   },
 });
 
-export const StyleRadioGroup = styled(RadioGroup.Root, {
+export const InnerContainer = styled(RadioGroupPrimitive.Root, {
   display: 'flex',
   flexDirection: 'column',
 });
 
-export const StyleGrid = styled('div', {
+export const Grid = styled('div', {
   display: 'grid',
   placeItems: 'center',
   gridTemplateColumns: '$5 $5 $5 $5',
   gap: '$1',
 });
 
-export const StyleLabel = styled(LabelRoot, {
+export const Label = styled(LabelPrimitive.Root, {
   display: 'inline-block',
   paddingBottom: '$1',
   color: '$gray700',
 });
 
-export const ToggleButton = styled(Toggle.Root, ButtonStyled, {
+export const Toggle = styled(TogglePrimitive.Root, ButtonStyled.Button, {
   defaultVariants: {
     size: 'extra-small',
     color: 'secondary',
@@ -48,7 +48,7 @@ export const ToggleButton = styled(Toggle.Root, ButtonStyled, {
   },
 });
 
-export const StyleButton = styled(RadioGroup.Item, ButtonStyled, {
+export const Item = styled(RadioGroupPrimitive.Item, ButtonStyled.Button, {
   defaultVariants: {
     size: 'extra-small',
     color: 'secondary',

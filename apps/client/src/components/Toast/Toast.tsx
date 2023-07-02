@@ -3,15 +3,9 @@ import type { PropsWithChildren } from 'react';
 import { IoCloseOutline } from 'react-icons/io5';
 import Button from '@/components/Elements/Button/Button';
 import { ICON_SIZES } from '@/constants/icon';
-import {
-  ToastRoot,
-  ToastDescription,
-  ToastTitle,
-  ToastViewport,
-  ToastClose,
-} from './ToastStyled';
+import * as Styled from './Toast.styled';
 
-type Props = ComponentProps<typeof ToastRoot> &
+type Props = ComponentProps<typeof Styled.Container> &
   PropsWithChildren<{
     title?: string;
     description?: string;
@@ -20,18 +14,18 @@ type Props = ComponentProps<typeof ToastRoot> &
 const Toast = ({ title, description, children, ...props }: Props) => {
   return (
     <>
-      <ToastRoot {...props}>
+      <Styled.Container {...props}>
         {title && (
-          <ToastTitle asChild>
+          <Styled.Title asChild>
             <span>{title}</span>
-          </ToastTitle>
+          </Styled.Title>
         )}
         {description && (
-          <ToastDescription asChild>
+          <Styled.Description asChild>
             <span>{description}</span>
-          </ToastDescription>
+          </Styled.Description>
         )}
-        <ToastClose asChild>
+        <Styled.Close asChild>
           <Button
             title="Close"
             color="secondary-light"
@@ -40,9 +34,9 @@ const Toast = ({ title, description, children, ...props }: Props) => {
           >
             <IoCloseOutline size={ICON_SIZES.SMALL} />
           </Button>
-        </ToastClose>
-      </ToastRoot>
-      <ToastViewport />
+        </Styled.Close>
+      </Styled.Container>
+      <Styled.Viewport />
     </>
   );
 };

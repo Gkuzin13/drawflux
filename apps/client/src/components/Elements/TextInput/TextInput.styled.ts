@@ -1,6 +1,6 @@
 import { styled } from 'shared';
 
-export const TextInputContainer = styled('div', {
+export const Container = styled('div', {
   display: 'flex',
   flexDirection: 'column',
 });
