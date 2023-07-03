@@ -3,7 +3,7 @@ import * as PanelStyled from '@/components/Panels/StylePanel/StylePanel.styled';
 import { ICON_SIZES } from '@/constants/icon';
 import { COLOR } from '@/constants/panels/style';
 import { getColorValue } from '@/utils/shape';
-import * as Styled from './ColorsGridStyled';
+import * as Styled from './ColorsGrid.styled';
 
 type Props = {
   value: string;

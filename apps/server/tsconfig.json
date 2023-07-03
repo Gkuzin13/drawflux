@@ -8,7 +8,9 @@
     "isolatedModules": true,
     "sourceMap": true,
     "types": ["vitest/globals"],
-    "baseUrl": "."
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src"]
 }
