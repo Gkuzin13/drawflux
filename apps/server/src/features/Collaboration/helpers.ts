@@ -1,5 +1,7 @@
+import type { User } from 'shared';
 import * as queries from '@/features/Page/queries/index';
-import type { CollabRoom } from './models';
+import { COLORS } from './constants';
+import type { CollabRoom, CollabUser } from './models';
 
 export function broadcast(
   room: CollabRoom,
@@ -19,4 +21,9 @@ export async function findPage(id: string) {
   } catch (error) {
     return null;
   }
+}
+
+export function getUnusedUserColor(users: CollabUser[]): User['color'] {
+  const usedColors = new Set(users.map((user) => user.color));
+  return COLORS.find((color) => !usedColors.has(color)) || COLORS[0];
 }

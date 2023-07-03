@@ -1,13 +1,26 @@
 import type { IncomingMessage } from 'http';
 import { type WSMessage, WSMessageUtil } from 'shared';
-import type { WebSocket } from 'ws';
-import { COLORS, MAX_USERS } from './constants';
-import { broadcast, findPage } from './helpers';
+import type { RawData, WebSocket } from 'ws';
+import { broadcast, findPage, getUnusedUserColor } from './helpers';
 import { CollabRoom, CollabUser } from './models';
 
 const rooms = new Map<string, InstanceType<typeof CollabRoom>>();
 
-export async function handleWSConnection(ws: WebSocket, req: IncomingMessage) {
+export async function initWSEvents(ws: WebSocket, req: IncomingMessage) {
+  const connection = await handleConnection(ws, req);
+
+  if (connection) {
+    const { room, user } = connection;
+
+    rooms.set(room.id, room);
+
+    ws.on('error', handleError);
+    ws.on('close', () => handleClose(ws, user, room));
+    ws.on('message', (rawMessage) => handleMessage(rawMessage, user, room));
+  }
+}
+
+export async function handleConnection(ws: WebSocket, req: IncomingMessage) {
   const url = req.url as string;
   const pageId = new URL(url, req.headers.origin).searchParams.get('id');
   const page = pageId ? await findPage(pageId) : null;
@@ -17,108 +30,78 @@ export async function handleWSConnection(ws: WebSocket, req: IncomingMessage) {
     return;
   }
 
-  const room = rooms.get(pageId);
+  const room = rooms.get(pageId) || new CollabRoom(pageId);
 
-  const usedColors = new Set(room ? room.users.map((user) => user.color) : []);
-  const userColor = COLORS.find((color) => !usedColors.has(color));
-  const user = new CollabUser('New User', userColor || COLORS[0], ws);
-
-  if (room) {
-    if (room.userCount() >= MAX_USERS) {
-      ws.close(
-        1011,
-        'Sorry, the collaborative drawing session has reached its maximum number of users.',
-      );
-      return;
-    }
-
-    room.addUser(user);
-
-    const roomJoinedMessage: WSMessage = {
-      type: 'room-joined',
-      data: { users: room.users, userId: user.id, nodes: page.nodes },
-    };
-
-    const userJoinedMessage: WSMessage = {
-      type: 'user-joined',
-      data: { user },
-    };
-
-    const serializedRoomJoinedMessage =
-      WSMessageUtil.serialize(roomJoinedMessage);
-    const serializedUserJoinedMessage =
-      WSMessageUtil.serialize(userJoinedMessage);
-
-    if (serializedRoomJoinedMessage && serializedUserJoinedMessage) {
-      ws.send(serializedRoomJoinedMessage);
-      broadcast(room, user.id, serializedUserJoinedMessage);
-    }
-  } else {
-    const newRoom = new CollabRoom(pageId, user);
-
-    const roomJoinedMessage: WSMessage = {
-      type: 'room-joined',
-      data: { users: newRoom.users, userId: user.id, nodes: page.nodes },
-    };
-
-    const message = WSMessageUtil.serialize(roomJoinedMessage);
-
-    if (message) {
-      ws.send(message);
-      rooms.set(pageId, newRoom);
-    }
+  if (room.hasReachedMaxUsers()) {
+    ws.close(
+      1011,
+      'Sorry, the collaborative drawing session has reached its maximum number of users.',
+    );
+    return;
   }
 
-  ws.on('error', console.error);
+  const userColor = getUnusedUserColor(room.users);
+  const user = new CollabUser('New User', userColor, ws);
 
-  ws.on('close', () => {
-    const roomToUpdate = rooms.get(pageId);
+  room.addUser(user);
 
-    if (!roomToUpdate) {
-      return;
-    }
+  const roomJoinedMessage = WSMessageUtil.serialize({
+    type: 'room-joined',
+    data: { users: room.users, userId: user.id, nodes: page.nodes },
+  } as WSMessage);
 
-    roomToUpdate.removeUser(user.id);
+  roomJoinedMessage && ws.send(roomJoinedMessage);
 
-    rooms.set(pageId, roomToUpdate);
+  if (room.hasMultipleUsers()) {
+    const userJoinedMessage = WSMessageUtil.serialize({
+      type: 'user-joined',
+      data: { user },
+    } as WSMessage);
 
-    const userLeftMessage: WSMessage = {
-      type: 'user-left',
-      data: { id: user.id },
-    };
+    userJoinedMessage && broadcast(room, user.id, userJoinedMessage);
+  }
 
-    const message = WSMessageUtil.serialize(userLeftMessage);
+  return { room, user };
+}
 
-    if (message) {
-      broadcast(roomToUpdate, user.id, message);
-    }
+export function handleClose(ws: WebSocket, user: CollabUser, room: CollabRoom) {
+  room.removeUser(user.id);
 
-    if (roomToUpdate.users.length <= 0) {
-      ws.terminate();
-      rooms.delete(pageId);
-    }
-  });
+  if (room.isEmpty()) {
+    rooms.delete(room.id);
+    ws.terminate();
+    return;
+  }
 
-  ws.on('message', (rawMessage) => {
-    const message = rawMessage.toString();
-    const deserializedMessage = WSMessageUtil.deserialize(message);
-    const roomToUpdate = rooms.get(pageId);
+  const message = WSMessageUtil.serialize({
+    type: 'user-left',
+    data: { id: user.id },
+  } as WSMessage);
 
-    if (!deserializedMessage || !roomToUpdate) {
-      return;
-    }
+  message && broadcast(room, user.id, message);
+}
 
-    switch (deserializedMessage.type) {
-      case 'user-change': {
-        roomToUpdate.updateUser(deserializedMessage.data.user);
-        rooms.set(pageId, roomToUpdate);
-        broadcast(roomToUpdate, user.id, message);
+export function handleMessage(
+  rawMessage: RawData,
+  user: CollabUser,
+  room: CollabRoom,
+) {
+  const message = rawMessage.toString();
+  const deserializedMessage = WSMessageUtil.deserialize(message);
 
-        break;
-      }
-      default: {
-        broadcast(roomToUpdate, user.id, message);
-      }
-    }
-  });
+  if (!deserializedMessage) {
+    return;
+  }
+
+  if (deserializedMessage.type === 'user-change') {
+    room.updateUser(deserializedMessage.data.user);
+  }
+
+  if (room.hasMultipleUsers()) {
+    broadcast(room, user.id, message);
+  }
+}
+
+export function handleError(ws: WebSocket, error: Error) {
+  console.error(ws.url, error);
 }

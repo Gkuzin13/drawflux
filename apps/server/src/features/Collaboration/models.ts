@@ -1,14 +1,14 @@
 import { randomUUID } from 'crypto';
 import type { Point, Room, User } from 'shared';
 import type WebSocket from 'ws';
+import { MAX_USERS } from './constants';
 
 export class CollabRoom implements Room {
   id;
-  users;
+  users: CollabUser[] = [];
 
-  constructor(id: string, user: InstanceType<typeof CollabUser>) {
+  constructor(id: string) {
     this.id = id;
-    this.users = [user];
   }
 
   addUser(user: InstanceType<typeof CollabUser>) {
@@ -35,8 +35,16 @@ export class CollabRoom implements Room {
     this.users = this.users.filter((user) => user.id !== id);
   }
 
-  userCount() {
-    return this.users.length;
+  hasReachedMaxUsers() {
+    return this.users.length >= MAX_USERS;
+  }
+
+  hasMultipleUsers() {
+    return this.users.length > 1;
+  }
+
+  isEmpty() {
+    return this.users.length === 0;
   }
 }
 

@@ -1,7 +1,7 @@
 import { WebSocketServer } from 'ws';
 import app from '@/app';
 import config from '@/config';
-import { handleWSConnection } from '@/features/Collaboration/controller';
+import { initWSEvents } from '@/features/Collaboration/controller';
 import * as queries from '@/features/Page/mutators/index';
 import Jobs from '@/jobs/index';
 import { validateWSConnection } from '@/middlewares/ws-validator';
@@ -29,4 +29,4 @@ httpServer.on('upgrade', (req, socket, head) => {
   });
 });
 
-wsServer.on('connection', handleWSConnection);
+wsServer.on('connection', initWSEvents);
