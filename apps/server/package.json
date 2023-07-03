@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node --enable-source-maps dist/server.js",
     "dev": "nodemon --watch './**' --ext 'ts,json' --exec 'tsx src/server.ts'",
-    "build": "tsc --project tsconfig.build.json",
+    "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "test:watch": "vitest",
     "test": "vitest run",
     "lint": "eslint . --ext .ts",
@@ -24,6 +24,7 @@
     "pg": "^8.10.0",
     "qrcode": "^1.5.3",
     "shared": "workspace:^",
+    "tsc-alias": "^1.8.6",
     "ws": "^8.13.0"
   },
   "devDependencies": {
