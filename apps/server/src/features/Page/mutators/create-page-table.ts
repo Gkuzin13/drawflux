@@ -1,4 +1,4 @@
-import * as db from '../../database/index';
+import * as db from '@/database/index';
 
 const query = `CREATE TABLE IF NOT EXISTS pages (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

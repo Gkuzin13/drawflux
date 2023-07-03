@@ -6,9 +6,9 @@ import type {
   StageConfig,
 } from 'shared';
 import request from 'supertest';
-import app from '../../../app.js';
-import * as db from '../../database/index';
-import queries from '../../queries/index';
+import app from '@/app';
+import * as db from '@/database/index';
+import * as mutators from '../mutators/index';
 
 const mockNode: NodeObject = {
   nodeProps: { id: randomUUID(), point: [0, 0], rotation: 0, visible: true },
@@ -27,7 +27,7 @@ const mockStageConfig: StageConfig = { position: { x: 0, y: 0 }, scale: 1 };
 
 describe('db queries', () => {
   beforeEach(async () => {
-    await queries.createPagesTable();
+    await mutators.createPagesTable();
   });
 
   afterEach(async () => {

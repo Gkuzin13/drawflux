@@ -1,12 +1,12 @@
-import Jobs from './api/jobs/index';
-import queries from './api/queries/index';
-import { openNewWSConnection } from './api/services/collaboration/handlers';
-import app from './app';
-import config from './config';
+import { WebSocketServer } from 'ws';
+import app from '@/app';
+import config from '@/config';
+import { handleWSConnection } from '@/features/Collaboration/controller';
+import * as queries from '@/features/Page/mutators/index';
+import Jobs from '@/jobs/index';
+import { validateWSConnection } from '@/middlewares/ws-validator';
 
-(async () => {
-  await queries.createPagesTable();
-})();
+queries.createPagesTable();
 
 Jobs.deleteExpiredPages.start();
 
@@ -15,4 +15,18 @@ const httpServer = app.listen(config.port, '0.0.0.0', () => {
   console.log(`App is listening on http://localhost:${config.port}`);
 });
 
-httpServer.on('upgrade', openNewWSConnection);
+const wsServer = new WebSocketServer({ noServer: true, path: '/page' });
+
+httpServer.on('upgrade', (req, socket, head) => {
+  wsServer.handleUpgrade(req, socket, head, (ws) => {
+    const validated = validateWSConnection(req);
+
+    if (validated) {
+      wsServer.emit('connection', ws, req);
+    } else {
+      ws.close(1011, 'Bad request');
+    }
+  });
+});
+
+wsServer.on('connection', handleWSConnection);

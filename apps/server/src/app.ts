@@ -2,7 +2,7 @@ import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
-import { mountRoutes } from './api/routes/index';
+import { appRoutes } from '@/routes/index';
 import config from './config/index';
 
 const app = express();
@@ -23,6 +23,6 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-mountRoutes(app);
+appRoutes(app);
 
 export default app;

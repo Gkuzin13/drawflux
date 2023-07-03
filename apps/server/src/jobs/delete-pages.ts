@@ -1,5 +1,5 @@
 import { CronJob } from 'cron';
-import * as db from '../database/index';
+import * as db from '@/database/index';
 
 const query = `DELETE FROM pages WHERE created_at < now()-'24 hours'::interval RETURNING *;`;
 

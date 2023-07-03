@@ -1,6 +1,6 @@
 import pg from 'pg';
 import { BadRequestError, type NodeObject, type StageConfig } from 'shared';
-import * as db from '../../database/index';
+import * as db from '@/database/index';
 
 export type GetPageValues = [PageId: string];
 export type GetPageReturn = {

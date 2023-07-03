@@ -1,55 +1,15 @@
 import type { IncomingMessage } from 'http';
-import type internal from 'stream';
-import { type WSMessage, WSMessageUtil, type User } from 'shared';
-import { WebSocketServer } from 'ws';
-import queries from '../../queries';
+import { type WSMessage, WSMessageUtil } from 'shared';
+import type { WebSocket } from 'ws';
+import { COLORS, MAX_USERS } from './constants';
+import { broadcast, findPage } from './helpers';
 import { CollabRoom, CollabUser } from './models';
 
-const MAX_USERS = 4;
-
-const colorNames = [
-  'teal600',
-  'light-blue600',
-  'indigo600',
-  'gray600',
-] as User['color'][];
-
-const wss = new WebSocketServer({ noServer: true });
 const rooms = new Map<string, InstanceType<typeof CollabRoom>>();
 
-export function openNewWSConnection(
-  req: IncomingMessage,
-  socket: internal.Duplex,
-  head: Buffer,
-) {
-  wss.handleUpgrade(req, socket, head, (ws) => {
-    wss.emit('connection', ws, req);
-  });
-}
-
-function broadcast(room: CollabRoom, broadcasterId: string, message: string) {
-  room.users.forEach((user) => {
-    if (user.id !== broadcasterId) {
-      user.getWS().send(message);
-    }
-  });
-}
-
-async function findPage(id: string) {
-  try {
-    return (await queries.getPage(id)).page;
-  } catch (error) {
-    return null;
-  }
-}
-
-wss.on('connection', async (ws, req) => {
-  if (!req.url || !req.headers.origin) {
-    ws.close(1011, 'Bad request');
-    return;
-  }
-
-  const pageId = new URL(req.url, req.headers.origin).searchParams.get('id');
+export async function handleWSConnection(ws: WebSocket, req: IncomingMessage) {
+  const url = req.url as string;
+  const pageId = new URL(url, req.headers.origin).searchParams.get('id');
   const page = pageId ? await findPage(pageId) : null;
 
   if (!page || !pageId) {
@@ -59,9 +19,9 @@ wss.on('connection', async (ws, req) => {
 
   const room = rooms.get(pageId);
 
-  const usedColors = new Set(room?.users.map((user) => user.color) || []);
-  const userColor = colorNames.find((color) => !usedColors.has(color));
-  const user = new CollabUser('New User', userColor || colorNames[0], ws);
+  const usedColors = new Set(room ? room.users.map((user) => user.color) : []);
+  const userColor = COLORS.find((color) => !usedColors.has(color));
+  const user = new CollabUser('New User', userColor || COLORS[0], ws);
 
   if (room) {
     if (room.userCount() >= MAX_USERS) {
@@ -150,10 +110,10 @@ wss.on('connection', async (ws, req) => {
 
     switch (deserializedMessage.type) {
       case 'user-change': {
-        broadcast(roomToUpdate, user.id, message);
-
         roomToUpdate.updateUser(deserializedMessage.data.user);
         rooms.set(pageId, roomToUpdate);
+        broadcast(roomToUpdate, user.id, message);
+
         break;
       }
       default: {
@@ -161,4 +121,4 @@ wss.on('connection', async (ws, req) => {
       }
     }
   });
-});
+}

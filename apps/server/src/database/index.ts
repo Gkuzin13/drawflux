@@ -1,6 +1,6 @@
 import pg from 'pg';
 import type { PoolClient, QueryConfig } from 'pg';
-import config from '../../config';
+import config from '@/config';
 
 const poolClient = new pg.Pool({
   connectionString: config.isProduction ? config.pgConnectionUri : undefined,
