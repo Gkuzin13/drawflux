@@ -8,3 +8,5 @@ export const COLORS = [
   'indigo600',
   'gray600',
 ] as User['color'][];
+
+export const DEFAULT_COLOR: User['color'] = 'gray600';
