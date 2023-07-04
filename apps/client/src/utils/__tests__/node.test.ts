@@ -1,5 +1,5 @@
 import { nodesGenerator } from '@/test/data-generators';
-import { createNode, reorderNodes } from '../node';
+import { createNode, duplicateNodes, reorderNodes } from '../node';
 
 describe('createNode', () => {
   it('should create a node object correctly', () => {
@@ -109,5 +109,19 @@ describe('reorderNodes', () => {
     const reorderedNodes = reorderNodes(idsToReorder, []).toStart();
 
     expect(reorderedNodes.map((node) => node.nodeProps.id)).toEqual([]);
+  });
+});
+
+describe('duplicateNodes', () => {
+  it('should duplicate nodes correctly', () => {
+    const nodes = nodesGenerator(5);
+    const duplicatedNodes = duplicateNodes(nodes);
+
+    expect(duplicatedNodes).toHaveLength(nodes.length);
+
+    duplicatedNodes.forEach((node, index) => {
+      expect(node.nodeProps.id).not.toBe(nodes[index].nodeProps.id);
+      expect(node.nodeProps.point).not.toEqual(nodes[index].nodeProps.point);
+    });
   });
 });

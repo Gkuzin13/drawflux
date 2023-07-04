@@ -1,49 +1,38 @@
 import type { IncomingMessage } from 'http';
 import { type WSMessage, WSMessageUtil } from 'shared';
-import type { RawData, WebSocket } from 'ws';
-import { broadcast, findPage, getUnusedUserColor } from './helpers';
+import type { RawData } from 'ws';
+import { type PatchedWebSocket } from '@/services/websocket';
+import { findPage, getUnusedUserColor } from './helpers';
 import { CollabRoom, CollabUser } from './models';
 
 const rooms = new Map<string, InstanceType<typeof CollabRoom>>();
 
-export async function initWSEvents(ws: WebSocket, req: IncomingMessage) {
-  const connection = await handleConnection(ws, req);
-
-  if (connection) {
-    const { room, user } = connection;
-
-    rooms.set(room.id, room);
-
-    ws.on('error', handleError);
-    ws.on('close', () => handleClose(ws, user, room));
-    ws.on('message', (rawMessage) => handleMessage(rawMessage, user, room));
-  }
-}
-
-export async function handleConnection(ws: WebSocket, req: IncomingMessage) {
+export async function initCollabConnection(
+  ws: PatchedWebSocket,
+  req: IncomingMessage,
+) {
   const url = req.url as string;
   const pageId = new URL(url, req.headers.origin).searchParams.get('id');
   const page = pageId ? await findPage(pageId) : null;
 
   if (!page || !pageId) {
-    ws.close(1011, 'Page not found');
-    return;
+    return ws.close(1011, 'Page not found');
   }
 
   const room = rooms.get(pageId) || new CollabRoom(pageId);
 
   if (room.hasReachedMaxUsers()) {
-    ws.close(
+    return ws.close(
       1011,
       'Sorry, the collaborative drawing session has reached its maximum number of users.',
     );
-    return;
   }
 
   const userColor = getUnusedUserColor(room.users);
   const user = new CollabUser('New User', userColor, ws);
 
   room.addUser(user);
+  rooms.set(room.id, room);
 
   const roomJoinedMessage = WSMessageUtil.serialize({
     type: 'room-joined',
@@ -58,30 +47,23 @@ export async function handleConnection(ws: WebSocket, req: IncomingMessage) {
       data: { user },
     } as WSMessage);
 
-    userJoinedMessage && broadcast(room, user.id, userJoinedMessage);
+    userJoinedMessage && room.broadcast(user.id, userJoinedMessage);
   }
 
-  return { room, user };
+  ws.on('message', (rawMessage) => onMessage(rawMessage, user, room));
+  ws.on('close', () => onClose(ws, user, room));
 }
 
-export function handleClose(ws: WebSocket, user: CollabUser, room: CollabRoom) {
-  room.removeUser(user.id);
-
-  if (room.isEmpty()) {
-    rooms.delete(room.id);
-    ws.terminate();
-    return;
-  }
-
-  const message = WSMessageUtil.serialize({
-    type: 'user-left',
-    data: { id: user.id },
-  } as WSMessage);
-
-  message && broadcast(room, user.id, message);
+export function onClose(
+  ws: PatchedWebSocket,
+  user: CollabUser,
+  room: CollabRoom,
+) {
+  leaveRoom(user, room);
+  ws.terminate();
 }
 
-export function handleMessage(
+export function onMessage(
   rawMessage: RawData,
   user: CollabUser,
   room: CollabRoom,
@@ -98,10 +80,21 @@ export function handleMessage(
   }
 
   if (room.hasMultipleUsers()) {
-    broadcast(room, user.id, message);
+    room.broadcast(user.id, message);
   }
 }
 
-export function handleError(ws: WebSocket, error: Error) {
-  console.error(ws.url, error);
+export function leaveRoom(user: CollabUser, room: CollabRoom) {
+  room.removeUser(user.id);
+
+  if (room.isEmpty()) {
+    return rooms.delete(room.id);
+  }
+
+  const message = WSMessageUtil.serialize({
+    type: 'user-left',
+    data: { id: user.id },
+  } as WSMessage);
+
+  message && room.broadcast(user.id, message);
 }

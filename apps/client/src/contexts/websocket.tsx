@@ -82,7 +82,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       if (serverErrorCodes.includes(event.code)) {
         modal.open('Error', event.reason);
       } else {
-        modal.open('Disconnected', event.reason);
+        modal.open('Live collaboration', 'Disconnected');
       }
     };
 
