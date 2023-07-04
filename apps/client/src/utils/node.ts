@@ -1,7 +1,7 @@
 import type { IRect } from 'konva/lib/types';
 import type { NodeType, Point, NodeObject, NodeProps } from 'shared';
 import { v4 as uuid } from 'uuid';
-import { getNodeRect, isNodePartiallyInView } from './position';
+import { calculateDuplicationDistance, isNodeFullyInView } from './position';
 
 export const createNode = (type: NodeType, point: Point): NodeObject => {
   return {
@@ -109,16 +109,7 @@ export function reorderNodes(nodesIdsToReorder: string[], nodes: NodeObject[]) {
 const DUPLICATION_GAP = 16;
 
 export function duplicateNodes(nodes: NodeObject[]): NodeObject[] {
-  const nodeMinXEdge = Math.min(...nodes.map((node) => getNodeRect(node).x));
-  const nodeMaxXEdge = Math.max(
-    ...nodes.map((node) => {
-      const { x, width } = getNodeRect(node);
-      return x + width;
-    }),
-  );
-
-  const duplicationStartXPoint = nodeMaxXEdge + DUPLICATION_GAP;
-  const distance = duplicationStartXPoint - nodeMinXEdge;
+  const distance = calculateDuplicationDistance(nodes, DUPLICATION_GAP);
 
   return nodes.map((node) => {
     const updatedNodeProps: Partial<NodeProps> = {
@@ -142,7 +133,5 @@ export function allNodesInView(
   stageRect: IRect,
   stageScale: number,
 ) {
-  return nodes.every((node) =>
-    isNodePartiallyInView(node, stageRect, stageScale),
-  );
+  return nodes.every((node) => isNodeFullyInView(node, stageRect, stageScale));
 }

@@ -62,7 +62,7 @@ export function getVisibleBoundaries(rect: IRect, scale: number): IRect {
   };
 }
 
-export function isNodePartiallyInView(
+export function isNodeFullyInView(
   node: NodeObject,
   stageRect: IRect,
   stageScale: number,
@@ -138,4 +138,22 @@ export function getNormalizedInvertedRect(rect: IRect, scale: number): IRect {
     width: rect.width / scale,
     height: rect.width / scale,
   };
+}
+
+export function calculateDuplicationDistance(
+  nodes: NodeObject[],
+  gap = 0,
+): number {
+  const nodeMinXEdge = Math.min(...nodes.map((node) => getNodeRect(node).x));
+  const nodeMaxXEdge = Math.max(
+    ...nodes.map((node) => {
+      const { x, width } = getNodeRect(node);
+      return x + width;
+    }),
+  );
+
+  const duplicationStartXPoint = nodeMaxXEdge + gap;
+  const distance = duplicationStartXPoint - nodeMinXEdge;
+
+  return distance;
 }
