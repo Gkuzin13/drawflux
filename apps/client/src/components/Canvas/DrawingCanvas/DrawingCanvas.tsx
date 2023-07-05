@@ -81,7 +81,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
     const { userId } = useAppSelector(selectCollaboration);
 
-    const notifications = useNotifications();
+    const { addNotification } = useNotifications();
 
     const dispatch = useAppDispatch();
 
@@ -105,13 +105,13 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
     useEffect(() => {
       if (error) {
-        notifications.add({
+        addNotification({
           title: 'Error',
           description: 'Failed to update the drawing',
           type: 'error',
         });
       }
-    }, [error, notifications]);
+    }, [error, addNotification]);
 
     const handleDraftEnd = useCallback(
       (node: NodeObject, resetToolType = true) => {
@@ -407,27 +407,33 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [stageConfig, dispatch],
     );
 
-    const handleNodesChange = (nodes: NodeObject[]) => {
-      dispatch(canvasActions.updateNodes(nodes));
+    const handleNodesChange = useCallback(
+      (nodes: NodeObject[]) => {
+        dispatch(canvasActions.updateNodes(nodes));
 
-      if (ws?.isConnected && ws?.pageId) {
-        const message: WSMessage = {
-          type: 'nodes-update',
-          data: { nodes },
-        };
+        if (ws?.isConnected && ws?.pageId) {
+          const message: WSMessage = {
+            type: 'nodes-update',
+            data: { nodes },
+          };
 
-        sendMessage(ws.connection, message);
+          sendMessage(ws.connection, message);
 
-        const currentNodes = store.getState().canvas.present.nodes;
-        updatePage({ nodes: currentNodes });
-      }
-    };
+          const currentNodes = store.getState().canvas.present.nodes;
+          updatePage({ nodes: currentNodes });
+        }
+      },
+      [ws, updatePage, dispatch],
+    );
 
-    const handleNodePress = (nodeId: string) => {
-      if (toolType === 'select') {
-        dispatch(canvasActions.setSelectedNodesIds([nodeId]));
-      }
-    };
+    const handleNodePress = useCallback(
+      (nodeId: string) => {
+        if (toolType === 'select') {
+          dispatch(canvasActions.setSelectedNodesIds([nodeId]));
+        }
+      },
+      [toolType, dispatch],
+    );
 
     return (
       <Stage

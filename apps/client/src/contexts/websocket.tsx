@@ -41,7 +41,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const dispatch = useAppDispatch();
 
   const modal = useModal();
-  const notifications = useNotifications();
+  const { addNotification } = useNotifications();
 
   useEffect(() => {
     if (attemptedConnection || !pageId) {
@@ -54,7 +54,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       const message = WSMessageUtil.deserialize(event.data);
 
       if (message?.type === 'room-joined') {
-        notifications.add({
+        addNotification({
           title: 'Live collaboration',
           description: 'You are connected',
           type: 'success',
@@ -87,7 +87,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     };
 
     const onError = () => {
-      notifications.add({
+      addNotification({
         title: 'Connection',
         description: 'Something went wrong',
         type: 'error',
@@ -101,7 +101,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     webSocket.addEventListener('error', onError);
 
     attemptedConnection = true;
-  }, [modal, notifications, dispatch]);
+  }, [modal, addNotification, dispatch]);
 
   return (
     <WebSocketContext.Provider

@@ -77,19 +77,19 @@ const NodeMenu = () => {
   );
 
   const { selectedNodesIds } = useAppSelector(selectCanvas);
-  const notifications = useNotifications();
+  const { addNotification } = useNotifications();
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (error) {
-      notifications.add({
+      addNotification({
         title: 'Error',
         description: 'Could not update page',
         type: 'error',
       });
     }
-  }, [error, notifications]);
+  }, [error, addNotification]);
 
   const dispatchNodesAction = useCallback(
     (action: ActionCreatorWithPayload<string[]>) => {

@@ -15,13 +15,13 @@ type Notification = {
 };
 
 type NotificationContextValue = {
-  add: (args: Notification) => void;
-  remove: (id: string) => void;
+  addNotification: (args: Notification) => void;
+  removeNotification: (id: string) => void;
 };
 
 export const NotificationsContext = createContext<NotificationContextValue>({
-  add: () => null,
-  remove: () => null,
+  addNotification: () => null,
+  removeNotification: () => null,
 });
 
 export const NotificationsProvider = ({ children }: PropsWithChildren) => {
@@ -48,8 +48,8 @@ export const NotificationsProvider = ({ children }: PropsWithChildren) => {
   return (
     <NotificationsContext.Provider
       value={{
-        add: handleAddNotification,
-        remove: handleRemoveNotification,
+        addNotification: handleAddNotification,
+        removeNotification: handleRemoveNotification,
       }}
     >
       <ToastProvider>
