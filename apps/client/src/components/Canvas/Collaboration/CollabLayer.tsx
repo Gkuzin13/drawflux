@@ -20,7 +20,7 @@ import { throttleFn } from '@/utils/throttle';
 import { sendMessage } from '@/utils/websocket';
 import { type DrawableType, drawTypes } from '../DrawingCanvas/helpers/draw';
 import DraftNode from '../Node/DraftNode';
-import UserCursor from './UserCursor';
+import UserCursor from './UserCursor/UserCursor';
 
 type Props = {
   stageScale: number;

@@ -9,7 +9,6 @@ import { ICON_SIZES } from '@/constants/icon';
 import useFetch from '@/hooks/useFetch';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
-import { store } from '@/stores/store';
 import { urlSearchParam } from '@/utils/url';
 import * as Styled from './SharePanel.styled';
 

@@ -42,6 +42,7 @@ const WSNodesActionMap: Partial<
   'canvas/moveNodesToEnd': 'nodes-move-to-end',
   'canvas/moveNodesBackward': 'nodes-move-backward',
   'canvas/moveNodesForward': 'nodes-move-forward',
+  'canvas/deleteNodes': 'nodes-delete',
 };
 
 const CanvasMenu = () => {
