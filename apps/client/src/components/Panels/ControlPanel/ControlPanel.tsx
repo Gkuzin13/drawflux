@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { ICON_SIZES } from '@/constants/icon';
 import { CONTROL, type ControlAction } from '@/constants/panels/control';
 import { getKeyTitle } from '@/utils/string';
@@ -25,6 +26,7 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
         return false;
     }
   };
+
   return (
     <PanelStyled.Panel>
       {CONTROL.map((control) => {
@@ -46,4 +48,4 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
   );
 };
 
-export default ControlPanel;
+export default memo(ControlPanel);

@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, memo } from 'react';
 import Divider from '@/components/Elements/Divider/Divider';
 import { ICON_SIZES } from '@/constants/icon';
 import { TOOLS, type Tool } from '@/constants/panels/tools';
@@ -32,4 +32,4 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
   );
 };
 
-export default ToolsPanel;
+export default memo(ToolsPanel);

@@ -1,4 +1,5 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+import { memo } from 'react';
 import { IoEllipsisHorizontal } from 'react-icons/io5';
 import { ICON_SIZES } from '@/constants/icon';
 import {
@@ -41,4 +42,4 @@ const MenuPanel = ({ disabledItems, onAction }: Props) => {
   );
 };
 
-export default MenuPanel;
+export default memo(MenuPanel);

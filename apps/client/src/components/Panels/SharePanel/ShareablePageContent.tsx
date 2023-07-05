@@ -7,14 +7,13 @@ import Loader from '@/components/Elements/Loader/Loader';
 import { PAGE_URL_SEARCH_PARAM_KEY } from '@/constants/app';
 import { ICON_SIZES } from '@/constants/icon';
 import useFetch from '@/hooks/useFetch';
+import { useAppSelector } from '@/stores/hooks';
+import { selectCanvas } from '@/stores/slices/canvas';
+import { store } from '@/stores/store';
 import { urlSearchParam } from '@/utils/url';
 import * as Styled from './SharePanel.styled';
 
-type Props = {
-  page: SharePageRequestBody['page'];
-};
-
-const SharablePageContent = ({ page }: Props) => {
+const SharablePageContent = () => {
   const [{ data, status }, sharePage] = useFetch<
     SharePageResponse,
     SharePageRequestBody
@@ -25,6 +24,8 @@ const SharablePageContent = ({ page }: Props) => {
     },
     { skip: true },
   );
+
+  const { nodes, stageConfig } = useAppSelector(selectCanvas);
 
   useEffect(() => {
     if (data?.id) {
@@ -37,11 +38,11 @@ const SharablePageContent = ({ page }: Props) => {
   }, [data]);
 
   const handlePageShare = () => {
-    if (!page.nodes.length) {
+    if (!nodes.length) {
       return;
     }
 
-    sharePage({ page });
+    sharePage({ page: { nodes, stageConfig } });
   };
 
   return (
@@ -50,7 +51,7 @@ const SharablePageContent = ({ page }: Props) => {
         align="start"
         color="secondary-light"
         size="extra-small"
-        disabled={!page.nodes.length}
+        disabled={!nodes.length}
         onClick={handlePageShare}
       >
         {status === 'idle' && <TbLink size={ICON_SIZES.SMALL} />}
