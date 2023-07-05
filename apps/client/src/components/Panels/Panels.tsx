@@ -1,5 +1,12 @@
 import type Konva from 'konva';
-import { type RefObject, useMemo, useEffect, lazy, Suspense } from 'react';
+import {
+  type RefObject,
+  useMemo,
+  useEffect,
+  lazy,
+  Suspense,
+  useCallback,
+} from 'react';
 import type {
   NodeStyle,
   NodeObject,
@@ -32,7 +39,7 @@ import ControlPanel from './ControlPanel/ControlPanel';
 import MenuPanel, { type MenuKey } from './MenuPanel/MenuPanel';
 import * as Styled from './Panels.styled';
 import SharePanel from './SharePanel/SharePanel';
-import StylePanel, { type StylePanelProps } from './StylePanel/StylePanel';
+import StylePanel from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
 
@@ -62,7 +69,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   const { online } = useNetworkState();
 
   const modal = useModal();
-  const notifications = useNotifications();
+  const { addNotification } = useNotifications();
 
   const dispatch = useAppDispatch();
 
@@ -80,44 +87,6 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
     };
   }, [past, future, intersectedNodesIds]);
 
-  const stylePanelEnabledOptions = useMemo<
-    StylePanelProps['enabledOptions']
-  >(() => {
-    const selectedNodesTypes = selectedNodes.map(({ type }) => type);
-
-    if (selectedNodesTypes.includes('text')) {
-      return { line: false, size: true };
-    }
-
-    return { line: true, size: true };
-  }, [selectedNodes]);
-
-  const selectedNodesStyle = useMemo(() => {
-    const styles: NodeStyle[] = selectedNodes.map(({ style }) => style);
-
-    const colors = new Set(styles.map(({ color }) => color));
-    const lines = new Set(styles.map(({ line }) => line));
-    const sizes = new Set(styles.map(({ size }) => size));
-    const opacities = new Set(styles.map(({ opacity }) => opacity));
-    const allShapesAnimated = styles.every(({ animated }) => animated);
-
-    const getValueIfAllIdentical = <T extends string | number | boolean>(
-      set: Set<T>,
-    ): T | undefined => {
-      return set.size === 1 ? [...set][0] : undefined;
-    };
-
-    return {
-      color: getValueIfAllIdentical(colors),
-      line: getValueIfAllIdentical(lines),
-      size: getValueIfAllIdentical(sizes),
-      opacity: getValueIfAllIdentical(opacities),
-      animated: allShapesAnimated,
-    };
-  }, [selectedNodes]);
-
-  const isStylePanelActive = selectedNodes.length > 0;
-
   const disabledMenuItems = useMemo((): MenuKey[] | null => {
     if (ws?.isConnected) {
       return ['import-json'];
@@ -127,138 +96,167 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
   useEffect(() => {
     if (error) {
-      notifications.add({
+      addNotification({
         title: 'Error',
         description: 'Could not update page',
         type: 'error',
       });
     }
-  }, [error, notifications]);
+  }, [error, addNotification]);
 
-  const handleToolSelect = (type: Tool['value']) => {
-    dispatch(canvasActions.setToolType(type));
-  };
+  const handleToolSelect = useCallback(
+    (type: Tool['value']) => {
+      dispatch(canvasActions.setToolType(type));
+    },
+    [dispatch],
+  );
 
-  const handleUpdatePage = () => {
+  const handleUpdatePage = useCallback(() => {
     const currentNodes = store.getState().canvas.present.nodes;
     updatePage({ nodes: currentNodes });
-  };
+  }, [updatePage]);
 
-  const handleStyleChange = (style: Partial<NodeStyle>, updateAsync = true) => {
-    const updatedNodes = selectedNodes.map((node) => {
-      return { ...node, style: { ...node.style, ...style } };
-    });
+  const handleStyleChange = useCallback(
+    (style: Partial<NodeStyle>, updateAsync = true) => {
+      const { selectedNodesIds, nodes } = store.getState().canvas.present;
 
-    dispatch(canvasActions.updateNodes(updatedNodes));
+      const updatedNodes = nodes
+        .filter((node) => node.nodeProps.id in selectedNodesIds)
+        .map((node) => {
+          return { ...node, style: { ...node.style, ...style } };
+        });
 
-    if (ws?.isConnected && ws.pageId) {
-      const message: WSMessage = {
-        type: 'nodes-update',
-        data: { nodes: updatedNodes },
-      };
+      dispatch(canvasActions.updateNodes(updatedNodes));
 
-      sendMessage(ws.connection, message);
-
-      updateAsync && handleUpdatePage();
-    }
-  };
-
-  const handleMenuAction = async (type: MenuPanelActionType) => {
-    switch (type) {
-      case 'export-as-image': {
-        const dataUrl = stageRef.current?.toDataURL();
-
-        if (dataUrl) {
-          downloadDataUrlAsFile(dataUrl, 'export-image');
-        }
-        break;
-      }
-      case 'export-as-json': {
-        const state = store.getState().canvas.present;
-
-        const stateToExport = {
-          stageConfig: state.stageConfig,
-          nodes: state.nodes,
-        };
-
-        const dataUrl = URL.createObjectURL(
-          new Blob([JSON.stringify(stateToExport)], {
-            type: 'application/json',
-          }),
-        );
-
-        downloadDataUrlAsFile(dataUrl, 'export-json');
-        break;
-      }
-      case 'import-json': {
-        try {
-          const jsonData = await loadJsonFile<{
-            nodes: NodeObject[];
-            stageConfig: StageConfig;
-          }>(Schemas.Page.shape.page);
-
-          if (!jsonData) {
-            throw new Error('Could not load file');
-          }
-
-          dispatch(
-            canvasActions.set({ ...jsonData, toolType, selectedNodesIds: {} }),
-          );
-        } catch (error) {
-          if (error instanceof Error) {
-            modal.open('Error', error.message as string);
-          }
-        }
-      }
-    }
-  };
-
-  const handleZoomChange = (value: number) => {
-    dispatch(canvasActions.setStageConfig({ ...stageConfig, scale: value }));
-  };
-
-  const handleControlActions = (action: ControlAction) => {
-    if (action.type === 'canvas/deleteNodes') {
-      dispatch(canvasActions.deleteNodes(intersectedNodesIds));
-
-      if (ws?.isConnected) {
+      if (ws?.isConnected && ws.pageId) {
         const message: WSMessage = {
-          type: 'nodes-delete',
-          data: { nodesIds: intersectedNodesIds },
+          type: 'nodes-update',
+          data: { nodes: updatedNodes },
         };
 
         sendMessage(ws.connection, message);
+
+        updateAsync && handleUpdatePage();
       }
-      return;
-    }
+    },
+    [ws, dispatch, handleUpdatePage],
+  );
 
-    dispatch(action());
+  const handleMenuAction = useCallback(
+    (type: MenuPanelActionType) => {
+      switch (type) {
+        case 'export-as-image': {
+          const dataUrl = stageRef.current?.toDataURL();
 
-    if (ws?.isConnected) {
-      const historyAction = action.type === 'history/redo' ? 'redo' : 'undo';
+          if (dataUrl) {
+            downloadDataUrlAsFile(dataUrl, 'export-image');
+          }
+          break;
+        }
+        case 'export-as-json': {
+          const state = store.getState().canvas.present;
 
-      const message: WSMessage = {
-        type: 'history-change',
-        data: { action: historyAction },
-      };
+          const stateToExport = {
+            stageConfig: state.stageConfig,
+            nodes: state.nodes,
+          };
 
-      sendMessage(ws.connection, message);
-      handleUpdatePage();
-    }
-  };
+          const dataUrl = URL.createObjectURL(
+            new Blob([JSON.stringify(stateToExport)], {
+              type: 'application/json',
+            }),
+          );
 
-  const handleUserChange = (user: User) => {
-    if (ws?.isConnected) {
-      const message: WSMessage = {
-        type: 'user-change',
-        data: { user },
-      };
+          downloadDataUrlAsFile(dataUrl, 'export-json');
+          break;
+        }
+        case 'import-json': {
+          const getJsonData = async () => {
+            try {
+              const jsonData = await loadJsonFile<{
+                nodes: NodeObject[];
+                stageConfig: StageConfig;
+              }>(Schemas.Page.shape.page);
 
-      sendMessage(ws.connection, message);
+              if (!jsonData) {
+                throw new Error('Could not load file');
+              }
 
-      dispatch(collaborationActions.updateUser(user));
-    }
-  };
+              dispatch(
+                canvasActions.set({
+                  ...jsonData,
+                  toolType,
+                  selectedNodesIds: {},
+                }),
+              );
+            } catch (error) {
+              if (error instanceof Error) {
+                modal.open('Error', error.message as string);
+              }
+            }
+          };
+          getJsonData();
+        }
+      }
+    },
+    [dispatch, modal, stageRef, toolType],
+  );
+
+  const handleZoomChange = useCallback(
+    (value: number) => {
+      dispatch(canvasActions.setStageConfig({ ...stageConfig, scale: value }));
+    },
+    [stageConfig, dispatch],
+  );
+
+  const handleControlActions = useCallback(
+    (action: ControlAction) => {
+      if (action.type === 'canvas/deleteNodes') {
+        dispatch(canvasActions.deleteNodes(intersectedNodesIds));
+
+        if (ws?.isConnected) {
+          const message: WSMessage = {
+            type: 'nodes-delete',
+            data: { nodesIds: intersectedNodesIds },
+          };
+
+          sendMessage(ws.connection, message);
+        }
+        return;
+      }
+
+      dispatch(action());
+
+      if (ws?.isConnected) {
+        const historyAction = action.type === 'history/redo' ? 'redo' : 'undo';
+
+        const message: WSMessage = {
+          type: 'history-change',
+          data: { action: historyAction },
+        };
+
+        sendMessage(ws.connection, message);
+        handleUpdatePage();
+      }
+    },
+    [ws, intersectedNodesIds, dispatch, handleUpdatePage],
+  );
+
+  const handleUserChange = useCallback(
+    (user: User) => {
+      if (ws?.isConnected) {
+        const message: WSMessage = {
+          type: 'user-change',
+          data: { user },
+        };
+
+        sendMessage(ws.connection, message);
+
+        dispatch(collaborationActions.updateUser(user));
+      }
+    },
+    [ws, dispatch],
+  );
 
   return (
     <Styled.Container>
@@ -268,9 +266,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
           enabledControls={enabledControls}
         />
         <StylePanel
-          active={isStylePanelActive}
-          style={selectedNodesStyle}
-          enabledOptions={stylePanelEnabledOptions}
+          selectedNodes={selectedNodes}
           onStyleChange={handleStyleChange}
         />
         <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
@@ -281,10 +277,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
         )}
         <Styled.TopPanelRightContainer>
           {online && (
-            <SharePanel
-              isPageShared={!!ws?.isConnected}
-              pageState={{ page: { nodes, stageConfig } }}
-            />
+            <SharePanel isPageShared={ws?.isConnected ? true : false} />
           )}
           <MenuPanel
             disabledItems={disabledMenuItems}

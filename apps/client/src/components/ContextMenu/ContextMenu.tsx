@@ -42,6 +42,7 @@ const WSNodesActionMap: Partial<
   'canvas/moveNodesToEnd': 'nodes-move-to-end',
   'canvas/moveNodesBackward': 'nodes-move-backward',
   'canvas/moveNodesForward': 'nodes-move-forward',
+  'canvas/deleteNodes': 'nodes-delete',
 };
 
 const CanvasMenu = () => {
@@ -77,19 +78,19 @@ const NodeMenu = () => {
   );
 
   const { selectedNodesIds } = useAppSelector(selectCanvas);
-  const notifications = useNotifications();
+  const { addNotification } = useNotifications();
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (error) {
-      notifications.add({
+      addNotification({
         title: 'Error',
         description: 'Could not update page',
         type: 'error',
       });
     }
-  }, [error, notifications]);
+  }, [error, addNotification]);
 
   const dispatchNodesAction = useCallback(
     (action: ActionCreatorWithPayload<string[]>) => {

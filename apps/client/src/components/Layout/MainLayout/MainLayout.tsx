@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type StageConfig } from 'shared';
 import DrawingCanvas from '@/components/Canvas/DrawingCanvas/DrawingCanvas';
 import {
-  getIntersectingNodes,
+  getNodesIntersectingWithRect,
   getPointerRect,
 } from '@/components/Canvas/DrawingCanvas/helpers/stage';
 import ContextMenu from '@/components/ContextMenu/ContextMenu';
@@ -75,8 +75,11 @@ const MainLayout = ({ viewportSize }: Props) => {
       const layer = stage.getLayers()[NODES_LAYER_INDEX];
 
       const pointerRect = getPointerRect(pointerPosition, stageConfig.scale);
-      const children = layer.getChildren((child) => !!child.id());
-      const nodesInClickArea = getIntersectingNodes(children, pointerRect);
+      const nodesInClickArea = getNodesIntersectingWithRect(
+        layer,
+        nodes,
+        pointerRect,
+      );
 
       const multipleNodesSelected = intersectedNodesIds.length > 1;
       const clickedOnNodes = !!nodesInClickArea.length;

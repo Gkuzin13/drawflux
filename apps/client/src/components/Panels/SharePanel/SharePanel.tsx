@@ -1,20 +1,16 @@
 import * as PopoverPrimitive from '@radix-ui/react-popover';
-import type {
-  QRCodeRequestBody,
-  QRCodeResponse,
-  SharePageRequestBody,
-} from 'shared';
+import { memo } from 'react';
+import type { QRCodeRequestBody, QRCodeResponse } from 'shared';
 import useFetch from '@/hooks/useFetch';
 import ShareablePageContent from './ShareablePageContent';
 import SharedPageContent from './SharedPageContent';
 import * as Styled from './SharePanel.styled';
 
 type Props = {
-  pageState: SharePageRequestBody;
   isPageShared: boolean;
 };
 
-const SharePanel = ({ pageState, isPageShared }: Props) => {
+const SharePanel = ({ isPageShared }: Props) => {
   const [{ data, error }, getQRCode] = useFetch<
     QRCodeResponse,
     QRCodeRequestBody
@@ -36,7 +32,7 @@ const SharePanel = ({ pageState, isPageShared }: Props) => {
           {isPageShared ? (
             <SharedPageContent qrCode={data} error={error} />
           ) : (
-            <ShareablePageContent page={pageState.page} />
+            <ShareablePageContent />
           )}
         </Styled.Content>
       </PopoverPrimitive.Portal>
@@ -44,4 +40,4 @@ const SharePanel = ({ pageState, isPageShared }: Props) => {
   );
 };
 
-export default SharePanel;
+export default memo(SharePanel);

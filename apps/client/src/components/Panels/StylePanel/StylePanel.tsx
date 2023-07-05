@@ -1,35 +1,70 @@
-import type { NodeColor, NodeStyle } from 'shared';
-import ColorsGrid from '@/components/Elements/ColorsGrid/ColorsGrid';
-import Slider from '@/components/Elements/Slider/Slider';
-import { ICON_SIZES } from '@/constants/icon';
-import { ANIMATED, LINE, OPACITY, SIZE } from '@/constants/panels/style';
+import { useMemo } from 'react';
+import type {
+  NodeColor,
+  NodeLine,
+  NodeObject,
+  NodeSize,
+  NodeStyle,
+} from 'shared';
+import { OPACITY } from '@/constants/panels/style';
 import { clamp } from '@/utils/math';
+import AnimatedSection from './AnimatedSection';
+import ColorSection from './ColorSection';
+import LineSection from './LineSection';
+import OpacitySection from './OpacitySection';
+import SizeSection from './SizeSection';
 import * as Styled from './StylePanel.styled';
 
 export type StylePanelProps = {
-  active: boolean;
-  style: Partial<NodeStyle>;
-  enabledOptions: {
-    line: boolean;
-    size: boolean;
-  };
+  selectedNodes: NodeObject[];
   onStyleChange: (
     updatedStyle: Partial<NodeStyle>,
     updateAsync?: boolean,
   ) => void;
 };
 
-const StylePanel = ({
-  active,
-  style,
-  enabledOptions,
-  onStyleChange,
-}: StylePanelProps) => {
+const StylePanel = ({ selectedNodes, onStyleChange }: StylePanelProps) => {
+  const style = useMemo(() => {
+    const styles: NodeStyle[] = selectedNodes.map(({ style }) => style);
+
+    const colors = new Set(styles.map(({ color }) => color));
+    const lines = new Set(styles.map(({ line }) => line));
+    const sizes = new Set(styles.map(({ size }) => size));
+    const opacities = new Set(styles.map(({ opacity }) => opacity));
+    const allShapesAnimated = styles.every(({ animated }) => animated);
+
+    const getValueIfAllIdentical = <T extends string | number | boolean>(
+      set: Set<T>,
+    ): T | undefined => {
+      return set.size === 1 ? [...set][0] : undefined;
+    };
+
+    return {
+      color: getValueIfAllIdentical(colors),
+      line: getValueIfAllIdentical(lines),
+      size: getValueIfAllIdentical(sizes),
+      opacity: getValueIfAllIdentical(opacities),
+      animated: allShapesAnimated,
+    };
+  }, [selectedNodes]);
+
+  const enabledOptions = useMemo(() => {
+    const selectedNodesTypes = selectedNodes.map(({ type }) => type);
+
+    if (selectedNodesTypes.includes('text')) {
+      return { line: false, size: true };
+    }
+
+    return { line: true, size: true };
+  }, [selectedNodes]);
+
+  const isActive = selectedNodes.length > 0;
+
   const handleColorSelect = (color: NodeColor) => {
     onStyleChange({ color });
   };
 
-  const handleLineSelect = (value: (typeof LINE)[number]['value']) => {
+  const handleLineSelect = (value: NodeLine) => {
     onStyleChange({
       animated: style.animated && value !== 'solid' ? true : false,
       line: value,
@@ -40,123 +75,43 @@ const StylePanel = ({
     onStyleChange({ animated: !style.animated });
   };
 
-  const handleSizeSelect = (sizeName: (typeof SIZE)[number]['name']) => {
-    const value = SIZE.find((s) => s.name === sizeName)?.value;
-
-    onStyleChange({ size: value });
+  const handleSizeSelect = (size: NodeSize) => {
+    onStyleChange({ size });
   };
 
-  const handleOpacityChange = (value: number, updateAsync = true) => {
+  const handleOpacitySelect = (value: number, commit = false) => {
     const clampedOpacity = clamp(value, OPACITY.minValue, OPACITY.maxValue);
-    onStyleChange({ opacity: clampedOpacity }, updateAsync);
+    onStyleChange({ opacity: clampedOpacity }, commit);
+  };
+
+  const handleOpacityChange = (value: number) => {
+    handleOpacitySelect(value);
+  };
+
+  const handleOpacityCommit = (value: number) => {
+    handleOpacitySelect(value, true);
   };
 
   return (
-    <Styled.Container active={active}>
-      <Styled.InnerContainer
-        defaultValue={style.color}
-        aria-label="Color"
-        aria-labelledby="shape-color"
-        orientation="horizontal"
-        value={style.color}
-        onValueChange={handleColorSelect}
-      >
-        <Styled.Label htmlFor="shape-color" css={{ fontSize: '$1' }}>
-          Color
-        </Styled.Label>
-        <ColorsGrid value={style.color || ''} onSelect={handleColorSelect} />
-      </Styled.InnerContainer>
-      <div aria-labelledby="Opacity">
-        <Styled.Label css={{ fontSize: '$1' }}>Opacity</Styled.Label>
-        <Slider
-          value={[style.opacity ?? OPACITY.maxValue]}
-          min={OPACITY.minValue}
-          max={OPACITY.maxValue}
-          step={OPACITY.step}
-          label="Opacity"
-          onValueChange={(values) => handleOpacityChange(values[0], false)}
-          onValueCommit={(values) => handleOpacityChange(values[0])}
-        />
-      </div>
+    <Styled.Container active={isActive}>
+      <ColorSection value={style.color} onColorChange={handleColorSelect} />
+      <OpacitySection
+        value={style.opacity}
+        onValueChange={handleOpacityChange}
+        onValueCommit={handleOpacityCommit}
+      />
       {enabledOptions.line && (
         <>
-          <Styled.InnerContainer
-            aria-label="Line"
-            aria-labelledby="shape-line"
-            orientation="horizontal"
-            value={style.line}
-            onValueChange={handleLineSelect}
-          >
-            <Styled.Label htmlFor="shape-line" css={{ fontSize: '$1' }}>
-              Line
-            </Styled.Label>
-            <Styled.Grid>
-              {LINE.map((line) => {
-                return (
-                  <Styled.Item
-                    aria-label="Select Line"
-                    key={line.value}
-                    value={line.value}
-                    title={line.name}
-                    checked={line.value === style.line}
-                    color={
-                      line.value === style.line
-                        ? 'secondary'
-                        : 'secondary-light'
-                    }
-                  >
-                    {line.icon({ size: ICON_SIZES.LARGE })}
-                  </Styled.Item>
-                );
-              })}
-            </Styled.Grid>
-          </Styled.InnerContainer>
-          <div aria-labelledby="shape-animated">
-            <Styled.Label htmlFor="shape-animated" css={{ fontSize: '$1' }}>
-              Animated
-            </Styled.Label>
-            <Styled.Toggle
-              aria-label="Toggle Animated"
-              title={ANIMATED.name}
-              pressed={style.animated}
-              color={style.animated ? 'primary' : 'secondary-light'}
-              disabled={style.line === 'solid'}
-              onPressedChange={handleAnimatedSelect}
-            >
-              {style.animated ? 'On' : 'Off'}
-            </Styled.Toggle>
-          </div>
+          <LineSection value={style.line} onLineChange={handleLineSelect} />
+          <AnimatedSection
+            value={style.animated}
+            isDisabled={style.line === 'solid'}
+            onAnimatedChange={handleAnimatedSelect}
+          />
         </>
       )}
       {enabledOptions.size && (
-        <Styled.InnerContainer
-          aria-label="Size"
-          aria-labelledby="shape-size"
-          orientation="horizontal"
-          value={SIZE.find((size) => size.value === style.size)?.name}
-          onValueChange={handleSizeSelect}
-        >
-          <Styled.Label htmlFor="shape-size" css={{ fontSize: '$1' }}>
-            Size
-          </Styled.Label>
-          <Styled.Grid>
-            {SIZE.map((size) => {
-              return (
-                <Styled.Item
-                  key={size.name}
-                  title={size.name}
-                  value={size.name}
-                  checked={size.value === style.size}
-                  color={
-                    size.value === style?.size ? 'secondary' : 'secondary-light'
-                  }
-                >
-                  {size.icon({ size: ICON_SIZES.SMALL })}
-                </Styled.Item>
-              );
-            })}
-          </Styled.Grid>
-        </Styled.InnerContainer>
+        <SizeSection value={style.size} onSizeChange={handleSizeSelect} />
       )}
     </Styled.Container>
   );

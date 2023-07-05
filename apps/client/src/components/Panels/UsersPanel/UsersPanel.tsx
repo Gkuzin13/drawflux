@@ -1,5 +1,5 @@
 import * as PopoverPrimitive from '@radix-ui/react-popover';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { TbCheck, TbPencil, TbUsers } from 'react-icons/tb';
 import { type User, colors } from 'shared';
 import Button from '@/components/Elements/Button/Button';
@@ -143,4 +143,4 @@ const UsersPanel = ({ onUserChange }: Props) => {
   );
 };
 
-export default UsersPanel;
+export default memo(UsersPanel);

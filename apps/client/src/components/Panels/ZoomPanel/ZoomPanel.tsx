@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { ZOOM_RANGE } from '@/constants/app';
 import { ICON_SIZES } from '@/constants/icon';
 import { ZOOM, type ZoomAction } from '@/constants/panels/zoom';
@@ -59,4 +60,4 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
   );
 };
 
-export default ZoomPanel;
+export default memo(ZoomPanel);

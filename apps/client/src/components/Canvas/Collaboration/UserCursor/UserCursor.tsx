@@ -1,7 +1,9 @@
 import { memo } from 'react';
-import { Arrow, Group, Text } from 'react-konva';
+import { Group } from 'react-konva';
 import type { User, Point } from 'shared';
 import { colors } from 'shared';
+import CursorHead from './CursorHead';
+import CursorLabel from './CursorLabel';
 
 type ColorValue = (typeof colors)[User['color']];
 
@@ -20,30 +22,16 @@ const UserCursor = ({ name, color, position, stageScale }: Props) => {
     <Group
       x={position[0]}
       y={position[1]}
+      offset={{ x: -8, y: -12 }}
       scaleX={normalizedScale}
       scaleY={normalizedScale}
       listening={false}
-      rotation={-130}
+      rotation={0}
       perfectDrawEnabled={false}
       shadowForStrokeEnabled={false}
     >
-      <Arrow
-        points={[0]}
-        pointerWidth={12}
-        pointerLength={12}
-        fill={colorValue}
-        listening={false}
-      />
-      <Text
-        text={name}
-        fill={colorValue}
-        listening={false}
-        fontStyle="bold"
-        rotation={130}
-        offsetX={-20}
-        offsetY={-2}
-        opacity={0.5}
-      />
+      <CursorHead color={colorValue} />
+      <CursorLabel text={name} color={colorValue} />
     </Group>
   );
 };
