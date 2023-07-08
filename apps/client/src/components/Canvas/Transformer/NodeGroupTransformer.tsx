@@ -6,7 +6,7 @@ import Node from '@/components/Canvas/Node/Node';
 import useForceUpdate from '@/hooks/useForceUpdate/useForceUpdate';
 import useTransformer from '@/hooks/useTransformer';
 import { getPointsAbsolutePosition } from '@/utils/position';
-import NodeTransformer from '../NodeTransformer';
+import NodeTransformer from './NodeTransformer';
 
 type Props = {
   nodes: NodeObject[];

@@ -3,7 +3,7 @@ import type { KonvaEventObject } from 'konva/lib/Node';
 import { useCallback } from 'react';
 import { Ellipse } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
-import NodeTransformer from '@/components/Canvas/NodeTransformer';
+import NodeTransformer from '@/components/Canvas/Transformer/NodeTransformer';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';

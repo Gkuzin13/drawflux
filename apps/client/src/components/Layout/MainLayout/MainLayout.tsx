@@ -54,9 +54,9 @@ const MainLayout = ({ viewportSize }: Props) => {
     dispatch(canvasActions.setStageConfig(config));
   };
 
-  const handleNodesIntersection = (nodesIds: string[]) => {
+  const handleNodesIntersection = useCallback((nodesIds: string[]) => {
     setIntersectedNodesIds(nodesIds);
-  };
+  }, []);
 
   const handleContextMenuOpen = useCallback(
     (open: boolean) => {
