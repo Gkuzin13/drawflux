@@ -1,18 +1,20 @@
-import { type ZodSchema } from 'zod';
+import { PROJECT_FILE_EXT, appState } from '@/constants/app';
 
-export type ImportFileType = 'json';
-
-export function downloadDataUrlAsFile(dataUrl: string, fileName: string) {
+export function downloadDataUrlAsFile(
+  dataUrl: string,
+  name: string,
+  ext: string,
+) {
   const link = document.createElement('a');
 
   link.setAttribute('href', dataUrl);
-  link.setAttribute('download', fileName);
+  link.setAttribute('download', `${name}.${ext}`);
 
   link.click();
   link.remove();
 }
 
-export function getUserSelectedFile(type: ImportFileType) {
+export function getUserSelectedFile(type: string) {
   return new Promise((resolve: (file: File | null) => void) => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -38,22 +40,17 @@ export function readUserSelectedFileAsText(file: File) {
   });
 }
 
-export async function loadJsonFile<T>(schema: ZodSchema) {
-  const file = await getUserSelectedFile('json');
-
-  if (!file) {
-    return null;
-  }
-
-  const fileContents = await readUserSelectedFileAsText(file);
-
-  if (!fileContents || !isJsonString(fileContents)) return null;
-
-  const data = JSON.parse(fileContents);
-
+export async function importProject() {
   try {
-    schema.parse(data);
-    return data as T;
+    const file = await getUserSelectedFile(PROJECT_FILE_EXT);
+
+    const fileContents = file && (await readUserSelectedFileAsText(file));
+
+    if (!fileContents || !isJsonString(fileContents)) return null;
+
+    const data = JSON.parse(fileContents);
+
+    return (await appState.shape.page.parseAsync(data)) ?? null;
   } catch (error) {
     return null;
   }

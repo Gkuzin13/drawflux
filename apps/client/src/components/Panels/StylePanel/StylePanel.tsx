@@ -65,10 +65,7 @@ const StylePanel = ({ selectedNodes, onStyleChange }: StylePanelProps) => {
   };
 
   const handleLineSelect = (value: NodeLine) => {
-    onStyleChange({
-      animated: style.animated && value !== 'solid' ? true : false,
-      line: value,
-    });
+    onStyleChange({ line: value });
   };
 
   const handleAnimatedSelect = () => {
@@ -104,7 +101,7 @@ const StylePanel = ({ selectedNodes, onStyleChange }: StylePanelProps) => {
         <>
           <LineSection value={style.line} onLineChange={handleLineSelect} />
           <AnimatedSection
-            value={style.animated}
+            value={style.animated && style.line !== 'solid'}
             isDisabled={style.line === 'solid'}
             onAnimatedChange={handleAnimatedSelect}
           />

@@ -25,7 +25,6 @@ const LineSection = ({ value, onLineChange }: Props) => {
         {LINE.map((line) => {
           return (
             <Styled.Item
-              aria-label="Select Line"
               key={line.value}
               value={line.value}
               title={line.name}

@@ -14,6 +14,9 @@ export const LOCAL_STORAGE_KEY = 'drawflux';
 
 export const WS_THROTTLE_MS = 16;
 
+export const PROJECT_FILE_EXT = 'drawflux';
+export const PROJECT_FILE_NAME = 'project';
+
 export const USER = {
   maxNameLength: 10,
 };
