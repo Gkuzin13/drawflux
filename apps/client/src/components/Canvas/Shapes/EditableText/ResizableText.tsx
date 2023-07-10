@@ -90,6 +90,7 @@ const ResizableText = ({
         y={node.nodeProps.point[1]}
         text={node.text ?? ''}
         lineHeight={1.5}
+        fontFamily="sans-serif"
         {...config}
         draggable={draggable}
         onDragEnd={handleDragEnd}
