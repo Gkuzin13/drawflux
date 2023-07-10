@@ -88,7 +88,7 @@ const ResizableText = ({
         ref={nodeRef}
         x={node.nodeProps.point[0]}
         y={node.nodeProps.point[1]}
-        text={node.text || ''}
+        text={node.text ?? ''}
         lineHeight={1.5}
         {...config}
         draggable={draggable}
