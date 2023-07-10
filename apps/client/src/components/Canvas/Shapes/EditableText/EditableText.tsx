@@ -9,6 +9,7 @@ import ResizableText from './ResizableText';
 export type OnTextSaveArgs = {
   text: string;
   width: number;
+  height: number;
 };
 
 const EditableText = ({
@@ -32,13 +33,14 @@ const EditableText = ({
     };
   }, [node.text]);
 
-  const handleTextSave = ({ text, width }: OnTextSaveArgs) => {
+  const handleTextSave = ({ text, width, height }: OnTextSaveArgs) => {
     onNodeChange({
       ...node,
       text,
       nodeProps: {
         ...node.nodeProps,
         width,
+        height,
       },
     });
 

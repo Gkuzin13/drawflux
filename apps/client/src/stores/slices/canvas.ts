@@ -31,6 +31,15 @@ export const initialState: CanvasSliceState = {
   selectedNodesIds: {},
 };
 
+function sanitizeNodes(nodes: NodeObject[]) {
+  return nodes.filter((node) => {
+    if (node.type === 'text' && !node.text?.length) {
+      return false;
+    }
+    return true;
+  });
+}
+
 export const canvasSlice = createSlice({
   name: 'canvas',
   initialState,
@@ -42,17 +51,22 @@ export const canvasSlice = createSlice({
       state.nodes = action.payload;
     },
     addNodes: (state, action: PayloadAction<NodeObject[]>) => {
-      state.nodes = [...state.nodes, ...action.payload];
+      const sanitizedNodesToAdd = sanitizeNodes(action.payload);
+
+      state.nodes = [...state.nodes, ...sanitizedNodesToAdd];
     },
     updateNodes: (state, action: PayloadAction<NodeObject[]>) => {
       const nodesMap = new Map<string, NodeObject>(
         action.payload.map((node) => [node.nodeProps.id, node]),
       );
 
-      state.nodes = state.nodes.map((node) => {
+      const updatedNodes = state.nodes.map((node) => {
         const updatedNode = nodesMap.get(node.nodeProps.id);
+
         return updatedNode ?? node;
       });
+
+      state.nodes = sanitizeNodes(updatedNodes);
     },
     deleteNodes: (state, action: PayloadAction<string[]>) => {
       const ids = new Set<string>(action.payload);
