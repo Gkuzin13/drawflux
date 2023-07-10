@@ -23,7 +23,10 @@ const getStyle = (fontSize: number, color: string): React.CSSProperties => {
   };
 
   if (isFirefox) {
-    return baseStyle;
+    return {
+      ...baseStyle,
+      marginTop: `-${fontSize / 2 + 1}px`,
+    };
   }
 
   return {
@@ -48,8 +51,8 @@ const EditableTextInput = ({
 
   useEffect(() => {
     if (ref.current) {
-      ref.current.focus();
       ref.current.setSelectionRange(0, initialValue.length);
+      ref.current.focus();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref.current, initialValue.length]);
