@@ -21,7 +21,7 @@ const useAnimatedDash = ({
   totalDashLength,
 }: UseAnimatedDashArgs) => {
   const animation = useMemo(() => {
-    if (!elementRef.current || !enabled) {
+    if (!elementRef.current || !enabled || isNaN(totalDashLength)) {
       return null;
     }
 

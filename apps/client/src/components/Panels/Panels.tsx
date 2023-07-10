@@ -82,7 +82,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
   const handleStyleChange = useCallback(
     (style: Partial<NodeStyle>, updateAsync = true) => {
-      const { selectedNodesIds, nodes } = store.getState().canvas.present;
+      const { nodes, selectedNodesIds } = store.getState().canvas.present;
 
       const updatedNodes = nodes
         .filter((node) => node.nodeProps.id in selectedNodesIds)
@@ -92,7 +92,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
       dispatch(canvasActions.updateNodes(updatedNodes));
 
-      if (ws?.isConnected && ws.pageId) {
+      if (ws?.isConnected) {
         const message: WSMessage = {
           type: 'nodes-update',
           data: updatedNodes,
@@ -103,7 +103,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
         updateAsync && handleUpdatePage();
       }
     },
-    [ws, dispatch, handleUpdatePage],
+    [ws, handleUpdatePage, dispatch],
   );
 
   const handleMenuAction = useCallback(
