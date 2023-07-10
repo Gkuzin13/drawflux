@@ -53,7 +53,11 @@ startAppListening({
       listenerApi.unsubscribe();
       return;
     }
-    const canvas = listenerApi.getState().canvas.present;
-    storage.set<AppState>(LOCAL_STORAGE_KEY, { page: { ...canvas } });
+
+    const canvasState = listenerApi.getState().canvas.present;
+
+    storage.set<AppState>(LOCAL_STORAGE_KEY, {
+      page: canvasState,
+    });
   },
 });

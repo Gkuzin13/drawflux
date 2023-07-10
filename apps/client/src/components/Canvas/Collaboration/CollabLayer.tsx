@@ -104,7 +104,7 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
       switch (type) {
         case 'draft-add': {
           setDraftNodes((prevNodes) => {
-            return [...prevNodes, data.node];
+            return [...prevNodes, data];
           });
           break;
         }
@@ -138,7 +138,9 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
         }
         case 'draft-end': {
           setDraftNodes((prevNodes) => {
-            return prevNodes.filter((n) => n.nodeProps.id !== data.id);
+            return prevNodes.filter(
+              (n) => n.nodeProps.id !== data.nodeProps.id,
+            );
           });
           break;
         }

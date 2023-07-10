@@ -4,24 +4,19 @@ import {
   type PropsWithChildren,
   type ReactNode,
   useCallback,
-  useEffect,
   useMemo,
 } from 'react';
-import {
-  type UpdatePageRequestBody,
-  type UpdatePageResponse,
-  type WSMessage,
-} from 'shared';
+import { type WSMessage } from 'shared';
 import Divider from '@/components/Elements/Divider/Divider';
 import Kbd from '@/components/Elements/Kbd/Kbd';
-import { useNotifications } from '@/contexts/notifications';
 import { useWebSocket } from '@/contexts/websocket';
-import useFetch from '@/hooks/useFetch';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { store } from '@/stores/store';
 import { sendMessage } from '@/utils/websocket';
 import * as Styled from './ContextMenu.styled';
+import usePageMutation from '@/hooks/usePageMutation';
+import { getAddedNodes } from '@/utils/node';
 
 export type ContextMenuType = 'node-menu' | 'canvas-menu';
 
@@ -37,7 +32,6 @@ const WSNodesActionMap: Partial<
     WSMessage['type']
   >
 > = {
-  'canvas/duplicateNodes': 'nodes-duplicate',
   'canvas/moveNodesToStart': 'nodes-move-to-start',
   'canvas/moveNodesToEnd': 'nodes-move-to-end',
   'canvas/moveNodesBackward': 'nodes-move-backward',
@@ -46,19 +40,17 @@ const WSNodesActionMap: Partial<
 };
 
 const CanvasMenu = () => {
-  const { nodes } = useAppSelector(selectCanvas);
-
   const dispatch = useAppDispatch();
 
   const handleSelectAll = useCallback(() => {
-    const allSelectedNodesIds = nodes.map((node) => node.nodeProps.id);
-
-    dispatch(canvasActions.setSelectedNodesIds(allSelectedNodesIds));
-  }, [dispatch, nodes]);
+    dispatch(canvasActions.selectAllNodes());
+  }, [dispatch]);
 
   return (
     <>
-      <Styled.Item onSelect={handleSelectAll}>Select All</Styled.Item>
+      <Styled.Item onSelect={handleSelectAll}>
+        Select All <Kbd>Ctrl + A</Kbd>
+      </Styled.Item>
     </>
   );
 };
@@ -66,64 +58,55 @@ const CanvasMenu = () => {
 const NodeMenu = () => {
   const ws = useWebSocket();
 
-  const [{ error }, updatePage] = useFetch<
-    UpdatePageResponse,
-    UpdatePageRequestBody
-  >(
-    `/p/${ws?.pageId}`,
-    {
-      method: 'PATCH',
-    },
-    { skip: true },
-  );
+  const { updatePage } = usePageMutation(ws?.pageId ?? '');
 
   const { selectedNodesIds } = useAppSelector(selectCanvas);
-  const { addNotification } = useNotifications();
 
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (error) {
-      addNotification({
-        title: 'Error',
-        description: 'Could not update page',
-        type: 'error',
-      });
+  const dispatchNodesAction = (action: ActionCreatorWithPayload<string[]>) => {
+    const nodesIds = Object.keys(selectedNodesIds);
+
+    dispatch(action(nodesIds));
+
+    if (ws?.isConnected) {
+      const messageType =
+        WSNodesActionMap[action.type as keyof typeof WSNodesActionMap];
+
+      const message =
+        messageType && ({ type: messageType, data: nodesIds } as WSMessage);
+
+      message && sendMessage(ws.connection, message);
+
+      const currentNodes = store.getState().canvas.present.nodes;
+      updatePage({ nodes: currentNodes });
     }
-  }, [error, addNotification]);
+  };
 
-  const dispatchNodesAction = useCallback(
-    (action: ActionCreatorWithPayload<string[]>) => {
-      const nodesIds = Object.keys(selectedNodesIds);
+  const handleNodesDuplicate = () => {
+    const nodesIds = Object.keys(selectedNodesIds);
+    dispatch(canvasActions.duplicateNodes(nodesIds));
 
-      dispatch(action(nodesIds));
+    if (ws?.isConnected) {
+      const currentNodes = store.getState().canvas.present.nodes;
 
-      if (ws?.isConnected) {
-        const messageType =
-          WSNodesActionMap[action.type as keyof typeof WSNodesActionMap];
+      const message: WSMessage = {
+        type: 'nodes-add',
+        data: getAddedNodes(currentNodes, nodesIds.length),
+      };
 
-        const message =
-          messageType &&
-          ({ type: messageType, data: { nodesIds } } as WSMessage);
+      message && sendMessage(ws.connection, message);
+      updatePage({ nodes: currentNodes });
+    }
+  };
 
-        message && sendMessage(ws.connection, message);
-
-        const currentNodes = store.getState().canvas.present.nodes;
-        updatePage({ nodes: currentNodes });
-      }
-    },
-    [ws, selectedNodesIds, dispatch, updatePage],
-  );
-
-  const handleSelectNone = useCallback(() => {
+  const handleSelectNone = () => {
     dispatch(canvasActions.setSelectedNodesIds([]));
-  }, [dispatch]);
+  };
 
   return (
     <>
-      <Styled.Item
-        onSelect={() => dispatchNodesAction(canvasActions.duplicateNodes)}
-      >
+      <Styled.Item onSelect={handleNodesDuplicate}>
         Duplicate <Kbd>Ctrl + D</Kbd>
       </Styled.Item>
       <Divider orientation="horizontal" />

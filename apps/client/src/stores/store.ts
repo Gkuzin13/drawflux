@@ -4,11 +4,9 @@ import historyReducer from './reducers/history';
 import canvas from './slices/canvas';
 import collaboration from './slices/collaboration';
 
-const canvasReducer = historyReducer(canvas);
-
 export const store = configureStore({
   reducer: {
-    canvas: canvasReducer,
+    canvas: historyReducer(canvas),
     collaboration,
   },
   middleware: (getDefaultMiddleware) =>

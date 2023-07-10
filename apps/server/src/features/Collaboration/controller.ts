@@ -44,7 +44,7 @@ export async function initCollabConnection(
   if (room.hasMultipleUsers()) {
     const userJoinedMessage = WSMessageUtil.serialize({
       type: 'user-joined',
-      data: { user },
+      data: user,
     } as WSMessage);
 
     userJoinedMessage && room.broadcast(user.id, userJoinedMessage);
@@ -76,7 +76,7 @@ export function onMessage(
   }
 
   if (deserializedMessage.type === 'user-change') {
-    room.updateUser(deserializedMessage.data.user);
+    room.updateUser(deserializedMessage.data);
   }
 
   if (room.hasMultipleUsers()) {

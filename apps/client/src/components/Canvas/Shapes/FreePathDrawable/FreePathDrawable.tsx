@@ -11,7 +11,7 @@ import { selectCanvas } from '@/stores/slices/canvas';
 import { calculateLengthFromPoints } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import { getDashValue, getSizeValue } from '@/utils/shape';
-import NodeTransformer from '../../NodeTransformer';
+import NodeTransformer from '../../Transformer/NodeTransformer';
 import { pairPoints } from './helpers/points';
 
 const FreePathDrawable = ({

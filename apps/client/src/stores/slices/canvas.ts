@@ -2,7 +2,12 @@ import { createSlice, isAnyOf, type PayloadAction } from '@reduxjs/toolkit';
 import type { Vector2d } from 'konva/lib/types';
 import type { NodeObject } from 'shared';
 import type { AppState } from '@/constants/app';
-import { allNodesInView, duplicateNodes, reorderNodes } from '@/utils/node';
+import {
+  allNodesInView,
+  duplicateNodes,
+  getAddedNodes,
+  reorderNodes,
+} from '@/utils/node';
 import {
   getCenterPosition,
   getMiddleNode,
@@ -45,10 +50,8 @@ export const canvasSlice = createSlice({
       );
 
       state.nodes = state.nodes.map((node) => {
-        if (nodesMap.has(node.nodeProps.id)) {
-          return nodesMap.get(node.nodeProps.id) as NodeObject;
-        }
-        return node;
+        const updatedNode = nodesMap.get(node.nodeProps.id);
+        return updatedNode ?? node;
       });
     },
     deleteNodes: (state, action: PayloadAction<string[]>) => {
@@ -94,13 +97,15 @@ export const canvasSlice = createSlice({
         state.selectedNodesIds = {};
         return;
       }
-      const newSelectedNodes: CanvasSliceState['selectedNodesIds'] = {};
 
-      for (const nodeId of action.payload) {
-        newSelectedNodes[nodeId] = true;
-      }
-
-      state.selectedNodesIds = newSelectedNodes;
+      state.selectedNodesIds = Object.fromEntries(
+        action.payload.map((nodeId) => [nodeId, true]),
+      );
+    },
+    selectAllNodes: (state) => {
+      state.selectedNodesIds = Object.fromEntries(
+        state.nodes.map((node) => [node.nodeProps.id, true]),
+      );
     },
     focusStage: (state, action: PayloadAction<Vector2d>) => {
       const { scale } = state.stageConfig;
@@ -136,8 +141,7 @@ export const canvasSlice = createSlice({
         const { actions, caseReducers } = canvasSlice;
         const { nodes, stageConfig } = state;
 
-        const lastPushedNodeIndex = -action.payload.length;
-        const duplicatedNodes = nodes.slice(lastPushedNodeIndex);
+        const duplicatedNodes = getAddedNodes(nodes, action.payload.length);
         const nodesIds = duplicatedNodes.map(({ nodeProps }) => nodeProps.id);
 
         caseReducers.setSelectedNodesIds(

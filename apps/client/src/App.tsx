@@ -23,47 +23,47 @@ const App = () => {
 
     switch (type) {
       case 'user-joined': {
-        dispatch(collaborationActions.addUser(data.user));
+        dispatch(collaborationActions.addUser(data));
         break;
       }
       case 'user-change': {
-        dispatch(collaborationActions.updateUser(data.user));
+        dispatch(collaborationActions.updateUser(data));
         break;
       }
       case 'nodes-set': {
-        dispatch(canvasActions.setNodes(data.nodes));
+        dispatch(canvasActions.setNodes(data));
         break;
       }
       case 'nodes-add': {
-        dispatch(canvasActions.addNodes(data.nodes));
+        dispatch(canvasActions.addNodes(data));
+        break;
+      }
+      case 'draft-end': {
+        dispatch(canvasActions.addNodes([data]));
         break;
       }
       case 'nodes-update': {
-        dispatch(canvasActions.updateNodes(data.nodes));
+        dispatch(canvasActions.updateNodes(data));
         break;
       }
       case 'nodes-delete': {
-        dispatch(canvasActions.deleteNodes(data.nodesIds));
-        break;
-      }
-      case 'nodes-duplicate': {
-        dispatch(canvasActions.duplicateNodes(data.nodesIds));
+        dispatch(canvasActions.deleteNodes(data));
         break;
       }
       case 'nodes-move-to-start': {
-        dispatch(canvasActions.moveNodesToStart(data.nodesIds));
+        dispatch(canvasActions.moveNodesToStart(data));
         break;
       }
       case 'nodes-move-to-end': {
-        dispatch(canvasActions.moveNodesToEnd(data.nodesIds));
+        dispatch(canvasActions.moveNodesToEnd(data));
         break;
       }
       case 'nodes-move-forward': {
-        dispatch(canvasActions.moveNodesForward(data.nodesIds));
+        dispatch(canvasActions.moveNodesForward(data));
         break;
       }
       case 'nodes-move-backward': {
-        dispatch(canvasActions.moveNodesBackward(data.nodesIds));
+        dispatch(canvasActions.moveNodesBackward(data));
         break;
       }
       case 'draft-text-update': {

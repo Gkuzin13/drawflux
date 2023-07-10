@@ -37,7 +37,7 @@ describe('CollabRoom', () => {
     // broadcaster message
     const message = WSMessageUtil.serialize({
       type: 'user-joined',
-      data: { user: user1 },
+      data: user1,
     } as WSMessage) as string;
 
     room.broadcast(user1.id, message);

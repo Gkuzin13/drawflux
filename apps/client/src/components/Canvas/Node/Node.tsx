@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import type { NodeObject, NodeType } from 'shared';
 import ArrowDrawable from '@/components/Canvas/Shapes/ArrowDrawable/ArrowDrawable';
 import EllipseDrawable from '@/components/Canvas/Shapes/EllipseDrawable/EllipseDrawable';
@@ -28,4 +27,4 @@ const Node = ({ node, ...restProps }: NodeComponentProps) => {
   return <Element node={node} {...restProps} />;
 };
 
-export default memo(Node);
+export default Node;
