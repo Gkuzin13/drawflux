@@ -135,3 +135,7 @@ export function allNodesInView(
 ) {
   return nodes.every((node) => isNodeFullyInView(node, stageRect, stageScale));
 }
+
+export function getAddedNodes(nodes: NodeObject[], addedcount: number) {
+  return nodes.slice(-addedcount);
+}

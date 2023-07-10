@@ -1,19 +1,10 @@
 import type Konva from 'konva';
-import {
-  type RefObject,
-  useMemo,
-  useEffect,
-  lazy,
-  Suspense,
-  useCallback,
-} from 'react';
+import { type RefObject, useMemo, lazy, Suspense, useCallback } from 'react';
 import type {
   NodeStyle,
   NodeObject,
   StageConfig,
   WSMessage,
-  UpdatePageResponse,
-  UpdatePageRequestBody,
   User,
 } from 'shared';
 import { Schemas } from 'shared';
@@ -21,9 +12,7 @@ import type { ControlAction } from '@/constants/panels/control';
 import { type MenuPanelActionType } from '@/constants/panels/menu';
 import { type Tool } from '@/constants/panels/tools';
 import { useModal } from '@/contexts/modal';
-import { useNotifications } from '@/contexts/notifications';
 import { useWebSocket } from '@/contexts/websocket';
-import useFetch from '@/hooks/useFetch';
 import useNetworkState from '@/hooks/useNetworkState/useNetworkState';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
@@ -42,6 +31,7 @@ import SharePanel from './SharePanel/SharePanel';
 import StylePanel from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
+import usePageMutation from '@/hooks/usePageMutation';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;
@@ -53,23 +43,13 @@ const UsersPanel = lazy(() => import('./UsersPanel/UsersPanel'));
 const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   const ws = useWebSocket();
 
-  const [{ error }, updatePage] = useFetch<
-    UpdatePageResponse,
-    UpdatePageRequestBody
-  >(
-    `/p/${ws?.pageId}`,
-    {
-      method: 'PATCH',
-    },
-    { skip: true },
-  );
+  const { updatePage } = usePageMutation(ws?.pageId ?? '');
 
   const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
   const { past, future } = useAppSelector(selectHistory);
   const { online } = useNetworkState();
 
   const modal = useModal();
-  const { addNotification } = useNotifications();
 
   const dispatch = useAppDispatch();
 
@@ -93,16 +73,6 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
     }
     return null;
   }, [ws]);
-
-  useEffect(() => {
-    if (error) {
-      addNotification({
-        title: 'Error',
-        description: 'Could not update page',
-        type: 'error',
-      });
-    }
-  }, [error, addNotification]);
 
   const handleToolSelect = useCallback(
     (type: Tool['value']) => {
@@ -131,7 +101,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
       if (ws?.isConnected && ws.pageId) {
         const message: WSMessage = {
           type: 'nodes-update',
-          data: { nodes: updatedNodes },
+          data: updatedNodes,
         };
 
         sendMessage(ws.connection, message);
@@ -217,7 +187,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
         if (ws?.isConnected) {
           const message: WSMessage = {
             type: 'nodes-delete',
-            data: { nodesIds: intersectedNodesIds },
+            data: intersectedNodesIds,
           };
 
           sendMessage(ws.connection, message);
@@ -247,7 +217,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
       if (ws?.isConnected) {
         const message: WSMessage = {
           type: 'user-change',
-          data: { user },
+          data: user,
         };
 
         sendMessage(ws.connection, message);

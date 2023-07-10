@@ -11,6 +11,8 @@ export type CanvasHistoryState = {
 export type HistoryActionType =
   (typeof historyActions)[keyof typeof historyActions]['type'];
 
+export type HistoryActionKey = keyof typeof historyActions;
+
 export const historyActions = {
   undo: createAction('history/undo'),
   redo: createAction('history/redo'),

@@ -21,20 +21,19 @@ type RoomJoined = Message<
   'room-joined',
   { userId: string; users: User[]; nodes: NodeObject[] }
 >;
-type UserJoined = Message<'user-joined', { user: User }>;
+type UserJoined = Message<'user-joined', User>;
 type UserLeft = Message<'user-left', { id: string }>;
-type UserChange = Message<'user-change', { user: User }>;
+type UserChange = Message<'user-change', User>;
 type UserMove = Message<'user-move', { id: string; position: Point }>;
-type NodesAdd = Message<'nodes-add', { nodes: NodeObject[] }>;
-type NodesUpdate = Message<'nodes-update', { nodes: NodeObject[] }>;
-type NodesSet = Message<'nodes-set', { nodes: NodeObject[] }>;
-type NodesDelete = Message<'nodes-delete', { nodesIds: string[] }>;
-type NodesDuplicate = Message<'nodes-duplicate', { nodesIds: string[] }>;
-type NodesMoveToStart = Message<'nodes-move-to-start', { nodesIds: string[] }>;
-type NodesMoveToEnd = Message<'nodes-move-to-end', { nodesIds: string[] }>;
-type NodesMoveForward = Message<'nodes-move-forward', { nodesIds: string[] }>;
-type NodesMoveBackward = Message<'nodes-move-backward', { nodesIds: string[] }>;
-type DraftNodeAdd = Message<'draft-add', { node: NodeObject }>;
+type NodesAdd = Message<'nodes-add', NodeObject[]>;
+type NodesUpdate = Message<'nodes-update', NodeObject[]>;
+type NodesSet = Message<'nodes-set', NodeObject[]>;
+type NodesDelete = Message<'nodes-delete', string[]>;
+type NodesMoveToStart = Message<'nodes-move-to-start', string[]>;
+type NodesMoveToEnd = Message<'nodes-move-to-end', string[]>;
+type NodesMoveForward = Message<'nodes-move-forward', string[]>;
+type NodesMoveBackward = Message<'nodes-move-backward', string[]>;
+type DraftNodeAdd = Message<'draft-add', NodeObject>;
 type DraftNodeDraw = Message<
   'draft-draw',
   {
@@ -44,7 +43,7 @@ type DraftNodeDraw = Message<
     position: { start: Point; current: Point };
   }
 >;
-type DraftNodeEnd = Message<'draft-end', { id: string }>;
+type DraftNodeEnd = Message<'draft-end', NodeObject>;
 type DraftTextNodeUpdate = Message<
   'draft-text-update',
   { id: string; text: string }
@@ -61,7 +60,6 @@ export type WSMessage =
   | NodesUpdate
   | NodesSet
   | NodesDelete
-  | NodesDuplicate
   | NodesMoveToStart
   | NodesMoveToEnd
   | NodesMoveForward
