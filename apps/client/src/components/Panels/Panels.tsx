@@ -1,13 +1,6 @@
 import type Konva from 'konva';
 import { type RefObject, useMemo, lazy, Suspense, useCallback } from 'react';
-import type {
-  NodeStyle,
-  NodeObject,
-  StageConfig,
-  WSMessage,
-  User,
-} from 'shared';
-import { Schemas } from 'shared';
+import type { NodeStyle, WSMessage, User } from 'shared';
 import type { ControlAction } from '@/constants/panels/control';
 import { type MenuPanelActionType } from '@/constants/panels/menu';
 import { type Tool } from '@/constants/panels/tools';
@@ -22,7 +15,7 @@ import {
 } from '@/stores/slices/canvas';
 import { collaborationActions } from '@/stores/slices/collaboration';
 import { store } from '@/stores/store';
-import { downloadDataUrlAsFile, loadJsonFile } from '@/utils/file';
+import { downloadDataUrlAsFile, importProject } from '@/utils/file';
 import { sendMessage } from '@/utils/websocket';
 import ControlPanel from './ControlPanel/ControlPanel';
 import MenuPanel, { type MenuKey } from './MenuPanel/MenuPanel';
@@ -32,6 +25,7 @@ import StylePanel from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
 import usePageMutation from '@/hooks/usePageMutation';
+import { PROJECT_FILE_EXT, PROJECT_FILE_NAME } from '@/constants/app';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;
@@ -69,7 +63,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
   const disabledMenuItems = useMemo((): MenuKey[] | null => {
     if (ws?.isConnected) {
-      return ['import-json'];
+      return ['open'];
     }
     return null;
   }, [ws]);
@@ -119,57 +113,38 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
           const dataUrl = stageRef.current?.toDataURL();
 
           if (dataUrl) {
-            downloadDataUrlAsFile(dataUrl, 'export-image');
+            downloadDataUrlAsFile(dataUrl, PROJECT_FILE_NAME, PROJECT_FILE_EXT);
           }
           break;
         }
-        case 'export-as-json': {
+        case 'save': {
           const state = store.getState().canvas.present;
 
-          const stateToExport = {
-            stageConfig: state.stageConfig,
-            nodes: state.nodes,
-          };
-
           const dataUrl = URL.createObjectURL(
-            new Blob([JSON.stringify(stateToExport)], {
+            new Blob([JSON.stringify(state)], {
               type: 'application/json',
             }),
           );
 
-          downloadDataUrlAsFile(dataUrl, 'export-json');
+          downloadDataUrlAsFile(dataUrl, PROJECT_FILE_NAME, PROJECT_FILE_EXT);
           break;
         }
-        case 'import-json': {
-          const getJsonData = async () => {
-            try {
-              const jsonData = await loadJsonFile<{
-                nodes: NodeObject[];
-                stageConfig: StageConfig;
-              }>(Schemas.Page.shape.page);
+        case 'open': {
+          const openProject = async () => {
+            const project = await importProject();
 
-              if (!jsonData) {
-                throw new Error('Could not load file');
-              }
-
-              dispatch(
-                canvasActions.set({
-                  ...jsonData,
-                  toolType,
-                  selectedNodesIds: {},
-                }),
-              );
-            } catch (error) {
-              if (error instanceof Error) {
-                modal.open('Error', error.message as string);
-              }
+            if (project) {
+              dispatch(canvasActions.set(project));
+            } else {
+              modal.open('Error', 'Could not load file');
             }
           };
-          getJsonData();
+
+          openProject();
         }
       }
     },
-    [dispatch, modal, stageRef, toolType],
+    [dispatch, modal, stageRef],
   );
 
   const handleZoomChange = useCallback(
