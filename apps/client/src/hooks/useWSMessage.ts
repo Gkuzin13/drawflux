@@ -24,7 +24,7 @@ function useWSMessage(
     return () => {
       connection.removeEventListener('message', listener);
     };
-  }, [connection, ...deps]);
+  }, [connection, onMessage, ...deps]);
 }
 
 export default useWSMessage;
