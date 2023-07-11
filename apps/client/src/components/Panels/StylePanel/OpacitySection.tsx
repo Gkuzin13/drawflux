@@ -13,7 +13,7 @@ type Props = {
 const OpacitySection = ({ value, onValueChange, onValueCommit }: Props) => {
   return (
     <div aria-labelledby="Opacity">
-      <Styled.Label css={{ fontSize: '$1' }}>Opacity</Styled.Label>
+      <Styled.Label>Opacity</Styled.Label>
       <Slider
         value={[value ?? OPACITY.maxValue]}
         min={OPACITY.minValue}

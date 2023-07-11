@@ -18,9 +18,7 @@ const ColorSection = ({ value, onColorChange }: Props) => {
       value={value}
       onValueChange={onColorChange}
     >
-      <Styled.Label htmlFor="shape-color" css={{ fontSize: '$1' }}>
-        Color
-      </Styled.Label>
+      <Styled.Label>Color</Styled.Label>
       <ColorsGrid value={value || colors.black} onSelect={onColorChange} />
     </Styled.InnerContainer>
   );
