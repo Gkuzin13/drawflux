@@ -77,6 +77,9 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^1.9.3
         version: 1.9.3(react-redux@8.0.5)(react@18.2.0)
+      fontfaceobserver:
+        specifier: ^2.3.0
+        version: 2.3.0
       konva:
         specifier: ^8.4.3
         version: 8.4.3
@@ -123,6 +126,9 @@ importers:
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.0.0(react-dom@18.2.0)(react@18.2.0)
+      '@types/fontfaceobserver':
+        specifier: ^2.1.0
+        version: 2.1.0
       '@types/node':
         specifier: ^18.15.11
         version: 18.15.11
@@ -3271,6 +3277,10 @@ packages:
       '@types/qs': 6.9.7
       '@types/serve-static': 1.15.1
 
+  /@types/fontfaceobserver@2.1.0:
+    resolution: {integrity: sha512-Vqf183RAiFdIjUi4asKqogf2HIfLDnxn+dQo9GCpnsU5QrrsLMA2bkJU1dHRudQlizLybWD61Csd1zAgUQ3JKQ==}
+    dev: true
+
   /@types/hoist-non-react-statics@3.3.1:
     resolution: {integrity: sha512-iMIqiko6ooLrTh1joXodJK5X9xeEALT1kM5G3ZLhD3hszxBdIEd5C75U834D9mLcINgD4OyZf5uQXjkuYydWvA==}
     dependencies:
@@ -5320,6 +5330,10 @@ packages:
   /flatted@3.2.7:
     resolution: {integrity: sha512-5nqDSxl8nn5BSNxyR3n4I6eDmbolI6WT+QqR547RwxQapgjQBmtktdP+HTBb/a/zLsbzERTONyUB5pefh5TtjQ==}
     dev: true
+
+  /fontfaceobserver@2.3.0:
+    resolution: {integrity: sha512-6FPvD/IVyT4ZlNe7Wcn5Fb/4ChigpucKYSvD6a+0iMoLn2inpo711eyIcKjmDtE5XNcgAkSH9uN/nfAeZzHEfg==}
+    dev: false
 
   /for-each@0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}

@@ -24,8 +24,6 @@ export const Content = styled(DropdownMenuPrimitive.Content, {
 });
 
 export const Item = styled(DropdownMenuPrimitive.Item, ButtonStyled.Button, {
-  justifyContent: 'start',
-  gap: '$1',
   padding: '$1',
   userSelect: 'none',
   outline: 'none',

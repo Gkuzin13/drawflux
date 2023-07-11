@@ -50,7 +50,11 @@ const MainLayout = ({ viewportSize }: Props) => {
 
   const canvasConfig = useMemo(() => {
     const scale = { x: stageConfig.scale, y: stageConfig.scale };
-    return { scale, ...stageConfig.position, ...viewportSize };
+    return {
+      scale,
+      ...stageConfig.position,
+      ...viewportSize,
+    };
   }, [stageConfig, viewportSize]);
 
   const onKeyDown = useCallback(
@@ -145,8 +149,9 @@ const MainLayout = ({ viewportSize }: Props) => {
   }, []);
 
   const handleNodesUpdate = useCallback(() => {
-    updatePage({ nodes });
-  }, [nodes, updatePage]);
+    const currentNodes = store.getState().canvas.present.nodes;
+    updatePage({ nodes: currentNodes });
+  }, [updatePage]);
 
   const handleContextMenuOpen = useCallback(
     (open: boolean) => {

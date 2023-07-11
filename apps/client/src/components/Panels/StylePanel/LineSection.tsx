@@ -18,9 +18,7 @@ const LineSection = ({ value, onLineChange }: Props) => {
       value={value}
       onValueChange={onLineChange}
     >
-      <Styled.Label htmlFor="shape-line" css={{ fontSize: '$1' }}>
-        Line
-      </Styled.Label>
+      <Styled.Label>Line</Styled.Label>
       <Styled.Grid>
         {LINE.map((line) => {
           return (

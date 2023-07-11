@@ -1,4 +1,3 @@
-import * as LabelPrimitive from '@radix-ui/react-label';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import * as TogglePrimitive from '@radix-ui/react-toggle';
 import { styled } from 'shared';
@@ -34,7 +33,8 @@ export const Grid = styled('div', {
   gap: '$1',
 });
 
-export const Label = styled(LabelPrimitive.Root, {
+export const Label = styled('span', {
+  fontSize: '$1',
   display: 'inline-block',
   paddingBottom: '$1',
   color: '$gray700',

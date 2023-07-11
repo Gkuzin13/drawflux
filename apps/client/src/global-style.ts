@@ -1,8 +1,23 @@
 import { globalCss } from '@stitches/react';
 
 export const globalStyle = globalCss({
+  '@font-face': [
+    {
+      fontFamily: 'Heebo',
+      fontDisplay: 'swap',
+      fontStyle: 'normal',
+      fontWeight: 400,
+      src: "url('../fonts/Heebo-Regular.woff2') format('woff2')",
+    },
+    {
+      fontFamily: 'Klee One',
+      fontStyle: 'normal',
+      fontDisplay: 'swap',
+      src: "url('../fonts/Klee-One-Regular.woff2') format('woff2')",
+    },
+  ],
   body: {
-    fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
+    fontFamily: 'Heebo, sans-serif',
     fontSmooth: 'antialiased',
     overflow: 'hidden',
   },

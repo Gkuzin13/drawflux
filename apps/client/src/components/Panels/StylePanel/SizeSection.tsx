@@ -18,9 +18,7 @@ const SizeSection = ({ value, onSizeChange }: Props) => {
       value={value}
       onValueChange={onSizeChange}
     >
-      <Styled.Label htmlFor="shape-size" css={{ fontSize: '$1' }}>
-        Size
-      </Styled.Label>
+      <Styled.Label>Size</Styled.Label>
       <Styled.Grid>
         {SIZE.map((size) => {
           return (

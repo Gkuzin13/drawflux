@@ -12,9 +12,7 @@ type Props = {
 const AnimatedSection = ({ value, isDisabled, onAnimatedChange }: Props) => {
   return (
     <div aria-labelledby="shape-animated">
-      <Styled.Label htmlFor="shape-animated" css={{ fontSize: '$1' }}>
-        Animated
-      </Styled.Label>
+      <Styled.Label>Animated</Styled.Label>
       <Styled.Toggle
         aria-label="Toggle Animated"
         title={ANIMATED.name}

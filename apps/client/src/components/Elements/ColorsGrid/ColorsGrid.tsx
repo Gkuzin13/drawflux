@@ -21,11 +21,7 @@ const ColorsGrid = ({ withLabel = false, value, onSelect }: Props) => {
       value={value}
       onValueChange={onSelect}
     >
-      {withLabel && (
-        <PanelStyled.Label htmlFor="shape-color" css={{ fontSize: '$1' }}>
-          Color
-        </PanelStyled.Label>
-      )}
+      {withLabel && <PanelStyled.Label>Color</PanelStyled.Label>}
       <Styled.Grid>
         {COLOR.map((color) => {
           return (
