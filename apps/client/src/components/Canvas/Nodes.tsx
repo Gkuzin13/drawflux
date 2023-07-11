@@ -4,6 +4,8 @@ import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import Node from './Node/Node';
 import NodeGroupTransformer from './Transformer/NodeGroupTransformer';
+import useFontFaceObserver from '@/hooks/useFontFaceObserver';
+import { TEXT } from '@/constants/shape';
 
 type Props = {
   selectedNodesIds: string[];
@@ -14,6 +16,9 @@ const Nodes = ({ selectedNodesIds, onNodesChange }: Props) => {
   const { toolType, nodes } = useAppSelector(selectCanvas);
 
   const dispatch = useAppDispatch();
+
+  // Triggers re-render when font is loaded
+  useFontFaceObserver(TEXT.FONT_FAMILY);
 
   const areNodesDraggable = useMemo(() => toolType === 'select', [toolType]);
 
