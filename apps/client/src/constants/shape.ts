@@ -13,4 +13,11 @@ export const RECT = {
   MIN_SIZE: 10,
 };
 
+export const TEXT = {
+  PADDING: 4,
+  LINE_HEIGHT: 1,
+  FONT_FAMILY: 'Klee One',
+  FONT_WEIGHT: 'bold',
+} as const;
+
 export const NODES_LAYER_INDEX = 1;

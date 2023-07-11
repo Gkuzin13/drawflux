@@ -9,6 +9,9 @@ import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
 import { getColorValue, getSizeValue } from '@/utils/shape';
 import NodeTransformer from '../../Transformer/NodeTransformer';
+import { getFontSize } from './helpers/font';
+import { TEXT } from '@/constants/shape';
+import { getNodeSize } from './helpers/size';
 
 type Props = {
   onDoubleClick: () => void;
@@ -29,11 +32,15 @@ const ResizableText = ({
   const { config } = useNode(node, stageConfig, {
     fillEnabled: true,
     strokeWidth: 0,
-    fontSize: getSizeValue(node.style.size) * 8,
-    width: node.nodeProps.width,
+    fontSize: getFontSize(getSizeValue(node.style.size)),
     fill: getColorValue(node.style.color),
+    fontFamily: TEXT.FONT_FAMILY,
     dash: [],
   });
+
+  const handleOnPress = useCallback(() => {
+    onPress(node.nodeProps.id);
+  }, [node, onPress]);
 
   const handleDragEnd = useCallback(
     (event: KonvaEventObject<DragEvent>) => {
@@ -44,9 +51,9 @@ const ResizableText = ({
           point: [event.target.x(), event.target.y()],
         },
       });
-      onPress(node.nodeProps.id);
+      handleOnPress();
     },
-    [node, onNodeChange, onPress],
+    [node, onNodeChange, handleOnPress],
   );
 
   const handleTransform = useCallback((event: KonvaEventObject<Event>) => {
@@ -78,10 +85,6 @@ const ResizableText = ({
     [node, onNodeChange],
   );
 
-  const getNodeSize = (width: number, scale: number, min = 20) => {
-    return Math.max(width * scale, min);
-  };
-
   return (
     <>
       <Text
@@ -89,15 +92,16 @@ const ResizableText = ({
         x={node.nodeProps.point[0]}
         y={node.nodeProps.point[1]}
         text={node.text ?? ''}
-        lineHeight={1.5}
-        fontFamily="sans-serif"
+        lineHeight={TEXT.LINE_HEIGHT}
+        padding={TEXT.PADDING}
+        fontStyle={TEXT.FONT_WEIGHT}
         {...config}
         draggable={draggable}
         onDragEnd={handleDragEnd}
         onTransform={handleTransform}
         onTransformEnd={handleTransformEnd}
-        onTap={() => onPress(node.nodeProps.id)}
-        onClick={() => onPress(node.nodeProps.id)}
+        onTap={handleOnPress}
+        onClick={handleOnPress}
       />
       {selected && (
         <NodeTransformer

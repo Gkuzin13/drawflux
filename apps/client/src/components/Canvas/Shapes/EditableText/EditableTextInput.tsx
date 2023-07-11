@@ -1,4 +1,4 @@
-import { type ChangeEvent, useEffect, useRef, useState } from 'react';
+import { type ChangeEvent, useEffect, useRef, useState, useMemo } from 'react';
 import { Html } from 'react-konva-utils';
 import { type NodeObject } from 'shared';
 import { KEYS } from '@/constants/keys';
@@ -6,33 +6,14 @@ import { useClickAway } from '@/hooks/useClickAway/useClickAway';
 import { getColorValue, getSizeValue } from '@/utils/shape';
 import type { OnTextSaveArgs } from './EditableText';
 import * as Styled from './EditableTextInput.styled';
+import { getFontSize, getStyle } from './helpers/font';
+import { getSizePropsFromTextValue } from './helpers/size';
 
 type Props = {
   node: NodeObject;
   initialValue: string;
   onChange: (args: OnTextSaveArgs) => void;
   onUpdate: (value: string) => void;
-};
-
-const getStyle = (fontSize: number, color: string): React.CSSProperties => {
-  const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-
-  const baseStyle: React.CSSProperties = {
-    color,
-    fontSize: `${fontSize * 8}px`,
-  };
-
-  if (isFirefox) {
-    return {
-      ...baseStyle,
-      marginTop: `-${fontSize / 2 + 1}px`,
-    };
-  }
-
-  return {
-    ...baseStyle,
-    marginTop: `-${fontSize / 2}px`,
-  };
 };
 
 const textSaveKeys = [KEYS.ENTER, KEYS.ESCAPE] as string[];
@@ -50,22 +31,34 @@ const EditableTextInput = ({
   useClickAway(ref, () => handleTextChange(value));
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.setSelectionRange(0, initialValue.length);
-      ref.current.focus();
+    const element = ref.current;
+
+    if (element) {
+      element.focus();
+
+      const textLength = initialValue.length;
+      const hasText = textLength > 0;
+
+      hasText && element.setSelectionRange(0, textLength);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref.current, initialValue.length]);
 
-  const size = getSizeValue(node.style.size);
+  const fontSize = useMemo(() => {
+    return getFontSize(getSizeValue(node.style.size));
+  }, [node.style.size]);
 
-  const style = getStyle(size, getColorValue(node.style.color));
+  const style = useMemo(() => {
+    return getStyle(fontSize, getColorValue(node.style.color));
+  }, [fontSize, node.style.color]);
+
+  const { width, height } = getSizePropsFromTextValue(value, fontSize);
 
   const handleTextChange = (text: string) => {
     if (ref.current) {
       onChange({
         text,
-        width: ref.current.scrollWidth + 2,
+        width: ref.current.scrollWidth,
         height: ref.current.scrollHeight,
       });
     }
@@ -79,29 +72,16 @@ const EditableTextInput = ({
     }
 
     if (textSaveKeys.includes(event.key) && ref.current) {
-      const { value } = ref.current;
-      handleTextChange(value);
+      handleTextChange(ref.current.value);
     }
   };
 
   const handleValueChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    const { value } = event.target;
+    const value = event.target.value;
 
     setValue(value);
-
     onUpdate(value);
   };
-
-  const getTextAreaSize = (text: string) => {
-    const lines = text.split('\n');
-
-    return {
-      width: `${Math.max(...lines.map((line) => line.length), 1)}ch`,
-      rows: lines.length,
-    };
-  };
-
-  const { width, rows } = getTextAreaSize(value);
 
   return (
     <Html
@@ -110,15 +90,20 @@ const EditableTextInput = ({
         y: node.nodeProps.point[1],
         rotation: node.nodeProps.rotation,
       }}
+      divProps={{ style: { zIndex: 0 } }}
     >
       <Styled.TextArea
         ref={ref}
         defaultValue={initialValue}
-        style={{ ...style, width }}
-        rows={rows}
+        style={{ ...style, width, height }}
         onChange={handleValueChange}
         onKeyDown={handleKeyDown}
         autoFocus
+        autoCapitalize="false"
+        autoComplete="false"
+        autoSave="false"
+        autoCorrect="false"
+        wrap="off"
       />
     </Html>
   );
