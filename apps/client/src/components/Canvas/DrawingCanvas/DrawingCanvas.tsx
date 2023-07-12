@@ -181,7 +181,6 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           case 'text':
             {
               const node = createNode(toolType, currentPoint);
-
               setDraftNode(node);
 
               if (ws?.isConnected) {
@@ -289,17 +288,24 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     );
 
     const handlePointerUp = useCallback(() => {
-      setDrawing(false);
+      drawing && setDrawing(false);
 
       if (toolType === 'select') {
         dispatch(canvasActions.setSelectedNodesIds(intersectedNodesIds));
         return;
       }
 
-      if (draftNode) {
+      if (draftNode && draftNode.type !== 'text') {
         handleDraftEnd(draftNode);
       }
-    }, [draftNode, toolType, intersectedNodesIds, dispatch, handleDraftEnd]);
+    }, [
+      drawing,
+      draftNode,
+      toolType,
+      intersectedNodesIds,
+      dispatch,
+      handleDraftEnd,
+    ]);
 
     const zoomStageRelativeToPointerPosition = useCallback(
       (stage: Konva.Stage, event: WheelEvent) => {
@@ -413,6 +419,12 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         onDragStart={handleStageDragStart}
         onDragMove={handleStageDragMove}
         onDragEnd={handleStageDragEnd}
+        onContextMenu={(e) => {
+          if (draftNode) {
+            e.evt.preventDefault();
+            e.evt.stopPropagation();
+          }
+        }}
       >
         <Layer listening={false}>
           <BackgroundRect

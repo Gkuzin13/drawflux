@@ -168,7 +168,7 @@ const Root = ({
     <ContextMenuPrimitive.Root onOpenChange={onContextMenuOpen}>
       {children}
       <ContextMenuPrimitive.Portal>
-        <Styled.Content onFocusOutside={(e) => e.preventDefault()}>
+        <Styled.Content>
           <ActiveMenu />
         </Styled.Content>
       </ContextMenuPrimitive.Portal>

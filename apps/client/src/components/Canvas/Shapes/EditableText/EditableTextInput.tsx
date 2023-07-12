@@ -83,6 +83,11 @@ const EditableTextInput = ({
     onUpdate(value);
   };
 
+  const handleOnContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
   return (
     <Html
       groupProps={{
@@ -99,11 +104,13 @@ const EditableTextInput = ({
         onChange={handleValueChange}
         onKeyDown={handleKeyDown}
         autoFocus
+        tabIndex={0}
         autoCapitalize="false"
         autoComplete="false"
         autoSave="false"
         autoCorrect="false"
         wrap="off"
+        onContextMenu={handleOnContextMenu}
       />
     </Html>
   );
