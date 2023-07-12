@@ -18,7 +18,7 @@ const Nodes = ({ selectedNodesIds, onNodesChange }: Props) => {
   const dispatch = useAppDispatch();
 
   // Triggers re-render when font is loaded
-  useFontFaceObserver(TEXT.FONT_FAMILY);
+  const { loading } = useFontFaceObserver(TEXT.FONT_FAMILY);
 
   const areNodesDraggable = useMemo(() => toolType === 'select', [toolType]);
 
@@ -49,6 +49,10 @@ const Nodes = ({ selectedNodesIds, onNodesChange }: Props) => {
     },
     [onNodesChange],
   );
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <>
