@@ -146,11 +146,9 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [selectRectRef, nodes, onNodesIntersection],
     );
 
-    const handlePointerPress = useCallback(
-      (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
-        const isMouseEvent = event.type === 'mousedown';
-
-        if (isMouseEvent && (event.evt as MouseEvent).button !== 0) {
+    const handlePointerDown = useCallback(
+      (event: KonvaEventObject<PointerEvent>) => {
+        if (event.evt.button !== 0) {
           return;
         }
 
@@ -159,8 +157,13 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         const clickedOnEmpty = event.target === stage;
 
         if (!clickedOnEmpty) {
+          if (!intersectedNodesIds.length) {
+            event.evt.stopPropagation();
+          }
           return;
         }
+
+        event.evt.stopPropagation();
 
         const { x, y } = stage.getRelativePointerPosition();
 
@@ -178,7 +181,6 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           case 'text':
             {
               const node = createNode(toolType, currentPoint);
-
               setDraftNode(node);
 
               if (ws?.isConnected) {
@@ -219,7 +221,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     );
 
     const handlePointerMove = useCallback(
-      (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
+      (event: KonvaEventObject<PointerEvent>) => {
         const stage = event.target.getStage();
 
         if (!stage || !drawing || toolType === 'hand' || toolType === 'text') {
@@ -285,18 +287,25 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       ],
     );
 
-    const handlePointerMoveEnd = useCallback(() => {
-      setDrawing(false);
+    const handlePointerUp = useCallback(() => {
+      drawing && setDrawing(false);
 
       if (toolType === 'select') {
         dispatch(canvasActions.setSelectedNodesIds(intersectedNodesIds));
         return;
       }
 
-      if (draftNode) {
+      if (draftNode && draftNode.type !== 'text') {
         handleDraftEnd(draftNode);
       }
-    }, [draftNode, toolType, intersectedNodesIds, dispatch, handleDraftEnd]);
+    }, [
+      drawing,
+      draftNode,
+      toolType,
+      intersectedNodesIds,
+      dispatch,
+      handleDraftEnd,
+    ]);
 
     const zoomStageRelativeToPointerPosition = useCallback(
       (stage: Konva.Stage, event: WheelEvent) => {
@@ -401,18 +410,21 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         ref={ref}
         {...config}
         tabIndex={0}
-        style={{ ...containerStyle, cursor: cursorStyle }}
+        style={{ ...containerStyle, cursor: cursorStyle, touchAction: 'none' }}
         draggable={isStageDraggable}
-        onMouseDown={handlePointerPress}
-        onMouseMove={handlePointerMove}
-        onMouseUp={handlePointerMoveEnd}
-        onTouchStart={handlePointerPress}
-        onTouchMove={handlePointerMove}
-        onTouchEnd={handlePointerMoveEnd}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
         onWheel={handleStageOnWheel}
         onDragStart={handleStageDragStart}
         onDragMove={handleStageDragMove}
         onDragEnd={handleStageDragEnd}
+        onContextMenu={(e) => {
+          if (draftNode) {
+            e.evt.preventDefault();
+            e.evt.stopPropagation();
+          }
+        }}
       >
         <Layer listening={false}>
           <BackgroundRect

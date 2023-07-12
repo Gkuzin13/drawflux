@@ -1,9 +1,11 @@
 import FontFaceObserver from 'fontfaceobserver';
 import { useLayoutEffect, useState } from 'react';
 
-function useFontFaceObserver(
-  fontFamily: string,
-): [success: boolean, loading: boolean, error: boolean] {
+function useFontFaceObserver(fontFamily: string): {
+  success: boolean;
+  loading: boolean;
+  error: boolean;
+} {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -23,7 +25,7 @@ function useFontFaceObserver(
     observeFontFaceLoad(observer);
   }, []);
 
-  return [success, loading, error];
+  return { success, loading, error };
 }
 
 export default useFontFaceObserver;

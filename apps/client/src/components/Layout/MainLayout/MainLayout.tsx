@@ -177,7 +177,7 @@ const MainLayout = ({ viewportSize }: Props) => {
       );
 
       const multipleNodesSelected = intersectedNodesIds.length > 1;
-      const clickedOnNodes = !!nodesInClickArea.length;
+      const clickedOnNodes = Boolean(nodesInClickArea.length);
       const clickedOnSelectedNodes = nodesInClickArea.some((node) =>
         intersectedNodesIds.includes(node.id()),
       );
@@ -194,21 +194,23 @@ const MainLayout = ({ viewportSize }: Props) => {
   );
 
   return (
-    <Styled.Container tabIndex={0}>
+    <Styled.Container tabIndex={-1}>
       <Panels intersectedNodesIds={intersectedNodesIds} stageRef={stageRef} />
-      <ContextMenu
-        selectedNodesCount={Object.keys(selectedNodesIds).length}
+      <ContextMenu.Root
+        selectedNodesCount={intersectedNodesIds.length}
         onContextMenuOpen={handleContextMenuOpen}
       >
-        <DrawingCanvas
-          ref={stageRef}
-          config={canvasConfig}
-          intersectedNodesIds={intersectedNodesIds}
-          onNodesIntersection={handleNodesIntersection}
-          onConfigChange={handleStageConfigChange}
-          onNodesUpdate={handleNodesUpdate}
-        />
-      </ContextMenu>
+        <ContextMenu.Trigger>
+          <DrawingCanvas
+            ref={stageRef}
+            config={canvasConfig}
+            intersectedNodesIds={intersectedNodesIds}
+            onNodesIntersection={handleNodesIntersection}
+            onConfigChange={handleStageConfigChange}
+            onNodesUpdate={handleNodesUpdate}
+          />
+        </ContextMenu.Trigger>
+      </ContextMenu.Root>
       <Dialog
         open={modal.opened}
         title={modal.title}

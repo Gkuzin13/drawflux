@@ -1,11 +1,6 @@
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
-import {
-  type PropsWithChildren,
-  type ReactNode,
-  useCallback,
-  useMemo,
-} from 'react';
+import { type PropsWithChildren, type ReactNode, useCallback } from 'react';
 import { type WSMessage } from 'shared';
 import Divider from '@/components/Elements/Divider/Divider';
 import Kbd from '@/components/Elements/Kbd/Kbd';
@@ -20,11 +15,13 @@ import { getAddedNodes } from '@/utils/node';
 
 export type ContextMenuType = 'node-menu' | 'canvas-menu';
 
-type Props = PropsWithChildren<{
+type RootProps = PropsWithChildren<{
   selectedNodesCount: number;
   children: ReactNode;
   onContextMenuOpen: (open: boolean) => void;
 }>;
+
+type TriggerProps = ContextMenuPrimitive.ContextMenuTriggerProps;
 
 const WSNodesActionMap: Partial<
   Record<
@@ -148,22 +145,28 @@ const menus: Record<ContextMenuType, React.FC> = {
   'canvas-menu': CanvasMenu,
 };
 
-const ContextMenu = ({
+const Trigger = ({ children }: TriggerProps) => {
+  return (
+    <ContextMenuPrimitive.Trigger asChild>
+      <div>{children}</div>
+    </ContextMenuPrimitive.Trigger>
+  );
+};
+
+const Root = ({
   selectedNodesCount,
   onContextMenuOpen,
   children,
-}: Props) => {
-  const contextMenuType: ContextMenuType = useMemo(() => {
-    return selectedNodesCount ? 'node-menu' : 'canvas-menu';
-  }, [selectedNodesCount]);
+}: RootProps) => {
+  const contextMenuType: ContextMenuType = selectedNodesCount
+    ? 'node-menu'
+    : 'canvas-menu';
 
   const ActiveMenu = menus[contextMenuType];
 
   return (
     <ContextMenuPrimitive.Root onOpenChange={onContextMenuOpen}>
-      <ContextMenuPrimitive.Trigger asChild>
-        <div>{children}</div>
-      </ContextMenuPrimitive.Trigger>
+      {children}
       <ContextMenuPrimitive.Portal>
         <Styled.Content>
           <ActiveMenu />
@@ -173,4 +176,7 @@ const ContextMenu = ({
   );
 };
 
-export default ContextMenu;
+export default {
+  Root,
+  Trigger,
+};

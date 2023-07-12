@@ -1,13 +1,13 @@
 import { type RefObject, useEffect } from 'react';
 
-const EVENTS = ['mousedown', 'touchstart'];
+const EVENTS = ['mousedown', 'touchstart', 'pointerdown'] as const;
 
 const useClickAway = (ref: RefObject<Element>, handler: () => void) => {
   useEffect(() => {
-    const listener = (event: Event) => {
-      const element = event?.target as Element;
+    const listener = (event: PointerEvent | TouchEvent | MouseEvent) => {
+      const element = event.target;
 
-      if (ref.current && !ref.current.contains(element)) {
+      if (ref.current && element && !ref.current.contains(element as Element)) {
         handler();
       }
     };
