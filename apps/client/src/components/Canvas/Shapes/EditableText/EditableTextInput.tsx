@@ -41,8 +41,7 @@ const EditableTextInput = ({
 
       hasText && element.setSelectionRange(0, textLength);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref.current, initialValue.length]);
+  }, [ref, initialValue.length]);
 
   const fontSize = useMemo(() => {
     return getFontSize(getSizeValue(node.style.size));
