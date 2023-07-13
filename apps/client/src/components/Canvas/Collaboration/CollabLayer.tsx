@@ -16,7 +16,7 @@ import {
   selectCollaboration,
   collaborationActions,
 } from '@/stores/slices/collaboration';
-import { throttleFn } from '@/utils/throttle';
+import { throttleFn } from '@/utils/timed';
 import { sendMessage } from '@/utils/websocket';
 import { type DrawableType, drawTypes } from '../DrawingCanvas/helpers/draw';
 import DraftNode from '../Node/DraftNode';

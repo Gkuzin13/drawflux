@@ -1,6 +1,6 @@
 import { WSMessageUtil, type WSMessage } from 'shared';
 import { WS_THROTTLE_MS } from '@/constants/app';
-import { throttleFn } from './throttle';
+import { throttleFn } from './timed';
 
 export function sendMessage(connection: WebSocket | null, message: WSMessage) {
   if (connection) {
