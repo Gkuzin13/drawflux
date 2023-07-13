@@ -1,4 +1,4 @@
-import { throttleFn } from '@/utils/throttle';
+import { throttleFn } from '@/utils/timed';
 
 // needs work
 describe.skip('throttleFn', () => {

@@ -31,7 +31,7 @@ const RectDrawable = ({
 
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
-    elementRef: nodeRef,
+    nodeRef,
     totalDashLength,
   });
 
@@ -44,9 +44,12 @@ const RectDrawable = ({
           point: [event.target.x(), event.target.y()],
         },
       });
-      onPress(node.nodeProps.id);
+
+      if (!selected) {
+        onPress(node.nodeProps.id);
+      }
     },
-    [node, onNodeChange, onPress],
+    [node, selected, onNodeChange, onPress],
   );
 
   const handleTransformStart = useCallback(() => {

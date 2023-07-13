@@ -42,7 +42,7 @@ const ArrowDrawable = ({
 
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
-    elementRef: lineRef,
+    nodeRef: lineRef,
     totalDashLength: config.dash[0] + config.dash[1],
   });
 

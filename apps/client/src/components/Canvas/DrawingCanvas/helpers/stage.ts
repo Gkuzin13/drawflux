@@ -1,7 +1,6 @@
 import type Konva from 'konva';
 import type { IRect, Vector2d } from 'konva/lib/types';
 import { Util } from 'konva/lib/Util';
-import type { NodeObject } from 'shared';
 
 const POINTER_RECT_SIZE = 32;
 
@@ -36,11 +35,9 @@ export function getPointerRect(position: Vector2d, scale: number): IRect {
 
 export function getNodesIntersectingWithRect(
   layer: Konva.Layer,
-  nodes: NodeObject[],
   rect: IRect,
 ): (Konva.Shape | Konva.Group)[] {
-  const nodesIds = new Set(nodes.map((node) => node.nodeProps.id));
-  const children = layer.getChildren((child) => nodesIds.has(child.id()));
+  const children = layer.getChildren((child) => Boolean(child.id()));
 
   return getIntersectingNodes(children, rect);
 }

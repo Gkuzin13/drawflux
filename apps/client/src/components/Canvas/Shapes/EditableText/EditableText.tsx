@@ -5,6 +5,7 @@ import { useWebSocket } from '@/contexts/websocket';
 import { sendMessage } from '@/utils/websocket';
 import EditableTextInput from './EditableTextInput';
 import ResizableText from './ResizableText';
+import type { KonvaEventObject } from 'konva/lib/Node';
 
 export type OnTextSaveArgs = {
   text: string;
@@ -58,11 +59,16 @@ const EditableText = ({
     }
   };
 
+  const handleDoubleClick = (event: KonvaEventObject<PointerEvent>) => {
+    event.evt.stopPropagation();
+    setEditing(true);
+  };
+
   if (editing) {
     return (
       <EditableTextInput
         node={node}
-        initialValue={node.text || ''}
+        initialValue={node.text ?? ''}
         onChange={handleTextSave}
         onUpdate={handleTextUpdate}
       />
@@ -76,7 +82,7 @@ const EditableText = ({
       draggable={draggable}
       onNodeChange={onNodeChange}
       onPress={onPress}
-      onDoubleClick={() => setEditing(true)}
+      onDoubleClick={handleDoubleClick}
     />
   );
 };

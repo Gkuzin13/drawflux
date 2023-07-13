@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { Text } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useNode from '@/hooks/useNode/useNode';
@@ -12,9 +12,10 @@ import NodeTransformer from '../../Transformer/NodeTransformer';
 import { getFontSize } from './helpers/font';
 import { TEXT } from '@/constants/shape';
 import { getNodeSize } from './helpers/size';
+import { createSingleClickHandler } from '@/utils/timed';
 
 type Props = {
-  onDoubleClick: () => void;
+  onDoubleClick: (event: KonvaEventObject<PointerEvent>) => void;
 } & NodeComponentProps;
 
 const ResizableText = ({
@@ -38,6 +39,10 @@ const ResizableText = ({
     dash: [],
   });
 
+  const singleClickHandler = useRef(
+    createSingleClickHandler((callback) => callback()),
+  );
+
   const handleOnPress = useCallback(() => {
     onPress(node.nodeProps.id);
   }, [node, onPress]);
@@ -51,9 +56,12 @@ const ResizableText = ({
           point: [event.target.x(), event.target.y()],
         },
       });
-      handleOnPress();
+
+      if (!selected) {
+        onPress(node.nodeProps.id);
+      }
     },
-    [node, onNodeChange, handleOnPress],
+    [node, selected, onNodeChange, onPress],
   );
 
   const handleTransform = useCallback((event: KonvaEventObject<Event>) => {
@@ -85,6 +93,25 @@ const ResizableText = ({
     [node, onNodeChange],
   );
 
+  // Prevents triggering ContextMenu on double click (touch devices)
+  const handleTransformerPointerDown = useCallback(
+    (event: KonvaEventObject<PointerEvent>) => {
+      if (event.evt.pointerType === 'mouse') {
+        return;
+      }
+
+      event.evt.stopPropagation();
+      const stage = event.target?.getStage();
+
+      if (stage) {
+        singleClickHandler.current(() =>
+          stage.container().dispatchEvent(event.evt),
+        );
+      }
+    },
+    [],
+  );
+
   return (
     <>
       <Text
@@ -110,8 +137,8 @@ const ResizableText = ({
             enabledAnchors: ['middle-left', 'middle-right'],
           }}
           transformerEvents={{
-            onDblClick: onDoubleClick,
-            onDblTap: onDoubleClick,
+            onPointerDblClick: onDoubleClick,
+            onPointerDown: handleTransformerPointerDown,
           }}
         />
       )}

@@ -26,7 +26,7 @@ const EllipseDrawable = ({
   const { config } = useNode(node, stageConfig);
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
-    elementRef: nodeRef,
+    nodeRef,
     totalDashLength: config.dash[0] + config.dash[1],
   });
 
@@ -39,9 +39,11 @@ const EllipseDrawable = ({
           point: [event.target.x(), event.target.y()],
         },
       });
-      onPress(node.nodeProps.id);
+      if (!selected) {
+        onPress(node.nodeProps.id);
+      }
     },
-    [node, onNodeChange, onPress],
+    [node, selected, onNodeChange, onPress],
   );
 
   const handleTransformStart = useCallback(() => {

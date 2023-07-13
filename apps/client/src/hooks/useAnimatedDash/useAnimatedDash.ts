@@ -1,9 +1,9 @@
-import type Konva from 'konva';
+import { type RefObject, useEffect, useRef } from 'react';
 import { Animation } from 'konva/lib/Animation';
-import { type RefObject, useEffect, useMemo } from 'react';
 import { clamp } from '@/utils/math';
+import type Konva from 'konva';
 
-export type UseAnimatedDashElement =
+export type UseAnimatedDashNode =
   | Konva.Shape
   | Konva.Rect
   | Konva.Ellipse
@@ -11,48 +11,56 @@ export type UseAnimatedDashElement =
 
 type UseAnimatedDashArgs = {
   enabled?: boolean;
-  elementRef: RefObject<UseAnimatedDashElement | null>;
+  nodeRef: RefObject<UseAnimatedDashNode | null>;
   totalDashLength: number;
 };
 
 const useAnimatedDash = ({
+  nodeRef,
   enabled,
-  elementRef,
   totalDashLength,
 }: UseAnimatedDashArgs) => {
-  const animation = useMemo(() => {
-    if (!elementRef.current || !enabled || isNaN(totalDashLength)) {
-      return null;
-    }
-
-    const element = elementRef.current;
-    const speedFactor = clamp(35 * totalDashLength, 650, 750);
-
-    return new Animation((frame) => {
-      if (!frame) return;
-
-      const time = frame.time / speedFactor;
-      const offset = totalDashLength * ((time * 2) % 2);
-
-      element.dashOffset(-offset);
-    }, element.getLayer());
-  }, [elementRef.current, totalDashLength, enabled]);
+  const animationRef = useRef<Konva.Animation | null>(null);
+  const totalDashLengthRef = useRef(0);
 
   useEffect(() => {
-    if (!animation) {
-      return;
+    if (!isNaN(totalDashLength)) {
+      totalDashLengthRef.current = totalDashLength;
     }
+  }, [totalDashLength]);
+
+  useEffect(() => {
+    if (!nodeRef.current) return;
+
+    const node = nodeRef.current;
+
+    if (!animationRef.current) {
+      const speedFactor = clamp(35 * totalDashLengthRef.current, 650, 750);
+
+      animationRef.current = new Animation((frame) => {
+        if (!frame) return;
+
+        const time = frame.time / speedFactor;
+        const offset = totalDashLengthRef.current * ((time * 2) % 2);
+
+        node.dashOffset(-offset);
+      }, node.getLayer());
+    }
+
+    const animation = animationRef.current;
 
     if (enabled && !animation.isRunning()) {
       animation.start();
+    } else if (!enabled && animation.isRunning()) {
+      animation.stop();
     }
 
     return () => {
       animation.stop();
     };
-  }, [enabled, animation]);
+  }, [enabled, nodeRef]);
 
-  return { animation };
+  return { animation: animationRef.current };
 };
 
 export default useAnimatedDash;

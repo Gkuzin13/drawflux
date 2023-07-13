@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo } from 'react';
 import type { NodeObject } from 'shared';
-import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { useAppSelector } from '@/stores/hooks';
+import { selectCanvas } from '@/stores/slices/canvas';
 import Node from './Node/Node';
 import NodeGroupTransformer from './Transformer/NodeGroupTransformer';
 import useFontFaceObserver from '@/hooks/useFontFaceObserver';
@@ -10,12 +10,11 @@ import { TEXT } from '@/constants/shape';
 type Props = {
   selectedNodesIds: string[];
   onNodesChange: (nodes: NodeObject[]) => void;
+  onNodePress: (nodeId: string) => void;
 };
 
-const Nodes = ({ selectedNodesIds, onNodesChange }: Props) => {
+const Nodes = ({ selectedNodesIds, onNodesChange, onNodePress }: Props) => {
   const { toolType, nodes } = useAppSelector(selectCanvas);
-
-  const dispatch = useAppDispatch();
 
   // Triggers re-render when font is loaded
   const { loading } = useFontFaceObserver(TEXT.FONT_FAMILY);
@@ -33,15 +32,6 @@ const Nodes = ({ selectedNodesIds, onNodesChange }: Props) => {
 
     return null;
   }, [selectedNodes]);
-
-  const handleNodePress = useCallback(
-    (nodeId: string) => {
-      if (toolType === 'select') {
-        dispatch(canvasActions.setSelectedNodesIds([nodeId]));
-      }
-    },
-    [toolType, dispatch],
-  );
 
   const handleNodeChange = useCallback(
     (node: NodeObject) => {
@@ -63,8 +53,8 @@ const Nodes = ({ selectedNodesIds, onNodesChange }: Props) => {
             node={node}
             selected={selectedNodeId === node.nodeProps.id}
             draggable={areNodesDraggable}
-            onPress={handleNodePress}
             onNodeChange={handleNodeChange}
+            onPress={onNodePress}
           />
         );
       })}
