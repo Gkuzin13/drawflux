@@ -9,6 +9,7 @@ import {
   useRef,
   lazy,
   Suspense,
+  useEffect,
 } from 'react';
 import { Layer, Stage } from 'react-konva';
 import type { NodeObject, Point, StageConfig, WSMessage } from 'shared';
@@ -31,14 +32,14 @@ import {
   calcNewStagePositionAndScale,
   isScaleOutOfRange,
 } from './helpers/zoom';
+import { throttleFn } from '@/utils/timed';
 
 type Props = PropsWithRef<{
   config: NodeConfig;
   containerStyle?: React.CSSProperties;
-  intersectedNodesIds: string[];
-  onNodesIntersection: (nodesIds: string[]) => void;
   onConfigChange: (config: Partial<StageConfig>) => void;
   onNodesUpdate: () => void;
+  onNodesSelect: (nodesIds: string[]) => void;
 }>;
 
 const CollabLayer = lazy(() => import('../Collaboration/CollabLayer'));
@@ -50,21 +51,18 @@ const initialDrawingPosition = {
 
 const DrawingCanvas = forwardRef<Konva.Stage, Props>(
   (
-    {
-      config,
-      containerStyle,
-      intersectedNodesIds,
-      onNodesIntersection,
-      onConfigChange,
-      onNodesUpdate,
-    },
+    { config, containerStyle, onNodesSelect, onConfigChange, onNodesUpdate },
     ref,
   ) => {
+    const [intersectedNodesIds, setIntersectedNodesIds] = useState<string[]>(
+      [],
+    );
     const [draftNode, setDraftNode] = useState<NodeObject | null>(null);
     const [drawing, setDrawing] = useState(false);
     const [draggingStage, setDraggingStage] = useState(false);
 
-    const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
+    const { stageConfig, toolType, selectedNodesIds } =
+      useAppSelector(selectCanvas);
     const { userId } = useAppSelector(selectCollaboration);
 
     const ws = useWebSocket();
@@ -74,6 +72,10 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const drawingPositionRef = useRef(initialDrawingPosition);
     const selectRectRef = useRef<Konva.Rect>(null);
     const backgroundRectRef = useRef<Konva.Rect>(null);
+
+    const throttledOnNodesSelect = useRef(
+      throttleFn((nodesIds: string[]) => onNodesSelect(nodesIds), 70),
+    );
 
     const cursorStyle = useMemo(() => {
       switch (toolType) {
@@ -89,6 +91,16 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const isStageDraggable = toolType === 'hand';
     const isSelectRectActive = drawing && toolType === 'select';
     const isNodesLayerActive = !drawing || toolType === 'hand';
+
+    useEffect(() => {
+      throttledOnNodesSelect.current(intersectedNodesIds);
+    }, [intersectedNodesIds]);
+
+    useEffect(() => {
+      const nodesIds = Object.keys(selectedNodesIds);
+      setIntersectedNodesIds(nodesIds);
+      onNodesSelect(nodesIds);
+    }, [selectedNodesIds, onNodesSelect]);
 
     const handleDraftEnd = useCallback(
       (node: NodeObject) => {
@@ -135,15 +147,14 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
         const nodesIntersectedWithSelectRect = getNodesIntersectingWithRect(
           layer,
-          nodes,
           selectClientRect,
         );
 
-        onNodesIntersection(
+        setIntersectedNodesIds(
           nodesIntersectedWithSelectRect.map((node) => node.id()),
         );
       },
-      [selectRectRef, nodes, onNodesIntersection],
+      [selectRectRef],
     );
 
     const handlePointerDown = useCallback(
@@ -156,13 +167,14 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
         const clickedOnEmpty = event.target === stage;
 
+        const hasSelectedNodes = Object.keys(selectedNodesIds).length > 0;
+
         if (!clickedOnEmpty) {
-          if (!intersectedNodesIds.length) {
+          if (!hasSelectedNodes) {
             event.evt.stopPropagation();
           }
           return;
         }
-
         event.evt.stopPropagation();
 
         const { x, y } = stage.getRelativePointerPosition();
@@ -213,11 +225,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           }
         }
 
-        if (Object.keys(intersectedNodesIds).length) {
-          onNodesIntersection([]);
+        if (hasSelectedNodes) {
+          setIntersectedNodesIds([]);
         }
       },
-      [toolType, intersectedNodesIds, ws, onNodesIntersection],
+      [toolType, ws, selectedNodesIds],
     );
 
     const handlePointerMove = useCallback(
@@ -290,7 +302,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const handlePointerUp = useCallback(() => {
       drawing && setDrawing(false);
 
-      if (toolType === 'select') {
+      if (toolType === 'select' && drawing) {
         dispatch(canvasActions.setSelectedNodesIds(intersectedNodesIds));
         return;
       }
@@ -386,6 +398,16 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [stageConfig, dispatch],
     );
 
+    const handleOnContextMenu = useCallback(
+      (event: KonvaEventObject<PointerEvent>) => {
+        if (draftNode) {
+          event.evt.preventDefault();
+          event.evt.stopPropagation();
+        }
+      },
+      [draftNode],
+    );
+
     const handleNodesChange = useCallback(
       (nodes: NodeObject[] | NodeObject) => {
         const updatedNodes = Array.isArray(nodes) ? nodes : [nodes];
@@ -405,6 +427,15 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [ws, onNodesUpdate, dispatch],
     );
 
+    const handleNodePress = useCallback(
+      (nodeId: string) => {
+        if (toolType === 'select') {
+          dispatch(canvasActions.setSelectedNodesIds([nodeId]));
+        }
+      },
+      [toolType, dispatch],
+    );
+
     return (
       <Stage
         ref={ref}
@@ -419,12 +450,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         onDragStart={handleStageDragStart}
         onDragMove={handleStageDragMove}
         onDragEnd={handleStageDragEnd}
-        onContextMenu={(e) => {
-          if (draftNode) {
-            e.evt.preventDefault();
-            e.evt.stopPropagation();
-          }
-        }}
+        onContextMenu={handleOnContextMenu}
       >
         <Layer listening={false}>
           <BackgroundRect
@@ -455,6 +481,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         <Layer listening={isNodesLayerActive}>
           <Nodes
             selectedNodesIds={intersectedNodesIds}
+            onNodePress={handleNodePress}
             onNodesChange={handleNodesChange}
           />
         </Layer>

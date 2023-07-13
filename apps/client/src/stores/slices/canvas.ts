@@ -53,7 +53,11 @@ export const canvasSlice = createSlice({
     addNodes: (state, action: PayloadAction<NodeObject[]>) => {
       const sanitizedNodesToAdd = sanitizeNodes(action.payload);
 
-      state.nodes = [...state.nodes, ...sanitizedNodesToAdd];
+      if (sanitizedNodesToAdd.length === 1) {
+        state.nodes.push(sanitizedNodesToAdd[0]);
+      } else {
+        state.nodes = [...state.nodes, ...sanitizedNodesToAdd];
+      }
     },
     updateNodes: (state, action: PayloadAction<NodeObject[]>) => {
       const nodesMap = new Map<string, NodeObject>(

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { type AppState, LOCAL_STORAGE_KEY, appState } from '@/constants/app';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
@@ -83,7 +83,7 @@ const App = () => {
     }
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (ws?.pageId) {
       return;
     }
