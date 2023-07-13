@@ -51,9 +51,12 @@ const ResizableText = ({
           point: [event.target.x(), event.target.y()],
         },
       });
-      handleOnPress();
+
+      if (!selected) {
+        onPress(node.nodeProps.id);
+      }
     },
-    [node, onNodeChange, handleOnPress],
+    [node, selected, onNodeChange, onPress],
   );
 
   const handleTransform = useCallback((event: KonvaEventObject<Event>) => {

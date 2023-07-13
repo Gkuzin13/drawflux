@@ -27,7 +27,7 @@ const FreePathDrawable = ({
 
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
-    elementRef: nodeRef,
+    nodeRef,
     totalDashLength: config.dash[0] + config.dash[1],
   });
 
@@ -54,9 +54,11 @@ const FreePathDrawable = ({
 
       line.position({ x: 0, y: 0 });
 
-      onPress(node.nodeProps.id);
+      if (!selected) {
+        onPress(node.nodeProps.id);
+      }
     },
-    [node, onNodeChange, onPress],
+    [node, selected, onNodeChange, onPress],
   );
 
   const handleTransformStart = useCallback(() => {
@@ -112,7 +114,7 @@ const FreePathDrawable = ({
       line.position({ x: 0, y: 0 });
 
       if (node.style.animated && animation?.isRunning() === false) {
-        animation.stop();
+        animation.start();
       }
     },
     [node, animation, onNodeChange],
