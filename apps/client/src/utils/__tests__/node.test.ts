@@ -1,5 +1,10 @@
 import { nodesGenerator } from '@/test/data-generators';
-import { createNode, duplicateNodes, reorderNodes } from '../node';
+import {
+  createNode,
+  duplicateNodes,
+  getAddedNodes,
+  reorderNodes,
+} from '../node';
 
 describe('createNode', () => {
   it('should create a node object correctly', () => {
@@ -123,5 +128,42 @@ describe('duplicateNodes', () => {
       expect(node.nodeProps.id).not.toBe(nodes[index].nodeProps.id);
       expect(node.nodeProps.point).not.toEqual(nodes[index].nodeProps.point);
     });
+  });
+});
+
+describe('getAddedNodes', () => {
+  it('should return added nodes correctly', () => {
+    const nodes = nodesGenerator(5);
+    const nodesToAdd = nodesGenerator(4);
+
+    const addedNodes = getAddedNodes(
+      [...nodes, ...nodesToAdd],
+      nodesToAdd.length,
+    );
+
+    expect(addedNodes).toEqual(nodesToAdd);
+  });
+
+  it('should return empty array if no nodes are added', () => {
+    const nodes = nodesGenerator(5);
+    const addedNodes = getAddedNodes(nodes, 0);
+
+    expect(addedNodes).toEqual([]);
+  });
+
+  it('should return empty array if no nodes are passed', () => {
+    const addedNodes = getAddedNodes([], 0);
+
+    expect(addedNodes).toEqual([]);
+  });
+
+  it('should return passed nodes if addedCount is more than nodes count', () => {
+    const nodes = nodesGenerator(5);
+    const nodesToAdd = nodesGenerator(6);
+    const allNodes = [...nodes, ...nodesToAdd];
+
+    const addedNodes = getAddedNodes(allNodes, allNodes.length + 1);
+
+    expect(addedNodes).toEqual(allNodes);
   });
 });

@@ -1,39 +1,42 @@
 import { createContext, useContext, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import useDisclosure from '@/hooks/useDisclosure/useDisclosure';
+import Dialog from '@/components/Elements/Dialog/Dialog';
 
 type ModalContextValue = {
   opened: boolean;
-  title: string;
-  description: string;
+  content: ModalContent;
   open: (title: string, description: string) => void;
   close: () => void;
 };
 
+type ModalContent = {
+  title: string;
+  description: string;
+};
+
+const initialContent: ModalContent = { title: '', description: '' };
+
 export const ModalContext = createContext<ModalContextValue>({
   opened: false,
-  title: '',
-  description: '',
+  content: initialContent,
   open: () => null,
   close: () => null,
 });
 
 export const ModalProvider = ({ children }: PropsWithChildren) => {
   const [opened, { open, close }] = useDisclosure();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [content, setContent] = useState<ModalContent>(initialContent);
 
   const openModal = (title: string, description: string) => {
-    setTitle(title);
-    setDescription(description);
+    setContent({ title, description });
     open();
   };
 
   return (
-    <ModalContext.Provider
-      value={{ opened, title, description, open: openModal, close }}
-    >
+    <ModalContext.Provider value={{ opened, content, open: openModal, close }}>
       {children}
+      <Dialog open={opened} {...content} onClose={close} />
     </ModalContext.Provider>
   );
 };
