@@ -136,6 +136,17 @@ export function allNodesInView(
   return nodes.every((node) => isNodeFullyInView(node, stageRect, stageScale));
 }
 
-export function getAddedNodes(nodes: NodeObject[], addedcount: number) {
-  return nodes.slice(-addedcount);
+export function getAddedNodes(
+  nodes: NodeObject[],
+  addedCount: number,
+): NodeObject[] {
+  if (addedCount <= 0 || nodes.length === 0) {
+    return [];
+  }
+
+  if (addedCount >= nodes.length) {
+    return nodes;
+  }
+
+  return nodes.slice(-addedCount);
 }

@@ -12,7 +12,7 @@ function useKeyDown(
     element.addEventListener('keydown', handler);
 
     return () => {
-      element?.removeEventListener('keydown', handler);
+      element.removeEventListener('keydown', handler);
     };
   }, [element, handler]);
 }
