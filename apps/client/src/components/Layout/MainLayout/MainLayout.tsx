@@ -7,14 +7,12 @@ import {
   getPointerRect,
 } from '@/components/Canvas/DrawingCanvas/helpers/stage';
 import ContextMenu from '@/components/ContextMenu/ContextMenu';
-import Dialog from '@/components/Elements/Dialog/Dialog';
 import Panels from '@/components/Panels/Panels';
 import { KEYS } from '@/constants/keys';
 import { TOOLS } from '@/constants/panels/tools';
 import { NODES_LAYER_INDEX } from '@/constants/shape';
-import { useModal } from '@/contexts/modal';
 import { useWebSocket } from '@/contexts/websocket';
-import useKeyDown from '@/hooks/useKeyDown';
+import useKeyDown from '@/hooks/useKeyDown/useKeyDown';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
   type HistoryActionKey,
@@ -40,7 +38,6 @@ const MainLayout = ({ viewportSize }: Props) => {
   const { stageConfig } = useAppSelector(selectCanvas);
 
   const ws = useWebSocket();
-  const modal = useModal();
 
   const { updatePage } = usePageMutation(ws?.pageId ?? '');
 
@@ -198,12 +195,6 @@ const MainLayout = ({ viewportSize }: Props) => {
           />
         </ContextMenu.Trigger>
       </ContextMenu.Root>
-      <Dialog
-        open={modal.opened}
-        title={modal.title}
-        description={modal.description}
-        onClose={modal.close}
-      />
     </Styled.Container>
   );
 };
