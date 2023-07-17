@@ -17,13 +17,18 @@ import * as Styled from './StylePanel.styled';
 
 export type StylePanelProps = {
   selectedNodes: NodeObject[];
+  isActive: boolean;
   onStyleChange: (
     updatedStyle: Partial<NodeStyle>,
     updateAsync?: boolean,
   ) => void;
 };
 
-const StylePanel = ({ selectedNodes, onStyleChange }: StylePanelProps) => {
+const StylePanel = ({
+  selectedNodes,
+  isActive,
+  onStyleChange,
+}: StylePanelProps) => {
   const style = useMemo(() => {
     const styles: NodeStyle[] = selectedNodes.map(({ style }) => style);
 
@@ -57,8 +62,6 @@ const StylePanel = ({ selectedNodes, onStyleChange }: StylePanelProps) => {
 
     return { line: true, size: true };
   }, [selectedNodes]);
-
-  const isActive = selectedNodes.length > 0;
 
   const handleColorSelect = (color: NodeColor) => {
     onStyleChange({ color });

@@ -88,9 +88,9 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       }
     }, [drawing, toolType, draggingStage]);
 
-    const isStageDraggable = toolType === 'hand';
+    const isHandTool = toolType === 'hand';
     const isSelectRectActive = drawing && toolType === 'select';
-    const isNodesLayerActive = !drawing || toolType === 'hand';
+    const isNodesLayerActive = !drawing || isHandTool;
 
     useEffect(() => {
       throttledOnNodesSelect.current(intersectedNodesIds);
@@ -442,7 +442,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         {...config}
         tabIndex={0}
         style={{ ...containerStyle, cursor: cursorStyle, touchAction: 'none' }}
-        draggable={isStageDraggable}
+        draggable={isHandTool}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -458,7 +458,6 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
             stageRef={ref}
             stageConfig={stageConfig}
           />
-
           {ws?.isConnected && (
             <Suspense>
               <CollabLayer
@@ -480,7 +479,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         </Layer>
         <Layer listening={isNodesLayerActive}>
           <Nodes
-            selectedNodesIds={intersectedNodesIds}
+            selectedNodesIds={!isHandTool ? intersectedNodesIds : []}
             onNodePress={handleNodePress}
             onNodesChange={handleNodesChange}
           />

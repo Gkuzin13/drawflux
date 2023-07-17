@@ -47,11 +47,17 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
   const dispatch = useAppDispatch();
 
+  const isHandTool = useMemo(() => toolType === 'hand', [toolType]);
+
   const selectedNodes = useMemo(() => {
     const nodesIds = new Set(intersectedNodesIds);
 
     return nodes.filter((node) => nodesIds.has(node.nodeProps.id));
   }, [intersectedNodesIds, nodes]);
+
+  const isStylePanelActive = useMemo(() => {
+    return selectedNodes.length > 0 && !isHandTool;
+  }, [selectedNodes.length, isHandTool]);
 
   const enabledControls = useMemo(() => {
     return {
@@ -59,7 +65,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
       redo: Boolean(future.length),
       deleteSelectedNodes: Boolean(intersectedNodesIds.length),
     };
-  }, [past, future, intersectedNodesIds]);
+  }, [past, future, intersectedNodesIds.length]);
 
   const disabledMenuItems = useMemo((): MenuKey[] | null => {
     if (ws?.isConnected) {
@@ -206,12 +212,15 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   return (
     <Styled.Container>
       <Styled.TopPanel>
-        <ControlPanel
-          onControl={handleControlActions}
-          enabledControls={enabledControls}
-        />
+        {!isHandTool && (
+          <ControlPanel
+            onControl={handleControlActions}
+            enabledControls={enabledControls}
+          />
+        )}
         <StylePanel
           selectedNodes={selectedNodes}
+          isActive={isStylePanelActive}
           onStyleChange={handleStyleChange}
         />
         <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
