@@ -2,7 +2,12 @@ import type Konva from 'konva';
 import { useMemo } from 'react';
 import type { NodeColor, NodeObject, StageConfig, colors } from 'shared';
 import { getShapeLength } from '@/utils/math';
-import { getColorValue, getDashValue, getSizeValue } from '@/utils/shape';
+import {
+  getColorValue,
+  getDashValue,
+  getFillValue,
+  getSizeValue,
+} from '@/utils/shape';
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
@@ -42,12 +47,16 @@ function useNode(
 
   const config = useMemo(() => {
     const size = getSizeValue(node.style.size);
+    const fillEnabled = (node.style.fill ?? 'none') !== 'none';
+    const isFillable = node.type !== 'arrow' && node.type !== 'text';
 
     const shapeConfig: UseNodeShapeConfig & Config = {
       id: node.nodeProps.id,
       visible: node.nodeProps.visible,
       rotation: node.nodeProps.rotation,
       stroke: getColorValue(node.style.color),
+      fill: getFillValue(node.style.fill, node.style.color),
+      fillEnabled: fillEnabled && isFillable,
       strokeWidth: size * stageScale,
       opacity: node.style.opacity,
       dash: [],

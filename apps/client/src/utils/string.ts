@@ -1,3 +1,5 @@
+import { Util } from 'konva/lib/Util';
+
 export function capitalizeFirstLetter(string: string) {
   if (typeof string !== 'string') {
     throw new Error('The provided input must be a string');
@@ -24,4 +26,14 @@ export const getKeyTitle = (name: string, keys: string[]) => {
   return `${capitalizedName} — ${keys
     .map((key) => capitalizeFirstLetter(`${key}`))
     .join(' + ')}`;
+};
+
+export const getStyleTitle = (name: string, value: string) => {
+  return `${name} — ${value}`;
+};
+
+export const hexToRGBa = (hex: string, alpha: number) => {
+  const { r, g, b } = Util.getRGB(hex);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };

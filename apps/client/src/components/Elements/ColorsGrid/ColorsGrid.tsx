@@ -4,6 +4,7 @@ import { ICON_SIZES } from '@/constants/icon';
 import { COLOR } from '@/constants/panels/style';
 import { getColorValue } from '@/utils/shape';
 import * as Styled from './ColorsGrid.styled';
+import { getStyleTitle } from '@/utils/string';
 
 type Props = {
   value: string;
@@ -30,7 +31,7 @@ const ColorsGrid = ({ withLabel = false, value, onSelect }: Props) => {
               checked={color.value === value}
               value={color.value}
               aria-label={`${color.name} color`}
-              title={color.name}
+              title={getStyleTitle('Color', color.name)}
               color={color.value === value ? 'secondary' : 'secondary-light'}
               style={{ color: getColorValue(color.value) }}
             >

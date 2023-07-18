@@ -21,6 +21,7 @@ export type NodeType = z.infer<typeof type>;
 export type NodeLine = NodeStyle['line'];
 export type NodeSize = NodeStyle['size'];
 export type NodeColor = NodeStyle['color'];
+export type NodeFill = NodeStyle['fill'];
 
 export type Point = z.infer<(typeof nodeProps)['shape']['point']>;
 

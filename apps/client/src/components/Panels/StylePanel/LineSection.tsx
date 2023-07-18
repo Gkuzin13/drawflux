@@ -3,6 +3,7 @@ import type { NodeLine } from 'shared';
 import { ICON_SIZES } from '@/constants/icon';
 import { LINE } from '@/constants/panels/style';
 import * as Styled from './StylePanel.styled';
+import { getStyleTitle } from '@/utils/string';
 
 type Props = {
   value?: NodeLine;
@@ -25,7 +26,7 @@ const LineSection = ({ value, onLineChange }: Props) => {
             <Styled.Item
               key={line.value}
               value={line.value}
-              title={line.name}
+              title={getStyleTitle('Line', line.name)}
               checked={line.value === value}
               color={line.value === value ? 'secondary' : 'secondary-light'}
             >

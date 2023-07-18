@@ -8,14 +8,16 @@ import {
 
 describe('createNode', () => {
   it('should create a node object correctly', () => {
-    const node = createNode('arrow', [180, 100]);
+    const node = createNode('ellipse', [180, 100]);
+    node.style.fill = 'solid';
 
-    expect(node.type).toBe('arrow');
+    expect(node.type).toBe('ellipse');
     expect(node.nodeProps.point).toEqual([180, 100]);
     expect(node.text).toBeNull();
     expect(node.style.opacity).toBe(1);
     expect(node.style.line).toBe('solid');
     expect(node.style.color).toBe('black');
+    expect(node.style.fill).toBe('solid');
     expect(node.style.size).toBe('medium');
     expect(node.style.animated).toBe(false);
     expect(node.nodeProps.id).toBeTruthy();

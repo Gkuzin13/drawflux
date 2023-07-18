@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type {
   NodeColor,
+  NodeFill,
   NodeLine,
   NodeObject,
   NodeSize,
@@ -14,6 +15,7 @@ import LineSection from './LineSection';
 import OpacitySection from './OpacitySection';
 import SizeSection from './SizeSection';
 import * as Styled from './StylePanel.styled';
+import FillSection from './FillSection';
 
 export type StylePanelProps = {
   selectedNodes: NodeObject[];
@@ -34,11 +36,14 @@ const StylePanel = ({
 
     const colors = new Set(styles.map(({ color }) => color));
     const lines = new Set(styles.map(({ line }) => line));
+    const fills = new Set(styles.map(({ fill }) => fill));
     const sizes = new Set(styles.map(({ size }) => size));
     const opacities = new Set(styles.map(({ opacity }) => opacity));
     const allShapesAnimated = styles.every(({ animated }) => animated);
 
-    const getValueIfAllIdentical = <T extends string | number | boolean>(
+    const getValueIfAllIdentical = <
+      T extends string | number | boolean | undefined,
+    >(
       set: Set<T>,
     ): T | undefined => {
       return set.size === 1 ? [...set][0] : undefined;
@@ -47,6 +52,7 @@ const StylePanel = ({
     return {
       color: getValueIfAllIdentical(colors),
       line: getValueIfAllIdentical(lines),
+      fill: getValueIfAllIdentical(fills),
       size: getValueIfAllIdentical(sizes),
       opacity: getValueIfAllIdentical(opacities),
       animated: allShapesAnimated,
@@ -62,6 +68,14 @@ const StylePanel = ({
 
     return { line: true, size: true };
   }, [selectedNodes]);
+
+  const fillSectionValue = useMemo(() => {
+    if (selectedNodes.length > 1) {
+      return style.fill;
+    }
+
+    return style.fill ?? 'none';
+  }, [style.fill, selectedNodes.length]);
 
   const handleColorSelect = (color: NodeColor) => {
     onStyleChange({ color });
@@ -92,6 +106,10 @@ const StylePanel = ({
     handleOpacitySelect(value, true);
   };
 
+  const handleFillChange = (value: NodeFill) => {
+    onStyleChange({ fill: value });
+  };
+
   return (
     <Styled.Container active={isActive}>
       <ColorSection value={style.color} onColorChange={handleColorSelect} />
@@ -100,6 +118,7 @@ const StylePanel = ({
         onValueChange={handleOpacityChange}
         onValueCommit={handleOpacityCommit}
       />
+      <FillSection value={fillSectionValue} onFillChange={handleFillChange} />
       {enabledOptions.line && (
         <>
           <LineSection value={style.line} onLineChange={handleLineSelect} />

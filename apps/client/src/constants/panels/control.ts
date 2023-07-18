@@ -28,7 +28,7 @@ export const CONTROL = [
     name: 'Delete',
     value: canvasActions.deleteNodes,
     icon: IoTrashOutline,
-    key: KEYS.C,
-    modifierKeys: [KEYS.CTRL],
+    key: 'Del',
+    modifierKeys: [],
   },
 ] as const;

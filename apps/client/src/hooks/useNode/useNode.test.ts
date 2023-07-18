@@ -2,12 +2,13 @@ import { renderHook } from '@testing-library/react';
 import type { ShapeConfig } from 'konva/lib/Shape';
 import type { StageConfig } from 'shared';
 import { createNode } from '@/utils/node';
-import { getColorValue, getSizeValue } from '@/utils/shape';
+import { getColorValue, getFillValue, getSizeValue } from '@/utils/shape';
 import useNode, { baseConfig } from './useNode';
 
 describe('useNode', () => {
-  const node = createNode('arrow', [0, 0]);
+  const node = createNode('rectangle', [0, 0]);
   node.style.size = 'extra-large';
+  node.style.fill = 'solid';
 
   const stageConfig: StageConfig = {
     position: { x: 0, y: 0 },
@@ -25,6 +26,8 @@ describe('useNode', () => {
       stroke: getColorValue(node.style.color),
       strokeWidth: getSizeValue(node.style.size),
       dash: [],
+      fillEnabled: true,
+      fill: getFillValue(node.style.fill, node.style.color),
       opacity: node.style.opacity,
       listening: node.nodeProps.visible,
     };
