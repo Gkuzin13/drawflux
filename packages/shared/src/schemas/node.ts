@@ -23,6 +23,12 @@ const Line = z.union([
   z.literal('dotted'),
 ]);
 
+const Fill = z.union([
+  z.literal('none'),
+  z.literal('semi'),
+  z.literal('solid'),
+]);
+
 export const NodePoint = z.tuple([z.number(), z.number()]);
 
 const NodeProps = z.object({
@@ -38,6 +44,7 @@ const NodeProps = z.object({
 
 const Style = z.object({
   color: createUnionSchema(Object.keys(colors) as (keyof typeof colors)[]),
+  fill: Fill.optional(),
   line: Line,
   size: Size,
   animated: z.boolean().optional(),

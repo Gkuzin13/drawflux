@@ -1,5 +1,6 @@
-import type { NodeColor, NodeLine, NodeSize } from 'shared';
+import type { NodeColor, NodeFill, NodeLine, NodeSize } from 'shared';
 import { colors } from 'shared';
+import { hexToRGBa } from './string';
 
 export function getDashValue(
   shapeLength: number,
@@ -36,13 +37,13 @@ export function getSizeValue(key: NodeSize) {
     case 'small':
       return 2;
     case 'medium':
-      return 4;
+      return 3;
     case 'large':
-      return 6;
+      return 5;
     case 'extra-large':
       return 8;
     default:
-      return 4;
+      return 3;
   }
 }
 
@@ -52,4 +53,17 @@ export function getColorValue(key: NodeColor): (typeof colors)[NodeColor] {
   }
 
   return '#000000';
+}
+
+export function getFillValue(fill: NodeFill, color: NodeColor) {
+  switch (fill) {
+    case 'semi': {
+      return hexToRGBa(colors.white50, 0.5);
+    }
+    case 'solid': {
+      return hexToRGBa(getColorValue(color), 0.2);
+    }
+    default:
+      return undefined;
+  }
 }

@@ -1,12 +1,15 @@
 import type { IconBaseProps, IconType } from 'react-icons';
 import {
   TbCircleFilled,
+  TbLayersIntersect,
+  TbLayersSubtract,
   TbLineDashed,
   TbLineDotted,
   TbMinus,
   TbSlash,
+  TbSquaresFilled,
 } from 'react-icons/tb';
-import type { NodeLine, NodeSize, NodeColor } from 'shared';
+import type { NodeLine, NodeSize, NodeColor, NodeFill } from 'shared';
 import { Schemas } from 'shared';
 
 export type Style<Value> = {
@@ -30,6 +33,25 @@ export const LINE: Style<NodeLine>[] = [
     value: 'dotted',
     name: 'Dotted',
     icon: TbLineDotted,
+  },
+];
+
+export const FILL: Style<NodeFill>[] = [
+  {
+    value: 'none',
+    name: 'None',
+    icon: TbLayersIntersect,
+  },
+  {
+    value: 'semi',
+    name: 'Semi',
+    icon: TbLayersSubtract,
+  },
+  {
+    value: 'solid',
+    name: 'Solid',
+    icon: (props: IconBaseProps) =>
+      TbSquaresFilled({ transform: 'rotate(-90)', ...props }),
   },
 ];
 

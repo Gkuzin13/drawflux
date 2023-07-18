@@ -9,7 +9,7 @@ export const TRANSFORMER = {
 };
 
 export const RECT = {
-  CORNER_RADIUS: 8,
+  CORNER_RADIUS: 6,
   MIN_SIZE: 10,
 };
 
