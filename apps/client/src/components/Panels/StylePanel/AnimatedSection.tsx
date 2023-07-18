@@ -2,6 +2,7 @@ import { memo } from 'react';
 import type { NodeStyle } from 'shared';
 import { ANIMATED } from '@/constants/panels/style';
 import * as Styled from './StylePanel.styled';
+import { getStyleTitle } from '@/utils/string';
 
 type Props = {
   value: NodeStyle['animated'];
@@ -10,18 +11,20 @@ type Props = {
 };
 
 const AnimatedSection = ({ value, isDisabled, onAnimatedChange }: Props) => {
+  const valueTitle = value ? 'On' : 'Off';
+
   return (
     <div aria-labelledby="shape-animated">
-      <Styled.Label>Animated</Styled.Label>
+      <Styled.Label>{ANIMATED.name}</Styled.Label>
       <Styled.Toggle
         aria-label="Toggle Animated"
-        title={ANIMATED.name}
+        title={getStyleTitle(ANIMATED.name, valueTitle)}
         pressed={value}
         color={value ? 'primary' : 'secondary-light'}
         disabled={isDisabled}
         onPressedChange={onAnimatedChange}
       >
-        {value ? 'On' : 'Off'}
+        {valueTitle}
       </Styled.Toggle>
     </div>
   );
