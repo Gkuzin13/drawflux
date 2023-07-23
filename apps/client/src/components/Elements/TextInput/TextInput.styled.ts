@@ -8,7 +8,7 @@ export const Container = styled('div', {
 export const Input = styled('input', {
   borderRadius: '$1',
   border: '1px solid $gray200',
-  padding: '$2 $2',
+  padding: '$1 $2',
   backgroundColor: '$white',
   '&:focus': {
     outline: 'none',
