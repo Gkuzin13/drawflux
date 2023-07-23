@@ -1,21 +1,21 @@
-import { TbFileDownload, TbFileUpload, TbPhotoDown } from 'react-icons/tb';
+import type { Entity } from '@/constants/index';
 
-export type MenuPanelActionType = (typeof MENU_PANEL_ACTIONS)[number]['key'];
+export type MenuPanelActionType = (typeof MENU_PANEL_ACTIONS)[number]['value'];
 
-export const MENU_PANEL_ACTIONS = [
+export const MENU_PANEL_ACTIONS: Entity<string>[] = [
   {
-    key: 'open',
+    value: 'open',
     name: 'Open',
-    icon: TbFileUpload,
+    icon: 'fileUpload',
   },
   {
-    key: 'save',
+    value: 'save',
     name: 'Save',
-    icon: TbFileDownload,
+    icon: 'fileDownload',
   },
   {
-    key: 'export-as-image',
+    value: 'export-as-image',
     name: 'Export Image',
-    icon: TbPhotoDown,
+    icon: 'photoDown',
   },
-] as const;
+];

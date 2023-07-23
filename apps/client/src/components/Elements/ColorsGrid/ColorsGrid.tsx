@@ -1,16 +1,31 @@
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import * as PanelStyled from '@/components/Panels/StylePanel/StylePanel.styled';
-import { ICON_SIZES } from '@/constants/icon';
-import { COLOR } from '@/constants/panels/style';
 import { getColorValue } from '@/utils/shape';
 import * as Styled from './ColorsGrid.styled';
 import { getStyleTitle } from '@/utils/string';
+import type { NodeColor } from 'shared';
+import ColorCircle from '../ColorCircle/ColorCircle';
 
 type Props = {
   value: string;
   withLabel?: boolean;
   onSelect: (color: (typeof COLOR)[number]['value']) => void;
 };
+
+const COLOR: { name: string; value: NodeColor }[] = [
+  { name: 'Red', value: 'red600' },
+  { name: 'Pink', value: 'pink600' },
+  { name: 'Deep Orange', value: 'deep-orange600' },
+  { name: 'Yellow', value: 'yellow600' },
+  { name: 'Green', value: 'green600' },
+  { name: 'Teal', value: 'teal600' },
+  { name: 'Light Blue', value: 'light-blue600' },
+  { name: 'Blue', value: 'blue600' },
+  { name: 'Deep Purple', value: 'deep-purple600' },
+  { name: 'Indigo', value: 'indigo600' },
+  { name: 'Black', value: 'black' },
+  { name: 'Gray', value: 'gray600' },
+];
 
 const ColorsGrid = ({ withLabel = false, value, onSelect }: Props) => {
   return (
@@ -35,7 +50,7 @@ const ColorsGrid = ({ withLabel = false, value, onSelect }: Props) => {
               color={color.value === value ? 'secondary' : 'secondary-light'}
               style={{ color: getColorValue(color.value) }}
             >
-              {color.icon({ size: ICON_SIZES.LARGE })}
+              <ColorCircle />
             </Styled.Color>
           );
         })}

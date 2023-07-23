@@ -1,9 +1,9 @@
 import { memo } from 'react';
 import type { NodeFill } from 'shared';
-import { ICON_SIZES } from '@/constants/icon';
 import { FILL } from '@/constants/panels/style';
 import * as Styled from './StylePanel.styled';
 import { getStyleTitle } from '@/utils/string';
+import Icon from '@/components/Elements/Icon/Icon';
 
 type FillValue = Exclude<NodeFill, undefined>;
 
@@ -32,7 +32,7 @@ const FillSection = ({ value, onFillChange }: Props) => {
               checked={fill.value === value}
               color={fill.value === value ? 'secondary' : 'secondary-light'}
             >
-              {fill.icon({ size: ICON_SIZES.LARGE })}
+              <Icon name={fill.icon} size="lg" />
             </Styled.Item>
           );
         })}

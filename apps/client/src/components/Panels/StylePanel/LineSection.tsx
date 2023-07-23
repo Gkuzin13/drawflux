@@ -1,9 +1,9 @@
 import { memo } from 'react';
 import type { NodeLine } from 'shared';
-import { ICON_SIZES } from '@/constants/icon';
 import { LINE } from '@/constants/panels/style';
 import * as Styled from './StylePanel.styled';
 import { getStyleTitle } from '@/utils/string';
+import Icon from '@/components/Elements/Icon/Icon';
 
 type Props = {
   value?: NodeLine;
@@ -30,7 +30,7 @@ const LineSection = ({ value, onLineChange }: Props) => {
               checked={line.value === value}
               color={line.value === value ? 'secondary' : 'secondary-light'}
             >
-              {line.icon({ size: ICON_SIZES.LARGE })}
+              <Icon name={line.icon} size="lg" />
             </Styled.Item>
           );
         })}

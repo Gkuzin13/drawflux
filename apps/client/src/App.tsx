@@ -5,14 +5,12 @@ import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { storage } from '@/utils/storage';
 import MainLayout from './components/Layout/MainLayout/MainLayout';
 import { useWebSocket } from './contexts/websocket';
-import useWindowSize from './hooks/useWindowSize/useWindowSize';
 import useWSMessage from './hooks/useWSMessage';
 import { historyActions } from './stores/reducers/history';
 import { collaborationActions } from './stores/slices/collaboration';
 
 const App = () => {
   const { nodes } = useAppSelector(selectCanvas);
-  const windowSize = useWindowSize();
 
   const ws = useWebSocket();
 
@@ -101,7 +99,7 @@ const App = () => {
     }
   }, [ws?.pageId, dispatch]);
 
-  return <MainLayout viewportSize={windowSize} />;
+  return <MainLayout />;
 };
 
 export default App;

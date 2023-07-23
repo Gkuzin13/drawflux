@@ -17,5 +17,3 @@ export const KEYS = {
   V: 'v',
   Z: 'z',
 } as const;
-
-export const CTRL_KEY = 'ctrlKey';

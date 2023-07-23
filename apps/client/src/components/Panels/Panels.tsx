@@ -1,9 +1,8 @@
 import type Konva from 'konva';
 import { type RefObject, useMemo, lazy, Suspense, useCallback } from 'react';
 import type { NodeStyle, WSMessage, User } from 'shared';
-import type { ControlAction } from '@/constants/panels/control';
 import { type MenuPanelActionType } from '@/constants/panels/menu';
-import { type Tool } from '@/constants/panels/tools';
+import { type ToolType } from '@/constants/panels/tools';
 import { useModal } from '@/contexts/modal';
 import { useWebSocket } from '@/contexts/websocket';
 import useNetworkState from '@/hooks/useNetworkState/useNetworkState';
@@ -17,7 +16,9 @@ import { collaborationActions } from '@/stores/slices/collaboration';
 import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, importProject } from '@/utils/file';
 import { sendMessage } from '@/utils/websocket';
-import ControlPanel from './ControlPanel/ControlPanel';
+import ControlPanel, {
+  type ControlActionKey,
+} from './ControlPanel/ControlPanel';
 import MenuPanel, { type MenuKey } from './MenuPanel/MenuPanel';
 import * as Styled from './Panels.styled';
 import SharePanel from './SharePanel/SharePanel';
@@ -26,6 +27,7 @@ import ToolsPanel from './ToolsPanel/ToolsPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
 import usePageMutation from '@/hooks/usePageMutation';
 import { PROJECT_FILE_EXT, PROJECT_FILE_NAME } from '@/constants/app';
+import { historyActions } from '@/stores/reducers/history';
 
 type Props = {
   stageRef: RefObject<Konva.Stage>;
@@ -75,7 +77,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   }, [ws]);
 
   const handleToolSelect = useCallback(
-    (type: Tool['value']) => {
+    (type: ToolType) => {
       dispatch(canvasActions.setToolType(type));
     },
     [dispatch],
@@ -161,8 +163,8 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   );
 
   const handleControlActions = useCallback(
-    (action: ControlAction) => {
-      if (action.type === 'canvas/deleteNodes') {
+    (actionType: ControlActionKey) => {
+      if (actionType === 'deleteNodes') {
         dispatch(canvasActions.deleteNodes(intersectedNodesIds));
 
         if (ws?.isConnected) {
@@ -176,18 +178,22 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
         return;
       }
 
-      dispatch(action());
+      if (actionType === 'undo' || actionType === 'redo') {
+        const action = historyActions[actionType];
 
-      if (ws?.isConnected) {
-        const historyAction = action.type === 'history/redo' ? 'redo' : 'undo';
+        dispatch(action());
 
-        const message: WSMessage = {
-          type: 'history-change',
-          data: { action: historyAction },
-        };
+        if (ws?.isConnected) {
+          const historyAction = actionType === 'redo' ? 'redo' : 'undo';
 
-        sendMessage(ws.connection, message);
-        handleUpdatePage();
+          const message: WSMessage = {
+            type: 'history-change',
+            data: { action: historyAction },
+          };
+
+          sendMessage(ws.connection, message);
+          handleUpdatePage();
+        }
       }
     },
     [ws, intersectedNodesIds, dispatch, handleUpdatePage],

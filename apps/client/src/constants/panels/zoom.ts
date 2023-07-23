@@ -1,20 +1,26 @@
-import { IoAdd, IoRemove } from 'react-icons/io5';
+import type { Entity } from '../index';
 
 export type ZoomAction = (typeof ZOOM)[keyof typeof ZOOM]['value'];
 
-export const ZOOM = {
-  IN: {
+type Zoom = {
+  in: Entity;
+  out: Entity;
+  reset: Omit<Entity, 'icon'>;
+};
+
+export const ZOOM: Zoom = {
+  in: {
     name: 'Zoom In',
     value: 'increase',
-    icon: IoAdd,
+    icon: 'plus',
   },
-  OUT: {
+  out: {
     name: 'Zoom Out',
     value: 'decrease',
-    icon: IoRemove,
+    icon: 'minus',
   },
-  RESET: {
+  reset: {
     name: 'Reset Zoom',
     value: 'reset',
   },
-} as const;
+};

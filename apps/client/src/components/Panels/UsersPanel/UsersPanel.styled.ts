@@ -1,7 +1,7 @@
 import * as Popover from '@radix-ui/react-popover';
-import { TbCircleFilled } from 'react-icons/tb';
 import { styled } from 'shared';
 import * as PanelStyled from '../Panels.styled';
+import ColorCircle from '@/components/Elements/ColorCircle/ColorCircle';
 
 export const Container = styled(PanelStyled.Panel, {});
 
@@ -35,6 +35,6 @@ export const Indicator = styled('span', {
 
 export const Name = styled('span', {});
 
-export const Color = styled(TbCircleFilled, {
+export const Color = styled(ColorCircle, {
   flexShrink: 0,
 });

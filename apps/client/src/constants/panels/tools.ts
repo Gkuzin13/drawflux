@@ -1,54 +1,54 @@
-import { type IconType } from 'react-icons';
-import {
-  IoEllipseOutline,
-  IoSquareOutline,
-  IoHandRightOutline,
-} from 'react-icons/io5';
-import { RxCursorArrow } from 'react-icons/rx';
-import { TbArrowUpRight, TbScribble, TbTypography } from 'react-icons/tb';
+import { KEYS } from '@/constants/keys';
+import type { Entity } from '@/constants/index';
 import type { AppState } from '../app';
-import { KEYS } from '../keys';
 
-export type Tool = {
-  icon: IconType;
-  value: AppState['page']['toolType'];
+export type Tool = Entity<ToolType> & {
   key: (typeof KEYS)[keyof typeof KEYS];
 };
 
-export const TOOLS: Tool[] = [
+export type ToolType = AppState['page']['toolType'];
+
+export const TOOLS: readonly Tool[] = [
   {
-    icon: RxCursorArrow,
+    name: 'Select',
     value: 'select',
+    icon: 'pointer',
     key: KEYS.V,
   },
   {
-    icon: IoHandRightOutline,
+    name: 'Hand',
+    icon: 'handStop',
     value: 'hand',
     key: KEYS.H,
   },
   {
-    icon: TbArrowUpRight,
+    name: 'Arrow',
     value: 'arrow',
+    icon: 'arrowUpRight',
     key: KEYS.A,
   },
   {
-    icon: IoEllipseOutline,
+    name: 'Ellipse',
     value: 'ellipse',
+    icon: 'circle',
     key: KEYS.O,
   },
   {
-    icon: IoSquareOutline,
+    name: 'Rectangle',
     value: 'rectangle',
+    icon: 'square',
     key: KEYS.R,
   },
   {
-    icon: TbScribble,
+    name: 'Draw',
     value: 'draw',
+    icon: 'scribble',
     key: KEYS.P,
   },
   {
-    icon: TbTypography,
+    name: 'Text',
     value: 'text',
+    icon: 'text',
     key: KEYS.T,
   },
-];
+] as const;

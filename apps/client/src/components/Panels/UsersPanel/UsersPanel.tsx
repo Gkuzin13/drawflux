@@ -1,16 +1,15 @@
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { memo, useEffect, useRef, useState } from 'react';
-import { TbCheck, TbPencil, TbUsers } from 'react-icons/tb';
 import { type User, colors } from 'shared';
 import Button from '@/components/Elements/Button/Button';
 import ColorsGrid from '@/components/Elements/ColorsGrid/ColorsGrid';
 import TextInput from '@/components/Elements/TextInput/TextInput';
 import { USER } from '@/constants/app';
-import { ICON_SIZES } from '@/constants/icon';
 import { KEYS } from '@/constants/keys';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCollaboration } from '@/stores/slices/collaboration';
 import * as Styled from './UsersPanel.styled';
+import Icon from '@/components/Elements/Icon/Icon';
 
 type Props = {
   onUserChange: (user: User) => void;
@@ -63,23 +62,24 @@ const UsersPanel = ({ onUserChange }: Props) => {
     <PopoverPrimitive.Root onOpenChange={() => setIsEditing(false)}>
       <Styled.Container>
         <Styled.Trigger>
-          <TbUsers size={ICON_SIZES.SMALL} />
+          <Icon name="users" />
         </Styled.Trigger>
       </Styled.Container>
       <PopoverPrimitive.Portal>
         <Styled.Content align="end" sideOffset={4} css={{ minWidth: '$11' }}>
           {users.map((user) => {
             const isCurrentUser = user.id === userId;
+            const color = colors[user.color];
 
             return (
               <Styled.Info key={user.id}>
                 {isCurrentUser ? (
                   <PopoverPrimitive.Root>
-                    <PopoverPrimitive.Trigger title="Change user color">
-                      <Styled.Color
-                        color={colors[user.color]}
-                        size={ICON_SIZES.LARGE}
-                      />
+                    <PopoverPrimitive.Trigger
+                      title="Change user color"
+                      style={{ color }}
+                    >
+                      <Styled.Color />
                     </PopoverPrimitive.Trigger>
                     <PopoverPrimitive.Portal>
                       <Styled.Content
@@ -96,10 +96,7 @@ const UsersPanel = ({ onUserChange }: Props) => {
                     </PopoverPrimitive.Portal>
                   </PopoverPrimitive.Root>
                 ) : (
-                  <Styled.Color
-                    color={colors[user.color]}
-                    size={ICON_SIZES.LARGE}
-                  />
+                  <Styled.Color color={color} />
                 )}
                 {isCurrentUser && isEditing ? (
                   <TextInput
@@ -127,9 +124,9 @@ const UsersPanel = ({ onUserChange }: Props) => {
                       squared
                     >
                       {isEditing ? (
-                        <TbCheck size={ICON_SIZES.SMALL} />
+                        <Icon name="check" size="sm" />
                       ) : (
-                        <TbPencil size={ICON_SIZES.SMALL} />
+                        <Icon name="pencil" size="sm" />
                       )}
                     </Button>
                   </>

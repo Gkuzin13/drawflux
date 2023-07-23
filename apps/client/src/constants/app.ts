@@ -25,6 +25,8 @@ export const ZOOM_RANGE = {
   MIN: 0.1,
   MAX: 2.5,
 };
+export const ZOOM_MULTIPLIER_VALUE = 0.1;
+export const DEFAULT_ZOOM_VALUE = 1;
 
 export const appState = z.object({
   page: z.object({

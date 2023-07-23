@@ -24,16 +24,12 @@ import * as Styled from './MainLayout.styled';
 import usePageMutation from '@/hooks/usePageMutation';
 import { store } from '@/stores/store';
 import { getAddedNodes } from '@/utils/node';
+import useWindowSize from '@/hooks/useWindowSize/useWindowSize';
 
-type Props = {
-  viewportSize: {
-    width: number;
-    height: number;
-  };
-};
-
-const MainLayout = ({ viewportSize }: Props) => {
+const MainLayout = () => {
   const [selectedNodesIds, setSelectedNodesIds] = useState<string[]>([]);
+
+  const windowSize = useWindowSize();
 
   const { stageConfig } = useAppSelector(selectCanvas);
 
@@ -50,9 +46,9 @@ const MainLayout = ({ viewportSize }: Props) => {
     return {
       scale,
       ...stageConfig.position,
-      ...viewportSize,
+      ...windowSize,
     };
-  }, [stageConfig, viewportSize]);
+  }, [stageConfig, windowSize]);
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {

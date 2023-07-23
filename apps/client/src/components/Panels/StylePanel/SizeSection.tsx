@@ -1,9 +1,10 @@
 import { memo } from 'react';
 import type { NodeSize } from 'shared';
-import { ICON_SIZES } from '@/constants/icon';
 import { SIZE } from '@/constants/panels/style';
 import * as Styled from './StylePanel.styled';
 import { getStyleTitle } from '@/utils/string';
+import Icon from '@/components/Elements/Icon/Icon';
+import { getSizeValue } from '@/utils/shape';
 
 type Props = {
   value?: NodeSize;
@@ -30,7 +31,7 @@ const SizeSection = ({ value, onSizeChange }: Props) => {
               checked={size.value === value}
               color={size.value === value ? 'secondary' : 'secondary-light'}
             >
-              {size.icon({ size: ICON_SIZES.SMALL })}
+              <Icon name={size.icon} stroke={getSizeValue(size.value)} />
             </Styled.Item>
           );
         })}

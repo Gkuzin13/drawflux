@@ -136,7 +136,7 @@ export function getNormalizedInvertedRect(rect: IRect, scale: number): IRect {
     x: -rect.x / scale,
     y: -rect.y / scale,
     width: rect.width / scale,
-    height: rect.width / scale,
+    height: rect.height / scale,
   };
 }
 
