@@ -1,33 +1,32 @@
-import {
-  IoArrowUndoOutline,
-  IoArrowRedoOutline,
-  IoTrashOutline,
-} from 'react-icons/io5';
-import { historyActions } from '@/stores/reducers/history';
-import { canvasActions } from '@/stores/slices/canvas';
-import { KEYS } from '../keys.js';
+import type { HistoryActionKey } from '@/stores/reducers/history';
+import { type canvasActions } from '@/stores/slices/canvas';
+import { KEYS, type Key } from '../keys';
+import type { Entity } from '@/constants/index';
 
-export type ControlAction = (typeof CONTROL)[number]['value'];
+type Control = Entity<HistoryActionKey | keyof typeof canvasActions> & {
+  key: string;
+  modifierKeys: readonly Key[];
+};
 
-export const CONTROL = [
+export const CONTROL: readonly Control[] = [
   {
     name: 'Undo',
-    value: historyActions.undo,
-    icon: IoArrowUndoOutline,
-    key: KEYS.Z,
+    value: 'undo',
+    icon: 'arrowBackUp',
+    key: 'Z',
     modifierKeys: [KEYS.CTRL],
   },
   {
     name: 'Redo',
-    value: historyActions.redo,
-    icon: IoArrowRedoOutline,
-    key: KEYS.Z,
+    value: 'redo',
+    icon: 'arrowForwardUp',
+    key: 'Z',
     modifierKeys: [KEYS.CTRL, KEYS.SHIFT],
   },
   {
     name: 'Delete',
-    value: canvasActions.deleteNodes,
-    icon: IoTrashOutline,
+    value: 'deleteNodes',
+    icon: 'trash',
     key: 'Del',
     modifierKeys: [],
   },

@@ -1,16 +1,15 @@
 import { useEffect } from 'react';
-import { TbLink } from 'react-icons/tb';
 import type { SharePageRequestBody, SharePageResponse } from 'shared';
 import Button from '@/components/Elements/Button/Button';
 import Divider from '@/components/Elements/Divider/Divider';
 import Loader from '@/components/Elements/Loader/Loader';
 import { PAGE_URL_SEARCH_PARAM_KEY } from '@/constants/app';
-import { ICON_SIZES } from '@/constants/icon';
 import useFetch from '@/hooks/useFetch';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCanvas } from '@/stores/slices/canvas';
 import { urlSearchParam } from '@/utils/url';
 import * as Styled from './SharePanel.styled';
+import Icon from '@/components/Elements/Icon/Icon';
 
 const SharablePageContent = () => {
   const [{ data, status }, sharePage] = useFetch<
@@ -53,7 +52,7 @@ const SharablePageContent = () => {
         disabled={!nodes.length}
         onClick={handlePageShare}
       >
-        {status === 'idle' && <TbLink size={ICON_SIZES.SMALL} />}
+        {status === 'idle' && <Icon name="link" size="sm" />}
         {status === 'loading' || status === 'success' ? (
           <Loader />
         ) : (

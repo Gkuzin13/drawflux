@@ -1,8 +1,7 @@
 import type { ComponentProps } from '@stitches/react';
 import type { PropsWithChildren } from 'react';
-import { IoCloseOutline } from 'react-icons/io5';
 import Button from '@/components/Elements/Button/Button';
-import { ICON_SIZES } from '@/constants/icon';
+import Icon from '@/components/Elements/Icon/Icon';
 import * as Styled from './Toast.styled';
 
 type Props = ComponentProps<typeof Styled.Container> &
@@ -32,7 +31,7 @@ const Toast = ({ title, description, children, ...props }: Props) => {
             size="extra-small"
             squared
           >
-            <IoCloseOutline size={ICON_SIZES.SMALL} />
+            <Icon name="x" size="sm" />
           </Button>
         </Styled.Close>
       </Styled.Container>

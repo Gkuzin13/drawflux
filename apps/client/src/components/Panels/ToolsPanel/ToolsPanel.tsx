@@ -1,13 +1,13 @@
 import { Fragment, memo } from 'react';
 import Divider from '@/components/Elements/Divider/Divider';
-import { ICON_SIZES } from '@/constants/icon';
-import { TOOLS, type Tool } from '@/constants/panels/tools';
+import { TOOLS, type ToolType } from '@/constants/panels/tools';
 import { getKeyTitle } from '@/utils/string';
 import * as Styled from '../Panels.styled';
+import Icon from '@/components/Elements/Icon/Icon';
 
 type Props = {
-  activeTool: Tool['value'];
-  onToolSelect: (type: Tool['value']) => void;
+  activeTool: ToolType;
+  onToolSelect: (type: ToolType) => void;
 };
 
 const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
@@ -19,10 +19,10 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
             <Styled.Button
               size="small"
               color={activeTool === tool.value ? 'primary' : 'secondary'}
-              title={getKeyTitle(tool.value, [tool.key])}
+              title={getKeyTitle(tool.name, [tool.key])}
               onClick={() => onToolSelect(tool.value)}
             >
-              {tool.icon({ size: ICON_SIZES.MEDIUM })}
+              <Icon name={tool.icon} size="lg" stroke="md" />
             </Styled.Button>
             {index === 1 && <Divider orientation="vertical" />}
           </Fragment>

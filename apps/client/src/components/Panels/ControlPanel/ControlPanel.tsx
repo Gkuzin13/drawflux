@@ -1,11 +1,13 @@
 import { memo } from 'react';
-import { ICON_SIZES } from '@/constants/icon';
-import { CONTROL, type ControlAction } from '@/constants/panels/control';
+import { CONTROL } from '@/constants/panels/control';
 import { getKeyTitle } from '@/utils/string';
 import * as PanelStyled from '../Panels.styled';
+import Icon from '@/components/Elements/Icon/Icon';
+
+export type ControlActionKey = (typeof CONTROL)[number]['value'];
 
 type Props = {
-  onControl: (type: ControlAction) => void;
+  onControl: (actionType: ControlActionKey) => void;
   enabledControls: {
     undo: boolean;
     redo: boolean;
@@ -14,13 +16,13 @@ type Props = {
 };
 
 const ControlPanel = ({ enabledControls, onControl }: Props) => {
-  const getDisabledByControlValue = (action: ControlAction) => {
-    switch (action.type) {
-      case 'history/undo':
+  const getDisabledByControlValue = (actionType: ControlActionKey) => {
+    switch (actionType) {
+      case 'undo':
         return !enabledControls.undo;
-      case 'history/redo':
+      case 'redo':
         return !enabledControls.redo;
-      case 'canvas/deleteNodes':
+      case 'deleteNodes':
         return !enabledControls.deleteSelectedNodes;
       default:
         return false;
@@ -40,7 +42,7 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
             disabled={getDisabledByControlValue(control.value)}
             onClick={() => onControl(control.value)}
           >
-            {control.icon({ size: ICON_SIZES.SMALL })}
+            <Icon name={control.icon} />
           </PanelStyled.Button>
         );
       })}

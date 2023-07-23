@@ -1,6 +1,6 @@
 import { keyframes } from '@stitches/react';
-import { TbLoader2 } from 'react-icons/tb';
 import { styled } from 'shared';
+import Icon from '../Icon/Icon';
 
 const dash = keyframes({
   '0%': {
@@ -52,7 +52,7 @@ export const InnerContainer = styled('div', {
   gap: '$3',
 });
 
-export const Spinner = styled(TbLoader2, {
+export const Spinner = styled(Icon, {
   '& path:nth-of-type(2)': {
     transformOrigin: 'center',
     animation: `${dash} 1.5s linear infinite`,

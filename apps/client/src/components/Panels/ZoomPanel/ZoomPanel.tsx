@@ -1,9 +1,13 @@
 import { memo } from 'react';
-import { ZOOM_RANGE } from '@/constants/app';
-import { ICON_SIZES } from '@/constants/icon';
+import {
+  ZOOM_MULTIPLIER_VALUE,
+  DEFAULT_ZOOM_VALUE,
+  ZOOM_RANGE,
+} from '@/constants/app';
 import { ZOOM, type ZoomAction } from '@/constants/panels/zoom';
 import * as PanelStyled from '../Panels.styled';
 import * as Styled from './ZoomPanel.styled';
+import Icon from '@/components/Elements/Icon/Icon';
 
 type Props = {
   value: number;
@@ -16,13 +20,13 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
   const getScaleValueByAction = (currentValue: number, action: ZoomAction) => {
     switch (action) {
       case 'increase':
-        return Math.min(currentValue + 0.1, ZOOM_RANGE.MAX);
+        return Math.min(currentValue + ZOOM_MULTIPLIER_VALUE, ZOOM_RANGE.MAX);
       case 'decrease':
-        return Math.max(currentValue - 0.1, ZOOM_RANGE.MIN);
+        return Math.max(currentValue - ZOOM_MULTIPLIER_VALUE, ZOOM_RANGE.MIN);
       case 'reset':
-        return 1;
+        return DEFAULT_ZOOM_VALUE;
       default:
-        return 1;
+        return DEFAULT_ZOOM_VALUE;
     }
   };
 
@@ -34,27 +38,26 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
   return (
     <Styled.Container>
       <PanelStyled.Button
-        disabled={value === 1}
-        title={ZOOM.RESET.name}
-        css={{ fontSize: '$1', width: 'calc($5 * 2)' }}
-        squared={false}
-        onClick={() => handleZoomAction(ZOOM.RESET.value)}
+        disabled={value === DEFAULT_ZOOM_VALUE}
+        title={ZOOM.reset.name}
+        css={{ fontSize: '$1', width: 'calc($5 * 1.5)' }}
+        onClick={() => handleZoomAction(ZOOM.reset.value)}
       >
         {stageScalePercent}
       </PanelStyled.Button>
       <PanelStyled.Button
         disabled={value === ZOOM_RANGE.MAX}
-        title={ZOOM.IN.name}
-        onClick={() => handleZoomAction(ZOOM.IN.value)}
+        title={ZOOM.in.name}
+        onClick={() => handleZoomAction(ZOOM.in.value)}
       >
-        {ZOOM.IN.icon({ size: ICON_SIZES.SMALL })}
+        <Icon name={ZOOM.in.icon} size="sm" />
       </PanelStyled.Button>
       <PanelStyled.Button
         disabled={value === ZOOM_RANGE.MIN}
-        title={ZOOM.OUT.name}
-        onClick={() => handleZoomAction(ZOOM.OUT.value)}
+        title={ZOOM.out.name}
+        onClick={() => handleZoomAction(ZOOM.out.value)}
       >
-        {ZOOM.OUT.icon({ size: ICON_SIZES.SMALL })}
+        <Icon name={ZOOM.out.icon} size="sm" />
       </PanelStyled.Button>
     </Styled.Container>
   );

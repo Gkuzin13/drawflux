@@ -1,7 +1,6 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { IoCloseOutline } from 'react-icons/io5';
-import { ICON_SIZES } from '@/constants/icon';
 import * as Styled from './Dialog.styled';
+import Icon from '../Icon/Icon';
 
 type Props = {
   title: string;
@@ -23,7 +22,7 @@ const Dialog = ({ title, description, open, onClose }: Props) => {
         <Styled.Overlay />
         <Styled.Content>
           <Styled.Close>
-            <IoCloseOutline size={ICON_SIZES.LARGE} />
+            <Icon name="x" size="lg" />
           </Styled.Close>
           <Styled.Title>{title}</Styled.Title>
           <Styled.Description>{description}</Styled.Description>

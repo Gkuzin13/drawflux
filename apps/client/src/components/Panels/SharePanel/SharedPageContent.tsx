@@ -1,11 +1,10 @@
 import { Suspense, lazy } from 'react';
-import { TbClipboardCheck, TbCopy } from 'react-icons/tb';
 import type { QRCodeResponse } from 'shared';
 import Button from '@/components/Elements/Button/Button';
 import Loader from '@/components/Elements/Loader/Loader';
-import { ICON_SIZES } from '@/constants/icon';
 import useClipboard from '@/hooks/useClipboard/useClipboard';
 import * as Styled from './SharePanel.styled';
+import Icon from '@/components/Elements/Icon/Icon';
 
 type Props = {
   qrCode: QRCodeResponse | null;
@@ -39,11 +38,7 @@ const SharedPageContent = ({ qrCode, error }: Props) => {
         onClick={handleCopyLinkClick}
       >
         Copy Link
-        {!copied ? (
-          <TbCopy size={ICON_SIZES.MEDIUM} />
-        ) : (
-          <TbClipboardCheck size={ICON_SIZES.MEDIUM} />
-        )}
+        {!copied ? <Icon name="copy" /> : <Icon name="clipboardCheck" />}
       </Button>
       <Styled.Info>
         Anyone with the link has access to this page for 24 hours since sharing.

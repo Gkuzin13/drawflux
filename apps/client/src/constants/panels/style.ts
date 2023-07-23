@@ -1,57 +1,40 @@
-import type { IconBaseProps, IconType } from 'react-icons';
-import {
-  TbCircleFilled,
-  TbLayersIntersect,
-  TbLayersSubtract,
-  TbLineDashed,
-  TbLineDotted,
-  TbMinus,
-  TbSlash,
-  TbSquaresFilled,
-} from 'react-icons/tb';
-import type { NodeLine, NodeSize, NodeColor, NodeFill } from 'shared';
+import type { NodeLine, NodeSize, NodeFill } from 'shared';
 import { Schemas } from 'shared';
+import type { Entity } from '@/constants/index';
 
-export type Style<Value> = {
-  value: Value;
-  name: string;
-  icon: IconType;
-};
-
-export const LINE: Style<NodeLine>[] = [
+export const LINE: Entity<NodeLine>[] = [
   {
     value: 'solid',
     name: 'Solid',
-    icon: TbMinus,
+    icon: 'minus',
   },
   {
     value: 'dashed',
     name: 'Dashed',
-    icon: TbLineDashed,
+    icon: 'lineDashed',
   },
   {
     value: 'dotted',
     name: 'Dotted',
-    icon: TbLineDotted,
+    icon: 'lineDotted',
   },
 ];
 
-export const FILL: Style<NodeFill>[] = [
+export const FILL: Entity<NodeFill>[] = [
   {
     value: 'none',
     name: 'None',
-    icon: TbLayersIntersect,
+    icon: 'filledNone',
   },
   {
     value: 'semi',
     name: 'Semi',
-    icon: TbLayersSubtract,
+    icon: 'filledSemi',
   },
   {
     value: 'solid',
     name: 'Solid',
-    icon: (props: IconBaseProps) =>
-      TbSquaresFilled({ transform: 'rotate(-90)', ...props }),
+    icon: 'filledSolid',
   },
 ];
 
@@ -66,42 +49,25 @@ export const ANIMATED = {
   value: 'animated',
 } as const;
 
-export const SIZE: Style<NodeSize>[] = [
+export const SIZE: Entity<NodeSize>[] = [
   {
     value: 'small',
     name: 'Small',
-    icon: (props: IconBaseProps) => TbSlash({ strokeWidth: 2, ...props }),
+    icon: 'shapeSize',
   },
   {
     value: 'medium',
     name: 'Medium',
-    icon: (props: IconBaseProps) => TbSlash({ strokeWidth: 4, ...props }),
+    icon: 'shapeSize',
   },
   {
     value: 'large',
     name: 'Large',
-    icon: (props: IconBaseProps) => TbSlash({ strokeWidth: 6, ...props }),
+    icon: 'shapeSize',
   },
   {
     value: 'extra-large',
     name: 'Extra Large',
-    icon: (props: IconBaseProps) => TbSlash({ strokeWidth: 8, ...props }),
+    icon: 'shapeSize',
   },
 ];
-
-export const COLOR: Style<NodeColor>[] = [
-  { name: 'Red', value: 'red600' },
-  { name: 'Pink', value: 'pink600' },
-  { name: 'Deep Orange', value: 'deep-orange600' },
-  { name: 'Yellow', value: 'yellow600' },
-  { name: 'Green', value: 'green600' },
-  { name: 'Teal', value: 'teal600' },
-  { name: 'Light Blue', value: 'light-blue600' },
-  { name: 'Blue', value: 'blue600' },
-  { name: 'Deep Purple', value: 'deep-purple600' },
-  { name: 'Indigo', value: 'indigo600' },
-  { name: 'Black', value: 'black' },
-  { name: 'Gray', value: 'gray600' },
-].map((color) => {
-  return { ...color, icon: TbCircleFilled };
-}) as Style<NodeColor>[];
