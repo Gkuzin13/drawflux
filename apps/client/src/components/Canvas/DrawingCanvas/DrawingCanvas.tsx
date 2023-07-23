@@ -35,7 +35,10 @@ import {
 import { throttleFn } from '@/utils/timed';
 
 type Props = PropsWithRef<{
-  config: NodeConfig;
+  config: {
+    width: number;
+    height: number;
+  } & NodeConfig;
   containerStyle?: React.CSSProperties;
   onConfigChange: (config: Partial<StageConfig>) => void;
   onNodesUpdate: () => void;
@@ -455,8 +458,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         <Layer listening={false}>
           <BackgroundRect
             ref={backgroundRectRef}
-            stageRef={ref}
-            stageConfig={stageConfig}
+            stageScale={stageConfig.scale}
+            x={stageConfig.position.x}
+            y={stageConfig.position.y}
+            width={config.width}
+            height={config.height}
           />
           {ws?.isConnected && (
             <Suspense>
