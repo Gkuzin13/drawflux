@@ -73,14 +73,18 @@ const NodeGroupTransformer = ({ nodes, draggable, onDragEnd }: Props) => {
         if (node.nodeProps.points) {
           const points = [node.nodeProps.point, ...node.nodeProps.points];
 
-          const updatedPoints = getPointsAbsolutePosition(points, child, stage);
+          const [firstPoint, ...restPoints] = getPointsAbsolutePosition(
+            points,
+            child,
+            stage,
+          );
 
           return {
             ...node,
             nodeProps: {
               ...node.nodeProps,
-              point: updatedPoints[0],
-              points: updatedPoints.slice(1),
+              point: firstPoint,
+              points: restPoints,
             },
           };
         }

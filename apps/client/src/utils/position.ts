@@ -140,20 +140,26 @@ export function getNormalizedInvertedRect(rect: IRect, scale: number): IRect {
   };
 }
 
-export function calculateDuplicationDistance(
-  nodes: NodeObject[],
-  gap = 0,
-): number {
-  const nodeMinXEdge = Math.min(...nodes.map((node) => getNodeRect(node).x));
-  const nodeMaxXEdge = Math.max(
+export function getNodesMinMaxXPoints(nodes: NodeObject[]) {
+  const minX = Math.min(...nodes.map((node) => getNodeRect(node).x));
+  const maxX = Math.max(
     ...nodes.map((node) => {
       const { x, width } = getNodeRect(node);
       return x + width;
     }),
   );
 
-  const duplicationStartXPoint = nodeMaxXEdge + gap;
-  const distance = duplicationStartXPoint - nodeMinXEdge;
+  return { minX, maxX };
+}
+
+export function calculateNodesCopyDistance(
+  nodes: NodeObject[],
+  gap = 0,
+): number {
+  const { minX, maxX } = getNodesMinMaxXPoints(nodes);
+
+  const duplicationStartXPoint = maxX + gap;
+  const distance = duplicationStartXPoint - minX;
 
   return distance;
 }

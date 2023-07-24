@@ -28,6 +28,8 @@ export const ZOOM_RANGE = {
 export const ZOOM_MULTIPLIER_VALUE = 0.1;
 export const DEFAULT_ZOOM_VALUE = 1;
 
+export const DUPLICATION_GAP = 16;
+
 export const appState = z.object({
   page: z.object({
     ...Schemas.Page.shape.page.shape,

@@ -6,6 +6,8 @@ import {
   allNodesInView,
   duplicateNodes,
   getAddedNodes,
+  mapNodesIds,
+  makeNodesCopy,
   reorderNodes,
 } from '@/utils/node';
 import {
@@ -16,7 +18,9 @@ import {
 import { historyActions } from '../reducers/history';
 import { type RootState } from '../store';
 
-export type CanvasSliceState = AppState['page'];
+export type CanvasSliceState = {
+  copiedNodes: NodeObject[] | null;
+} & AppState['page'];
 
 export type CanvasAcionType =
   (typeof canvasActions)[keyof typeof canvasActions]['type'];
@@ -29,6 +33,7 @@ export const initialState: CanvasSliceState = {
   },
   toolType: 'select',
   selectedNodesIds: {},
+  copiedNodes: null,
 };
 
 function sanitizeNodes(nodes: NodeObject[]) {
@@ -44,8 +49,11 @@ export const canvasSlice = createSlice({
   name: 'canvas',
   initialState,
   reducers: {
-    set: (_, action: PayloadAction<CanvasSliceState>) => {
-      return action.payload;
+    set: (state, action: PayloadAction<AppState['page']>) => {
+      state.nodes = action.payload.nodes;
+      state.selectedNodesIds = action.payload.selectedNodesIds;
+      state.stageConfig = action.payload.stageConfig;
+      state.toolType = action.payload.toolType;
     },
     setNodes: (state, action: PayloadAction<NodeObject[]>) => {
       state.nodes = action.payload;
@@ -53,11 +61,7 @@ export const canvasSlice = createSlice({
     addNodes: (state, action: PayloadAction<NodeObject[]>) => {
       const sanitizedNodesToAdd = sanitizeNodes(action.payload);
 
-      if (sanitizedNodesToAdd.length === 1) {
-        state.nodes.push(sanitizedNodesToAdd[0]);
-      } else {
-        state.nodes = [...state.nodes, ...sanitizedNodesToAdd];
-      }
+      state.nodes.push(...sanitizedNodesToAdd);
     },
     updateNodes: (state, action: PayloadAction<NodeObject[]>) => {
       const nodesMap = new Map<string, NodeObject>(
@@ -73,18 +77,20 @@ export const canvasSlice = createSlice({
       state.nodes = sanitizeNodes(updatedNodes);
     },
     deleteNodes: (state, action: PayloadAction<string[]>) => {
-      const ids = new Set<string>(action.payload);
+      const nodesIds = new Set<string>(action.payload);
 
-      state.nodes = state.nodes.filter((node) => !ids.has(node.nodeProps.id));
+      state.nodes = state.nodes.filter(
+        (node) => !nodesIds.has(node.nodeProps.id),
+      );
     },
     duplicateNodes: (state, action: PayloadAction<string[]>) => {
-      const ids = new Set<string>(action.payload);
+      const nodesIds = new Set<string>(action.payload);
 
-      const duplicatedNodes = duplicateNodes(
-        state.nodes.filter((node) => ids.has(node.nodeProps.id)),
+      const nodesToDuplicate = state.nodes.filter((node) =>
+        nodesIds.has(node.nodeProps.id),
       );
 
-      state.nodes.push(...duplicatedNodes);
+      state.nodes.push(...duplicateNodes(nodesToDuplicate));
     },
     moveNodesToStart: (state, action: PayloadAction<string[]>) => {
       state.nodes = reorderNodes(action.payload, state.nodes).toStart();
@@ -97,6 +103,20 @@ export const canvasSlice = createSlice({
     },
     moveNodesToEnd: (state, action: PayloadAction<string[]>) => {
       state.nodes = reorderNodes(action.payload, state.nodes).toEnd();
+    },
+    copyNodes: (state, action: PayloadAction<string[]>) => {
+      const nodesIds = new Set<string>(action.payload);
+
+      const nodesToCopy = state.nodes.filter((node) =>
+        nodesIds.has(node.nodeProps.id),
+      );
+
+      state.copiedNodes = makeNodesCopy(nodesToCopy);
+    },
+    pasteNodes: (state) => {
+      if (state.copiedNodes) {
+        state.nodes.push(...state.copiedNodes);
+      }
     },
     setToolType: (
       state,
@@ -155,12 +175,26 @@ export const canvasSlice = createSlice({
           state.selectedNodesIds = {};
         },
       )
+      .addMatcher(canvasSlice.actions.pasteNodes.match, (state) => {
+        if (state.copiedNodes) {
+          const { caseReducers, actions } = canvasSlice;
+
+          const copiedNodesIds = mapNodesIds(state.copiedNodes);
+
+          caseReducers.setSelectedNodesIds(
+            state,
+            actions.setSelectedNodesIds(copiedNodesIds),
+          );
+
+          state.copiedNodes = null;
+        }
+      })
       .addMatcher(canvasSlice.actions.duplicateNodes.match, (state, action) => {
         const { actions, caseReducers } = canvasSlice;
         const { nodes, stageConfig } = state;
 
         const duplicatedNodes = getAddedNodes(nodes, action.payload.length);
-        const nodesIds = duplicatedNodes.map(({ nodeProps }) => nodeProps.id);
+        const nodesIds = mapNodesIds(duplicatedNodes);
 
         caseReducers.setSelectedNodesIds(
           state,
