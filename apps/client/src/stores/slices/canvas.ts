@@ -194,7 +194,7 @@ export const canvasSlice = createSlice({
         const { nodes, stageConfig } = state;
 
         const duplicatedNodes = getAddedNodes(nodes, action.payload.length);
-        const nodesIds = duplicatedNodes.map(({ nodeProps }) => nodeProps.id);
+        const nodesIds = mapNodesIds(duplicatedNodes);
 
         caseReducers.setSelectedNodesIds(
           state,
