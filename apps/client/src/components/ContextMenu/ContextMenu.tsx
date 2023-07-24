@@ -37,14 +37,38 @@ const WSNodesActionMap: Partial<
 };
 
 const CanvasMenu = () => {
+  const ws = useWebSocket();
+  const { updatePage } = usePageMutation(ws?.pageId ?? '');
+
   const dispatch = useAppDispatch();
 
   const handleSelectAll = useCallback(() => {
     dispatch(canvasActions.selectAllNodes());
   }, [dispatch]);
 
+  const handlePaste = useCallback(() => {
+    dispatch(canvasActions.pasteNodes());
+
+    if (ws?.isConnected) {
+      const { selectedNodesIds, nodes } = store.getState().canvas.present;
+      const nodesIds = Object.keys(selectedNodesIds);
+
+      const message: WSMessage = {
+        type: 'nodes-add',
+        data: getAddedNodes(nodes, nodesIds.length),
+      };
+
+      message && sendMessage(ws.connection, message);
+      updatePage({ nodes });
+    }
+  }, [ws, updatePage, dispatch]);
+
   return (
     <>
+      <Styled.Item onSelect={handlePaste}>
+        Paste <Kbd>Ctrl + V</Kbd>
+      </Styled.Item>
+      <Divider orientation="horizontal" />
       <Styled.Item onSelect={handleSelectAll}>
         Select All <Kbd>Ctrl + A</Kbd>
       </Styled.Item>
@@ -101,8 +125,15 @@ const NodeMenu = () => {
     dispatch(canvasActions.setSelectedNodesIds([]));
   };
 
+  const handleCopy = () => {
+    dispatch(canvasActions.copyNodes(Object.keys(selectedNodesIds)));
+  };
+
   return (
     <>
+      <Styled.Item onSelect={handleCopy}>
+        Copy <Kbd>Ctrl + C</Kbd>
+      </Styled.Item>
       <Styled.Item onSelect={handleNodesDuplicate}>
         Duplicate <Kbd>Ctrl + D</Kbd>
       </Styled.Item>

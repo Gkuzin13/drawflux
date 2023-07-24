@@ -2,7 +2,7 @@ import type { Point } from 'shared';
 import { nodesGenerator } from '@/test/data-generators';
 import { createNode } from '../node';
 import {
-  calculateDuplicationDistance,
+  calculateNodesCopyDistance,
   getMiddleNode,
   getNodeRect,
   isNodeFullyInView,
@@ -36,7 +36,7 @@ describe('getMiddleNode', () => {
   });
 });
 
-describe('calculateDuplicationDistance', () => {
+describe('calculateNodesCopyDistance', () => {
   it('should return correct distance', () => {
     const maxXPoint = 200;
     const gap = 16;
@@ -54,7 +54,7 @@ describe('calculateDuplicationDistance', () => {
 
     const nodes = [arrowNode, ellipseNode, rectNode];
 
-    const distance = calculateDuplicationDistance(nodes, gap);
+    const distance = calculateNodesCopyDistance(nodes, gap);
 
     expect(distance).toBe(maxXPoint + gap);
   });

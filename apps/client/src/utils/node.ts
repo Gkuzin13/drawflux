@@ -1,7 +1,8 @@
 import type { IRect } from 'konva/lib/types';
-import type { NodeType, Point, NodeObject, NodeProps } from 'shared';
+import type { NodeType, Point, NodeObject } from 'shared';
 import { v4 as uuid } from 'uuid';
-import { calculateDuplicationDistance, isNodeFullyInView } from './position';
+import { calculateNodesCopyDistance, isNodeFullyInView } from './position';
+import { DUPLICATION_GAP } from '@/constants/app';
 
 export const createNode = (type: NodeType, point: Point): NodeObject => {
   return {
@@ -106,25 +107,38 @@ export function reorderNodes(nodesIdsToReorder: string[], nodes: NodeObject[]) {
   return { toEnd, toStart, forward, backward };
 }
 
-const DUPLICATION_GAP = 16;
+export function cloneNode(node: NodeObject): NodeObject {
+  return {
+    ...node,
+    nodeProps: {
+      ...node.nodeProps,
+      id: uuid(),
+    },
+  };
+}
+
+export function makeNodesCopy(nodes: NodeObject[]): NodeObject[] {
+  return nodes.map(cloneNode);
+}
 
 export function duplicateNodes(nodes: NodeObject[]): NodeObject[] {
-  const distance = calculateDuplicationDistance(nodes, DUPLICATION_GAP);
+  const distance = calculateNodesCopyDistance(nodes, DUPLICATION_GAP);
 
   return nodes.map((node) => {
-    const updatedNodeProps: Partial<NodeProps> = {
-      id: uuid(),
-      point: [node.nodeProps.point[0] + distance, node.nodeProps.point[1]],
-    };
+    const clonedNode = cloneNode(node);
 
-    if (node.nodeProps.points) {
-      updatedNodeProps.points = node.nodeProps.points.map((point) => [
-        point[0] + distance,
-        point[1],
-      ]);
+    clonedNode.nodeProps.point = [
+      clonedNode.nodeProps.point[0] + distance,
+      clonedNode.nodeProps.point[1],
+    ];
+
+    if (clonedNode.nodeProps.points) {
+      clonedNode.nodeProps.points = clonedNode.nodeProps.points.map(
+        ([x, y]) => [x + distance, y],
+      );
     }
 
-    return { ...node, nodeProps: { ...node.nodeProps, ...updatedNodeProps } };
+    return clonedNode;
   });
 }
 
@@ -149,4 +163,12 @@ export function getAddedNodes(
   }
 
   return nodes.slice(-addedCount);
+}
+
+export function mapNodesIds(nodes: NodeObject[]): string[] {
+  if (!nodes.length) {
+    return [];
+  }
+
+  return nodes.map((node) => node.nodeProps.id);
 }

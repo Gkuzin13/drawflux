@@ -30,16 +30,13 @@ const MainLayout = () => {
   const [selectedNodesIds, setSelectedNodesIds] = useState<string[]>([]);
 
   const windowSize = useWindowSize();
-
+  const ws = useWebSocket();
+  const { updatePage } = usePageMutation(ws?.pageId ?? '');
   const { stageConfig } = useAppSelector(selectCanvas);
 
-  const ws = useWebSocket();
-
-  const { updatePage } = usePageMutation(ws?.pageId ?? '');
+  const dispatch = useAppDispatch();
 
   const stageRef = useRef<Konva.Stage>(null);
-
-  const dispatch = useAppDispatch();
 
   const canvasConfig = useMemo(() => {
     const scale = { x: stageConfig.scale, y: stageConfig.scale };
@@ -55,12 +52,12 @@ const MainLayout = () => {
       const { key, shiftKey, ctrlKey } = event;
       const lowerCaseKey = key.toLowerCase();
 
-      if (ctrlKey) {
-        switch (lowerCaseKey) {
+      const onCtrlKey = (key: string) => {
+        switch (key) {
           case KEYS.A: {
             event.preventDefault();
             dispatch(canvasActions.selectAllNodes());
-            return;
+            break;
           }
           case KEYS.Z: {
             const actionKey: HistoryActionKey = shiftKey ? 'redo' : 'undo';
@@ -76,7 +73,7 @@ const MainLayout = () => {
 
               sendMessage(ws.connection, message);
             }
-            return;
+            break;
           }
           case KEYS.D: {
             event.preventDefault();
@@ -94,9 +91,37 @@ const MainLayout = () => {
               sendMessage(ws.connection, message);
               updatePage({ nodes: currentNodes });
             }
-            return;
+            break;
+          }
+          case KEYS.C: {
+            dispatch(canvasActions.copyNodes(selectedNodesIds));
+            break;
+          }
+          case KEYS.V: {
+            dispatch(canvasActions.pasteNodes());
+
+            if (ws?.isConnected) {
+              const { nodes, selectedNodesIds } =
+                store.getState().canvas.present;
+
+              const message: WSMessage = {
+                type: 'nodes-add',
+                data: getAddedNodes(
+                  nodes,
+                  Object.keys(selectedNodesIds).length,
+                ),
+              };
+
+              sendMessage(ws.connection, message);
+              updatePage({ nodes });
+            }
+            break;
           }
         }
+      };
+
+      if (ctrlKey) {
+        return onCtrlKey(lowerCaseKey);
       }
 
       if (key === KEYS.DELETE) {
