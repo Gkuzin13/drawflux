@@ -33,7 +33,7 @@ const BackgroundRect = forwardRef<Konva.Rect, Props>(
         shadowForStrokeEnabled={false}
         listening={false}
         draggable={false}
-        fill={theme.colors.gray100.value}
+        fill={theme.colors.gray50.value}
       />
     );
   },
