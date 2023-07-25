@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test:watch": "vitest",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "fix-all-files": "eslint . --ext .ts,.tsx --fix",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit"

@@ -11,6 +11,7 @@
     "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "test:watch": "vitest",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "lint": "eslint . --ext .ts",
     "fix-all-files": "eslint . --ext .ts --fix",
     "typecheck": "tsc --noEmit"

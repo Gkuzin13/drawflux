@@ -10,9 +10,18 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     coverage: {
-      provider: 'istanbul',
-      reporter: ['text', 'clover'],
-      extension: ['js', 'ts'],
+      provider: 'c8',
+      reporter: ['text', 'json', 'html'],
+      all: true,
+      include: [
+        'src/features/**/*',
+        'src/loaders/**/*',
+        'src/middlewares/**/*',
+        'src/routes/**/*',
+        'src/utils/**/*',
+        'src/services/**/*',
+      ],
+      extension: ['.ts', '.tsx'],
     },
     deps: {
       inline: [/shared/],
