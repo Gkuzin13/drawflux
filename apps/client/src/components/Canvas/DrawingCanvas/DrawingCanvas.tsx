@@ -12,7 +12,7 @@ import {
   useEffect,
 } from 'react';
 import { Layer, Stage } from 'react-konva';
-import type { NodeObject, Point, StageConfig, WSMessage } from 'shared';
+import type { NodeObject, Point, StageConfig } from 'shared';
 import { CURSOR } from '@/constants/cursor';
 import { NODES_LAYER_INDEX } from '@/constants/shape';
 import { useWebSocket } from '@/contexts/websocket';
@@ -127,12 +127,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         dispatch(canvasActions.addNodes([node]));
 
         if (ws?.isConnected && ws.pageId) {
-          const draftEndMessage: WSMessage = {
+          sendMessage(ws.connection, {
             type: 'draft-end',
             data: node,
-          };
+          });
 
-          sendMessage(ws.connection, draftEndMessage);
           onNodesUpdate();
         }
       },
@@ -199,12 +198,10 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
               setDraftNode(node);
 
               if (ws?.isConnected) {
-                const message: WSMessage = {
+                sendMessage(ws.connection, {
                   type: 'draft-add',
                   data: node,
-                };
-
-                sendMessage(ws.connection, message);
+                });
               }
             }
             break;
@@ -217,12 +214,10 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
             setDraftNode(node);
 
             if (ws?.isConnected) {
-              const message: WSMessage = {
+              sendMessage(ws.connection, {
                 type: 'draft-add',
                 data: node,
-              };
-
-              sendMessage(ws.connection, message);
+              });
             }
             break;
           }
@@ -252,13 +247,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           handleSelectDraw(stage);
 
           if (ws?.isConnected && userId) {
-            const message: WSMessage = {
+            sendThrottledMessage(ws.connection, {
               type: 'user-move',
               data: { id: userId, position: currentPoint },
-            };
-            sendThrottledMessage(ws.connection, message);
+            });
           }
-
           return;
         }
 
@@ -276,7 +269,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           });
 
           if (ws?.isConnected && userId) {
-            const message: WSMessage = {
+            sendThrottledMessage(ws.connection, {
               type: 'draft-draw',
               data: {
                 userId,
@@ -287,8 +280,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
                   current: currentPoint,
                 },
               },
-            };
-            sendThrottledMessage(ws.connection, message);
+            });
           }
         }
       },
@@ -418,12 +410,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         dispatch(canvasActions.updateNodes(updatedNodes));
 
         if (ws?.isConnected && ws?.pageId) {
-          const message: WSMessage = {
+          sendMessage(ws.connection, {
             type: 'nodes-update',
             data: updatedNodes,
-          };
+          });
 
-          sendMessage(ws.connection, message);
           onNodesUpdate();
         }
       },

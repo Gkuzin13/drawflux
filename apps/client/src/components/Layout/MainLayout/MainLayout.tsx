@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import type { WSMessage, StageConfig } from 'shared';
+import type { StageConfig } from 'shared';
 import DrawingCanvas from '@/components/Canvas/DrawingCanvas/DrawingCanvas';
 import {
   getNodesIntersectingWithRect,
@@ -66,12 +66,10 @@ const MainLayout = () => {
             dispatch(action());
 
             if (ws?.isConnected) {
-              const message: WSMessage = {
+              sendMessage(ws.connection, {
                 type: 'history-change',
                 data: { action: actionKey },
-              };
-
-              sendMessage(ws.connection, message);
+              });
             }
             break;
           }
@@ -83,12 +81,10 @@ const MainLayout = () => {
             const currentNodes = store.getState().canvas.present.nodes;
 
             if (ws?.isConnected) {
-              const message: WSMessage = {
+              sendMessage(ws.connection, {
                 type: 'nodes-add',
                 data: getAddedNodes(currentNodes, selectedNodesIds.length),
-              };
-
-              sendMessage(ws.connection, message);
+              });
               updatePage({ nodes: currentNodes });
             }
             break;
@@ -104,15 +100,13 @@ const MainLayout = () => {
               const { nodes, selectedNodesIds } =
                 store.getState().canvas.present;
 
-              const message: WSMessage = {
+              sendMessage(ws.connection, {
                 type: 'nodes-add',
                 data: getAddedNodes(
                   nodes,
                   Object.keys(selectedNodesIds).length,
                 ),
-              };
-
-              sendMessage(ws.connection, message);
+              });
               updatePage({ nodes });
             }
             break;
@@ -128,12 +122,10 @@ const MainLayout = () => {
         dispatch(canvasActions.deleteNodes(selectedNodesIds));
 
         if (ws?.isConnected) {
-          const message: WSMessage = {
+          sendMessage(ws.connection, {
             type: 'nodes-delete',
             data: selectedNodesIds,
-          };
-
-          sendMessage(ws.connection, message);
+          });
 
           const currentNodes = store.getState().canvas.present.nodes;
           updatePage({ nodes: currentNodes });

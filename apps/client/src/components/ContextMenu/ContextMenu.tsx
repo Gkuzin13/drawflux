@@ -1,5 +1,4 @@
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
-import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import { type PropsWithChildren, type ReactNode, useCallback } from 'react';
 import { type WSMessage } from 'shared';
 import Divider from '@/components/Elements/Divider/Divider';
@@ -23,17 +22,30 @@ type RootProps = PropsWithChildren<{
 
 type TriggerProps = ContextMenuPrimitive.ContextMenuTriggerProps;
 
-const WSNodesActionMap: Partial<
-  Record<
-    (typeof canvasActions)[keyof typeof canvasActions]['type'],
-    WSMessage['type']
-  >
-> = {
-  'canvas/moveNodesToStart': 'nodes-move-to-start',
-  'canvas/moveNodesToEnd': 'nodes-move-to-end',
-  'canvas/moveNodesBackward': 'nodes-move-backward',
-  'canvas/moveNodesForward': 'nodes-move-forward',
-  'canvas/deleteNodes': 'nodes-delete',
+type NodesMenuWSMessageType = Extract<
+  WSMessage['type'],
+  | 'nodes-move-to-start'
+  | 'nodes-move-to-end'
+  | 'nodes-move-backward'
+  | 'nodes-move-forward'
+  | 'nodes-delete'
+>;
+
+type NodesMenuActionKey = Extract<
+  keyof typeof canvasActions,
+  | 'moveNodesToStart'
+  | 'moveNodesToEnd'
+  | 'moveNodesBackward'
+  | 'moveNodesForward'
+  | 'deleteNodes'
+>;
+
+const wsNodesActionMap: Record<NodesMenuActionKey, NodesMenuWSMessageType> = {
+  moveNodesToStart: 'nodes-move-to-start',
+  moveNodesToEnd: 'nodes-move-to-end',
+  moveNodesBackward: 'nodes-move-backward',
+  moveNodesForward: 'nodes-move-forward',
+  deleteNodes: 'nodes-delete',
 };
 
 const CanvasMenu = () => {
@@ -53,12 +65,10 @@ const CanvasMenu = () => {
       const { selectedNodesIds, nodes } = store.getState().canvas.present;
       const nodesIds = Object.keys(selectedNodesIds);
 
-      const message: WSMessage = {
+      sendMessage(ws.connection, {
         type: 'nodes-add',
         data: getAddedNodes(nodes, nodesIds.length),
-      };
-
-      message && sendMessage(ws.connection, message);
+      });
       updatePage({ nodes });
     }
   }, [ws, updatePage, dispatch]);
@@ -85,19 +95,16 @@ const NodeMenu = () => {
 
   const dispatch = useAppDispatch();
 
-  const dispatchNodesAction = (action: ActionCreatorWithPayload<string[]>) => {
+  const dispatchNodesAction = (actionKey: NodesMenuActionKey) => {
     const nodesIds = Object.keys(selectedNodesIds);
+    const action = canvasActions[actionKey];
 
     dispatch(action(nodesIds));
 
     if (ws?.isConnected) {
-      const messageType =
-        WSNodesActionMap[action.type as keyof typeof WSNodesActionMap];
+      const messageType = wsNodesActionMap[actionKey];
 
-      const message =
-        messageType && ({ type: messageType, data: nodesIds } as WSMessage);
-
-      message && sendMessage(ws.connection, message);
+      sendMessage(ws.connection, { type: messageType, data: nodesIds });
 
       const currentNodes = store.getState().canvas.present.nodes;
       updatePage({ nodes: currentNodes });
@@ -111,12 +118,10 @@ const NodeMenu = () => {
     if (ws?.isConnected) {
       const currentNodes = store.getState().canvas.present.nodes;
 
-      const message: WSMessage = {
+      sendMessage(ws.connection, {
         type: 'nodes-add',
         data: getAddedNodes(currentNodes, nodesIds.length),
-      };
-
-      message && sendMessage(ws.connection, message);
+      });
       updatePage({ nodes: currentNodes });
     }
   };
@@ -138,32 +143,22 @@ const NodeMenu = () => {
         Duplicate <Kbd>Ctrl + D</Kbd>
       </Styled.Item>
       <Divider orientation="horizontal" />
-      <Styled.Item
-        onSelect={() => dispatchNodesAction(canvasActions.moveNodesToEnd)}
-      >
+      <Styled.Item onSelect={() => dispatchNodesAction('moveNodesToEnd')}>
         Bring to front
       </Styled.Item>
-      <Styled.Item
-        onSelect={() => dispatchNodesAction(canvasActions.moveNodesForward)}
-      >
+      <Styled.Item onSelect={() => dispatchNodesAction('moveNodesForward')}>
         Bring forward
       </Styled.Item>
-      <Styled.Item
-        onSelect={() => dispatchNodesAction(canvasActions.moveNodesBackward)}
-      >
+      <Styled.Item onSelect={() => dispatchNodesAction('moveNodesBackward')}>
         Send backward
       </Styled.Item>
-      <Styled.Item
-        onSelect={() => dispatchNodesAction(canvasActions.moveNodesToStart)}
-      >
+      <Styled.Item onSelect={() => dispatchNodesAction('moveNodesToStart')}>
         Send to back
       </Styled.Item>
       <Divider orientation="horizontal" />
       <Styled.Item onSelect={handleSelectNone}>Select None</Styled.Item>
       <Divider orientation="horizontal" />
-      <Styled.Item
-        onSelect={() => dispatchNodesAction(canvasActions.deleteNodes)}
-      >
+      <Styled.Item onSelect={() => dispatchNodesAction('deleteNodes')}>
         Delete
         <Kbd>Del</Kbd>
       </Styled.Item>

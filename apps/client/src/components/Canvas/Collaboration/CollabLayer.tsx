@@ -66,12 +66,10 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
     const handlePointerMove = throttleFn(() => {
       const { x, y } = stage.getRelativePointerPosition();
 
-      const message: WSMessage = {
+      sendMessage(ws.connection, {
         type: 'user-move',
         data: { id: userId, position: [x, y] },
-      };
-
-      sendMessage(ws.connection, message);
+      });
     }, WS_THROTTLE_MS);
 
     if (!isDrawing) {

@@ -22,7 +22,7 @@ export type CanvasSliceState = {
   copiedNodes: NodeObject[] | null;
 } & AppState['page'];
 
-export type CanvasAcionType =
+export type CanvasActionType =
   (typeof canvasActions)[keyof typeof canvasActions]['type'];
 
 export const initialState: CanvasSliceState = {
