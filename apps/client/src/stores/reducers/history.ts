@@ -1,6 +1,6 @@
 import { type Action, createAction, type Reducer } from '@reduxjs/toolkit';
 import { initialState as initialCanvasState } from '../slices/canvas';
-import type { CanvasAcionType, CanvasSliceState } from '../slices/canvas';
+import type { CanvasActionType, CanvasSliceState } from '../slices/canvas';
 
 export type CanvasHistoryState = {
   past: CanvasSliceState[];
@@ -19,7 +19,7 @@ export const historyActions = {
   reset: createAction('history/reset'),
 };
 
-export type IgnoreActionType = HistoryActionType | CanvasAcionType;
+export type IgnoreActionType = HistoryActionType | CanvasActionType;
 
 const IGNORED_ACTIONS: IgnoreActionType[] = [
   'canvas/setToolType',
@@ -35,7 +35,7 @@ function isIgnoredActionType(type: string) {
 function undoable(
   reducer: Reducer<
     CanvasSliceState,
-    Action<HistoryActionType | CanvasAcionType | undefined>
+    Action<HistoryActionType | CanvasActionType | undefined>
   >,
 ) {
   const initialState: CanvasHistoryState = {
@@ -46,7 +46,7 @@ function undoable(
 
   return function (
     state = initialState,
-    action: Action<HistoryActionType | CanvasAcionType>,
+    action: Action<HistoryActionType | CanvasActionType>,
   ) {
     const { past, present, future } = state;
 
