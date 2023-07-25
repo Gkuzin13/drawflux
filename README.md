@@ -7,7 +7,7 @@
 # Features
 
 - Selection of tools - rectangle, ellipse, arrow, free-draw, text.
-- Customizable shape style - color, size, opacity, line style, animation.
+- Customizable shape style - color, size, fill, opacity, line style, animation.
 - Zoom and panning.
 - History undo / redo.
 - Live collaboration.

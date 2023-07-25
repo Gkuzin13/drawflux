@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import { type RefObject, useMemo, lazy, Suspense, useCallback } from 'react';
-import type { NodeStyle, WSMessage, User } from 'shared';
+import type { NodeStyle, User } from 'shared';
 import { type MenuPanelActionType } from '@/constants/panels/menu';
 import { type ToolType } from '@/constants/panels/tools';
 import { useModal } from '@/contexts/modal';
@@ -101,12 +101,10 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
       dispatch(canvasActions.updateNodes(updatedNodes));
 
       if (ws?.isConnected) {
-        const message: WSMessage = {
+        sendMessage(ws.connection, {
           type: 'nodes-update',
           data: updatedNodes,
-        };
-
-        sendMessage(ws.connection, message);
+        });
 
         updateAsync && handleUpdatePage();
       }
@@ -168,12 +166,10 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
         dispatch(canvasActions.deleteNodes(intersectedNodesIds));
 
         if (ws?.isConnected) {
-          const message: WSMessage = {
+          sendMessage(ws.connection, {
             type: 'nodes-delete',
             data: intersectedNodesIds,
-          };
-
-          sendMessage(ws.connection, message);
+          });
         }
         return;
       }
@@ -186,12 +182,10 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
         if (ws?.isConnected) {
           const historyAction = actionType === 'redo' ? 'redo' : 'undo';
 
-          const message: WSMessage = {
+          sendMessage(ws.connection, {
             type: 'history-change',
             data: { action: historyAction },
-          };
-
-          sendMessage(ws.connection, message);
+          });
           handleUpdatePage();
         }
       }
@@ -202,12 +196,10 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   const handleUserChange = useCallback(
     (user: User) => {
       if (ws?.isConnected) {
-        const message: WSMessage = {
+        sendMessage(ws.connection, {
           type: 'user-change',
           data: user,
-        };
-
-        sendMessage(ws.connection, message);
+        });
 
         dispatch(collaborationActions.updateUser(user));
       }

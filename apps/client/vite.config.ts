@@ -62,6 +62,18 @@ export default defineConfig({
       // Otherwise throws "ERR_MODULE_NOT_FOUND"
       registerNodeLoader: true,
     },
+    coverage: {
+      provider: 'c8',
+      reporter: ['text', 'json', 'html'],
+      all: true,
+      include: [
+        'src/components/**/*',
+        'src/hooks/**/*',
+        'src/utils/**/*',
+        'src/stores/**/*',
+      ],
+      extension: ['.ts', '.tsx'],
+    },
   },
   optimizeDeps: {
     include: ['shared'],

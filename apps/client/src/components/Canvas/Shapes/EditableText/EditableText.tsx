@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import type { WSMessage } from 'shared';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import { useWebSocket } from '@/contexts/websocket';
 import { sendMessage } from '@/utils/websocket';
@@ -50,12 +49,10 @@ const EditableText = ({
 
   const handleTextUpdate = (text: string) => {
     if (ws?.isConnected) {
-      const message: WSMessage = {
+      sendMessage(ws.connection, {
         type: 'draft-text-update',
         data: { id: node.nodeProps.id, text },
-      };
-
-      sendMessage(ws.connection, message);
+      });
     }
   };
 
