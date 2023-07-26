@@ -21,7 +21,6 @@ import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { selectCollaboration } from '@/stores/slices/collaboration';
 import { createNode } from '@/utils/node';
 import { getNormalizedInvertedRect } from '@/utils/position';
-import { sendMessage, sendThrottledMessage } from '@/utils/websocket';
 import BackgroundRect from '../BackgroundRect';
 import DraftNode from '../Node/DraftNode';
 import Nodes from '../Nodes';
@@ -33,6 +32,7 @@ import {
   isScaleOutOfRange,
 } from './helpers/zoom';
 import { throttleFn } from '@/utils/timed';
+import { WS_THROTTLE_MS } from '@/constants/app';
 
 type Props = PropsWithRef<{
   config: {
@@ -105,6 +105,13 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       onNodesSelect(nodesIds);
     }, [selectedNodesIds, onNodesSelect]);
 
+    // Required for throttleFn to work
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const sendThtottledWsMessage = useCallback(
+      throttleFn(ws.send, WS_THROTTLE_MS),
+      [ws],
+    );
+
     const handleDraftEnd = useCallback(
       (node: NodeObject) => {
         const shouldResetToolType = toolType !== 'draw';
@@ -126,11 +133,8 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
         dispatch(canvasActions.addNodes([node]));
 
-        if (ws?.isConnected && ws.pageId) {
-          sendMessage(ws.connection, {
-            type: 'draft-end',
-            data: node,
-          });
+        if (ws.isConnected) {
+          ws.send({ type: 'draft-end', data: node });
 
           onNodesUpdate();
         }
@@ -197,11 +201,8 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
               const node = createNode(toolType, currentPoint);
               setDraftNode(node);
 
-              if (ws?.isConnected) {
-                sendMessage(ws.connection, {
-                  type: 'draft-add',
-                  data: node,
-                });
+              if (ws.isConnected) {
+                ws.send({ type: 'draft-add', data: node });
               }
             }
             break;
@@ -213,11 +214,8 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
             setDraftNode(node);
 
-            if (ws?.isConnected) {
-              sendMessage(ws.connection, {
-                type: 'draft-add',
-                data: node,
-              });
+            if (ws.isConnected) {
+              ws.send({ type: 'draft-add', data: node });
             }
             break;
           }
@@ -246,8 +244,8 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           drawingPositionRef.current.current = currentPoint;
           handleSelectDraw(stage);
 
-          if (ws?.isConnected && userId) {
-            sendThrottledMessage(ws.connection, {
+          if (ws.isConnected && userId) {
+            sendThtottledWsMessage({
               type: 'user-move',
               data: { id: userId, position: currentPoint },
             });
@@ -268,8 +266,8 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
             );
           });
 
-          if (ws?.isConnected && userId) {
-            sendThrottledMessage(ws.connection, {
+          if (ws.isConnected && userId) {
+            sendThtottledWsMessage({
               type: 'draft-draw',
               data: {
                 userId,
@@ -291,6 +289,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         ws,
         userId,
         handleSelectDraw,
+        sendThtottledWsMessage,
       ],
     );
 
@@ -409,11 +408,8 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
         dispatch(canvasActions.updateNodes(updatedNodes));
 
-        if (ws?.isConnected && ws?.pageId) {
-          sendMessage(ws.connection, {
-            type: 'nodes-update',
-            data: updatedNodes,
-          });
+        if (ws.isConnected) {
+          ws.send({ type: 'nodes-update', data: updatedNodes });
 
           onNodesUpdate();
         }
@@ -455,7 +451,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
             width={config.width}
             height={config.height}
           />
-          {ws?.isConnected && (
+          {ws.isConnected && (
             <Suspense>
               <CollabLayer
                 isDrawing={drawing}

@@ -15,7 +15,6 @@ import {
 import { collaborationActions } from '@/stores/slices/collaboration';
 import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, importProject } from '@/utils/file';
-import { sendMessage } from '@/utils/websocket';
 import ControlPanel, {
   type ControlActionKey,
 } from './ControlPanel/ControlPanel';
@@ -39,7 +38,7 @@ const UsersPanel = lazy(() => import('./UsersPanel/UsersPanel'));
 const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   const ws = useWebSocket();
 
-  const { updatePage } = usePageMutation(ws?.pageId ?? '');
+  const { updatePage } = usePageMutation();
 
   const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
   const { past, future } = useAppSelector(selectHistory);
@@ -70,7 +69,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   }, [past, future, intersectedNodesIds.length]);
 
   const disabledMenuItems = useMemo((): MenuKey[] | null => {
-    if (ws?.isConnected) {
+    if (ws.isConnected) {
       return ['open'];
     }
     return null;
@@ -100,11 +99,8 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
       dispatch(canvasActions.updateNodes(updatedNodes));
 
-      if (ws?.isConnected) {
-        sendMessage(ws.connection, {
-          type: 'nodes-update',
-          data: updatedNodes,
-        });
+      if (ws.isConnected) {
+        ws.send({ type: 'nodes-update', data: updatedNodes });
 
         updateAsync && handleUpdatePage();
       }
@@ -165,11 +161,8 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
       if (actionType === 'deleteNodes') {
         dispatch(canvasActions.deleteNodes(intersectedNodesIds));
 
-        if (ws?.isConnected) {
-          sendMessage(ws.connection, {
-            type: 'nodes-delete',
-            data: intersectedNodesIds,
-          });
+        if (ws.isConnected) {
+          ws.send({ type: 'nodes-delete', data: intersectedNodesIds });
         }
         return;
       }
@@ -179,13 +172,10 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
         dispatch(action());
 
-        if (ws?.isConnected) {
+        if (ws.isConnected) {
           const historyAction = actionType === 'redo' ? 'redo' : 'undo';
+          ws.send({ type: 'history-change', data: { action: historyAction } });
 
-          sendMessage(ws.connection, {
-            type: 'history-change',
-            data: { action: historyAction },
-          });
           handleUpdatePage();
         }
       }
@@ -195,11 +185,8 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
 
   const handleUserChange = useCallback(
     (user: User) => {
-      if (ws?.isConnected) {
-        sendMessage(ws.connection, {
-          type: 'user-change',
-          data: user,
-        });
+      if (ws.isConnected) {
+        ws.send({ type: 'user-change', data: user });
 
         dispatch(collaborationActions.updateUser(user));
       }
@@ -222,15 +209,13 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
           onStyleChange={handleStyleChange}
         />
         <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
-        {ws?.isConnected && (
+        {ws.isConnected && (
           <Suspense>
             <UsersPanel onUserChange={handleUserChange} />
           </Suspense>
         )}
         <Styled.TopPanelRightContainer>
-          {online && (
-            <SharePanel isPageShared={ws?.isConnected ? true : false} />
-          )}
+          {online && <SharePanel isPageShared={ws.isConnected} />}
           <MenuPanel
             disabledItems={disabledMenuItems}
             onAction={handleMenuAction}

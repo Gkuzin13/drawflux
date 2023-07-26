@@ -1,6 +1,12 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import type { PropsWithChildren } from 'react';
-import { WSMessageUtil } from 'shared';
+import { type WSMessage, WSMessageUtil } from 'shared';
 import {
   BASE_WS_URL,
   BASE_WS_URL_DEV,
@@ -14,12 +20,13 @@ import { collaborationActions } from '@/stores/slices/collaboration';
 import { urlSearchParam } from '@/utils/url';
 import { useModal } from './modal';
 import { useNotifications } from './notifications';
+import useUrlSearchParams from '@/hooks/useUrlSearchParams/useUrlSearchParams';
 
-type WSContextValue = {
+type WebSocketContextValue = {
   connection: WebSocket | null;
   isConnected: boolean;
   isConnecting: boolean;
-  pageId: string | null;
+  send: (message: WSMessage) => void;
 };
 
 type WSStatus = 'idle' | 'connecting' | 'connected' | 'disconnected';
@@ -29,14 +36,15 @@ const wsBaseUrl = IS_PROD ? BASE_WS_URL : BASE_WS_URL_DEV;
 
 let attemptedConnection = false;
 
-const pageId = urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY);
-const initialStatus = pageId ? 'connecting' : 'idle';
-
-export const WebSocketContext = createContext<WSContextValue | null>(null);
+export const WebSocketContext = createContext<
+  WebSocketContextValue | undefined
+>(undefined);
 
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
-  const [status, setStatus] = useState<WSStatus>(initialStatus);
+  const [status, setStatus] = useState<WSStatus>('idle');
+
+  const params = useUrlSearchParams();
 
   const dispatch = useAppDispatch();
 
@@ -44,10 +52,18 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const { addNotification } = useNotifications();
 
   useEffect(() => {
+    const pageId = params[PAGE_URL_SEARCH_PARAM_KEY];
+
     if (attemptedConnection || !pageId) {
       return;
     }
-    const url = urlSearchParam.set('id', pageId, `${wsBaseUrl}/page`);
+
+    const url = urlSearchParam.set(
+      'id',
+      pageId,
+      `${wsBaseUrl}/${PAGE_URL_SEARCH_PARAM_KEY}`,
+    );
+
     const webSocket = new WebSocket(url);
 
     const onMessage = (event: MessageEvent) => {
@@ -101,7 +117,17 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
     webSocket.addEventListener('error', onError);
 
     attemptedConnection = true;
-  }, [modal, addNotification, dispatch]);
+  }, [modal, params, addNotification, dispatch]);
+
+  const send = useCallback(
+    (message: WSMessage) => {
+      if (webSocket && webSocket.readyState === webSocket.OPEN) {
+        const serializedMessage = WSMessageUtil.serialize(message);
+        serializedMessage && webSocket.send(serializedMessage);
+      }
+    },
+    [webSocket],
+  );
 
   return (
     <WebSocketContext.Provider
@@ -109,7 +135,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
         connection: webSocket,
         isConnected: status === 'connected',
         isConnecting: status === 'connecting',
-        pageId,
+        send,
       }}
     >
       {children}
@@ -117,7 +143,7 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   );
 };
 
-export const useWebSocket = (): WSContextValue | null => {
+export const useWebSocket = (): WebSocketContextValue => {
   const ctx = useContext(WebSocketContext);
 
   if (ctx === undefined) {

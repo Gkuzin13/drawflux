@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import { useWebSocket } from '@/contexts/websocket';
-import { sendMessage } from '@/utils/websocket';
 import EditableTextInput from './EditableTextInput';
 import ResizableText from './ResizableText';
 import type { KonvaEventObject } from 'konva/lib/Node';
@@ -48,8 +47,8 @@ const EditableText = ({
   };
 
   const handleTextUpdate = (text: string) => {
-    if (ws?.isConnected) {
-      sendMessage(ws.connection, {
+    if (ws.isConnected) {
+      ws.send({
         type: 'draft-text-update',
         data: { id: node.nodeProps.id, text },
       });

@@ -17,7 +17,6 @@ import {
   collaborationActions,
 } from '@/stores/slices/collaboration';
 import { throttleFn } from '@/utils/timed';
-import { sendMessage } from '@/utils/websocket';
 import { type DrawableType, drawTypes } from '../DrawingCanvas/helpers/draw';
 import DraftNode from '../Node/DraftNode';
 import UserCursor from './UserCursor/UserCursor';
@@ -54,7 +53,7 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
     if (
       typeof stageRef === 'function' ||
       !stageRef?.current ||
-      !ws?.isConnected ||
+      !ws.isConnected ||
       !userId
     ) {
       return;
@@ -64,25 +63,19 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
     const container = stage.container();
 
     const handlePointerMove = throttleFn(() => {
+      if (isDrawing) {
+        return;
+      }
+
       const { x, y } = stage.getRelativePointerPosition();
 
-      sendMessage(ws.connection, {
-        type: 'user-move',
-        data: { id: userId, position: [x, y] },
-      });
+      ws.send({ type: 'user-move', data: { id: userId, position: [x, y] } });
     }, WS_THROTTLE_MS);
 
-    if (!isDrawing) {
-      container.addEventListener('mousemove', handlePointerMove);
-      container.addEventListener('touchmove', handlePointerMove);
-    } else {
-      container.removeEventListener('mousemove', handlePointerMove);
-      container.removeEventListener('touchmove', handlePointerMove);
-    }
+    container.addEventListener('pointermove', handlePointerMove);
 
     return () => {
-      container.removeEventListener('mousemove', handlePointerMove);
-      container.removeEventListener('touchmove', handlePointerMove);
+      container.removeEventListener('pointermove', handlePointerMove);
     };
   }, [stageRef, ws, userId, isDrawing]);
 
@@ -161,7 +154,7 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
     [dispatch, handleUserMove],
   );
 
-  useWSMessage(ws?.connection, handleMessages, [handleMessages, ws]);
+  useWSMessage(ws.connection, handleMessages, [handleMessages, ws]);
 
   return (
     <>
