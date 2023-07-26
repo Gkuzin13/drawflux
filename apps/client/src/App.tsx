@@ -1,5 +1,10 @@
 import { useLayoutEffect } from 'react';
-import { type AppState, LOCAL_STORAGE_KEY, appState } from '@/constants/app';
+import {
+  type AppState,
+  LOCAL_STORAGE_KEY,
+  appState,
+  PAGE_URL_SEARCH_PARAM_KEY,
+} from '@/constants/app';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { storage } from '@/utils/storage';
@@ -8,15 +13,17 @@ import { useWebSocket } from './contexts/websocket';
 import useWSMessage from './hooks/useWSMessage';
 import { historyActions } from './stores/reducers/history';
 import { collaborationActions } from './stores/slices/collaboration';
+import useUrlSearchParams from './hooks/useUrlSearchParams/useUrlSearchParams';
 
 const App = () => {
   const { nodes } = useAppSelector(selectCanvas);
 
+  const params = useUrlSearchParams();
   const ws = useWebSocket();
 
   const dispatch = useAppDispatch();
 
-  useWSMessage(ws?.connection, (message) => {
+  useWSMessage(ws.connection, (message) => {
     const { type, data } = message;
 
     switch (type) {
@@ -82,7 +89,9 @@ const App = () => {
   });
 
   useLayoutEffect(() => {
-    if (ws?.pageId) {
+    const pageId = params[PAGE_URL_SEARCH_PARAM_KEY];
+
+    if (ws.isConnected || pageId) {
       return;
     }
 
@@ -97,7 +106,7 @@ const App = () => {
 
       dispatch(canvasActions.set(state.page));
     }
-  }, [ws?.pageId, dispatch]);
+  }, [ws, params, dispatch]);
 
   return <MainLayout />;
 };

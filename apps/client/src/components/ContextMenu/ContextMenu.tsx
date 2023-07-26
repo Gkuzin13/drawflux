@@ -7,7 +7,6 @@ import { useWebSocket } from '@/contexts/websocket';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
 import { store } from '@/stores/store';
-import { sendMessage } from '@/utils/websocket';
 import * as Styled from './ContextMenu.styled';
 import usePageMutation from '@/hooks/usePageMutation';
 import { getAddedNodes } from '@/utils/node';
@@ -50,7 +49,7 @@ const wsNodesActionMap: Record<NodesMenuActionKey, NodesMenuWSMessageType> = {
 
 const CanvasMenu = () => {
   const ws = useWebSocket();
-  const { updatePage } = usePageMutation(ws?.pageId ?? '');
+  const { updatePage } = usePageMutation();
 
   const dispatch = useAppDispatch();
 
@@ -61,14 +60,15 @@ const CanvasMenu = () => {
   const handlePaste = useCallback(() => {
     dispatch(canvasActions.pasteNodes());
 
-    if (ws?.isConnected) {
+    if (ws.isConnected) {
       const { selectedNodesIds, nodes } = store.getState().canvas.present;
       const nodesIds = Object.keys(selectedNodesIds);
 
-      sendMessage(ws.connection, {
+      ws.send({
         type: 'nodes-add',
         data: getAddedNodes(nodes, nodesIds.length),
       });
+
       updatePage({ nodes });
     }
   }, [ws, updatePage, dispatch]);
@@ -89,7 +89,7 @@ const CanvasMenu = () => {
 const NodeMenu = () => {
   const ws = useWebSocket();
 
-  const { updatePage } = usePageMutation(ws?.pageId ?? '');
+  const { updatePage } = usePageMutation();
 
   const { selectedNodesIds } = useAppSelector(selectCanvas);
 
@@ -101,10 +101,10 @@ const NodeMenu = () => {
 
     dispatch(action(nodesIds));
 
-    if (ws?.isConnected) {
+    if (ws.isConnected) {
       const messageType = wsNodesActionMap[actionKey];
 
-      sendMessage(ws.connection, { type: messageType, data: nodesIds });
+      ws.send({ type: messageType, data: nodesIds });
 
       const currentNodes = store.getState().canvas.present.nodes;
       updatePage({ nodes: currentNodes });
@@ -115,13 +115,14 @@ const NodeMenu = () => {
     const nodesIds = Object.keys(selectedNodesIds);
     dispatch(canvasActions.duplicateNodes(nodesIds));
 
-    if (ws?.isConnected) {
+    if (ws.isConnected) {
       const currentNodes = store.getState().canvas.present.nodes;
 
-      sendMessage(ws.connection, {
+      ws.send({
         type: 'nodes-add',
         data: getAddedNodes(currentNodes, nodesIds.length),
       });
+
       updatePage({ nodes: currentNodes });
     }
   };

@@ -19,7 +19,6 @@ import {
   historyActions,
 } from '@/stores/reducers/history';
 import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import { sendMessage } from '@/utils/websocket';
 import * as Styled from './MainLayout.styled';
 import usePageMutation from '@/hooks/usePageMutation';
 import { store } from '@/stores/store';
@@ -31,7 +30,7 @@ const MainLayout = () => {
 
   const windowSize = useWindowSize();
   const ws = useWebSocket();
-  const { updatePage } = usePageMutation(ws?.pageId ?? '');
+  const { updatePage } = usePageMutation();
   const { stageConfig } = useAppSelector(selectCanvas);
 
   const dispatch = useAppDispatch();
@@ -65,11 +64,8 @@ const MainLayout = () => {
 
             dispatch(action());
 
-            if (ws?.isConnected) {
-              sendMessage(ws.connection, {
-                type: 'history-change',
-                data: { action: actionKey },
-              });
+            if (ws.isConnected) {
+              ws.send({ type: 'history-change', data: { action: actionKey } });
             }
             break;
           }
@@ -80,8 +76,8 @@ const MainLayout = () => {
 
             const currentNodes = store.getState().canvas.present.nodes;
 
-            if (ws?.isConnected) {
-              sendMessage(ws.connection, {
+            if (ws.isConnected) {
+              ws.send({
                 type: 'nodes-add',
                 data: getAddedNodes(currentNodes, selectedNodesIds.length),
               });
@@ -96,17 +92,17 @@ const MainLayout = () => {
           case KEYS.V: {
             dispatch(canvasActions.pasteNodes());
 
-            if (ws?.isConnected) {
+            if (ws.isConnected) {
               const { nodes, selectedNodesIds } =
                 store.getState().canvas.present;
 
-              sendMessage(ws.connection, {
-                type: 'nodes-add',
-                data: getAddedNodes(
-                  nodes,
-                  Object.keys(selectedNodesIds).length,
-                ),
-              });
+              const pastedNodes = getAddedNodes(
+                nodes,
+                Object.keys(selectedNodesIds).length,
+              );
+
+              ws.send({ type: 'nodes-add', data: pastedNodes });
+
               updatePage({ nodes });
             }
             break;
@@ -121,11 +117,8 @@ const MainLayout = () => {
       if (key === KEYS.DELETE) {
         dispatch(canvasActions.deleteNodes(selectedNodesIds));
 
-        if (ws?.isConnected) {
-          sendMessage(ws.connection, {
-            type: 'nodes-delete',
-            data: selectedNodesIds,
-          });
+        if (ws.isConnected) {
+          ws.send({ type: 'nodes-delete', data: selectedNodesIds });
 
           const currentNodes = store.getState().canvas.present.nodes;
           updatePage({ nodes: currentNodes });
