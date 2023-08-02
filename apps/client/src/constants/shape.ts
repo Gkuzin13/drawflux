@@ -19,5 +19,3 @@ export const TEXT = {
   FONT_FAMILY: 'Klee One',
   FONT_WEIGHT: 'bold',
 } as const;
-
-export const NODES_LAYER_INDEX = 1;
