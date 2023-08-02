@@ -9,6 +9,7 @@ import {
   mapNodesIds,
   makeNodesCopy,
   reorderNodes,
+  isValidNode,
 } from '@/utils/node';
 import {
   getCenterPosition,
@@ -36,15 +37,6 @@ export const initialState: CanvasSliceState = {
   copiedNodes: null,
 };
 
-function sanitizeNodes(nodes: NodeObject[]) {
-  return nodes.filter((node) => {
-    if (node.type === 'text' && !node.text?.length) {
-      return false;
-    }
-    return true;
-  });
-}
-
 export const canvasSlice = createSlice({
   name: 'canvas',
   initialState,
@@ -59,9 +51,11 @@ export const canvasSlice = createSlice({
       state.nodes = action.payload;
     },
     addNodes: (state, action: PayloadAction<NodeObject[]>) => {
-      const sanitizedNodesToAdd = sanitizeNodes(action.payload);
+      const nodesToAdd = action.payload;
 
-      state.nodes.push(...sanitizedNodesToAdd);
+      if (nodesToAdd.every(isValidNode)) {
+        state.nodes.push(...action.payload);
+      }
     },
     updateNodes: (state, action: PayloadAction<NodeObject[]>) => {
       const nodesMap = new Map<string, NodeObject>(
@@ -74,7 +68,7 @@ export const canvasSlice = createSlice({
         return updatedNode ?? node;
       });
 
-      state.nodes = sanitizeNodes(updatedNodes);
+      state.nodes = updatedNodes.filter(isValidNode);
     },
     deleteNodes: (state, action: PayloadAction<string[]>) => {
       const nodesIds = new Set<string>(action.payload);
@@ -224,7 +218,15 @@ export const canvasSlice = createSlice({
   },
 });
 
-export const selectCanvas = (state: RootState) => state.canvas.present;
+export const selectNodes = (state: RootState) => state.canvas.present.nodes;
+export const selectConfig = (state: RootState) =>
+  state.canvas.present.stageConfig;
+export const selectToolType = (state: RootState) =>
+  state.canvas.present.toolType;
+export const selectSelectedNodesIds = (state: RootState) =>
+  state.canvas.present.selectedNodesIds;
+export const selectCopiedNodes = (state: RootState) =>
+  state.canvas.present.copiedNodes;
 export const selectHistory = (state: RootState) => state.canvas;
 
 export const canvasActions = canvasSlice.actions;

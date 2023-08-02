@@ -1,53 +1,50 @@
 import type Konva from 'konva';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import type { StageConfig } from 'shared';
+import { useCallback, useRef, useState } from 'react';
 import DrawingCanvas from '@/components/Canvas/DrawingCanvas/DrawingCanvas';
 import {
-  getNodesIntersectingWithRect,
+  getIntersectingNodes,
+  getLayerNodes,
+  getMainLayer,
   getPointerRect,
 } from '@/components/Canvas/DrawingCanvas/helpers/stage';
 import ContextMenu from '@/components/ContextMenu/ContextMenu';
 import Panels from '@/components/Panels/Panels';
-import { KEYS } from '@/constants/keys';
+import { useAppDispatch } from '@/stores/hooks';
+import { canvasActions } from '@/stores/slices/canvas';
+import * as Styled from './MainLayout.styled';
+import { store } from '@/stores/store';
+import useWindowSize from '@/hooks/useWindowSize/useWindowSize';
 import { TOOLS } from '@/constants/panels/tools';
-import { NODES_LAYER_INDEX } from '@/constants/shape';
-import { useWebSocket } from '@/contexts/websocket';
-import useKeyDown from '@/hooks/useKeyDown/useKeyDown';
-import { useAppDispatch, useAppSelector } from '@/stores/hooks';
+import { KEYS } from '@/constants/keys';
+import { getAddedNodes } from '@/utils/node';
 import {
   type HistoryActionKey,
   historyActions,
 } from '@/stores/reducers/history';
-import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
-import * as Styled from './MainLayout.styled';
 import usePageMutation from '@/hooks/usePageMutation';
-import { store } from '@/stores/store';
-import { getAddedNodes } from '@/utils/node';
-import useWindowSize from '@/hooks/useWindowSize/useWindowSize';
+import { useWebSocket } from '@/contexts/websocket';
 
 const MainLayout = () => {
   const [selectedNodesIds, setSelectedNodesIds] = useState<string[]>([]);
 
   const windowSize = useWindowSize();
   const ws = useWebSocket();
-  const { updatePage } = usePageMutation();
-  const { stageConfig } = useAppSelector(selectCanvas);
-
-  const dispatch = useAppDispatch();
 
   const stageRef = useRef<Konva.Stage>(null);
 
-  const canvasConfig = useMemo(() => {
-    const scale = { x: stageConfig.scale, y: stageConfig.scale };
-    return {
-      scale,
-      ...stageConfig.position,
-      ...windowSize,
-    };
-  }, [stageConfig, windowSize]);
+  const dispatch = useAppDispatch();
+  const { updatePage } = usePageMutation();
 
-  const onKeyDown = useCallback(
-    (event: KeyboardEvent) => {
+  const handleNodesSelect = useCallback((nodesIds: string[]) => {
+    setSelectedNodesIds(nodesIds);
+  }, []);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      const state = store.getState().canvas.present;
+      const nodes = state.nodes;
+      const selectedNodesIds = Object.keys(state.selectedNodesIds);
+
       const { key, shiftKey, ctrlKey } = event;
       const lowerCaseKey = key.toLowerCase();
 
@@ -74,14 +71,13 @@ const MainLayout = () => {
 
             dispatch(canvasActions.duplicateNodes(selectedNodesIds));
 
-            const currentNodes = store.getState().canvas.present.nodes;
-
             if (ws.isConnected) {
               ws.send({
                 type: 'nodes-add',
-                data: getAddedNodes(currentNodes, selectedNodesIds.length),
+                data: getAddedNodes(nodes, selectedNodesIds.length),
               });
-              updatePage({ nodes: currentNodes });
+
+              updatePage({ nodes });
             }
             break;
           }
@@ -93,13 +89,7 @@ const MainLayout = () => {
             dispatch(canvasActions.pasteNodes());
 
             if (ws.isConnected) {
-              const { nodes, selectedNodesIds } =
-                store.getState().canvas.present;
-
-              const pastedNodes = getAddedNodes(
-                nodes,
-                Object.keys(selectedNodesIds).length,
-              );
+              const pastedNodes = getAddedNodes(nodes, selectedNodesIds.length);
 
               ws.send({ type: 'nodes-add', data: pastedNodes });
 
@@ -118,10 +108,12 @@ const MainLayout = () => {
         dispatch(canvasActions.deleteNodes(selectedNodesIds));
 
         if (ws.isConnected) {
-          ws.send({ type: 'nodes-delete', data: selectedNodesIds });
+          ws.send({
+            type: 'nodes-delete',
+            data: selectedNodesIds,
+          });
 
-          const currentNodes = store.getState().canvas.present.nodes;
-          updatePage({ nodes: currentNodes });
+          updatePage({ nodes });
         }
         return;
       }
@@ -129,22 +121,8 @@ const MainLayout = () => {
       const toolTypeObj = TOOLS.find((tool) => tool.key === lowerCaseKey);
       toolTypeObj && dispatch(canvasActions.setToolType(toolTypeObj.value));
     },
-    [ws, selectedNodesIds, updatePage, dispatch],
+    [ws, updatePage, dispatch],
   );
-
-  useKeyDown(stageRef.current?.container(), onKeyDown);
-
-  const handleStageConfigChange = useCallback(
-    (config: Partial<StageConfig>) => {
-      dispatch(canvasActions.setStageConfig(config));
-    },
-    [dispatch],
-  );
-
-  const handleNodesUpdate = useCallback(() => {
-    const currentNodes = store.getState().canvas.present.nodes;
-    updatePage({ nodes: currentNodes });
-  }, [updatePage]);
 
   const handleContextMenuOpen = useCallback(
     (open: boolean) => {
@@ -160,44 +138,37 @@ const MainLayout = () => {
         return;
       }
 
-      const layer = stage.getLayers()[NODES_LAYER_INDEX];
+      const layer = getMainLayer(stage);
+      const children = getLayerNodes(layer);
 
-      const pointerRect = getPointerRect(pointerPosition, stageConfig.scale);
-      const nodesInClickArea = getNodesIntersectingWithRect(layer, pointerRect);
+      const selectedNodesIds = store.getState().canvas.present.selectedNodesIds;
 
-      const multipleNodesSelected = selectedNodesIds.length > 1;
+      const pointerRect = getPointerRect(pointerPosition, stage.scaleX());
+      const nodesInClickArea = getIntersectingNodes(children, pointerRect);
+
+      const multipleNodesSelected = Object.keys(selectedNodesIds).length > 1;
       const clickedOnNodes = Boolean(nodesInClickArea.length);
-      const clickedOnSelectedNodes = nodesInClickArea.some((node) =>
-        selectedNodesIds.includes(node.id()),
+      const clickedOnSelectedNodes = nodesInClickArea.some(
+        (node) => node.id() in selectedNodesIds,
       );
 
       if (clickedOnNodes && !clickedOnSelectedNodes && !multipleNodesSelected) {
         const nodesIds = nodesInClickArea.map((node) => node.id());
-        setSelectedNodesIds(nodesIds);
         dispatch(canvasActions.setSelectedNodesIds(nodesIds));
       }
     },
-    [stageConfig.scale, selectedNodesIds, dispatch],
+    [stageRef, dispatch],
   );
 
-  const handleNodesSelect = useCallback((nodesIds: string[]) => {
-    setSelectedNodesIds(nodesIds);
-  }, []);
-
   return (
-    <Styled.Container tabIndex={-1}>
-      <Panels intersectedNodesIds={selectedNodesIds} stageRef={stageRef} />
-      <ContextMenu.Root
-        selectedNodesCount={selectedNodesIds.length}
-        onContextMenuOpen={handleContextMenuOpen}
-      >
+    <Styled.Container tabIndex={-1} onKeyDown={handleKeyDown}>
+      <Panels stageRef={stageRef} selectedNodesIds={selectedNodesIds} />
+      <ContextMenu.Root onContextMenuOpen={handleContextMenuOpen}>
         <ContextMenu.Trigger>
           <DrawingCanvas
             ref={stageRef}
-            config={canvasConfig}
+            size={windowSize}
             onNodesSelect={handleNodesSelect}
-            onConfigChange={handleStageConfigChange}
-            onNodesUpdate={handleNodesUpdate}
           />
         </ContextMenu.Trigger>
       </ContextMenu.Root>

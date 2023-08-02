@@ -8,8 +8,6 @@ import { RECT } from '@/constants/shape';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
-import { useAppSelector } from '@/stores/hooks';
-import { selectCanvas } from '@/stores/slices/canvas';
 import { calculatePerimeter } from '@/utils/math';
 import { getDashValue, getSizeValue } from '@/utils/shape';
 import { getRectSize } from './helpers/calc';
@@ -17,13 +15,13 @@ import { getRectSize } from './helpers/calc';
 const RectDrawable = ({
   node,
   selected,
-  draggable,
+  stageScale,
   onNodeChange,
   onPress,
 }: NodeComponentProps) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
-  const { stageConfig } = useAppSelector(selectCanvas);
-  const { config } = useNode(node, stageConfig);
+
+  const { config } = useNode(node, stageScale);
 
   const totalDashLength = config.dash.length
     ? config.dash[0] + config.dash[1]
@@ -76,9 +74,9 @@ const RectDrawable = ({
 
       rect.width(width);
       rect.height(height);
-      rect.dash(dash.map((d) => d * stageConfig.scale));
+      rect.dash(dash.map((d) => d * stageScale));
     },
-    [node.style.size, node.style.line, stageConfig.scale],
+    [node.style.size, node.style.line, stageScale],
   );
 
   const handleTransformEnd = useCallback(
@@ -131,7 +129,6 @@ const RectDrawable = ({
         width={width}
         height={height}
         cornerRadius={RECT.CORNER_RADIUS}
-        draggable={draggable}
         onDragEnd={handleDragEnd}
         onTransformStart={handleTransformStart}
         onTransform={handlTransform}
@@ -142,10 +139,7 @@ const RectDrawable = ({
       {selected && (
         <NodeTransformer
           ref={transformerRef}
-          transformerConfig={{
-            id: node.nodeProps.id,
-            keepRatio: false,
-          }}
+          transformerConfig={{ keepRatio: false }}
         />
       )}
     </>

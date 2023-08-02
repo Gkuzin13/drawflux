@@ -16,7 +16,7 @@ describe('useNode', () => {
   };
 
   it('should return computed config correctly', () => {
-    const { result } = renderHook(() => useNode(node, stageConfig));
+    const { result } = renderHook(() => useNode(node, stageConfig.scale));
 
     const expectedConfig: ShapeConfig = {
       ...baseConfig,

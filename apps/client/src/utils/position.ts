@@ -37,8 +37,8 @@ export function getNodeRect(node: NodeObject): IRect {
     };
   }
 
-  let width = node.nodeProps.width || 0;
-  let height = node.nodeProps.height || 0;
+  let width = node.nodeProps.width ?? 0;
+  let height = node.nodeProps.height ?? 0;
 
   if (node.type === 'ellipse') {
     width *= 2;
@@ -77,6 +77,21 @@ export function isNodeFullyInView(
       visibleBoundaries.x + visibleBoundaries.width &&
     nodeRect.y + nodeRect.height <=
       visibleBoundaries.y + visibleBoundaries.height
+  );
+}
+
+export function isNodePartiallyInView(
+  nodeRect: IRect,
+  stageRect: IRect,
+  stageScale: number,
+): boolean {
+  const visibleBoundaries = getVisibleBoundaries(stageRect, stageScale);
+
+  return (
+    nodeRect.x + nodeRect.width >= visibleBoundaries.x &&
+    nodeRect.y + nodeRect.height >= visibleBoundaries.y &&
+    nodeRect.x <= visibleBoundaries.x + visibleBoundaries.width &&
+    nodeRect.y <= visibleBoundaries.y + visibleBoundaries.height
   );
 }
 

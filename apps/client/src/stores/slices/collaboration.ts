@@ -41,7 +41,8 @@ export const collaborationSlice = createSlice({
   },
 });
 
-export const selectCollaboration = (state: RootState) => state.collaboration;
+export const selectMyUser = (state: RootState) => state.collaboration.userId;
+export const selectUsers = (state: RootState) => state.collaboration.users;
 
 export const collaborationActions = collaborationSlice.actions;
 export default collaborationSlice.reducer;

@@ -5,8 +5,8 @@ import {
   appState,
   PAGE_URL_SEARCH_PARAM_KEY,
 } from '@/constants/app';
-import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { useAppDispatch } from '@/stores/hooks';
+import { canvasActions } from '@/stores/slices/canvas';
 import { storage } from '@/utils/storage';
 import MainLayout from './components/Layout/MainLayout/MainLayout';
 import { useWebSocket } from './contexts/websocket';
@@ -14,10 +14,9 @@ import useWSMessage from './hooks/useWSMessage';
 import { historyActions } from './stores/reducers/history';
 import { collaborationActions } from './stores/slices/collaboration';
 import useUrlSearchParams from './hooks/useUrlSearchParams/useUrlSearchParams';
+import { store } from './stores/store';
 
 const App = () => {
-  const { nodes } = useAppSelector(selectCanvas);
-
   const params = useUrlSearchParams();
   const ws = useWebSocket();
 
@@ -72,7 +71,9 @@ const App = () => {
         break;
       }
       case 'draft-text-update': {
-        const textNode = nodes.find((node) => node.nodeProps.id === data.id);
+        const textNode = store
+          .getState()
+          .canvas.present.nodes.find((node) => node.nodeProps.id === data.id);
 
         if (textNode) {
           dispatch(

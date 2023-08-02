@@ -5,8 +5,6 @@ import { Text } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
-import { useAppSelector } from '@/stores/hooks';
-import { selectCanvas } from '@/stores/slices/canvas';
 import { getColorValue, getSizeValue } from '@/utils/shape';
 import NodeTransformer from '../../Transformer/NodeTransformer';
 import { getFontSize } from './helpers/font';
@@ -20,17 +18,15 @@ type Props = {
 
 const ResizableText = ({
   node,
-  draggable,
   selected,
+  stageScale,
   onNodeChange,
   onPress,
   onDoubleClick,
 }: Props) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Text>([selected]);
 
-  const { stageConfig } = useAppSelector(selectCanvas);
-
-  const { config } = useNode(node, stageConfig, {
+  const { config } = useNode(node, stageScale, {
     fillEnabled: true,
     strokeWidth: 0,
     fontSize: getFontSize(getSizeValue(node.style.size)),
@@ -123,7 +119,6 @@ const ResizableText = ({
         padding={TEXT.PADDING}
         fontStyle={TEXT.FONT_WEIGHT}
         {...config}
-        draggable={draggable}
         onDragEnd={handleDragEnd}
         onTransform={handleTransform}
         onTransformEnd={handleTransformEnd}

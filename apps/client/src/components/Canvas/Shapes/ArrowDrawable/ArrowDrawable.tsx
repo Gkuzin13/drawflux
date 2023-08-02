@@ -6,8 +6,6 @@ import type { Point, NodeProps } from 'shared';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
-import { useAppSelector } from '@/stores/hooks';
-import { selectCanvas } from '@/stores/slices/canvas';
 import { calculateLengthFromPoints, getValueFromRatio } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import { getDashValue, getSizeValue } from '@/utils/shape';
@@ -20,7 +18,7 @@ const defaultBend = 0.5;
 const ArrowDrawable = ({
   node,
   selected,
-  draggable,
+  stageScale,
   onPress,
   onNodeChange,
 }: NodeComponentProps) => {
@@ -35,8 +33,7 @@ const ArrowDrawable = ({
 
   const [start, end] = points;
 
-  const { stageConfig } = useAppSelector(selectCanvas);
-  const { config } = useNode(node, stageConfig);
+  const { config } = useNode(node, stageScale);
 
   const lineRef = useRef<Konva.Line>(null);
 
@@ -119,9 +116,9 @@ const ArrowDrawable = ({
         node.style.line,
       );
 
-      lineRef.current?.dash(dash.map((d) => d * stageConfig.scale));
+      lineRef.current?.dash(dash.map((d) => d * stageScale));
     },
-    [bendValue, node.style.line, node.style.size, stageConfig.scale],
+    [bendValue, node.style.line, node.style.size, stageScale],
   );
 
   const handleTransformEnd = useCallback(
@@ -153,9 +150,9 @@ const ArrowDrawable = ({
     <>
       <Group
         id={node.nodeProps.id}
-        draggable={draggable}
         visible={node.nodeProps.visible}
         opacity={node.style.opacity}
+        draggable={config.draggable}
         onDragStart={() => setDragging(true)}
         onDragEnd={handleDragEnd}
         onTap={() => onPress(node.nodeProps.id)}
@@ -163,6 +160,7 @@ const ArrowDrawable = ({
       >
         <Shape
           {...config}
+          draggable={false}
           x={end[0]}
           y={end[1]}
           dash={[]}
@@ -173,6 +171,7 @@ const ArrowDrawable = ({
         <Line
           ref={lineRef}
           {...config}
+          draggable={false}
           points={flattenedPoints}
           sceneFunc={(ctx, shape) =>
             drawLine(ctx, shape, [start, end], control)
@@ -181,12 +180,11 @@ const ArrowDrawable = ({
       </Group>
       {shouldTransformerRender && (
         <ArrowTransformer
-          draggable={draggable}
           start={start}
           end={end}
           bendPoint={control}
           bendMovement={{ min: minPoint, max: maxPoint }}
-          stageScale={stageConfig.scale}
+          stageScale={stageScale}
           onTranformStart={handleTransformStart}
           onTransform={handleTransform}
           onTransformEnd={handleTransformEnd}
