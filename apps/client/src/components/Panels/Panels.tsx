@@ -9,8 +9,10 @@ import useNetworkState from '@/hooks/useNetworkState/useNetworkState';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
   canvasActions,
-  selectCanvas,
+  selectConfig,
   selectHistory,
+  selectNodes,
+  selectToolType,
 } from '@/stores/slices/canvas';
 import { collaborationActions } from '@/stores/slices/collaboration';
 import { store } from '@/stores/store';
@@ -29,32 +31,36 @@ import { PROJECT_FILE_EXT, PROJECT_FILE_NAME } from '@/constants/app';
 import { historyActions } from '@/stores/reducers/history';
 
 type Props = {
+  selectedNodesIds: string[];
   stageRef: RefObject<Konva.Stage>;
-  intersectedNodesIds: string[];
 };
 
 const UsersPanel = lazy(() => import('./UsersPanel/UsersPanel'));
 
-const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
+const Panels = ({ selectedNodesIds, stageRef }: Props) => {
   const ws = useWebSocket();
 
   const { updatePage } = usePageMutation();
 
-  const { stageConfig, toolType, nodes } = useAppSelector(selectCanvas);
+  const stageConfig = useAppSelector(selectConfig);
+  const toolType = useAppSelector(selectToolType);
+  const nodes = useAppSelector(selectNodes);
+
   const { past, future } = useAppSelector(selectHistory);
+
   const { online } = useNetworkState();
 
   const modal = useModal();
 
+  const isHandTool = toolType === 'hand';
+
   const dispatch = useAppDispatch();
 
-  const isHandTool = useMemo(() => toolType === 'hand', [toolType]);
-
   const selectedNodes = useMemo(() => {
-    const nodesIds = new Set(intersectedNodesIds);
+    const nodesIds = new Set(selectedNodesIds);
 
     return nodes.filter((node) => nodesIds.has(node.nodeProps.id));
-  }, [intersectedNodesIds, nodes]);
+  }, [selectedNodesIds, nodes]);
 
   const isStylePanelActive = useMemo(() => {
     return selectedNodes.length > 0 && !isHandTool;
@@ -64,9 +70,9 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
     return {
       undo: Boolean(past.length),
       redo: Boolean(future.length),
-      deleteSelectedNodes: Boolean(intersectedNodesIds.length),
+      deleteSelectedNodes: Boolean(selectedNodesIds.length),
     };
-  }, [past, future, intersectedNodesIds.length]);
+  }, [past, future, selectedNodesIds]);
 
   const disabledMenuItems = useMemo((): MenuKey[] | null => {
     if (ws.isConnected) {
@@ -159,10 +165,13 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
   const handleControlActions = useCallback(
     (actionType: ControlActionKey) => {
       if (actionType === 'deleteNodes') {
-        dispatch(canvasActions.deleteNodes(intersectedNodesIds));
+        dispatch(canvasActions.deleteNodes(selectedNodesIds));
 
         if (ws.isConnected) {
-          ws.send({ type: 'nodes-delete', data: intersectedNodesIds });
+          ws.send({
+            type: 'nodes-delete',
+            data: selectedNodesIds,
+          });
         }
         return;
       }
@@ -180,7 +189,7 @@ const Panels = ({ stageRef, intersectedNodesIds }: Props) => {
         }
       }
     },
-    [ws, intersectedNodesIds, dispatch, handleUpdatePage],
+    [ws, selectedNodesIds, dispatch, handleUpdatePage],
   );
 
   const handleUserChange = useCallback(

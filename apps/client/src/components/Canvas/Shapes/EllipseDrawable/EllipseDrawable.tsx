@@ -7,8 +7,6 @@ import NodeTransformer from '@/components/Canvas/Transformer/NodeTransformer';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
-import { useAppSelector } from '@/stores/hooks';
-import { selectCanvas } from '@/stores/slices/canvas';
 import { calculateCircumference } from '@/utils/math';
 import { getDashValue, getSizeValue } from '@/utils/shape';
 import { getEllipseRadius } from './helpers/calc';
@@ -16,14 +14,13 @@ import { getEllipseRadius } from './helpers/calc';
 const EllipseDrawable = ({
   node,
   selected,
-  draggable,
+  stageScale,
   onNodeChange,
   onPress,
 }: NodeComponentProps) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Ellipse>([selected]);
 
-  const { stageConfig } = useAppSelector(selectCanvas);
-  const { config } = useNode(node, stageConfig);
+  const { config } = useNode(node, stageScale);
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
     nodeRef,
@@ -66,9 +63,9 @@ const EllipseDrawable = ({
         node.style.line,
       );
 
-      ellipse.dash(dash.map((d) => d * stageConfig.scale));
+      ellipse.dash(dash.map((d) => d * stageScale));
     },
-    [node.style.size, node.style.line, stageConfig.scale],
+    [node.style.size, node.style.line, stageScale],
   );
 
   const handleTransformEnd = useCallback(
@@ -106,7 +103,6 @@ const EllipseDrawable = ({
         x={node.nodeProps.point[0]}
         y={node.nodeProps.point[1]}
         {...config}
-        draggable={draggable}
         onDragEnd={handleDragEnd}
         onTransformStart={handleTransformStart}
         onTransform={handlTransform}

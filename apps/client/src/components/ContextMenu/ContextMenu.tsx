@@ -5,7 +5,7 @@ import Divider from '@/components/Elements/Divider/Divider';
 import Kbd from '@/components/Elements/Kbd/Kbd';
 import { useWebSocket } from '@/contexts/websocket';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
-import { canvasActions, selectCanvas } from '@/stores/slices/canvas';
+import { canvasActions, selectSelectedNodesIds } from '@/stores/slices/canvas';
 import { store } from '@/stores/store';
 import * as Styled from './ContextMenu.styled';
 import usePageMutation from '@/hooks/usePageMutation';
@@ -14,7 +14,6 @@ import { getAddedNodes } from '@/utils/node';
 export type ContextMenuType = 'node-menu' | 'canvas-menu';
 
 type RootProps = PropsWithChildren<{
-  selectedNodesCount: number;
   children: ReactNode;
   onContextMenuOpen: (open: boolean) => void;
 }>;
@@ -91,7 +90,7 @@ const NodeMenu = () => {
 
   const { updatePage } = usePageMutation();
 
-  const { selectedNodesIds } = useAppSelector(selectCanvas);
+  const selectedNodesIds = useAppSelector(selectSelectedNodesIds);
 
   const dispatch = useAppDispatch();
 
@@ -180,23 +179,25 @@ const Trigger = ({ children }: TriggerProps) => {
   );
 };
 
-const Root = ({
-  selectedNodesCount,
-  onContextMenuOpen,
-  children,
-}: RootProps) => {
+const Menu = () => {
+  const selectedNodesIds = useAppSelector(selectSelectedNodesIds);
+  const selectedNodesCount = Object.keys(selectedNodesIds).length;
+
   const contextMenuType: ContextMenuType = selectedNodesCount
     ? 'node-menu'
     : 'canvas-menu';
 
   const ActiveMenu = menus[contextMenuType];
+  return <ActiveMenu />;
+};
 
+const Root = ({ onContextMenuOpen, children }: RootProps) => {
   return (
     <ContextMenuPrimitive.Root onOpenChange={onContextMenuOpen}>
       {children}
       <ContextMenuPrimitive.Portal>
         <Styled.Content>
-          <ActiveMenu />
+          <Menu />
         </Styled.Content>
       </ContextMenuPrimitive.Portal>
     </ContextMenuPrimitive.Root>

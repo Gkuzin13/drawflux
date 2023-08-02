@@ -26,6 +26,7 @@ export const ZOOM_RANGE = {
   MAX: 2.5,
 };
 export const ZOOM_MULTIPLIER_VALUE = 0.1;
+export const ZOOM_WHEEL_STEP = 1.1;
 export const DEFAULT_ZOOM_VALUE = 1;
 
 export const DUPLICATION_GAP = 16;

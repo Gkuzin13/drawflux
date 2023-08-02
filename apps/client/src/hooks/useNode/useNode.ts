@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import { useMemo } from 'react';
-import type { NodeColor, NodeObject, StageConfig, colors } from 'shared';
+import type { NodeColor, NodeObject, colors } from 'shared';
 import { getShapeLength } from '@/utils/math';
 import {
   getColorValue,
@@ -36,15 +36,14 @@ export const baseConfig: Config = {
   shadowForStrokeEnabled: false,
   hitStrokeWidth: 12,
   fillEnabled: false,
+  draggable: true,
 };
 
 function useNode(
   node: NodeObject,
-  stageConfig: StageConfig,
+  scale: number,
   configOverrides?: Partial<Config>,
 ): UseNodeReturn {
-  const { scale: stageScale } = stageConfig;
-
   const config = useMemo(() => {
     const size = getSizeValue(node.style.size);
     const fillEnabled = (node.style.fill ?? 'none') !== 'none';
@@ -57,7 +56,7 @@ function useNode(
       stroke: getColorValue(node.style.color),
       fill: getFillValue(node.style.fill, node.style.color),
       fillEnabled: fillEnabled && isFillable,
-      strokeWidth: size * stageScale,
+      strokeWidth: size * scale,
       opacity: node.style.opacity,
       dash: [],
       listening: node.nodeProps.visible,
@@ -70,11 +69,11 @@ function useNode(
       const shapeLength = getShapeLength(node);
       const dash = getDashValue(shapeLength, size, node.style.line);
 
-      shapeConfig.dash = dash.map((d) => d * stageScale);
+      shapeConfig.dash = dash.map((d) => d * scale);
     }
 
     return { ...baseConfig, ...shapeConfig, ...configOverrides };
-  }, [node, stageScale]);
+  }, [node, scale]);
 
   return { config };
 }

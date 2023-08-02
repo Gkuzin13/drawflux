@@ -8,7 +8,7 @@ import EditableText from '../Shapes/EditableText/EditableText';
 export type NodeComponentProps = {
   node: NodeObject;
   selected: boolean;
-  draggable: boolean;
+  stageScale: number;
   onPress: (nodeId: string) => void;
   onNodeChange: (node: NodeObject) => void;
 };

@@ -6,8 +6,6 @@ import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
-import { useAppSelector } from '@/stores/hooks';
-import { selectCanvas } from '@/stores/slices/canvas';
 import { calculateLengthFromPoints } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import { getDashValue, getSizeValue } from '@/utils/shape';
@@ -16,14 +14,14 @@ import { pairPoints } from './helpers/points';
 
 const FreePathDrawable = ({
   node,
-  draggable,
   selected,
+  stageScale,
   onNodeChange,
   onPress,
 }: NodeComponentProps) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Line>([selected]);
-  const { stageConfig } = useAppSelector(selectCanvas);
-  const { config } = useNode(node, stageConfig);
+
+  const { config } = useNode(node, stageScale);
 
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
@@ -88,9 +86,9 @@ const FreePathDrawable = ({
         node.style.line,
       );
 
-      line.dash(dash.map((d) => d * stageConfig.scale));
+      line.dash(dash.map((d) => d * stageScale));
     },
-    [node.style.size, node.style.line, stageConfig.scale],
+    [node.style.size, node.style.line, stageScale],
   );
 
   const handleTransformEnd = useCallback(
@@ -126,7 +124,6 @@ const FreePathDrawable = ({
         ref={nodeRef}
         points={flattenedPoints}
         {...config}
-        draggable={draggable}
         onDragEnd={handleDragEnd}
         onTransformStart={handleTransformStart}
         onTransform={handlTransform}

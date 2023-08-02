@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { BASE_URL, BASE_URL_DEV, IS_PROD } from '@/constants/app';
 
-type Config = {
+export type UseFetchConfig = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 };
 
@@ -17,18 +17,14 @@ const defaultConfig: RequestInit = {
   },
 };
 
-const defaultOptions = {
-  skip: false,
-};
-
 const baseUrl = IS_PROD ? BASE_URL : BASE_URL_DEV;
 
 let fetched = false;
 
 function useFetch<Data, Body>(
   url: string,
-  config?: Config,
-  options = defaultOptions,
+  config?: UseFetchConfig,
+  skip = false,
 ): UseFetchReturn<Data, Body> {
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +66,7 @@ function useFetch<Data, Body>(
   );
 
   useEffect(() => {
-    if (options.skip || fetched) {
+    if (skip || fetched) {
       return;
     }
 
@@ -86,7 +82,7 @@ function useFetch<Data, Body>(
       setError(null);
       setStatus('idle');
     };
-  }, [url, config, options]);
+  }, [url, config, skip]);
 
   return [{ status, data, error }, execute];
 }

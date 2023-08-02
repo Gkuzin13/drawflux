@@ -172,3 +172,15 @@ export function mapNodesIds(nodes: NodeObject[]): string[] {
 
   return nodes.map((node) => node.nodeProps.id);
 }
+
+export function isValidNode(node: NodeObject) {
+  if (node.type === 'text' && !node.text?.length) {
+    return false;
+  }
+
+  if (node.type === 'arrow' && !node.nodeProps.points) {
+    return false;
+  }
+
+  return true;
+}

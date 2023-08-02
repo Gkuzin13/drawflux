@@ -1,6 +1,9 @@
+import { CURSOR } from '@/constants/cursor';
+import type { ToolType } from '@/constants/panels/tools';
 import type Konva from 'konva';
 import type { IRect, Vector2d } from 'konva/lib/types';
 import { Util } from 'konva/lib/Util';
+import type { Point } from 'shared';
 
 const POINTER_RECT_SIZE = 32;
 
@@ -33,11 +36,33 @@ export function getPointerRect(position: Vector2d, scale: number): IRect {
   };
 }
 
-export function getNodesIntersectingWithRect(
+export function getLayerNodes(
   layer: Konva.Layer,
-  rect: IRect,
 ): (Konva.Shape | Konva.Group)[] {
-  const children = layer.getChildren((child) => Boolean(child.id()));
+  return layer.getChildren((child) => Boolean(child.id()));
+}
 
-  return getIntersectingNodes(children, rect);
+export function getCursorStyle(
+  toolType: ToolType,
+  dragging: boolean,
+  drawing: boolean,
+) {
+  switch (toolType) {
+    case 'hand':
+      return dragging ? CURSOR.GRABBING : CURSOR.GRAB;
+    case 'select':
+      return CURSOR.DEFAULT;
+    default:
+      return drawing ? CURSOR.CROSSHAIR : CURSOR.DEFAULT;
+  }
+}
+
+export function getMainLayer(stage: Konva.Stage) {
+  return stage.getLayers()[0];
+}
+
+export function getRelativePointerPosition(stage: Konva.Stage): Point {
+  const { x, y } = stage.getRelativePointerPosition();
+
+  return [x, y];
 }

@@ -13,13 +13,14 @@ import { useWebSocket } from '@/contexts/websocket';
 import useWSMessage from '@/hooks/useWSMessage';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
-  selectCollaboration,
+  selectUsers,
+  selectMyUser,
   collaborationActions,
 } from '@/stores/slices/collaboration';
 import { throttleFn } from '@/utils/timed';
-import { type DrawableType, drawTypes } from '../DrawingCanvas/helpers/draw';
+import { drawNodeByType } from '../DrawingCanvas/helpers/draw';
 import DraftNode from '../Node/DraftNode';
-import UserCursor from './UserCursor/UserCursor';
+import UserCursor from '../UserCursor';
 
 type Props = {
   stageScale: number;
@@ -31,11 +32,12 @@ type UserCursors = {
   [userId: string]: Point;
 };
 
-const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
+const Collaboration = ({ stageScale, stageRef, isDrawing }: Props) => {
   const [userCursors, setUserCursors] = useState<UserCursors>({});
   const [draftNodes, setDraftNodes] = useState<NodeObject[]>([]);
 
-  const { userId, users } = useAppSelector(selectCollaboration);
+  const users = useAppSelector(selectUsers);
+  const userId = useAppSelector(selectMyUser);
 
   const ws = useWebSocket();
 
@@ -100,8 +102,6 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
           break;
         }
         case 'draft-draw': {
-          const drawFn = drawTypes[data.type as DrawableType];
-
           setDraftNodes((prevNodes) => {
             const nodeToUpdate = prevNodes.find(
               (node) => node.nodeProps.id === data.nodeId,
@@ -109,19 +109,14 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
 
             if (!nodeToUpdate) return prevNodes;
 
-            const updatedNode = drawFn(
-              nodeToUpdate,
-              data.position.start,
-              data.position.current,
-            );
-
-            return prevNodes.map((node) => {
-              if (node.nodeProps.id === data.nodeId) {
-                return updatedNode;
-              }
-
-              return node;
+            const drawedNode = drawNodeByType({
+              node: nodeToUpdate,
+              position: data.position,
             });
+
+            return prevNodes.map((node) =>
+              node.nodeProps.id === data.nodeId ? drawedNode : node,
+            );
           });
 
           handleUserMove({ id: data.userId, position: data.position.current });
@@ -130,7 +125,7 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
         case 'draft-end': {
           setDraftNodes((prevNodes) => {
             return prevNodes.filter(
-              (n) => n.nodeProps.id !== data.nodeProps.id,
+              (node) => node.nodeProps.id !== data.nodeProps.id,
             );
           });
           break;
@@ -154,7 +149,7 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
     [dispatch, handleUserMove],
   );
 
-  useWSMessage(ws.connection, handleMessages, [handleMessages, ws]);
+  useWSMessage(ws.connection, handleMessages, [handleMessages]);
 
   return (
     <>
@@ -163,6 +158,7 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
           <DraftNode
             key={node.nodeProps.id}
             node={node}
+            stageScale={stageScale}
             onDraftEnd={() => null}
           />
         );
@@ -182,4 +178,4 @@ const CollabLayer = ({ stageScale, stageRef, isDrawing }: Props) => {
   );
 };
 
-export default memo(CollabLayer);
+export default memo(Collaboration);

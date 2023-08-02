@@ -6,7 +6,7 @@ import Loader from '@/components/Elements/Loader/Loader';
 import { PAGE_URL_SEARCH_PARAM_KEY } from '@/constants/app';
 import useFetch from '@/hooks/useFetch';
 import { useAppSelector } from '@/stores/hooks';
-import { selectCanvas } from '@/stores/slices/canvas';
+import { selectNodes, selectConfig } from '@/stores/slices/canvas';
 import { urlSearchParam } from '@/utils/url';
 import * as Styled from './SharePanel.styled';
 import Icon from '@/components/Elements/Icon/Icon';
@@ -20,10 +20,11 @@ const SharablePageContent = () => {
     {
       method: 'POST',
     },
-    { skip: true },
+    true,
   );
 
-  const { nodes, stageConfig } = useAppSelector(selectCanvas);
+  const nodes = useAppSelector(selectNodes);
+  const stageConfig = useAppSelector(selectConfig);
 
   useEffect(() => {
     if (data?.id) {

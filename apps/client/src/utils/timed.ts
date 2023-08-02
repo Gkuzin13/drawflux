@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export function throttleFn(callback: (...args: any[]) => void, ms = 0) {
+export function throttleFn<T extends any[]>(
+  callback: (...args: T) => void,
+  ms = 0,
+) {
   let prev = 0;
 
-  return (...args: any[]) => {
+  return (...args: Parameters<typeof callback>) => {
     const now = performance.now();
 
     if (now - prev > ms) {

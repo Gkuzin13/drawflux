@@ -7,7 +7,7 @@ import TextInput from '@/components/Elements/TextInput/TextInput';
 import { USER } from '@/constants/app';
 import { KEYS } from '@/constants/keys';
 import { useAppSelector } from '@/stores/hooks';
-import { selectCollaboration } from '@/stores/slices/collaboration';
+import { selectMyUser, selectUsers } from '@/stores/slices/collaboration';
 import * as Styled from './UsersPanel.styled';
 import Icon from '@/components/Elements/Icon/Icon';
 
@@ -18,7 +18,8 @@ type Props = {
 const UsersPanel = ({ onUserChange }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
 
-  const { users, userId } = useAppSelector(selectCollaboration);
+  const users = useAppSelector(selectUsers);
+  const userId = useAppSelector(selectMyUser);
 
   const inputRef = useRef<HTMLInputElement>(null);
 

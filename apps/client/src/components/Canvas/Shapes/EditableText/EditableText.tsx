@@ -14,7 +14,7 @@ export type OnTextSaveArgs = {
 const EditableText = ({
   node,
   selected,
-  draggable,
+  stageScale,
   onNodeChange,
   onPress,
 }: NodeComponentProps) => {
@@ -75,7 +75,7 @@ const EditableText = ({
     <ResizableText
       node={node}
       selected={selected}
-      draggable={draggable}
+      stageScale={stageScale}
       onNodeChange={onNodeChange}
       onPress={onPress}
       onDoubleClick={handleDoubleClick}

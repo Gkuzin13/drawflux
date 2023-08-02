@@ -14,7 +14,7 @@ const SharePanel = ({ isPageShared }: Props) => {
   const [{ data, error }, getQRCode] = useFetch<
     QRCodeResponse,
     QRCodeRequestBody
-  >('/qrcode', { method: 'POST' }, { skip: true });
+  >('/qrcode', { method: 'POST' }, true);
 
   const url = window.location.href;
 

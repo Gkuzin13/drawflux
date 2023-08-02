@@ -1,29 +1,19 @@
 import type Konva from 'konva';
-import { memo, forwardRef } from 'react';
+import { forwardRef, memo, type RefObject } from 'react';
 import { Rect } from 'react-konva';
 import { theme } from 'shared';
 import { getNormalizedInvertedRect } from '@/utils/position';
+import type { IRect } from 'konva/lib/types';
 
 type Props = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  stageScale: number;
+  rect: IRect;
+  scale: number;
+  ref: RefObject<Konva.Rect>;
 };
 
-const BackgroundRect = forwardRef<Konva.Rect, Props>(
-  ({ stageScale, x, y, width, height }, ref) => {
-    const normalizedRect = getNormalizedInvertedRect(
-      {
-        x,
-        y,
-        width,
-        height,
-      },
-      stageScale,
-    );
-
+const BackgroundLayer = forwardRef<Konva.Rect, Props>(
+  ({ scale, rect }, ref) => {
+    const normalizedRect = getNormalizedInvertedRect(rect, scale);
     return (
       <Rect
         ref={ref}
@@ -39,6 +29,6 @@ const BackgroundRect = forwardRef<Konva.Rect, Props>(
   },
 );
 
-BackgroundRect.displayName = 'BackgroundRect';
+BackgroundLayer.displayName = 'BackgroundLayer';
 
-export default memo(BackgroundRect);
+export default memo(BackgroundLayer);
