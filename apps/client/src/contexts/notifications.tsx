@@ -6,7 +6,7 @@ import {
   useState,
   useCallback,
 } from 'react';
-import Toast from '@/components/Toast/Toast';
+import Toast from '@/components/Elements/Toast/Toast';
 
 type Notification = {
   title: string;
