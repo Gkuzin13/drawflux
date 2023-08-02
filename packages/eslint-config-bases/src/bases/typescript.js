@@ -60,10 +60,6 @@ module.exports = {
     // Slow: https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/namespace.md
     'import/namespace': 'off', // ['error'] If you want the extra check (typechecks will spot most issues already)
     // https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-duplicates.md
-    'import/no-duplicates': [
-      'error',
-      { 'prefer-inline': true, considerQueryString: true },
-    ],
     'import/no-named-as-default-member': ['off'],
     'import/no-named-as-default': ['warn'],
     'import/order': [
