@@ -29,11 +29,9 @@ export const collaborationSlice = createSlice({
     ) => {
       const index = state.users.findIndex((u) => u.id === action.payload.id);
 
-      if (index === -1) {
-        return;
+      if (index !== -1) {
+        state.users[index] = { ...state.users[index], ...action.payload };
       }
-
-      state.users[index] = { ...state.users[index], ...action.payload };
     },
     removeUser: (state, action: PayloadAction<{ id: string }>) => {
       state.users = state.users.filter((u) => u.id !== action.payload.id);
