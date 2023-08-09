@@ -182,5 +182,9 @@ export function isValidNode(node: NodeObject) {
     return false;
   }
 
+  if (node.type === 'draw' && !node.nodeProps.points) {
+    return false;
+  }
+
   return true;
 }
