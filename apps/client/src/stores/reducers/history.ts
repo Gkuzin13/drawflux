@@ -32,7 +32,7 @@ function isIgnoredActionType(type: string) {
   return IGNORED_ACTIONS.includes(type as IgnoreActionType);
 }
 
-function undoable(
+function historyReducer(
   reducer: Reducer<
     CanvasSliceState,
     Action<HistoryActionType | CanvasActionType | undefined>
@@ -104,4 +104,4 @@ function undoable(
   };
 }
 
-export default undoable;
+export default historyReducer;
