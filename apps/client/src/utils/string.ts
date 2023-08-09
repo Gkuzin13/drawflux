@@ -1,4 +1,5 @@
 import { Util } from 'konva/lib/Util';
+import { clamp } from './math';
 
 export function capitalizeFirstLetter(string: string) {
   if (typeof string !== 'string') {
@@ -32,8 +33,8 @@ export const getStyleTitle = (name: string, value: string) => {
   return `${name} — ${value}`;
 };
 
-export const hexToRGBa = (hex: string, alpha: number) => {
+export const hexToRGBa = (hex: string, alpha = 1) => {
   const { r, g, b } = Util.getRGB(hex);
 
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  return `rgba(${r}, ${g}, ${b}, ${clamp(alpha, [0, 1])})`;
 };
