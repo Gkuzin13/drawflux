@@ -35,7 +35,7 @@ const useAnimatedDash = ({
     const node = nodeRef.current;
 
     if (!animationRef.current) {
-      const speedFactor = clamp(35 * totalDashLengthRef.current, 650, 750);
+      const speedFactor = clamp(35 * totalDashLengthRef.current, [650, 750]);
 
       animationRef.current = new Animation((frame) => {
         if (!frame) return;

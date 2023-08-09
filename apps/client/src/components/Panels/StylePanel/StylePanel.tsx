@@ -94,7 +94,7 @@ const StylePanel = ({
   };
 
   const handleOpacitySelect = (value: number, commit = false) => {
-    const clampedOpacity = clamp(value, OPACITY.minValue, OPACITY.maxValue);
+    const clampedOpacity = clamp(value, [OPACITY.minValue, OPACITY.maxValue]);
     onStyleChange({ opacity: clampedOpacity }, commit);
   };
 
