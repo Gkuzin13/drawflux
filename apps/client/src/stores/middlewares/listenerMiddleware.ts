@@ -29,7 +29,7 @@ export const addAppListener = addListener as TypedAddListener<
   AppDispatch
 >;
 
-const actionsToListenTo = [
+export const ACTIONS_TO_LISTEN = [
   historyActions.undo,
   historyActions.redo,
   canvasActions.addNodes,
@@ -47,7 +47,7 @@ const actionsToListenTo = [
 ];
 
 startAppListening({
-  matcher: isAnyOf(...actionsToListenTo),
+  matcher: isAnyOf(...ACTIONS_TO_LISTEN),
   effect: (action, listenerApi) => {
     if (collaborationActions.init.match(action)) {
       listenerApi.unsubscribe();
@@ -56,8 +56,6 @@ startAppListening({
 
     const canvasState = listenerApi.getState().canvas.present;
 
-    storage.set<AppState>(LOCAL_STORAGE_KEY, {
-      page: canvasState,
-    });
+    storage.set<AppState>(LOCAL_STORAGE_KEY, { page: canvasState });
   },
 });

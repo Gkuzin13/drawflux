@@ -3,6 +3,8 @@ import {
   createNode,
   duplicateNodes,
   getAddedNodes,
+  isValidNode,
+  mapNodesIds,
   reorderNodes,
 } from '../node';
 
@@ -167,5 +169,52 @@ describe('getAddedNodes', () => {
     const addedNodes = getAddedNodes(allNodes, allNodes.length + 1);
 
     expect(addedNodes).toEqual(allNodes);
+  });
+});
+
+describe('mapNodesIds', () => {
+  it('returns array of ids', () => {
+    const nodes = nodesGenerator(3);
+
+    expect(mapNodesIds(nodes)).toEqual([
+      nodes[0].nodeProps.id,
+      nodes[1].nodeProps.id,
+      nodes[2].nodeProps.id,
+    ]);
+  });
+
+  it('returns empty array if nodes are empty', () => {
+    expect(mapNodesIds([])).toEqual([]);
+  });
+});
+
+describe('isValidNode', () => {
+  it('returns true if node is valid', () => {
+    const node1 = nodesGenerator(1, 'ellipse')[0];
+    const node2 = nodesGenerator(1, 'rectangle')[0];
+
+    expect(isValidNode(node1)).toBe(true);
+    expect(isValidNode(node2)).toBe(true);
+  });
+
+  it('returns false if arrow node is has no points', () => {
+    const node = nodesGenerator(1, 'arrow')[0];
+    node.nodeProps.points = undefined;
+
+    expect(isValidNode(node)).toBe(false);
+  });
+
+  it('returns false if text node text is empty', () => {
+    const node = nodesGenerator(1, 'text')[0];
+    node.text = '';
+
+    expect(isValidNode(node)).toBe(false);
+  });
+
+  it('returns false if draw node has no points', () => {
+    const node = nodesGenerator(1, 'draw')[0];
+    node.nodeProps.points = undefined;
+
+    expect(isValidNode(node)).toBe(false);
   });
 });

@@ -17,8 +17,8 @@ export function calculateMiddlePoint(rect: IRect): Vector2d {
   };
 }
 
-export function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
+export function clamp(value: number, range: [min: number, max: number]) {
+  return Math.min(Math.max(value, range[0]), range[1]);
 }
 
 export function calculateLengthFromPoints(points: Point[]) {

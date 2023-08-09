@@ -42,10 +42,12 @@ export const canvasSlice = createSlice({
   initialState,
   reducers: {
     set: (state, action: PayloadAction<AppState['page']>) => {
-      state.nodes = action.payload.nodes;
-      state.selectedNodesIds = action.payload.selectedNodesIds;
-      state.stageConfig = action.payload.stageConfig;
-      state.toolType = action.payload.toolType;
+      const { nodes, selectedNodesIds, stageConfig, toolType } = action.payload;
+
+      state.nodes = nodes;
+      state.selectedNodesIds = selectedNodesIds;
+      state.stageConfig = stageConfig;
+      state.toolType = toolType;
     },
     setNodes: (state, action: PayloadAction<NodeObject[]>) => {
       state.nodes = action.payload;
@@ -54,16 +56,16 @@ export const canvasSlice = createSlice({
       const nodesToAdd = action.payload;
 
       if (nodesToAdd.every(isValidNode)) {
-        state.nodes.push(...action.payload);
+        state.nodes.push(...nodesToAdd);
       }
     },
     updateNodes: (state, action: PayloadAction<NodeObject[]>) => {
-      const nodesMap = new Map<string, NodeObject>(
+      const updatedNodesMap = new Map(
         action.payload.map((node) => [node.nodeProps.id, node]),
       );
 
       const updatedNodes = state.nodes.map((node) => {
-        const updatedNode = nodesMap.get(node.nodeProps.id);
+        const updatedNode = updatedNodesMap.get(node.nodeProps.id);
 
         return updatedNode ?? node;
       });

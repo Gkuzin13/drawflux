@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { capitalizeFirstLetter, getKeyTitle } from '../string';
+import {
+  capitalizeFirstLetter,
+  getKeyTitle,
+  getStyleTitle,
+  hexToRGBa,
+} from '../string';
 
 describe('capitalizeFirstLetter', () => {
   it('should capitalize the first letter', () => {
@@ -35,5 +40,21 @@ describe('getKeyTitle', () => {
 
   it('should return keys as strings when provided with non-string values', () => {
     expect(getKeyTitle('foo', [<any>12, null])).toBe('Foo — 12 + Null');
+  });
+});
+
+describe('getStyleTitle', () => {
+  it('returns a formatted title', () => {
+    expect(getStyleTitle('foo', 'bar')).toBe('foo — bar');
+  });
+});
+
+describe('hexToRGBa', () => {
+  it('return a hex color to rgba', () => {
+    expect(hexToRGBa('#FFFFFF')).toEqual('rgba(255, 255, 255, 1)');
+  });
+
+  it('returns a hex color with provided alpha to rgba', () => {
+    expect(hexToRGBa('#FFFFFF', 0.5)).toEqual('rgba(255, 255, 255, 0.5)');
   });
 });
