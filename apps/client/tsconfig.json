@@ -4,12 +4,18 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "jsx": "react-jsx",
-    "types": ["vitest/globals", "vite-plugin-pwa/client"],
+    "types": [
+      "node",
+      "vitest/globals",
+      "vite-plugin-pwa/client",
+      "@testing-library/jest-dom"
+    ],
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "e2e"],
   "extends": "../../tsconfig.base.json",
   "references": [{ "path": "./tsconfig.node.json" }]
 }
