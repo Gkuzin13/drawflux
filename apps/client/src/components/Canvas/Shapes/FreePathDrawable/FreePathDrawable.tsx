@@ -17,7 +17,6 @@ const FreePathDrawable = ({
   selected,
   stageScale,
   onNodeChange,
-  onPress,
 }: NodeComponentProps) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Line>([selected]);
 
@@ -51,12 +50,8 @@ const FreePathDrawable = ({
       });
 
       line.position({ x: 0, y: 0 });
-
-      if (!selected) {
-        onPress(node.nodeProps.id);
-      }
     },
-    [node, selected, onNodeChange, onPress],
+    [node, onNodeChange],
   );
 
   const handleTransformStart = useCallback(() => {
@@ -128,8 +123,6 @@ const FreePathDrawable = ({
         onTransformStart={handleTransformStart}
         onTransform={handlTransform}
         onTransformEnd={handleTransformEnd}
-        onTap={() => onPress(node.nodeProps.id)}
-        onClick={() => onPress(node.nodeProps.id)}
       />
       {selected && (
         <NodeTransformer

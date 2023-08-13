@@ -13,7 +13,6 @@ const DraftNode = ({ node, stageScale, onDraftEnd }: Props) => {
       node={node}
       selected={false}
       stageScale={stageScale}
-      onPress={() => null}
       onNodeChange={onDraftEnd}
     />
   );

@@ -9,7 +9,6 @@ export type NodeComponentProps = {
   node: NodeObject;
   selected: boolean;
   stageScale: number;
-  onPress: (nodeId: string) => void;
   onNodeChange: (node: NodeObject) => void;
 };
 

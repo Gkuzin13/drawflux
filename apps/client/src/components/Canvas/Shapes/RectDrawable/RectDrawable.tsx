@@ -17,7 +17,6 @@ const RectDrawable = ({
   selected,
   stageScale,
   onNodeChange,
-  onPress,
 }: NodeComponentProps) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
 
@@ -42,12 +41,8 @@ const RectDrawable = ({
           point: [event.target.x(), event.target.y()],
         },
       });
-
-      if (!selected) {
-        onPress(node.nodeProps.id);
-      }
     },
-    [node, selected, onNodeChange, onPress],
+    [node, onNodeChange],
   );
 
   const handleTransformStart = useCallback(() => {
@@ -133,8 +128,6 @@ const RectDrawable = ({
         onTransformStart={handleTransformStart}
         onTransform={handlTransform}
         onTransformEnd={handleTransformEnd}
-        onTap={() => onPress(node.nodeProps.id)}
-        onClick={() => onPress(node.nodeProps.id)}
       />
       {selected && (
         <NodeTransformer

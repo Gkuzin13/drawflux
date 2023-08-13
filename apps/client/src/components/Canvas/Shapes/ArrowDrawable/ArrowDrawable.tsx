@@ -19,7 +19,6 @@ const ArrowDrawable = ({
   node,
   selected,
   stageScale,
-  onPress,
   onNodeChange,
 }: NodeComponentProps) => {
   const [points, setPoints] = useState<Point[]>([
@@ -90,12 +89,8 @@ const ArrowDrawable = ({
       group.position({ x: 0, y: 0 });
 
       setDragging(false);
-
-      if (!selected) {
-        onPress(node.nodeProps.id);
-      }
     },
-    [node, points, selected, onNodeChange, onPress],
+    [node, points, onNodeChange],
   );
 
   const handleTransformStart = useCallback(() => {
@@ -155,8 +150,6 @@ const ArrowDrawable = ({
         draggable={config.draggable}
         onDragStart={() => setDragging(true)}
         onDragEnd={handleDragEnd}
-        onTap={() => onPress(node.nodeProps.id)}
-        onClick={() => onPress(node.nodeProps.id)}
       >
         <Shape
           {...config}

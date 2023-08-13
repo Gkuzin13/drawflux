@@ -21,7 +21,6 @@ const ResizableText = ({
   selected,
   stageScale,
   onNodeChange,
-  onPress,
   onDoubleClick,
 }: Props) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Text>([selected]);
@@ -39,10 +38,6 @@ const ResizableText = ({
     createSingleClickHandler((callback) => callback()),
   );
 
-  const handleOnPress = useCallback(() => {
-    onPress(node.nodeProps.id);
-  }, [node, onPress]);
-
   const handleDragEnd = useCallback(
     (event: KonvaEventObject<DragEvent>) => {
       onNodeChange({
@@ -52,12 +47,8 @@ const ResizableText = ({
           point: [event.target.x(), event.target.y()],
         },
       });
-
-      if (!selected) {
-        onPress(node.nodeProps.id);
-      }
     },
-    [node, selected, onNodeChange, onPress],
+    [node, onNodeChange],
   );
 
   const handleTransform = useCallback((event: KonvaEventObject<Event>) => {
@@ -122,8 +113,6 @@ const ResizableText = ({
         onDragEnd={handleDragEnd}
         onTransform={handleTransform}
         onTransformEnd={handleTransformEnd}
-        onTap={handleOnPress}
-        onClick={handleOnPress}
       />
       {selected && (
         <NodeTransformer

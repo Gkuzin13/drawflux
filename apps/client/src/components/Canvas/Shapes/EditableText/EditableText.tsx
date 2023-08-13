@@ -16,7 +16,6 @@ const EditableText = ({
   selected,
   stageScale,
   onNodeChange,
-  onPress,
 }: NodeComponentProps) => {
   const [editing, setEditing] = useState(false);
 
@@ -77,7 +76,6 @@ const EditableText = ({
       selected={selected}
       stageScale={stageScale}
       onNodeChange={onNodeChange}
-      onPress={onPress}
       onDoubleClick={handleDoubleClick}
     />
   );

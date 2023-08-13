@@ -10,16 +10,10 @@ import { selectNodes } from '@/stores/slices/canvas';
 type Props = {
   selectedNodesIds: string[];
   stageScale: number;
-  onNodePress: (nodeId: string) => void;
   onNodesChange: (nodes: NodeObject[]) => void;
 };
 
-const NodesLayer = ({
-  selectedNodesIds,
-  stageScale,
-  onNodePress,
-  onNodesChange,
-}: Props) => {
+const NodesLayer = ({ selectedNodesIds, stageScale, onNodesChange }: Props) => {
   const nodes = useAppSelector(selectNodes);
 
   /*
@@ -63,7 +57,6 @@ const NodesLayer = ({
         nodes={nodes}
         selectedNodeId={selectedNodeId}
         stageScale={stageScale}
-        onPress={onNodePress}
         onNodeChange={handleNodeChange}
       />
       {selectedMultipleNodes ? (
