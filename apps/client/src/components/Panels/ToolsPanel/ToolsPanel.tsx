@@ -20,6 +20,7 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
               size="small"
               color={activeTool === tool.value ? 'primary' : 'secondary'}
               title={getKeyTitle(tool.name, [tool.key])}
+              data-testid={`tool-button-${tool.value}`}
               onClick={() => onToolSelect(tool.value)}
             >
               <Icon name={tool.icon} size="lg" stroke="md" />
