@@ -9,10 +9,10 @@ describe('useForceUpdate', () => {
 
     expect(result.current.rerenderCount).toBe(1);
 
-    rerender([2]);
+    rerender([2, 1, 3]);
     expect(result.current.rerenderCount).toBe(2);
 
-    rerender([2]); // Dependencies didn't change, re-render shouldn't occur
+    rerender([2, 1, 3]); // Dependencies didn't change, re-render shouldn't occur
     expect(result.current.rerenderCount).toBe(2);
 
     rerender([3, 2, 1]);
