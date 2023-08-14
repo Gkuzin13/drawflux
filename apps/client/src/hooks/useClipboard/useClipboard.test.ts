@@ -1,12 +1,25 @@
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import useClipboard from './useClipboard';
-import { act } from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
 
 describe('useClipboard', () => {
-  userEvent.setup();
+  beforeAll(() => {
+    userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+  });
 
-  it('should copied true when calling copy', async () => {
+  it('copies text to the clipboard', async () => {
+    const { result } = renderHook(() => useClipboard());
+
+    await act(async () => {
+      result.current.copy('test');
+    });
+
+    const textContent = await window.navigator.clipboard.readText();
+
+    expect(textContent).toBe('test');
+  });
+
+  it('sets copied state to true when text is copied', async () => {
     const { result } = renderHook(() => useClipboard());
 
     await act(async () => {
@@ -17,7 +30,7 @@ describe('useClipboard', () => {
     expect(result.current.error).toBeNull();
   });
 
-  it('should reset copied state after the timeout', async () => {
+  it('resets copied state after the timeout', async () => {
     vi.useFakeTimers();
 
     const resetTimeout = 1000;
@@ -39,7 +52,7 @@ describe('useClipboard', () => {
     vi.useRealTimers();
   });
 
-  it('should reset correctly', async () => {
+  it('resets copied state when reset is called', async () => {
     const { result } = renderHook(() => useClipboard());
 
     await act(async () => {
