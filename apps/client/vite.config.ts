@@ -55,15 +55,24 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    include: ['./src/**/*.test.ts?(x)'],
     setupFiles: ['./src/test/setup.ts'],
     environment: 'jsdom',
     deps: {
-      // Temporary workaround
-      // Otherwise throws "ERR_MODULE_NOT_FOUND"
-      registerNodeLoader: true,
+      optimizer: {
+        web: {
+          include: ['vitest-canvas-mock'],
+        },
+      },
+    },
+    threads: false,
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable',
+      },
     },
     coverage: {
-      provider: 'c8',
+      provider: 'v8',
       reporter: ['text', 'json', 'html'],
       all: true,
       include: [

@@ -44,8 +44,6 @@
     "helmet": "^6.1.5",
     "nodemon": "^2.0.22",
     "supertest": "^6.3.3",
-    "tsx": "^3.12.6",
-    "typescript": "*",
-    "vitest": "*"
+    "tsx": "^3.12.6"
   }
 }

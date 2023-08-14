@@ -16,7 +16,6 @@ const EllipseDrawable = ({
   selected,
   stageScale,
   onNodeChange,
-  onPress,
 }: NodeComponentProps) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Ellipse>([selected]);
 
@@ -36,11 +35,8 @@ const EllipseDrawable = ({
           point: [event.target.x(), event.target.y()],
         },
       });
-      if (!selected) {
-        onPress(node.nodeProps.id);
-      }
     },
-    [node, selected, onNodeChange, onPress],
+    [node, onNodeChange],
   );
 
   const handleTransformStart = useCallback(() => {
@@ -107,8 +103,6 @@ const EllipseDrawable = ({
         onTransformStart={handleTransformStart}
         onTransform={handlTransform}
         onTransformEnd={handleTransformEnd}
-        onTap={() => onPress(node.nodeProps.id)}
-        onClick={() => onPress(node.nodeProps.id)}
       />
       {selected && (
         <NodeTransformer

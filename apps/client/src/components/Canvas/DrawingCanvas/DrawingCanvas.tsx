@@ -221,6 +221,15 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [ws, handlePageUpdate, dispatch],
     );
 
+    const handleNodePress = useCallback(
+      (nodeId: string) => {
+        if (isSelectTool) {
+          dispatch(canvasActions.setSelectedNodesIds([nodeId]));
+        }
+      },
+      [isSelectTool, dispatch],
+    );
+
     const updateDrawingPosition = useCallback(
       (current: Point, start?: Point) => {
         drawingPositionRef.current.current = current;
@@ -243,6 +252,12 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         const clickedOnEmpty = event.target === stage;
 
         if (!clickedOnEmpty) {
+          const nodeId = event.target.id();
+
+          if (nodeId) {
+            handleNodePress(nodeId);
+          }
+
           if (!hasSelectedNodes) {
             event.evt.stopPropagation();
           }
@@ -267,7 +282,13 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           setIntersectedNodesIds([]);
         }
       },
-      [toolType, hasSelectedNodes, handleCreateNode, updateDrawingPosition],
+      [
+        toolType,
+        hasSelectedNodes,
+        handleCreateNode,
+        updateDrawingPosition,
+        handleNodePress,
+      ],
     );
 
     const handlePointerMove = useCallback(
@@ -411,15 +432,6 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [ws, handlePageUpdate, dispatch],
     );
 
-    const handleNodePress = useCallback(
-      (nodeId: string) => {
-        if (isSelectTool) {
-          dispatch(canvasActions.setSelectedNodesIds([nodeId]));
-        }
-      },
-      [isSelectTool, dispatch],
-    );
-
     return (
       <Stage
         ref={ref}
@@ -455,7 +467,6 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           <NodesLayer
             selectedNodesIds={!isHandTool ? intersectedNodesIds : []}
             stageScale={stageConfig.scale}
-            onNodePress={handleNodePress}
             onNodesChange={handleNodesChange}
           />
           {draftNode && (

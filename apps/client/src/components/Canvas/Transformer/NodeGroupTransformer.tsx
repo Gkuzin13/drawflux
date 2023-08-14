@@ -15,6 +15,9 @@ type Props = {
   onDragEnd: (nodes: NodeObject[]) => void;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noop = () => {};
+
 const NodeGroupTransformer = ({ nodes, stageScale, onDragEnd }: Props) => {
   // Solves the issue when a nested group inside a tranformer is not updated properly when changed
   // Forces transformer to rerender with the updated nodes
@@ -124,8 +127,7 @@ const NodeGroupTransformer = ({ nodes, stageScale, onDragEnd }: Props) => {
               node={node}
               selected={false}
               stageScale={stageScale}
-              onPress={() => null}
-              onNodeChange={() => null}
+              onNodeChange={noop}
             />
           );
         })}
