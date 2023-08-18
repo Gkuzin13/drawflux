@@ -16,10 +16,6 @@
 
 # Local development
 
-### Requirements
-
-[PostgreSQL 15](https://www.postgresql.org/download/)
-
 ### Install
 
 Clone the repository to your local machine.
@@ -28,6 +24,26 @@ Install dependencies:
 
 ```bash
 pnpm install
+```
+
+### Docker
+
+The docker directory includes docker-compose that sets up a posgresql database and the backend for you.\
+Alternatively you can also set up your own postgresql database, you will need to set
+[environment variables](https://node-postgres.com/features/connecting#environment-variables) for it to work.
+
+#### Requirements:
+
+- [x] [docker-engine](https://docs.docker.com/get-docker) >= 23 and [buildkit](https://docs.docker.com/build/buildkit/).
+- [x] [docker-compose v2](https://docs.docker.com/compose).
+
+### Usage
+
+```sh
+pnpm docker:build # Build for production
+pnpm docker:build:dev # Build for development
+pnpm docker:up
+pnpm docker:up:dev
 ```
 
 ### Development Mode

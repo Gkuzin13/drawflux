@@ -12,6 +12,9 @@
     "fix-all-files": "eslint --fix . --ext .ts",
     "typecheck": "tsc --project ./tsconfig.json --noEmit"
   },
+  "dependencies": {
+    "@stitches/react": "*"
+  },
   "devDependencies": {
     "eslint-config-bases": "workspace:^"
   }

@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  server:
+    image: dflx-server-dev
+    container_name: dflx-server-dev
+    build:
+      target: development
+    ports:
+      - 7456:7456
+      - 9229:9229
+    environment:
+      - PORT=7456
+    volumes:
+      - ../apps/server:/app/apps/server
+      - /app/node_modules
+    command: pnpm run dev:server

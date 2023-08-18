@@ -1,0 +1,21 @@
+# Files
+.env
+.env.*
+*.md
+.git
+.gitignore
+npm-debug.log
+Dockerfile
+.dockerignore
+docker-compose
+tsconfig.tsbuildinfo
+.github
+.vscode
+
+# Directories
+node_modules
+dist
+test
+coverage
+apps/client
+assets
