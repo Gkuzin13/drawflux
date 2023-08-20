@@ -61,7 +61,7 @@ jobs:
       - name: 🕵️ Typecheck
         run: pnpm typecheck
 
-      - name: 🔬 Linter
+      - name: 🔬 Lint
         run: pnpm lint
 
       - name: 🧪 Test
