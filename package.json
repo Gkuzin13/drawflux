@@ -4,10 +4,12 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "dev:app": "pnpm --filter ./apps/client --filter ./apps/server --stream dev",
     "dev:client": "pnpm --filter ./apps/client dev",
     "dev:server": "pnpm --filter ./apps/server dev",
+    "test:client": "pnpm --filter ./apps/client test",
+    "test:client:watch": "pnpm --filter ./apps/client test:watch",
     "test:server": "pnpm --filter ./apps/server test",
+    "test:server:watch": "pnpm --filter ./apps/server test:watch",
     "g:lint": "pnpm -r lint",
     "g:fix-all-files": "pnpm -r fix-all-files",
     "g:test": "pnpm -r test",
@@ -15,11 +17,7 @@
     "g:typecheck": "pnpm -r typecheck",
     "packages:build": "pnpm --filter '{./packages/**}' build",
     "packages:lint": "pnpm --filter '{./packages/**}' lint",
-    "packages:typecheck": "pnpm --filter '{./packages/**}' typecheck",
-    "docker:build": "docker compose -f docker/docker-compose.yml build",
-    "docker:build:dev": "docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml build",
-    "docker:up": "docker compose -f docker/docker-compose.yml up",
-    "docker:up:dev": "docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up"
+    "packages:typecheck": "pnpm --filter '{./packages/**}' typecheck"
   },
   "dependencies": {
     "@stitches/react": "^1.2.8",

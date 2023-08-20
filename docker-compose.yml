@@ -1,26 +1,29 @@
-version: '3.8'
+version: '3.9'
 
 services:
   server:
-    image: dflx-server
     container_name: dflx-server
     build:
-      context: ../
-      dockerfile: docker/Dockerfile
-    restart: always
+      context: .
+      dockerfile: apps/server/Dockerfile
+      target: development
     environment:
       PGUSER: dflx
       PGPASSWORD: dflx
       PGDATABASE: maindb
       PGHOST: db
+      PORT: 7456
     ports:
-      - 3000:3000
+      - 7456:7456
     depends_on:
       - db
+    volumes:
+      - ./apps/server:/app/apps/server
+      - /app/node_modules
+    command: pnpm run dev:server
   db:
-    container_name: db
+    container_name: dflx-db
     image: postgres:15.4-alpine3.18
-    restart: always
     ports:
       - 5432:5432
     environment:
