@@ -42,7 +42,7 @@ Alternatively you can also set up your own postgresql database, you will need to
 - [x] [docker-engine](https://docs.docker.com/get-docker) `>=24` and [buildkit](https://docs.docker.com/build/buildkit/).
 - [x] [docker-compose v2](https://docs.docker.com/compose).
 
-### Usage
+#### Usage:
 
 ```sh
 docker compose build
