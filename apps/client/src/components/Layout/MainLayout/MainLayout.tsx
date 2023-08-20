@@ -23,9 +23,12 @@ import {
 } from '@/stores/reducers/history';
 import usePageMutation from '@/hooks/usePageMutation';
 import { useWebSocket } from '@/contexts/websocket';
+import useAutoFocus from '@/hooks/useAutoFocus/useAutoFocus';
 
 const MainLayout = () => {
   const [selectedNodesIds, setSelectedNodesIds] = useState<string[]>([]);
+
+  const containerRef = useAutoFocus<HTMLDivElement>();
 
   const windowSize = useWindowSize();
   const ws = useWebSocket();
@@ -161,7 +164,7 @@ const MainLayout = () => {
   );
 
   return (
-    <Styled.Container tabIndex={-1} onKeyDown={handleKeyDown}>
+    <Styled.Container ref={containerRef} tabIndex={0} onKeyDown={handleKeyDown}>
       <Panels stageRef={stageRef} selectedNodesIds={selectedNodesIds} />
       <ContextMenu.Root onContextMenuOpen={handleContextMenuOpen}>
         <ContextMenu.Trigger>
