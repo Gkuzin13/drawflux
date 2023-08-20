@@ -1,10 +1,7 @@
 import pg from 'pg';
 import type { PoolClient, QueryConfig } from 'pg';
-import config from '@/config';
 
-const poolClient = new pg.Pool({
-  connectionString: config.isProduction ? config.pgConnectionUri : undefined,
-});
+const poolClient = new pg.Pool();
 
 export async function query<
   Return extends pg.QueryResultRow,

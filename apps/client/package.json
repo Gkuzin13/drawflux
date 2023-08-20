@@ -32,7 +32,7 @@
     "@reduxjs/toolkit": "^1.9.3",
     "fontfaceobserver": "^2.3.0",
     "konva": "^9.2.0",
-    "react": "^18.2.0",
+    "react": "*",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
     "react-konva": "^18.2.10",

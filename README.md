@@ -16,9 +16,10 @@
 
 # Local development
 
-### Requirements
+### Pre-requisites
 
-[PostgreSQL 15](https://www.postgresql.org/download/)
+- _Node.js:_ `>=18.17.0`
+- _pnpm:_ `>=8.6.12`
 
 ### Install
 
@@ -30,6 +31,25 @@ Install dependencies:
 pnpm install
 ```
 
+### Docker
+
+The docker-compose file sets up a posgresql database and the backend for you.\
+Alternatively you can also set up your own postgresql database, you will need to set
+[environment variables](https://node-postgres.com/features/connecting#environment-variables) for it to work.
+
+#### Requirements:
+
+- [x] [docker-engine](https://docs.docker.com/get-docker) `>=24` and [buildkit](https://docs.docker.com/build/buildkit/).
+- [x] [docker-compose v2](https://docs.docker.com/compose).
+
+#### Usage:
+
+```sh
+docker compose build
+docker compose up
+docker compose down
+```
+
 ### Development Mode
 
 Make sure to build packages before starting the development mode:
@@ -38,13 +58,17 @@ Make sure to build packages before starting the development mode:
 pnpm packages:build
 ```
 
-Run client and server in development mode:
+Run client in development mode:
 
 ```bash
-pnpm dev:app
+pnpm dev:client
 ```
 
-You can find the rest of the scripts below.
+Run server in development mode (if you don't use docker-compose):
+
+```bash
+pnpm dev:server
+```
 
 # Monorepo Essentials
 
@@ -69,7 +93,6 @@ Some handy scripts that can be run from any directory.
 | `pnpm dev:client`         | Run react client in dev mode                         |
 | `pnpm dev:server`         | Run express server in dev mode                       |
 | `pnpm g:build`            | Run build in all workspaces                          |
-| `pnpm g:test`             | Run tests in all workspaces                          |
 | `pnpm g:typecheck`        | Run typechecks in all workspaces                     |
 | `pnpm g:lint`             | Display linter issues in all workspaces              |
 | `pnpm g:fix-all-files`    | Attempt to run linter auto-fix in all workspaces     |

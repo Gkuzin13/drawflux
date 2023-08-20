@@ -1,17 +1,8 @@
-import * as dotenv from 'dotenv';
-
-const isProduction = process.env.NODE_ENV === 'production';
-
-if (!isProduction) {
-  dotenv.config();
-}
-
 export default {
-  pgConnectionUri: process.env.PG_CONNECTION_URI,
-  isProduction,
-  port: Number(process.env.PORT || 7456),
+  isProduction: process.env.NODE_ENV === 'production',
+  port: Number(process.env.PORT || 3000),
   corsOrigin: {
-    prod: process.env.ORIGIN_URL,
+    prod: 'https://drawflux.onrender.com',
     dev: 'http://localhost:5174',
   },
 } as const;
