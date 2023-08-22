@@ -26,6 +26,7 @@ const IGNORED_ACTIONS: IgnoreActionType[] = [
   'canvas/setStageConfig',
   'canvas/set',
   'canvas/setSelectedNodesIds',
+  'canvas/copyNodes',
 ];
 
 function isIgnoredActionType(type: string) {
