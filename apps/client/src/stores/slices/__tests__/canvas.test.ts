@@ -85,14 +85,17 @@ describe('canvas slice', () => {
 
   it('should copy nodes', () => {
     const nodes = nodesGenerator(5, 'ellipse');
-    const nodesIdsToCopy = [nodes[0].nodeProps.id, nodes[2].nodeProps.id];
 
-    const previousState: CanvasSliceState = { ...initialState, nodes };
+    const previousState: CanvasSliceState = {
+      ...initialState,
+      nodes,
+      selectedNodesIds: {
+        [nodes[0].nodeProps.id]: true,
+        [nodes[2].nodeProps.id]: true,
+      },
+    };
 
-    const state = reducer(
-      previousState,
-      canvasActions.copyNodes(nodesIdsToCopy),
-    );
+    const state = reducer(previousState, canvasActions.copyNodes());
 
     expect(state).toEqual({
       ...previousState,
