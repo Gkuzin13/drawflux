@@ -6,7 +6,7 @@ import { type ToolType } from '@/constants/panels/tools';
 import { useModal } from '@/contexts/modal';
 import { useWebSocket } from '@/contexts/websocket';
 import useNetworkState from '@/hooks/useNetworkState/useNetworkState';
-import { useAppDispatch, useAppSelector } from '@/stores/hooks';
+import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import {
   canvasActions,
   selectConfig,
@@ -15,7 +15,6 @@ import {
   selectToolType,
 } from '@/stores/slices/canvas';
 import { collaborationActions } from '@/stores/slices/collaboration';
-import { store } from '@/stores/store';
 import { downloadDataUrlAsFile, importProject } from '@/utils/file';
 import ControlPanel, {
   type ControlActionKey,
@@ -38,6 +37,7 @@ type Props = {
 const UsersPanel = lazy(() => import('./UsersPanel/UsersPanel'));
 
 const Panels = ({ selectedNodesIds, stageRef }: Props) => {
+  const store = useAppStore();
   const ws = useWebSocket();
 
   const { updatePage } = usePageMutation();
@@ -91,7 +91,7 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
   const handleUpdatePage = useCallback(() => {
     const currentNodes = store.getState().canvas.present.nodes;
     updatePage({ nodes: currentNodes });
-  }, [updatePage]);
+  }, [store, updatePage]);
 
   const handleStyleChange = useCallback(
     (style: Partial<NodeStyle>, updateAsync = true) => {
@@ -111,7 +111,7 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
         updateAsync && handleUpdatePage();
       }
     },
-    [ws, handleUpdatePage, dispatch],
+    [ws, store, handleUpdatePage, dispatch],
   );
 
   const handleMenuAction = useCallback(
@@ -152,7 +152,7 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
         }
       }
     },
-    [dispatch, modal, stageRef],
+    [store, modal, stageRef, dispatch],
   );
 
   const handleZoomChange = useCallback(
