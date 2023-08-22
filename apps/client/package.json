@@ -57,6 +57,7 @@
     "@types/testing-library__jest-dom": "^5.14.9",
     "@types/uuid": "^9.0.1",
     "@vitejs/plugin-react": "^4.0.4",
+    "@vitest/coverage-v8": "*",
     "babel-loader": "^9.1.2",
     "canvas": "^2.11.2",
     "eslint-config-bases": "workspace:eslint-config-bases@latest",

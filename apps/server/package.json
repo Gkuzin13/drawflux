@@ -41,6 +41,7 @@
     "@types/qrcode": "^1.5.0",
     "@types/supertest": "^2.0.12",
     "@types/ws": "^8.5.5",
+    "@vitest/coverage-v8": "*",
     "dotenv": "^16.0.3",
     "eslint-config-bases": "workspace:eslint-config-bases@latest",
     "tsx": "^3.12.6",

@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { Layer, Stage } from 'react-konva';
 import { useWebSocket } from '@/contexts/websocket';
-import { useAppDispatch, useAppSelector } from '@/stores/hooks';
+import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import {
   canvasActions,
   selectConfig,
@@ -32,7 +32,6 @@ import { calculateStageZoom, isScaleOutOfRange } from './helpers/zoom';
 import { throttleFn } from '@/utils/timed';
 import { WS_THROTTLE_MS } from '@/constants/app';
 import usePageMutation from '@/hooks/usePageMutation';
-import { store } from '@/stores/store';
 import NodesLayer from '../Layers/NodesLayer';
 import { getNormalizedInvertedRect } from '@/utils/position';
 import type { IRect } from 'konva/lib/types';
@@ -68,6 +67,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const selectedNodesIds = useAppSelector(selectSelectedNodesIds);
 
     const userId = useAppSelector(selectMyUser);
+    const store = useAppStore();
 
     const ws = useWebSocket();
 
@@ -119,7 +119,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const handlePageUpdate = useCallback(() => {
       const currentNodes = store.getState().canvas.present.nodes;
       updatePage({ nodes: currentNodes });
-    }, [updatePage]);
+    }, [store, updatePage]);
 
     const updateBackgroundRectPosition = useCallback(
       (stageRect: IRect, stageScale: number) => {

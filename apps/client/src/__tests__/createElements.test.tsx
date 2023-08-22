@@ -4,7 +4,6 @@
  * @vitest-environment happy-dom
  */
 import { fireEvent, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { act } from 'react-dom/test-utils';
 import { renderWithProviders } from '@/test/test-utils';
 import App from '@/App';
@@ -129,7 +128,7 @@ describe('select a tool and create an element', () => {
   });
 
   it('text', async () => {
-    const { container, store } = renderWithProviders(<App />);
+    const { container, store, user } = renderWithProviders(<App />);
 
     const canvas = container.querySelector('canvas') as HTMLCanvasElement;
 
@@ -144,7 +143,7 @@ describe('select a tool and create an element', () => {
     fireEvent.pointerUp(canvas);
 
     // type 'Hello World!' and press enter
-    await userEvent.type(screen.getByRole('textbox'), 'Hello World!{enter}');
+    await user.type(screen.getByRole('textbox'), 'Hello World!{enter}');
 
     const canvasState = store.getState().canvas.present;
     const node = canvasState.nodes[0];

@@ -4,9 +4,8 @@ import { type WSMessage } from 'shared';
 import Divider from '@/components/Elements/Divider/Divider';
 import Kbd from '@/components/Elements/Kbd/Kbd';
 import { useWebSocket } from '@/contexts/websocket';
-import { useAppDispatch, useAppSelector } from '@/stores/hooks';
+import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import { canvasActions, selectSelectedNodesIds } from '@/stores/slices/canvas';
-import { store } from '@/stores/store';
 import * as Styled from './ContextMenu.styled';
 import usePageMutation from '@/hooks/usePageMutation';
 import { getAddedNodes } from '@/utils/node';
@@ -47,6 +46,7 @@ const wsNodesActionMap: Record<NodesMenuActionKey, NodesMenuWSMessageType> = {
 };
 
 const CanvasMenu = () => {
+  const store = useAppStore();
   const ws = useWebSocket();
   const { updatePage } = usePageMutation();
 
@@ -70,7 +70,7 @@ const CanvasMenu = () => {
 
       updatePage({ nodes });
     }
-  }, [ws, updatePage, dispatch]);
+  }, [ws, store, updatePage, dispatch]);
 
   return (
     <>
@@ -86,11 +86,11 @@ const CanvasMenu = () => {
 };
 
 const NodeMenu = () => {
+  const store = useAppStore();
+  const selectedNodesIds = useAppSelector(selectSelectedNodesIds);
   const ws = useWebSocket();
 
   const { updatePage } = usePageMutation();
-
-  const selectedNodesIds = useAppSelector(selectSelectedNodesIds);
 
   const dispatch = useAppDispatch();
 
@@ -131,7 +131,7 @@ const NodeMenu = () => {
   };
 
   const handleCopy = () => {
-    dispatch(canvasActions.copyNodes(Object.keys(selectedNodesIds)));
+    dispatch(canvasActions.copyNodes());
   };
 
   return (

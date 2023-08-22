@@ -23,8 +23,8 @@ export type CanvasSliceState = {
   copiedNodes: NodeObject[] | null;
 } & AppState['page'];
 
-export type CanvasActionType =
-  (typeof canvasActions)[keyof typeof canvasActions]['type'];
+export type CanvasAction = (typeof canvasActions)[keyof typeof canvasActions];
+export type CanvasActionType = CanvasAction['type'];
 
 export const initialState: CanvasSliceState = {
   nodes: [],
@@ -100,14 +100,14 @@ export const canvasSlice = createSlice({
     moveNodesToEnd: (state, action: PayloadAction<string[]>) => {
       state.nodes = reorderNodes(action.payload, state.nodes).toEnd();
     },
-    copyNodes: (state, action: PayloadAction<string[]>) => {
-      const nodesIds = new Set<string>(action.payload);
-
-      const nodesToCopy = state.nodes.filter((node) =>
-        nodesIds.has(node.nodeProps.id),
+    copyNodes: (state) => {
+      const nodesToCopy = state.nodes.filter(
+        ({ nodeProps }) => nodeProps.id in state.selectedNodesIds,
       );
 
-      state.copiedNodes = makeNodesCopy(nodesToCopy);
+      const clonedNodes = makeNodesCopy(nodesToCopy);
+
+      state.copiedNodes = clonedNodes;
     },
     pasteNodes: (state) => {
       if (state.copiedNodes) {

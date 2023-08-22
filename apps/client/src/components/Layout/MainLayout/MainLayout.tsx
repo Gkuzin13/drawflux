@@ -9,10 +9,9 @@ import {
 } from '@/components/Canvas/DrawingCanvas/helpers/stage';
 import ContextMenu from '@/components/ContextMenu/ContextMenu';
 import Panels from '@/components/Panels/Panels';
-import { useAppDispatch } from '@/stores/hooks';
+import { useAppDispatch, useAppStore } from '@/stores/hooks';
 import { canvasActions } from '@/stores/slices/canvas';
 import * as Styled from './MainLayout.styled';
-import { store } from '@/stores/store';
 import useWindowSize from '@/hooks/useWindowSize/useWindowSize';
 import { TOOLS } from '@/constants/panels/tools';
 import { KEYS } from '@/constants/keys';
@@ -28,12 +27,13 @@ import useAutoFocus from '@/hooks/useAutoFocus/useAutoFocus';
 const MainLayout = () => {
   const [selectedNodesIds, setSelectedNodesIds] = useState<string[]>([]);
 
+  const store = useAppStore();
+
   const containerRef = useAutoFocus<HTMLDivElement>();
+  const stageRef = useRef<Konva.Stage>(null);
 
   const windowSize = useWindowSize();
   const ws = useWebSocket();
-
-  const stageRef = useRef<Konva.Stage>(null);
 
   const dispatch = useAppDispatch();
   const { updatePage } = usePageMutation();
@@ -85,7 +85,7 @@ const MainLayout = () => {
             break;
           }
           case KEYS.C: {
-            dispatch(canvasActions.copyNodes(selectedNodesIds));
+            dispatch(canvasActions.copyNodes());
             break;
           }
           case KEYS.V: {
@@ -124,7 +124,7 @@ const MainLayout = () => {
       const toolTypeObj = TOOLS.find((tool) => tool.key === lowerCaseKey);
       toolTypeObj && dispatch(canvasActions.setToolType(toolTypeObj.value));
     },
-    [ws, updatePage, dispatch],
+    [ws, store, updatePage, dispatch],
   );
 
   const handleContextMenuOpen = useCallback(
@@ -160,7 +160,7 @@ const MainLayout = () => {
         dispatch(canvasActions.setSelectedNodesIds(nodesIds));
       }
     },
-    [stageRef, dispatch],
+    [stageRef, store, dispatch],
   );
 
   return (
