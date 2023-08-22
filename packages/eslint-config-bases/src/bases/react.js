@@ -62,6 +62,15 @@ module.exports = {
             leadingUnderscore: 'allow',
           },
         ],
+        '@typescript-eslint/no-restricted-imports': [
+          'warn',
+          {
+            name: 'react-redux',
+            importNames: ['useSelector', 'useDispatch', 'useStore'],
+            message:
+              'Use typed hooks `useAppDispatch`, `useAppSelector`, and `useAppStore` instead.',
+          },
+        ],
       },
     },
   ],
