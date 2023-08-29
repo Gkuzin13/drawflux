@@ -4,11 +4,11 @@ import ResizeObserverPolyfill from 'resize-observer-polyfill';
 import 'vitest-canvas-mock';
 import { localStorage, matchMedia } from './browser-mocks';
 
-expect.extend(matchers);
-
 afterEach(() => {
   cleanup();
 });
+
+expect.extend(matchers);
 
 /**
  * temporary fix for tests that use jest-canvas-mock
