@@ -19,10 +19,9 @@ type NotificationContextValue = {
   removeNotification: (id: string) => void;
 };
 
-export const NotificationsContext = createContext<NotificationContextValue>({
-  addNotification: () => null,
-  removeNotification: () => null,
-});
+export const NotificationsContext = createContext<
+  NotificationContextValue | undefined
+>(undefined);
 
 export const NotificationsProvider = ({ children }: PropsWithChildren) => {
   const [notifications, setNotifications] = useState(
