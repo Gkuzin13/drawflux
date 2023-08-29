@@ -9,7 +9,7 @@ export const Input = styled('input', {
   borderRadius: '$1',
   border: '1px solid $gray200',
   padding: '$1 $2',
-  backgroundColor: '$white',
+  backgroundColor: '$secondary-light',
   '&:focus': {
     outline: 'none',
     borderColor: '$green300',

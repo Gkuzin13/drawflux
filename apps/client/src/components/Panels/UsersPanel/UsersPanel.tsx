@@ -118,7 +118,7 @@ const UsersPanel = ({ onUserChange }: Props) => {
                     {!isEditing && <Styled.Indicator>You</Styled.Indicator>}
                     <Button
                       aria-label="Change username"
-                      size="extra-small"
+                      size="xs"
                       color="secondary-light"
                       onClick={() => handleNameChange()}
                       css={{ marginLeft: 'auto' }}

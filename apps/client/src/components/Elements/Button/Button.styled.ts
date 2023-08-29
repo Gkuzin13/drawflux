@@ -10,39 +10,45 @@ export const Button = styled('button', {
   '&[disabled], &[data-disabled]': {
     opacity: 0.5,
     cursor: 'revert',
-    backgroundColor: '$gray100',
-    '&:hover': {
-      backgroundColor: '$gray100',
-    },
+    backgroundColor: '$secondary',
   },
   variants: {
     color: {
       primary: {
-        backgroundColor: '$green500',
+        backgroundColor: '$primary',
         color: '$white',
         '&:hover': {
-          backgroundColor: '$green400',
+          backgroundColor: '$primary-dark',
         },
         '&[data-highlighted]': {
-          border: '1px $green400 solid',
+          border: '1px $primary-dark solid',
         },
       },
       secondary: {
-        backgroundColor: '$gray200',
+        backgroundColor: '$secondary',
         '&:hover': {
-          backgroundColor: '$gray300',
+          backgroundColor: '$secondary-dark',
         },
         '&[data-highlighted]': {
-          border: '1px $gray300 solid',
+          border: '1px $secondary-light solid',
         },
       },
       'secondary-light': {
-        backgroundColor: '$gray50',
+        backgroundColor: '$secondary-light',
         '&:hover': {
-          backgroundColor: '$gray200',
+          backgroundColor: '$secondary',
         },
         '&[data-highlighted]': {
-          border: '1px $gray300 solid',
+          border: '1px $secondary-dark solid',
+        },
+      },
+      'secondary-dark': {
+        backgroundColor: '$secondary-dark',
+        '&:hover': {
+          backgroundColor: '$secondary-dark',
+        },
+        '&[data-highlighted]': {
+          border: '1px $secondary solid',
         },
       },
     },
@@ -58,19 +64,19 @@ export const Button = styled('button', {
       },
     },
     size: {
-      'extra-small': {
+      xs: {
         fontSize: '$1',
         gap: '$1',
         padding: '$1 $1',
       },
-      small: {
+      sm: {
         fontSize: '$2',
         padding: '$1 $2',
       },
-      normal: {
+      md: {
         padding: '$2 $3',
       },
-      large: {
+      lg: {
         padding: '$3 $4',
       },
     },
@@ -86,7 +92,7 @@ export const Button = styled('button', {
   compoundVariants: [
     {
       squared: true,
-      size: 'extra-small',
+      size: 'xs',
       css: {
         padding: '$1',
         width: '$5',
@@ -95,7 +101,7 @@ export const Button = styled('button', {
     },
     {
       squared: true,
-      size: 'small',
+      size: 'sm',
       css: {
         padding: '$1',
         width: '$6',
@@ -104,7 +110,7 @@ export const Button = styled('button', {
     },
     {
       squared: true,
-      size: 'normal',
+      size: 'md',
       css: {
         padding: '$1',
         width: '$7',
@@ -114,7 +120,7 @@ export const Button = styled('button', {
     },
   ],
   defaultVariants: {
-    size: 'normal',
+    size: 'md',
     align: 'center',
   },
 });

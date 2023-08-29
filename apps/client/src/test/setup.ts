@@ -2,19 +2,22 @@ import matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
 import ResizeObserverPolyfill from 'resize-observer-polyfill';
 import 'vitest-canvas-mock';
+import { localStorage, matchMedia } from './browser-mocks';
 
-/**
- * temporary fix for tests that use jest-canvas-mock
- * throws this error: ReferenceError: jest is not defined
- */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-globalThis.jest = vi;
+expect.extend(matchers);
 
 afterEach(() => {
   cleanup();
 });
 
-expect.extend(matchers);
+/**
+ * temporary fix for tests that use jest-canvas-mock
+ * otherwise throws error
+ */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+globalThis.jest = vi;
 
 global.ResizeObserver = ResizeObserverPolyfill;
+Object.defineProperty(window, 'matchMedia', matchMedia);
+Object.defineProperty(window, 'localStorage', localStorage);

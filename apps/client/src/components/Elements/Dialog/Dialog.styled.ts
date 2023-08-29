@@ -2,7 +2,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { styled } from 'shared';
 
 export const Overlay = styled(DialogPrimitive.Overlay, {
-  backgroundColor: 'rgba(0, 0, 0, 0.125)',
+  backdropFilter: 'blur(4px)',
   position: 'fixed',
   inset: 0,
   zIndex: 1,
@@ -14,9 +14,9 @@ export const Overlay = styled(DialogPrimitive.Overlay, {
 });
 
 export const Content = styled(DialogPrimitive.Content, {
-  backgroundColor: '$white',
+  backgroundColor: '$bg',
   borderRadius: '$1',
-  boxShadow: '$small',
+  boxShadow: '$sm',
   position: 'fixed',
   top: '50%',
   left: '50%',
@@ -48,5 +48,4 @@ export const Title = styled(DialogPrimitive.Title, {
 
 export const Description = styled(DialogPrimitive.Description, {
   fontSize: '$2',
-  color: '$gray700',
 });

@@ -1,6 +1,16 @@
-import type { NodeColor, NodeFill, NodeLine, NodeSize } from 'shared';
-import { colors } from 'shared';
+import type {
+  ColorTokenValue,
+  NodeColor,
+  NodeFill,
+  NodeLine,
+  NodeObject,
+  NodeSize,
+  ThemeColors,
+} from 'shared';
+import { darkTheme, defaultTheme } from 'shared';
 import { hexToRGBa } from './string';
+import { getShapeLength } from './math';
+import type { ShapeConfig } from 'konva/lib/Shape';
 
 export function getDashValue(
   shapeLength: number,
@@ -47,23 +57,52 @@ export function getSizeValue(key: NodeSize) {
   }
 }
 
-export function getColorValue(key: NodeColor): (typeof colors)[NodeColor] {
-  if (key in colors) {
-    return colors[key];
+export function getColorValue(
+  key: NodeColor,
+  themeColors: ThemeColors,
+): ColorTokenValue {
+  if (key in themeColors) {
+    return themeColors[key].value;
   }
 
-  return '#000000';
+  return themeColors.black.value;
 }
 
-export function getFillValue(fill: NodeFill, color: NodeColor) {
+export function getFillValue(fill: NodeFill, colorValue: ColorTokenValue) {
   switch (fill) {
     case 'semi': {
-      return hexToRGBa(colors.white50, 0.5);
+      return 'transparent';
     }
     case 'solid': {
-      return hexToRGBa(getColorValue(color), 0.2);
+      return hexToRGBa(colorValue, 0.25);
     }
     default:
       return undefined;
   }
+}
+
+export function getDashStyle(node: NodeObject, sizeValue: number) {
+  if (node.style.line === 'solid') {
+    return [];
+  }
+
+  const shapeLength = getShapeLength(node);
+
+  return getDashValue(shapeLength, sizeValue, node.style.line);
+}
+
+export function getTotalDashLength(dash: ShapeConfig['dash']) {
+  return Array.isArray(dash) && dash.length > 1 ? dash[0] + dash[1] : 0;
+}
+
+export function getFontSize(size: number) {
+  return size * 8;
+}
+
+export function getCurrentThemeColors({
+  isDarkTheme,
+}: {
+  isDarkTheme: boolean;
+}) {
+  return isDarkTheme ? darkTheme.colors : defaultTheme.colors;
 }

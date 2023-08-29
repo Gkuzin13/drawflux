@@ -30,7 +30,6 @@ export const Container = styled('div', {
         inset: 0,
         width: '100vw',
         height: '100vh',
-        backgroundColor: 'rgba(255, 255, 255, 0.25)',
         zIndex: 1050,
         backdropFilter: 'blur(5px)',
       },
@@ -50,6 +49,7 @@ export const InnerContainer = styled('div', {
   display: 'flex',
   alignItems: 'center',
   gap: '$3',
+  color: '$black',
 });
 
 export const Spinner = styled(Icon, {

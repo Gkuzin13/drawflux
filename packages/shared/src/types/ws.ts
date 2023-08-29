@@ -1,4 +1,4 @@
-import type { colors } from '../design/design';
+import type { colors } from '../design/theme';
 import type { NodeObject, NodeType, Point } from '.';
 
 export type User = {

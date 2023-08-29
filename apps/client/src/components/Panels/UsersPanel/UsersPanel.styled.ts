@@ -10,10 +10,10 @@ export const Content = styled(Popover.Content, {
   display: 'flex',
   gap: '$1',
   flexDirection: 'column',
-  boxShadow: '$small',
+  boxShadow: '$sm',
   borderRadius: '$1',
   marginTop: '$2',
-  backgroundColor: '$white50',
+  backgroundColor: '$bg',
 });
 
 export const Trigger = styled(Popover.Trigger, PanelStyled.Button);

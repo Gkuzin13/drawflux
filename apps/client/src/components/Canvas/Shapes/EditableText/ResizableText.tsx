@@ -5,16 +5,14 @@ import { Text } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
-import { getColorValue, getSizeValue } from '@/utils/shape';
 import NodeTransformer from '../../Transformer/NodeTransformer';
-import { getFontSize } from './helpers/font';
 import { TEXT } from '@/constants/shape';
 import { getNodeSize } from './helpers/size';
 import { createSingleClickHandler } from '@/utils/timed';
 
 type Props = {
   onDoubleClick: (event: KonvaEventObject<PointerEvent>) => void;
-} & NodeComponentProps;
+} & NodeComponentProps<'text'>;
 
 const ResizableText = ({
   node,
@@ -25,14 +23,7 @@ const ResizableText = ({
 }: Props) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Text>([selected]);
 
-  const { config } = useNode(node, stageScale, {
-    fillEnabled: true,
-    strokeWidth: 0,
-    fontSize: getFontSize(getSizeValue(node.style.size)),
-    fill: getColorValue(node.style.color),
-    fontFamily: TEXT.FONT_FAMILY,
-    dash: [],
-  });
+  const { config } = useNode(node, stageScale);
 
   const singleClickHandler = useRef(
     createSingleClickHandler((callback) => callback()),

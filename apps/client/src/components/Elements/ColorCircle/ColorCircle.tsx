@@ -1,11 +1,11 @@
-import Icon from '../Icon/Icon';
+import * as Styled from './ColorCircle.styled';
 
 type Props = {
   color?: string;
 };
 
 const ColorCircle = ({ color }: Props) => {
-  return <Icon name="circleFilled" size="lg" color={color} />;
+  return <Styled.Root name="circleFilled" size="lg" color={color} />;
 };
 
 export default ColorCircle;

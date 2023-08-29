@@ -16,6 +16,9 @@ import type { PropsWithChildren } from 'react';
 import type { PreloadedState } from '@reduxjs/toolkit';
 import type { RootState } from '@/stores/store';
 import type { Options as UserEventOptions } from '@testing-library/user-event/dist/types/options';
+import { ThemeProvider } from '@/contexts/theme';
+import { NotificationsProvider } from '@/contexts/notifications';
+import { ModalProvider } from '@/contexts/modal';
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
   preloadedState?: PreloadedState<RootState>;
@@ -63,9 +66,15 @@ export function renderWithProviders(
     children,
   }: PropsWithChildren<{ children: React.ReactNode }>) {
     return (
-      <StoreProvider store={store}>
-        <WebSocketProvider>{children}</WebSocketProvider>
-      </StoreProvider>
+      <ThemeProvider>
+        <StoreProvider store={store}>
+          <ModalProvider>
+            <NotificationsProvider>
+              <WebSocketProvider>{children}</WebSocketProvider>
+            </NotificationsProvider>
+          </ModalProvider>
+        </StoreProvider>
+      </ThemeProvider>
     );
   }
 

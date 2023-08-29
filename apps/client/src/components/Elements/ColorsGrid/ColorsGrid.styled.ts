@@ -11,7 +11,7 @@ export const Grid = styled('div', {
 
 export const Color = styled(RadioGroupPrimitive.Item, ButtonStyled.Button, {
   defaultVariants: {
-    size: 'extra-small',
+    size: 'xs',
     color: 'secondary',
     squared: true,
   },

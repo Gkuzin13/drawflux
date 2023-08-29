@@ -25,12 +25,7 @@ const Toast = ({ title, description, children, ...props }: Props) => {
           </Styled.Description>
         )}
         <Styled.Close asChild>
-          <Button
-            title="Close"
-            color="secondary-light"
-            size="extra-small"
-            squared
-          >
+          <Button title="Close" color="secondary-light" size="xs" squared>
             <Icon name="x" size="sm" />
           </Button>
         </Styled.Close>

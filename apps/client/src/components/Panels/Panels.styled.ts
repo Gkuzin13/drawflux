@@ -20,14 +20,14 @@ export const Panel = styled('div', {
   gap: '$1',
   padding: '$1',
   pointerEvents: 'all',
-  boxShadow: '$small',
+  boxShadow: '$sm',
   borderRadius: '$1',
-  backgroundColor: '$white50',
+  backgroundColor: '$bg',
 });
 
 export const Button = styled(ButtonStyled.Button, {
   defaultVariants: {
-    size: 'extra-small',
+    size: 'xs',
     color: 'secondary',
     squared: true,
   },

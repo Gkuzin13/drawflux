@@ -17,7 +17,7 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
         return (
           <Fragment key={tool.value}>
             <Styled.Button
-              size="small"
+              size="sm"
               color={activeTool === tool.value ? 'primary' : 'secondary'}
               title={getKeyTitle(tool.name, [tool.key])}
               data-testid={`tool-button-${tool.value}`}
@@ -25,7 +25,9 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
             >
               <Icon name={tool.icon} size="lg" stroke="md" />
             </Styled.Button>
-            {index === 1 && <Divider orientation="vertical" />}
+            {index === 1 && (
+              <Divider orientation="vertical" css={{ margin: '0 $1' }} />
+            )}
           </Fragment>
         );
       })}

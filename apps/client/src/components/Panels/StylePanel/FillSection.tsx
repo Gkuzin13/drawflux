@@ -30,7 +30,9 @@ const FillSection = ({ value, onFillChange }: Props) => {
               value={fill.value ?? 'none'}
               title={getStyleTitle('Fill', fill.name)}
               checked={fill.value === value}
-              color={fill.value === value ? 'secondary' : 'secondary-light'}
+              color={
+                fill.value === value ? 'secondary-dark' : 'secondary-light'
+              }
             >
               <Icon name={fill.icon} size="lg" />
             </Styled.Item>

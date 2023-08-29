@@ -6,9 +6,9 @@ export const Content = styled(ContextMenu.Content, {
   display: 'flex',
   flexDirection: 'column',
   gap: '$1',
-  backgroundColor: '$gray50',
+  backgroundColor: '$bg',
   borderRadius: '$1',
-  boxShadow: '$small',
+  boxShadow: '$sm',
   padding: '$2',
   minWidth: '$11',
   zIndex: 3,
@@ -17,7 +17,7 @@ export const Content = styled(ContextMenu.Content, {
 export const Item = styled(ContextMenu.Item, ButtonStyled.Button, {
   userSelect: 'none',
   defaultVariants: {
-    size: 'extra-small',
+    size: 'xs',
     color: 'secondary-light',
     align: 'between',
   },

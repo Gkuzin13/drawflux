@@ -28,7 +28,9 @@ const LineSection = ({ value, onLineChange }: Props) => {
               value={line.value}
               title={getStyleTitle('Line', line.name)}
               checked={line.value === value}
-              color={line.value === value ? 'secondary' : 'secondary-light'}
+              color={
+                line.value === value ? 'secondary-dark' : 'secondary-light'
+              }
             >
               <Icon name={line.icon} size="lg" />
             </Styled.Item>

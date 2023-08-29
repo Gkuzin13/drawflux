@@ -1,7 +1,9 @@
-import type { SeparatorProps } from '@radix-ui/react-separator';
 import * as Styled from './Divider.styled';
+import type { ComponentProps } from 'react';
 
-const Divider = (props: SeparatorProps) => {
+type Props = ComponentProps<typeof Styled.Root>;
+
+const Divider = (props: Props) => {
   return <Styled.Root {...props} />;
 };
 

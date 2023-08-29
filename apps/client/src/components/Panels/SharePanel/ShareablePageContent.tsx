@@ -49,7 +49,7 @@ const SharablePageContent = () => {
       <Button
         align="start"
         color="secondary-light"
-        size="extra-small"
+        size="xs"
         disabled={!nodes.length}
         onClick={handlePageShare}
       >

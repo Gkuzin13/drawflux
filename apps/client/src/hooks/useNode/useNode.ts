@@ -1,33 +1,88 @@
-import type Konva from 'konva';
 import { useMemo } from 'react';
-import type { NodeColor, NodeObject, colors } from 'shared';
-import { getShapeLength } from '@/utils/math';
 import {
   getColorValue,
-  getDashValue,
+  getDashStyle,
+  getCurrentThemeColors,
   getFillValue,
   getSizeValue,
+  getFontSize,
 } from '@/utils/shape';
+import { useTheme } from '@/contexts/theme';
+import { TEXT } from '@/constants/shape';
+import type Konva from 'konva';
+import type {
+  ColorTokenValue,
+  NodeObject,
+  NodeType,
+  ThemeColors,
+} from 'shared';
 
-type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+type Config = Konva.NodeConfig &
+  Konva.ShapeConfig & { stroke?: ColorTokenValue };
 
-type Config = Konva.NodeConfig & Konva.ShapeConfig;
-type UseNodeShapeConfig = {
-  id: string;
-  visible: boolean;
-  rotation: number;
-  stroke: (typeof colors)[NodeColor];
+interface BaseStyleConfig extends Config {
+  opacity: number;
+}
+
+interface TextNodeStyleConfig extends BaseStyleConfig {
+  fill: ColorTokenValue;
+  fillEnabled: boolean;
+  fontSize: number;
+  fontFamily: typeof TEXT.FONT_FAMILY;
+}
+
+interface LineNodeStyleConfig extends BaseStyleConfig {
+  stroke: ColorTokenValue;
   strokeWidth: number;
   dash: number[];
-  listening: boolean;
-};
+}
 
-type UseNodeConfig = WithRequired<Config, keyof UseNodeShapeConfig> &
-  typeof baseConfig;
+interface FillableNodeStyleConfig extends BaseStyleConfig {
+  stroke: ColorTokenValue;
+  strokeWidth: number;
+  dash: number[];
+  fill: ColorTokenValue;
+  fillEnabled: boolean;
+}
 
-type UseNodeReturn = {
-  config: UseNodeConfig;
-};
+function createStyleConfig<T extends NodeType>(
+  node: NodeObject<T>,
+  stageScale: number,
+  themeColors: ThemeColors,
+) {
+  const baseStyle: BaseStyleConfig = { opacity: node.style.opacity };
+
+  const sizeValue = getSizeValue(node.style.size);
+  const colorValue = getColorValue(node.style.color, themeColors);
+
+  if (node.type === 'text') {
+    return {
+      ...baseStyle,
+      fill: colorValue,
+      fillEnabled: true,
+      fontSize: getFontSize(sizeValue),
+      fontFamily: TEXT.FONT_FAMILY,
+    } as T extends 'text' ? TextNodeStyleConfig : never;
+  }
+
+  if (node.type === 'draw' || node.type === 'arrow') {
+    return {
+      ...baseStyle,
+      stroke: colorValue,
+      strokeWidth: sizeValue * stageScale,
+      dash: getDashStyle(node, sizeValue),
+    } as T extends 'arrow' | 'draw' ? LineNodeStyleConfig : never;
+  }
+
+  return {
+    ...baseStyle,
+    stroke: colorValue,
+    strokeWidth: sizeValue * stageScale,
+    fill: getFillValue(node.style.fill, colorValue),
+    dash: getDashStyle(node, sizeValue),
+    fillEnabled: node.style.fill && node.style.fill !== 'none',
+  } as T extends 'ellipse' | 'rectangle' ? FillableNodeStyleConfig : never;
+}
 
 export const baseConfig: Config = {
   lineCap: 'round',
@@ -39,41 +94,24 @@ export const baseConfig: Config = {
   draggable: true,
 };
 
-function useNode(
-  node: NodeObject,
-  scale: number,
-  configOverrides?: Partial<Config>,
-): UseNodeReturn {
-  const config = useMemo(() => {
-    const size = getSizeValue(node.style.size);
-    const fillEnabled = (node.style.fill ?? 'none') !== 'none';
-    const isFillable = node.type !== 'arrow' && node.type !== 'text';
+function useNode<T extends NodeType>(node: NodeObject<T>, stageScale: number) {
+  const theme = useTheme();
 
-    const shapeConfig: UseNodeShapeConfig & Config = {
+  const config = useMemo(() => {
+    const isDarkTheme = theme.value === 'dark';
+    const themeColors = getCurrentThemeColors({ isDarkTheme });
+
+    const nodePropsConfig = {
       id: node.nodeProps.id,
       visible: node.nodeProps.visible,
       rotation: node.nodeProps.rotation,
-      stroke: getColorValue(node.style.color),
-      fill: getFillValue(node.style.fill, node.style.color),
-      fillEnabled: fillEnabled && isFillable,
-      strokeWidth: size * scale,
-      opacity: node.style.opacity,
-      dash: [],
       listening: node.nodeProps.visible,
     };
 
-    if (
-      !configOverrides ||
-      ('dash' in configOverrides === false && node.style.line !== 'solid')
-    ) {
-      const shapeLength = getShapeLength(node);
-      const dash = getDashValue(shapeLength, size, node.style.line);
+    const styleConfig = createStyleConfig(node, stageScale, themeColors);
 
-      shapeConfig.dash = dash.map((d) => d * scale);
-    }
-
-    return { ...baseConfig, ...shapeConfig, ...configOverrides };
-  }, [node, scale]);
+    return { ...baseConfig, ...nodePropsConfig, ...styleConfig };
+  }, [node, stageScale, theme]);
 
   return { config };
 }

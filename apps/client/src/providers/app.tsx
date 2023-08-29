@@ -4,6 +4,7 @@ import { ModalProvider } from '@/contexts/modal';
 import { NotificationsProvider } from '@/contexts/notifications';
 import { WebSocketProvider } from '@/contexts/websocket';
 import { store } from '@/stores/store';
+import { ThemeProvider } from '@/contexts/theme';
 
 type Props = {
   children: ReactNode;
@@ -11,12 +12,14 @@ type Props = {
 
 export const AppProvider = ({ children }: Props) => {
   return (
-    <StoreProvider store={store}>
-      <ModalProvider>
-        <NotificationsProvider>
-          <WebSocketProvider>{children}</WebSocketProvider>
-        </NotificationsProvider>
-      </ModalProvider>
-    </StoreProvider>
+    <ThemeProvider>
+      <StoreProvider store={store}>
+        <ModalProvider>
+          <NotificationsProvider>
+            <WebSocketProvider>{children}</WebSocketProvider>
+          </NotificationsProvider>
+        </ModalProvider>
+      </StoreProvider>
+    </ThemeProvider>
   );
 };
