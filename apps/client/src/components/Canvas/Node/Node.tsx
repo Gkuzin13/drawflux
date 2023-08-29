@@ -5,14 +5,14 @@ import FreePathDrawable from '@/components/Canvas/Shapes/FreePathDrawable/FreePa
 import RectDrawable from '@/components/Canvas/Shapes/RectDrawable/RectDrawable';
 import EditableText from '../Shapes/EditableText/EditableText';
 
-export type NodeComponentProps = {
-  node: NodeObject;
+export type NodeComponentProps<Type extends NodeType = NodeType> = {
+  node: NodeObject<Type>;
   selected: boolean;
   stageScale: number;
-  onNodeChange: (node: NodeObject) => void;
+  onNodeChange: (node: NodeObject<Type>) => void;
 };
 
-const elements: Record<NodeType, React.FC<NodeComponentProps>> = {
+const elements = {
   arrow: ArrowDrawable,
   rectangle: RectDrawable,
   ellipse: EllipseDrawable,
@@ -20,8 +20,11 @@ const elements: Record<NodeType, React.FC<NodeComponentProps>> = {
   text: EditableText,
 };
 
-const Node = ({ node, ...restProps }: NodeComponentProps) => {
-  const Element = elements[node.type];
+const Node = <T extends NodeType>({
+  node,
+  ...restProps
+}: NodeComponentProps<T>) => {
+  const Element: React.ElementType = elements[node.type];
 
   return <Element node={node} {...restProps} />;
 };

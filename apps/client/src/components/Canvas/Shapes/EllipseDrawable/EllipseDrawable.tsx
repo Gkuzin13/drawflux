@@ -8,7 +8,7 @@ import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { calculateCircumference } from '@/utils/math';
-import { getDashValue, getSizeValue } from '@/utils/shape';
+import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import { getEllipseRadius } from './helpers/calc';
 
 const EllipseDrawable = ({
@@ -16,14 +16,14 @@ const EllipseDrawable = ({
   selected,
   stageScale,
   onNodeChange,
-}: NodeComponentProps) => {
+}: NodeComponentProps<'ellipse'>) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Ellipse>([selected]);
 
   const { config } = useNode(node, stageScale);
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
     nodeRef,
-    totalDashLength: config.dash[0] + config.dash[1],
+    totalDashLength: getTotalDashLength(config.dash),
   });
 
   const handleDragEnd = useCallback(

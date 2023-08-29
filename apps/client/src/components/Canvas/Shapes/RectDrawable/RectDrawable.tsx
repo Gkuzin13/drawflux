@@ -9,7 +9,7 @@ import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { calculatePerimeter } from '@/utils/math';
-import { getDashValue, getSizeValue } from '@/utils/shape';
+import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import { getRectSize } from './helpers/calc';
 
 const RectDrawable = ({
@@ -17,19 +17,15 @@ const RectDrawable = ({
   selected,
   stageScale,
   onNodeChange,
-}: NodeComponentProps) => {
+}: NodeComponentProps<'rectangle'>) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
 
   const { config } = useNode(node, stageScale);
 
-  const totalDashLength = config.dash.length
-    ? config.dash[0] + config.dash[1]
-    : 0;
-
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
     nodeRef,
-    totalDashLength,
+    totalDashLength: getTotalDashLength(config.dash),
   });
 
   const handleDragEnd = useCallback(

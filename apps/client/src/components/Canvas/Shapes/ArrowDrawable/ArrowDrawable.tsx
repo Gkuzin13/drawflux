@@ -8,10 +8,9 @@ import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import { calculateLengthFromPoints, getValueFromRatio } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
-import { getDashValue, getSizeValue } from '@/utils/shape';
+import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import ArrowTransformer from './ArrowTransformer';
 import { calculateMinMaxMovementPoints } from './helpers/calc';
-import { drawArrowHead, drawLine } from './helpers/draw';
 
 const defaultBend = 0.5;
 
@@ -20,7 +19,7 @@ const ArrowDrawable = ({
   selected,
   stageScale,
   onNodeChange,
-}: NodeComponentProps) => {
+}: NodeComponentProps<'arrow'>) => {
   const [points, setPoints] = useState<Point[]>([
     node.nodeProps.point,
     ...(node.nodeProps?.points || [node.nodeProps.point]),
@@ -28,9 +27,8 @@ const ArrowDrawable = ({
   const [bendValue, setBendValue] = useState(
     node.nodeProps.bend ?? defaultBend,
   );
-  const [dragging, setDragging] = useState(false);
 
-  const [start, end] = points;
+  const [dragging, setDragging] = useState(false);
 
   const { config } = useNode(node, stageScale);
 
@@ -39,8 +37,10 @@ const ArrowDrawable = ({
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
     nodeRef: lineRef,
-    totalDashLength: config.dash[0] + config.dash[1],
+    totalDashLength: getTotalDashLength(config.dash),
   });
+
+  const [start, end] = points;
 
   useLayoutEffect(() => {
     setPoints([
@@ -63,6 +63,10 @@ const ArrowDrawable = ({
   }, [bendValue, minPoint, maxPoint]);
 
   const flattenedPoints = useMemo(() => points.flat(), [points]);
+
+  const handleDragStart = useCallback(() => {
+    setDragging(true);
+  }, []);
 
   const handleDragEnd = useCallback(
     (event: KonvaEventObject<DragEvent>) => {
@@ -116,30 +120,70 @@ const ArrowDrawable = ({
     [bendValue, node.style.line, node.style.size, stageScale],
   );
 
-  const handleTransformEnd = useCallback(
-    (updatedPoints: Point[], bend: NodeProps['bend']) => {
-      setPoints(updatedPoints);
+  const handleTransformEnd = useCallback(() => {
+    setPoints(points);
 
-      onNodeChange({
-        ...node,
-        nodeProps: {
-          ...node.nodeProps,
-          bend: bend ?? bendValue,
-          point: updatedPoints[0],
-          points: [updatedPoints[1]],
-        },
-      });
+    onNodeChange({
+      ...node,
+      nodeProps: {
+        ...node.nodeProps,
+        bend: bendValue,
+        point: points[0],
+        points: [points[1]],
+      },
+    });
 
-      if (node.style.animated && animation?.isRunning() === false) {
-        animation.start();
-      }
-    },
-    [node, bendValue, animation, onNodeChange],
-  );
+    if (node.style.animated && animation?.isRunning() === false) {
+      animation.start();
+    }
+  }, [node, bendValue, points, animation, onNodeChange]);
 
   const shouldTransformerRender = useMemo(() => {
     return selected && !dragging && node.nodeProps.visible;
   }, [selected, dragging, node.nodeProps.visible]);
+
+  const drawArrowHead = useCallback(
+    (ctx: Konva.Context, shape: Konva.Shape) => {
+      const [controlX, controlY] = control;
+
+      const PI2 = Math.PI * 2;
+      const dx = end[0] - controlX;
+      const dy = end[1] - controlY;
+
+      const radians = (Math.atan2(dy, dx) + PI2) % PI2;
+      const length = 3 * config.strokeWidth;
+      const width = 4 * config.strokeWidth;
+
+      ctx.save();
+
+      ctx.beginPath();
+      ctx.rotate(radians);
+
+      ctx.moveTo(0, 0);
+      ctx.lineTo(-length, width / 2);
+
+      ctx.moveTo(0, 0);
+      ctx.lineTo(-length, -width / 2);
+
+      ctx.restore();
+      ctx.fillStrokeShape(shape);
+    },
+    [control, end, config.strokeWidth],
+  );
+
+  const drawArrowLine = useCallback(
+    (ctx: Konva.Context, shape: Konva.Shape) => {
+      const [controlX, controlY] = control;
+
+      ctx.beginPath();
+      ctx.moveTo(start[0], start[1]);
+
+      ctx.quadraticCurveTo(controlX, controlY, end[0], end[1]);
+
+      ctx.fillStrokeShape(shape);
+    },
+    [end, control, start],
+  );
 
   return (
     <>
@@ -148,7 +192,7 @@ const ArrowDrawable = ({
         visible={node.nodeProps.visible}
         opacity={node.style.opacity}
         draggable={config.draggable}
-        onDragStart={() => setDragging(true)}
+        onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
         <Shape
@@ -157,18 +201,14 @@ const ArrowDrawable = ({
           x={end[0]}
           y={end[1]}
           dash={[]}
-          sceneFunc={(ctx, shape) =>
-            drawArrowHead(ctx, shape, control, end, config.strokeWidth)
-          }
+          sceneFunc={drawArrowHead}
         />
         <Line
           ref={lineRef}
           {...config}
           draggable={false}
           points={flattenedPoints}
-          sceneFunc={(ctx, shape) =>
-            drawLine(ctx, shape, [start, end], control)
-          }
+          sceneFunc={drawArrowLine}
         />
       </Group>
       {shouldTransformerRender && (

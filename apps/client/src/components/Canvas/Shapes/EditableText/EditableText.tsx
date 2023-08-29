@@ -16,7 +16,7 @@ const EditableText = ({
   selected,
   stageScale,
   onNodeChange,
-}: NodeComponentProps) => {
+}: NodeComponentProps<'text'>) => {
   const [editing, setEditing] = useState(false);
 
   const ws = useWebSocket();
