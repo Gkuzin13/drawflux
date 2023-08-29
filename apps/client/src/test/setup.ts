@@ -1,3 +1,4 @@
+import { expect } from 'vitest';
 import matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
 import ResizeObserverPolyfill from 'resize-observer-polyfill';
@@ -7,8 +8,6 @@ import { localStorage, matchMedia } from './browser-mocks';
 afterEach(() => {
   cleanup();
 });
-
-expect.extend(matchers);
 
 /**
  * temporary fix for tests that use jest-canvas-mock
@@ -21,3 +20,5 @@ globalThis.jest = vi;
 global.ResizeObserver = ResizeObserverPolyfill;
 global.matchMedia = matchMedia;
 global.localStorage = localStorage;
+
+expect.extend(matchers);
