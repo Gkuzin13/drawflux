@@ -19,5 +19,5 @@ expect.extend(matchers);
 globalThis.jest = vi;
 
 global.ResizeObserver = ResizeObserverPolyfill;
-Object.defineProperty(window, 'matchMedia', matchMedia);
-Object.defineProperty(window, 'localStorage', localStorage);
+global.matchMedia = matchMedia;
+global.localStorage = localStorage;
