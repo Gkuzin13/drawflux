@@ -4,6 +4,8 @@ import ResizeObserverPolyfill from 'resize-observer-polyfill';
 import 'vitest-canvas-mock';
 import { localStorage, matchMedia } from './browser-mocks';
 
+expect.extend(matchers);
+
 afterEach(() => {
   cleanup();
 });
@@ -19,5 +21,3 @@ globalThis.jest = vi;
 global.ResizeObserver = ResizeObserverPolyfill;
 global.matchMedia = matchMedia;
 global.localStorage = localStorage;
-
-expect.extend(matchers);
