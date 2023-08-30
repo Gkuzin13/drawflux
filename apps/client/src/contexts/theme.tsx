@@ -1,36 +1,23 @@
+import { createContext, useContext, useEffect, useState } from 'react';
 import { LOCAL_STORAGE_THEME_KEY } from '@/constants/app';
 import { storage } from '@/utils/storage';
-import { createContext, useContext, useEffect, useState } from 'react';
 import type { PropsWithChildren } from 'react';
-import { darkTheme } from 'shared';
 
 type ThemeValue = 'default' | 'dark';
 
 type ThemeContextValue = {
   value: ThemeValue;
-  changeTheme: (theme: ThemeValue) => void;
+  set: (theme: ThemeValue) => void;
 };
 
-function prefersDarkColorScheme() {
-  return window.matchMedia('(prefers-color-scheme: dark)');
-}
-
-function getDefaultValue() {
-  const storedThemeValue = storage.get<ThemeValue>(LOCAL_STORAGE_THEME_KEY);
-
-  if (!storedThemeValue) {
-    return prefersDarkColorScheme().matches ? 'dark' : 'default';
-  }
-
-  return storedThemeValue;
-}
+type Props = PropsWithChildren;
 
 export const ThemeContext = createContext<ThemeContextValue | undefined>(
   undefined,
 );
 
-export const ThemeProvider = ({ children }: PropsWithChildren) => {
-  const [theme, setTheme] = useState<ThemeValue>(getDefaultValue());
+export const ThemeProvider = ({ children }: Props) => {
+  const [theme, setTheme] = useState<ThemeValue>(getDefaultTheme());
 
   useEffect(() => {
     if (storage.get<ThemeValue>(LOCAL_STORAGE_THEME_KEY)) {
@@ -54,23 +41,10 @@ export const ThemeProvider = ({ children }: PropsWithChildren) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add(darkTheme);
-    } else {
-      document.documentElement.classList.remove(darkTheme);
-    }
-  }, [theme]);
-
-  const handleThemeChange = (value: ThemeValue) => {
-    setTheme(value);
-    storage.set<ThemeValue>(LOCAL_STORAGE_THEME_KEY, value);
-  };
+  const handleThemeChange = (value: ThemeValue) => setTheme(value);
 
   return (
-    <ThemeContext.Provider
-      value={{ value: theme, changeTheme: handleThemeChange }}
-    >
+    <ThemeContext.Provider value={{ value: theme, set: handleThemeChange }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -85,3 +59,17 @@ export const useTheme = () => {
 
   return ctx;
 };
+
+function getDefaultTheme(): ThemeValue {
+  const storedThemeValue = storage.get<ThemeValue>(LOCAL_STORAGE_THEME_KEY);
+
+  if (storedThemeValue) {
+    return storedThemeValue;
+  }
+
+  return prefersDarkColorScheme().matches ? 'dark' : 'default';
+}
+
+function prefersDarkColorScheme() {
+  return window.matchMedia('(prefers-color-scheme: dark)');
+}
