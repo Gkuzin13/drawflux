@@ -144,7 +144,10 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
             if (project) {
               dispatch(canvasActions.set(project));
             } else {
-              modal.open('Error', 'Could not load file');
+              modal.open({
+                title: 'Error',
+                description: 'Could not load file',
+              });
             }
           };
 
