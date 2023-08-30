@@ -8,15 +8,16 @@ import {
 } from 'react';
 import Toast from '@/components/Elements/Toast/Toast';
 
-type Notification = {
+export type Notification = {
   title: string;
   description?: string;
   type: 'error' | 'info' | 'success' | 'warning';
 };
 
 type NotificationContextValue = {
-  addNotification: (args: Notification) => void;
-  removeNotification: (id: string) => void;
+  add: (args: Notification) => void;
+  remove: (id: string) => void;
+  list: Map<string, Notification>;
 };
 
 export const NotificationsContext = createContext<
@@ -28,7 +29,7 @@ export const NotificationsProvider = ({ children }: PropsWithChildren) => {
     new Map<string, Notification>(),
   );
 
-  const handleAddNotification = useCallback((notification: Notification) => {
+  const handleNotificationAdd = useCallback((notification: Notification) => {
     setNotifications((prev) => {
       const newMap = new Map(prev);
       newMap.set(String(Date.now()), notification);
@@ -36,7 +37,7 @@ export const NotificationsProvider = ({ children }: PropsWithChildren) => {
     });
   }, []);
 
-  const handleRemoveNotification = useCallback((id: string) => {
+  const handleNotificationRemove = useCallback((id: string) => {
     setNotifications((prev) => {
       const newMap = new Map(prev);
       newMap.delete(id);
@@ -47,8 +48,9 @@ export const NotificationsProvider = ({ children }: PropsWithChildren) => {
   return (
     <NotificationsContext.Provider
       value={{
-        addNotification: handleAddNotification,
-        removeNotification: handleRemoveNotification,
+        add: handleNotificationAdd,
+        remove: handleNotificationRemove,
+        list: notifications,
       }}
     >
       <ToastProvider>
@@ -59,8 +61,8 @@ export const NotificationsProvider = ({ children }: PropsWithChildren) => {
               key={id}
               title={notification.title}
               description={notification.description}
-              onOpenChange={(open) => !open && handleRemoveNotification(id)}
-              forceMount
+              onOpenChange={(open) => !open && handleNotificationRemove(id)}
+              data-testid="toast"
             />
           );
         })}

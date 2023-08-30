@@ -6,7 +6,7 @@ import Dialog from '@/components/Elements/Dialog/Dialog';
 type ModalContextValue = {
   opened: boolean;
   content: ModalContent;
-  open: (title: string, description: string) => void;
+  open: (content: ModalContent) => void;
   close: () => void;
 };
 
@@ -26,8 +26,8 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
     description: '',
   });
 
-  const openModal = (title: string, description: string) => {
-    setContent({ title, description });
+  const openModal = (content: ModalContent) => {
+    setContent(content);
     open();
   };
 

@@ -20,17 +20,17 @@ function usePageMutation() {
     UpdatePageRequestBody
   >(url, options, true);
 
-  const { addNotification } = useNotifications();
+  const notifications = useNotifications();
 
   useEffect(() => {
     if (error) {
-      addNotification({
+      notifications.add({
         title: 'Error',
         description: 'Failed to update the drawing',
         type: 'error',
       });
     }
-  }, [error, addNotification]);
+  }, [error, notifications]);
 
   return { updatePage };
 }

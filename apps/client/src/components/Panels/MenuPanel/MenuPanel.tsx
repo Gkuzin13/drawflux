@@ -23,7 +23,7 @@ const MenuPanel = ({ disabledItems, onAction }: Props) => {
   const isDarkMode = theme.value === 'dark';
 
   const handleDarkModeChange = (checked: boolean) => {
-    theme.changeTheme(checked ? 'dark' : 'default');
+    theme.set(checked ? 'dark' : 'default');
   };
 
   return (
