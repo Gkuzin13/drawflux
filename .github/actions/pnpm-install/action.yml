@@ -7,7 +7,7 @@ runs:
   steps:
     - uses: pnpm/action-setup@v2.2.4
       with:
-        version: 7.16.1
+        version: 8.6.12
 
     - name: Expose pnpm config(s) through "$GITHUB_OUTPUT"
       id: pnpm-config
