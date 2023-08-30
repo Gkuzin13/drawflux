@@ -1,10 +1,10 @@
 import * as ToastPrimitive from '@radix-ui/react-toast';
-import { duration, easing, hide, slideLeft, styled } from 'shared';
+import { hide, slideLeft, styled } from 'shared';
 
 export const Container = styled(ToastPrimitive.Root, {
-  backgroundColor: '$white',
+  backgroundColor: '$bg',
   borderRadius: '$1',
-  boxShadow: '$small',
+  boxShadow: '$sm',
   padding: '$3',
   display: 'grid',
   gridTemplateAreas: "'title close' 'description close'",
@@ -12,22 +12,20 @@ export const Container = styled(ToastPrimitive.Root, {
   gap: '$2 $6',
   fontSize: '$2',
   '&[data-state="open"]': {
-    animation: `${slideLeft} ${duration.fast} ${easing.normal} forwards`,
+    animation: `${slideLeft} $transitions$fast forwards`,
   },
   '&[data-state="closed"]': {
-    animation: `${hide} ${duration.fast} ${easing.normal} forwards`,
+    animation: `${hide} $transitions$fast forwards`,
   },
 });
 
 export const Title = styled(ToastPrimitive.Title, {
   gridArea: 'title',
   fontWeight: 'bold',
-  color: '$black',
 });
 
 export const Description = styled(ToastPrimitive.Description, {
   gridArea: 'description',
-  color: '$gray800',
   fontSize: '$1',
 });
 
@@ -43,7 +41,7 @@ export const Viewport = styled(ToastPrimitive.Viewport, {
   flexDirection: 'column',
   padding: '$4',
   gap: '$3',
-  minWidth: '$13',
+  minWidth: '$12',
   maxWidth: '100vw',
   margin: 0,
   listStyle: 'none',

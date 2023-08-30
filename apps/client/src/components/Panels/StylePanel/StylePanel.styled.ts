@@ -1,10 +1,10 @@
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import * as TogglePrimitive from '@radix-ui/react-toggle';
 import { styled } from 'shared';
-import * as ButtonStyled from '@/components/Elements/Button/Button.styled';
-import { Panel } from '../Panels.styled';
+import * as PanelStyled from '../Panels.styled';
+import { Button } from '@/components/Elements/Button/Button.styled';
 
-export const Container = styled(Panel, {
+export const Container = styled(PanelStyled.Panel, {
   position: 'absolute',
   top: '100%',
   marginTop: '$2',
@@ -37,21 +37,20 @@ export const Label = styled('span', {
   fontSize: '$1',
   display: 'inline-block',
   paddingBottom: '$1',
-  color: '$gray700',
+  color: '$black',
+  opacity: 0.7,
 });
 
-export const Toggle = styled(TogglePrimitive.Root, ButtonStyled.Button, {
+export const Toggle = styled(TogglePrimitive.Root, Button, {
   defaultVariants: {
-    size: 'extra-small',
-    color: 'secondary',
+    size: 'xs',
     squared: true,
   },
 });
 
-export const Item = styled(RadioGroupPrimitive.Item, ButtonStyled.Button, {
+export const Item = styled(RadioGroupPrimitive.Item, Button, {
   defaultVariants: {
-    size: 'extra-small',
-    color: 'secondary',
     squared: true,
+    size: 'xs',
   },
 });

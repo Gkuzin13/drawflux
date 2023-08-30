@@ -16,11 +16,11 @@ export const Content = styled(DropdownMenuPrimitive.Content, {
   flexDirection: 'column',
   gap: '$1',
   padding: '$2',
-  boxShadow: '$small',
+  boxShadow: '$sm',
   borderRadius: '$1',
   marginTop: '$2',
   minWidth: '$11',
-  backgroundColor: '$white50',
+  backgroundColor: '$bg',
 });
 
 export const Item = styled(DropdownMenuPrimitive.Item, ButtonStyled.Button, {
@@ -28,7 +28,7 @@ export const Item = styled(DropdownMenuPrimitive.Item, ButtonStyled.Button, {
   userSelect: 'none',
   outline: 'none',
   defaultVariants: {
-    size: 'extra-small',
+    size: 'xs',
     align: 'start',
     color: 'secondary-light',
   },

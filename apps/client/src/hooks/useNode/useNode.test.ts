@@ -1,9 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import type { ShapeConfig } from 'konva/lib/Shape';
-import type { StageConfig } from 'shared';
+import { defaultTheme, type StageConfig } from 'shared';
 import { createNode } from '@/utils/node';
 import { getColorValue, getFillValue, getSizeValue } from '@/utils/shape';
 import useNode, { baseConfig } from './useNode';
+import { ThemeProvider } from '@/contexts/theme';
 
 describe('useNode', () => {
   const node = createNode('rectangle', [0, 0]);
@@ -16,18 +17,24 @@ describe('useNode', () => {
   };
 
   it('should return computed config correctly', () => {
-    const { result } = renderHook(() => useNode(node, stageConfig.scale));
+    const { result } = renderHook(() => useNode(node, stageConfig.scale), {
+      wrapper: ThemeProvider,
+    });
+
+    const color = getColorValue(node.style.color, defaultTheme.colors);
+    const size = getSizeValue(node.style.size);
+    const fill = getFillValue(node.style.fill, color);
 
     const expectedConfig: ShapeConfig = {
       ...baseConfig,
       id: node.nodeProps.id,
       visible: node.nodeProps.visible,
       rotation: node.nodeProps.rotation,
-      stroke: getColorValue(node.style.color),
-      strokeWidth: getSizeValue(node.style.size),
+      stroke: color,
+      strokeWidth: size,
+      fill,
       dash: [],
       fillEnabled: true,
-      fill: getFillValue(node.style.fill, node.style.color),
       opacity: node.style.opacity,
       listening: node.nodeProps.visible,
     };

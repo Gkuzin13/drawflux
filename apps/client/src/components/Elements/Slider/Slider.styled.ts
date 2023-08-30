@@ -13,7 +13,7 @@ export const Container = styled(SliderPrimitive.Root, {
 });
 
 export const Track = styled(SliderPrimitive.Track, {
-  backgroundColor: '$gray200',
+  backgroundColor: '$secondary-dark',
   position: 'relative',
   flexGrow: 1,
   borderRadius: '$1',
@@ -32,7 +32,7 @@ export const Thumb = styled(SliderPrimitive.Thumb, {
   width: '$3',
   height: '$3',
   backgroundColor: '$green500',
-  boxShadow: '$small',
+  boxShadow: '$sm',
   borderRadius: '$round',
   transition: 'all $fast',
   '&:hover': {

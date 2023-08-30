@@ -4,8 +4,11 @@ import {
   type MenuPanelActionType,
   MENU_PANEL_ACTIONS,
 } from '@/constants/panels/menu';
-import * as Styled from './MenuPanel.styled';
 import Icon from '@/components/Elements/Icon/Icon';
+import Switch from '@/components/Elements/Switch/Switch';
+import Divider from '@/components/Elements/Divider/Divider';
+import { useTheme } from '@/contexts/theme';
+import * as Styled from './MenuPanel.styled';
 
 export type MenuKey = (typeof MENU_PANEL_ACTIONS)[number]['value'];
 
@@ -15,8 +18,16 @@ type Props = {
 };
 
 const MenuPanel = ({ disabledItems, onAction }: Props) => {
+  const theme = useTheme();
+
+  const isDarkMode = theme.value === 'dark';
+
+  const handleDarkModeChange = (checked: boolean) => {
+    theme.changeTheme(checked ? 'dark' : 'default');
+  };
+
   return (
-    <DropdownMenuPrimitive.Root>
+    <DropdownMenuPrimitive.Root modal={true}>
       <Styled.Trigger aria-label="Open Menu">
         <Icon name="dots" size="lg" />
       </Styled.Trigger>
@@ -35,6 +46,17 @@ const MenuPanel = ({ disabledItems, onAction }: Props) => {
               </Styled.Item>
             );
           })}
+          <Divider css={{ margin: '$1 0' }} />
+          <Styled.Item onSelect={(e) => e.preventDefault()}>
+            <Switch
+              id="dark-mode"
+              label="Dark Mode"
+              checked={isDarkMode}
+              icon={isDarkMode ? 'moonStars' : 'moon'}
+              onCheckedChange={handleDarkModeChange}
+              data-testid="dark-mode-switch"
+            />
+          </Styled.Item>
         </Styled.Content>
       </DropdownMenuPrimitive.Portal>
     </DropdownMenuPrimitive.Root>

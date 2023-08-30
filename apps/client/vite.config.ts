@@ -86,6 +86,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['shared'],
+    exclude: ['canvas'],
   },
   build: {
     commonjsOptions: {

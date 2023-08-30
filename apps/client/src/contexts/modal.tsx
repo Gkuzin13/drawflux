@@ -15,18 +15,16 @@ type ModalContent = {
   description: string;
 };
 
-const initialContent: ModalContent = { title: '', description: '' };
-
-export const ModalContext = createContext<ModalContextValue>({
-  opened: false,
-  content: initialContent,
-  open: () => null,
-  close: () => null,
-});
+export const ModalContext = createContext<ModalContextValue | undefined>(
+  undefined,
+);
 
 export const ModalProvider = ({ children }: PropsWithChildren) => {
   const [opened, { open, close }] = useDisclosure();
-  const [content, setContent] = useState<ModalContent>(initialContent);
+  const [content, setContent] = useState<ModalContent>({
+    title: '',
+    description: '',
+  });
 
   const openModal = (title: string, description: string) => {
     setContent({ title, description });

@@ -10,10 +10,14 @@ import type {
 } from '../schemas/page';
 import type { QRCodeRequestBody, QRCodeResponse } from '../schemas/qrcode';
 import type { BadRequestError } from '../utils/errors';
+import type { darkTheme, defaultTheme } from '../design/theme';
 
 const { nodeProps, style, type } = Node.shape;
 
-export type NodeObject = z.infer<typeof Node>;
+export interface NodeObject<T extends NodeType = NodeType>
+  extends z.infer<typeof Node> {
+  type: T;
+}
 export type NodeProps = z.infer<typeof nodeProps>;
 export type NodeStyle = z.infer<typeof style>;
 export type NodeType = z.infer<typeof type>;
@@ -28,6 +32,9 @@ export type NodeFill = NodeStyle['fill'];
 export type Point = z.infer<(typeof nodeProps)['shape']['point']>;
 
 export type StageConfig = z.infer<typeof StageConfig>;
+
+export type ThemeColors = typeof defaultTheme.colors | typeof darkTheme.colors;
+export type ColorTokenValue = ThemeColors[keyof ThemeColors]['value'];
 
 export type SharePageRequestBody = z.infer<typeof SharePageRequestBody>;
 export type SharePageResponse = z.infer<typeof SharePageResponse>;

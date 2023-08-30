@@ -34,7 +34,7 @@ const SharedPageContent = ({ qrCode, error }: Props) => {
         title={copied ? 'Link Copied' : 'Copy link'}
         align="between"
         color="secondary-light"
-        size="extra-small"
+        size="xs"
         onClick={handleCopyLinkClick}
       >
         Copy Link

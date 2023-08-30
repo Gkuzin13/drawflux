@@ -1,23 +1,27 @@
 import { createStitches } from '@stitches/react';
 
 export const colors = {
-  black: '#000000',
-  white: '#FFFFFF',
+  black: '#090909',
+  white: '#fcfcfc',
   white50: '#FDFDFD',
   gray50: '#FAFAFA',
   gray100: '#F5F5F5',
   gray200: '#EEEEEE',
-  gray300: '#E0E0E0',
+  gray300: '#e3e3e3',
   gray400: '#BDBDBD',
   gray500: '#9E9E9E',
   gray600: '#757575',
   gray700: '#616161',
   gray800: '#424242',
-  gray900: '#212121',
+  gray900: '#292929',
+  darkgray100: '#2f3130',
+  darkgray200: '#252525',
+  darkgray300: '#171717',
   green300: '#81C784',
   green400: '#66BB6A',
   green500: '#4CAF50',
   green600: '#43A047',
+  green700: '#388e3c',
   blue600: '#1E88E5',
   blue700: '#1976D2',
   'deep-orange600': '#FB8C00',
@@ -30,9 +34,23 @@ export const colors = {
   red600: '#E53935',
 } as const;
 
-export const { theme, styled, css } = createStitches({
+const {
+  theme: defaultTheme,
+  styled,
+  css,
+  createTheme,
+} = createStitches({
   theme: {
-    colors,
+    colors: {
+      ...colors,
+      primary: colors.green500,
+      'primary-dark': colors.green600,
+      secondary: colors.gray200,
+      'secondary-dark': colors.gray300,
+      'secondary-light': colors.gray50,
+      bg: colors.white50,
+      'canvas-bg': colors.gray50,
+    },
     space: {
       1: '4px',
       2: '8px',
@@ -74,21 +92,41 @@ export const { theme, styled, css } = createStitches({
       2: '16px',
       round: '500px',
     },
-    shadows: {
-      small: '0px 2px 8px 0px $colors$gray300',
-      medium: '0px 4px 10px 0px $colors$gray300',
-    },
     lineHeights: {
       normal: 1.5,
     },
     transitions: {
-      normal: '0.25s cubic-bezier(0.645, 0.045, 0.355, 1)',
-      fast: '0.1s cubic-bezier(0.645, 0.045, 0.355, 1)',
+      fast: '0.075s cubic-bezier(0.645, 0.045, 0.355, 1)',
+      normal: '0.125s cubic-bezier(0.645, 0.045, 0.355, 1)',
     },
     media: {
       sm: '(min-width: 640px)',
       md: '(min-width: 768px)',
       lg: '(min-width: 1024px)',
     },
+    shadows: {
+      sm: '0px 2px 8px 0px $colors$gray300',
+      md: '0px 4px 10px 0px $colors$gray300',
+    },
   },
 });
+
+const darkTheme = createTheme('dark-theme', {
+  colors: {
+    ...colors,
+    primary: colors.green700,
+    'primary-dark': colors.green600,
+    secondary: colors.gray900,
+    'secondary-dark': colors.gray800,
+    'secondary-light': colors.darkgray200,
+    bg: colors.darkgray100,
+    'canvas-bg': colors.darkgray300,
+    black: colors.gray50,
+  },
+  shadows: {
+    sm: '0px 2px 8px 0px #131313',
+    md: '0px 4px 10px 0px #131313',
+  },
+});
+
+export { defaultTheme, darkTheme, styled, css };

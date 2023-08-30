@@ -7,8 +7,8 @@ const Loader = ({ children, ...restProps }: Props) => {
   return (
     <Styled.Container {...restProps}>
       <Styled.InnerContainer>
-        {children}
         <Styled.Spinner name="spinner" size="md" />
+        {children}
       </Styled.InnerContainer>
     </Styled.Container>
   );

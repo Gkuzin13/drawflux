@@ -7,23 +7,23 @@ export const Content = styled(PopoverPrimitive.Content, {
   display: 'flex',
   gap: '$2',
   flexDirection: 'column',
-  boxShadow: '$small',
+  boxShadow: '$sm',
   maxWidth: '$11',
   borderRadius: '$1',
   marginTop: '$2',
-  backgroundColor: '$white50',
+  backgroundColor: '$bg',
 });
 
 export const Info = styled('p', {
   padding: '0 $1 $1 $1',
   fontSize: '$1',
-  color: '$gray600',
+  color: '$gray500',
 });
 
 export const Trigger = styled(PopoverPrimitive.Trigger, ButtonStyled.Button, {
   defaultVariants: {
     color: 'primary',
-    size: 'small',
+    size: 'sm',
   },
 });
 

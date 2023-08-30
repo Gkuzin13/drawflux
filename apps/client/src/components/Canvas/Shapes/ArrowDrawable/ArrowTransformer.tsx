@@ -6,8 +6,9 @@ import { Circle, Group } from 'react-konva';
 import { type Point } from 'shared';
 import { getRatioFromValue } from '@/utils/math';
 import { calculateClampedMidPoint } from './helpers/calc';
-import { theme } from 'shared';
-import { TRANSFORMER } from '@/constants/shape';
+import { ARROW_TRANSFORMER } from '@/constants/shape';
+import useDefaultThemeColors from '@/hooks/useThemeColors';
+import { hexToRGBa } from '@/utils/string';
 
 type ArrowTransformerProps = {
   start: Point;
@@ -20,7 +21,7 @@ type ArrowTransformerProps = {
   stageScale: number;
   onTranformStart: () => void;
   onTransform: (updatedPoints: Point[], bend?: number) => void;
-  onTransformEnd: (updatedPoints: Point[], bend?: number) => void;
+  onTransformEnd: () => void;
 };
 
 type AnchorProps = {
@@ -43,11 +44,14 @@ const Anchor = ({
   onDragMove,
   onDragEnd,
 }: AnchorProps) => {
+  const themeColors = useDefaultThemeColors();
+
   const handleMouseEnter = useCallback(
     (event: KonvaEventObject<MouseEvent>) => {
       const circle = event.target as Konva.Circle;
 
-      circle.strokeWidth(TRANSFORMER.ANCHOR_STROKE_WIDTH * 7);
+      circle.strokeWidth(ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH_HOVER);
+      circle.stroke(hexToRGBa(ARROW_TRANSFORMER.STROKE, 0.75));
     },
     [],
   );
@@ -56,7 +60,8 @@ const Anchor = ({
     (event: KonvaEventObject<MouseEvent>) => {
       const circle = event.target as Konva.Circle;
 
-      circle.strokeWidth(TRANSFORMER.ANCHOR_STROKE_WIDTH);
+      circle.strokeWidth(ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH);
+      circle.stroke(ARROW_TRANSFORMER.STROKE);
     },
     [],
   );
@@ -67,20 +72,20 @@ const Anchor = ({
       y={y}
       scaleX={scale}
       scaleY={scale}
-      stroke={theme.colors.green300.value}
-      fill={theme.colors.white.value}
+      stroke={ARROW_TRANSFORMER.STROKE}
+      fill={themeColors['canvas-bg'].value}
+      strokeWidth={ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH}
+      hitStrokeWidth={ARROW_TRANSFORMER.HIT_STROKE_WIDTH}
+      radius={ARROW_TRANSFORMER.RADIUS}
       fillAfterStrokeEnabled={true}
       draggable={true}
-      strokeWidth={TRANSFORMER.ANCHOR_STROKE_WIDTH * 2.15}
-      hitStrokeWidth={16}
-      radius={3.75}
+      perfectDrawEnabled={false}
+      shadowForStrokeEnabled={false}
       onDragStart={onDragStart}
       onDragMove={onDragMove}
       onDragEnd={onDragEnd}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      perfectDrawEnabled={false}
-      shadowForStrokeEnabled={false}
     />
   );
 };
@@ -96,6 +101,8 @@ const ArrowTransformer = ({
   onTransformEnd,
 }: ArrowTransformerProps) => {
   const transformerRef = useRef<Konva.Group>(null);
+
+  const normalizedScale = 1 / stageScale;
 
   useEffect(() => {
     if (transformerRef.current) {
@@ -121,25 +128,14 @@ const ArrowTransformer = ({
     [bendMovement],
   );
 
-  const handleDragStart = useCallback(() => {
-    onTranformStart();
-
-    if (!transformerRef.current) {
-      return;
-    }
-
-    const transformer = transformerRef.current;
-    transformer.visible(false);
-  }, [transformerRef, onTranformStart]);
-
   const handleDragMove = useCallback(
-    (event: KonvaEventObject<DragEvent>, index: number) => {
+    (event: KonvaEventObject<DragEvent>) => {
       const node = event.target as Konva.Circle;
       const stage = node.getStage() as Konva.Stage;
 
       const { x, y } = node.getAbsolutePosition(stage);
 
-      if (index === controlIndex) {
+      if (node.index === controlIndex) {
         const { x: clampedX, y: clampedY } = calculateClampedMidPoint(
           [x, y],
           start,
@@ -157,23 +153,12 @@ const ArrowTransformer = ({
 
       const updatedPoints = [...[start, end]];
 
-      updatedPoints[index] = [x, y];
+      updatedPoints[node.index] = [x, y];
 
       onTransform(updatedPoints);
     },
     [start, end, getBendValue, onTransform],
   );
-
-  const handleDragEnd = () => {
-    if (!transformerRef.current) {
-      return;
-    }
-
-    onTransformEnd([start, end]);
-
-    const transformer = transformerRef.current;
-    transformer.visible(true);
-  };
 
   return (
     <Group ref={transformerRef}>
@@ -183,10 +168,10 @@ const ArrowTransformer = ({
             key={index}
             x={x}
             y={y}
-            scale={1 / stageScale}
-            onDragStart={handleDragStart}
-            onDragMove={(event) => handleDragMove(event, index)}
-            onDragEnd={handleDragEnd}
+            scale={normalizedScale}
+            onDragStart={onTranformStart}
+            onDragMove={handleDragMove}
+            onDragEnd={onTransformEnd}
           />
         );
       })}

@@ -1,9 +1,9 @@
 import type Konva from 'konva';
 import { forwardRef, memo, type RefObject } from 'react';
 import { Rect } from 'react-konva';
-import { theme } from 'shared';
 import { getNormalizedInvertedRect } from '@/utils/position';
 import type { IRect } from 'konva/lib/types';
+import useThemeColors from '@/hooks/useThemeColors';
 
 type Props = {
   rect: IRect;
@@ -13,7 +13,10 @@ type Props = {
 
 const BackgroundLayer = forwardRef<Konva.Rect, Props>(
   ({ scale, rect }, ref) => {
+    const themeColors = useThemeColors();
+
     const normalizedRect = getNormalizedInvertedRect(rect, scale);
+
     return (
       <Rect
         ref={ref}
@@ -23,7 +26,7 @@ const BackgroundLayer = forwardRef<Konva.Rect, Props>(
         shadowForStrokeEnabled={false}
         listening={false}
         draggable={false}
-        fill={theme.colors.gray50.value}
+        fill={themeColors['canvas-bg'].value}
       />
     );
   },

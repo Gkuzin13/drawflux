@@ -3,20 +3,41 @@ import { Html } from 'react-konva-utils';
 import { type NodeObject } from 'shared';
 import { KEYS } from '@/constants/keys';
 import { useClickAway } from '@/hooks/useClickAway/useClickAway';
-import { getColorValue, getSizeValue } from '@/utils/shape';
+import { getColorValue, getFontSize, getSizeValue } from '@/utils/shape';
 import type { OnTextSaveArgs } from './EditableText';
 import * as Styled from './EditableTextInput.styled';
-import { getFontSize, getStyle } from './helpers/font';
 import { getSizePropsFromTextValue } from './helpers/size';
+import useDefaultThemeColors from '@/hooks/useThemeColors';
 
 type Props = {
-  node: NodeObject;
+  node: NodeObject<'text'>;
   initialValue: string;
   onChange: (args: OnTextSaveArgs) => void;
   onUpdate: (value: string) => void;
 };
 
 const textSaveKeys = [KEYS.ENTER, KEYS.ESCAPE] as string[];
+
+function getStyle(fontSize: number, color: string): React.CSSProperties {
+  const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
+  const baseStyle: React.CSSProperties = {
+    color,
+    fontSize: `${fontSize}px`,
+  };
+
+  if (isFirefox) {
+    return {
+      ...baseStyle,
+      transform: `translateY(-${fontSize / 16}px)`,
+    };
+  }
+
+  return {
+    ...baseStyle,
+    transform: `translateY(-${fontSize / 18}px)`,
+  };
+}
 
 const EditableTextInput = ({
   node,
@@ -25,6 +46,8 @@ const EditableTextInput = ({
   onUpdate,
 }: Props) => {
   const [value, setValue] = useState(initialValue);
+
+  const themeColors = useDefaultThemeColors();
 
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -48,8 +71,8 @@ const EditableTextInput = ({
   }, [node.style.size]);
 
   const style = useMemo(() => {
-    return getStyle(fontSize, getColorValue(node.style.color));
-  }, [fontSize, node.style.color]);
+    return getStyle(fontSize, getColorValue(node.style.color, themeColors));
+  }, [fontSize, node.style.color, themeColors]);
 
   const { width, height } = getSizePropsFromTextValue(value, fontSize);
 

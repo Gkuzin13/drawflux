@@ -8,7 +8,7 @@ import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import { calculateLengthFromPoints } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
-import { getDashValue, getSizeValue } from '@/utils/shape';
+import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import NodeTransformer from '../../Transformer/NodeTransformer';
 import { pairPoints } from './helpers/points';
 
@@ -17,7 +17,7 @@ const FreePathDrawable = ({
   selected,
   stageScale,
   onNodeChange,
-}: NodeComponentProps) => {
+}: NodeComponentProps<'draw'>) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Line>([selected]);
 
   const { config } = useNode(node, stageScale);
@@ -25,7 +25,7 @@ const FreePathDrawable = ({
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
     nodeRef,
-    totalDashLength: config.dash[0] + config.dash[1],
+    totalDashLength: getTotalDashLength(config.dash),
   });
 
   const flattenedPoints = useMemo(() => {
