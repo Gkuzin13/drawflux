@@ -14,6 +14,10 @@ export const Content = styled(Popover.Content, {
   borderRadius: '$1',
   marginTop: '$2',
   backgroundColor: '$bg',
+  button: {
+    display: 'grid',
+    placeItems: 'center',
+  },
 });
 
 export const Trigger = styled(Popover.Trigger, PanelStyled.Button);
