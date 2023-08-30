@@ -13,6 +13,7 @@
 - Live collaboration.
 - Export to PNG / JSON.
 - Offline support.
+- Dark Mode.
 
 # Local development
 
