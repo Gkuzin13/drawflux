@@ -14,12 +14,14 @@ describe('theme context', () => {
     });
 
     expect(result.current.value).toBe('dark');
+    expect(storage.get(LOCAL_STORAGE_THEME_KEY)).toBe('dark');
 
     await act(async () => {
       result.current.set('default');
     });
 
     expect(result.current.value).toBe('default');
+    expect(storage.get(LOCAL_STORAGE_THEME_KEY)).toBe('default');
   });
 
   it('sets dark theme from storage', async () => {

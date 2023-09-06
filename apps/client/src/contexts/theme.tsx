@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LOCAL_STORAGE_THEME_KEY } from '@/constants/app';
 import { storage } from '@/utils/storage';
 import type { PropsWithChildren } from 'react';
+import { createContext } from './createContext';
 
 type ThemeValue = 'default' | 'dark';
 
@@ -12,9 +13,8 @@ type ThemeContextValue = {
 
 type Props = PropsWithChildren;
 
-export const ThemeContext = createContext<ThemeContextValue | undefined>(
-  undefined,
-);
+export const [ThemeContext, useTheme] =
+  createContext<ThemeContextValue>('Theme');
 
 export const ThemeProvider = ({ children }: Props) => {
   const [theme, setTheme] = useState<ThemeValue>(getDefaultTheme());
@@ -41,23 +41,16 @@ export const ThemeProvider = ({ children }: Props) => {
     };
   }, []);
 
-  const handleThemeChange = (value: ThemeValue) => setTheme(value);
+  const handleThemeChange = (value: ThemeValue) => {
+    setTheme(value);
+    storage.set(LOCAL_STORAGE_THEME_KEY, value);
+  };
 
   return (
     <ThemeContext.Provider value={{ value: theme, set: handleThemeChange }}>
       {children}
     </ThemeContext.Provider>
   );
-};
-
-export const useTheme = () => {
-  const ctx = useContext(ThemeContext);
-
-  if (ctx === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-
-  return ctx;
 };
 
 function getDefaultTheme(): ThemeValue {

@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import { type WSMessage, WSMessageUtil } from 'shared';
 import {
@@ -21,6 +15,7 @@ import { urlSearchParam } from '@/utils/url';
 import { useModal } from './modal';
 import { useNotifications } from './notifications';
 import useUrlSearchParams from '@/hooks/useUrlSearchParams/useUrlSearchParams';
+import { createContext } from './createContext';
 
 type WebSocketContextValue = {
   connection: WebSocket | null;
@@ -36,9 +31,8 @@ const wsBaseUrl = IS_PROD ? BASE_WS_URL : BASE_WS_URL_DEV;
 
 let attemptedConnection = false;
 
-export const WebSocketContext = createContext<
-  WebSocketContextValue | undefined
->(undefined);
+export const [WebSocketContext, useWebSocket] =
+  createContext<WebSocketContextValue>('WebSocket');
 
 export const WebSocketProvider = ({ children }: PropsWithChildren) => {
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
@@ -144,14 +138,4 @@ export const WebSocketProvider = ({ children }: PropsWithChildren) => {
       {children}
     </WebSocketContext.Provider>
   );
-};
-
-export const useWebSocket = (): WebSocketContextValue => {
-  const ctx = useContext(WebSocketContext);
-
-  if (ctx === undefined) {
-    throw new Error('useWebSocket must be used within a WebSocketProvider');
-  }
-
-  return ctx;
 };
