@@ -41,7 +41,10 @@ export const ThemeProvider = ({ children }: Props) => {
     };
   }, []);
 
-  const handleThemeChange = (value: ThemeValue) => setTheme(value);
+  const handleThemeChange = (value: ThemeValue) => {
+    setTheme(value);
+    storage.set(LOCAL_STORAGE_THEME_KEY, value);
+  };
 
   return (
     <ThemeContext.Provider value={{ value: theme, set: handleThemeChange }}>
