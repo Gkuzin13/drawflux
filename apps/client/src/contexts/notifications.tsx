@@ -1,12 +1,7 @@
 import { Provider as ToastProvider } from '@radix-ui/react-toast';
-import {
-  createContext,
-  useContext,
-  type PropsWithChildren,
-  useState,
-  useCallback,
-} from 'react';
+import { type PropsWithChildren, useState, useCallback } from 'react';
 import Toast from '@/components/Elements/Toast/Toast';
+import { createContext } from './createContext';
 
 export type Notification = {
   title: string;
@@ -20,9 +15,8 @@ type NotificationContextValue = {
   list: Map<string, Notification>;
 };
 
-export const NotificationsContext = createContext<
-  NotificationContextValue | undefined
->(undefined);
+export const [NotificationsContext, useNotifications] =
+  createContext<NotificationContextValue>('Notification');
 
 export const NotificationsProvider = ({ children }: PropsWithChildren) => {
   const [notifications, setNotifications] = useState(
@@ -69,16 +63,4 @@ export const NotificationsProvider = ({ children }: PropsWithChildren) => {
       </ToastProvider>
     </NotificationsContext.Provider>
   );
-};
-
-export const useNotifications = () => {
-  const ctx = useContext(NotificationsContext);
-
-  if (ctx === undefined) {
-    throw new Error(
-      'useNotifications must be used within a NotificationsProvider',
-    );
-  }
-
-  return ctx;
 };

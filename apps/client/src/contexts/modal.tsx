@@ -1,7 +1,8 @@
-import { createContext, useContext, useState } from 'react';
+import { useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import useDisclosure from '@/hooks/useDisclosure/useDisclosure';
 import Dialog from '@/components/Elements/Dialog/Dialog';
+import { createContext } from './createContext';
 
 type ModalContextValue = {
   opened: boolean;
@@ -15,9 +16,8 @@ type ModalContent = {
   description: string;
 };
 
-export const ModalContext = createContext<ModalContextValue | undefined>(
-  undefined,
-);
+export const [ModalContext, useModal] =
+  createContext<ModalContextValue>('Modal');
 
 export const ModalProvider = ({ children }: PropsWithChildren) => {
   const [opened, { open, close }] = useDisclosure();
@@ -37,14 +37,4 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
       <Dialog open={opened} {...content} onClose={close} />
     </ModalContext.Provider>
   );
-};
-
-export const useModal = () => {
-  const ctx = useContext(ModalContext);
-
-  if (ctx === undefined) {
-    throw new Error('useModal must be used within a ModalProvider');
-  }
-
-  return ctx;
 };
