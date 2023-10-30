@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   capitalizeFirstLetter,
-  getKeyTitle,
-  getStyleTitle,
+  createKeyTitle,
+  createTitle,
   hexToRGBa,
 } from '../string';
 
@@ -25,27 +25,27 @@ describe('capitalizeFirstLetter', () => {
   });
 });
 
-describe('getKeyTitle', () => {
+describe('createKeyTitle', () => {
   it('should return a formatted string for a single key', () => {
-    expect(getKeyTitle('foo', ['bar'])).toBe('Foo — Bar');
+    expect(createKeyTitle('foo', ['bar'])).toBe('Foo — Bar');
   });
 
   it('should return a formatted string for multiple keys', () => {
-    expect(getKeyTitle('foo', ['bar', 'foo'])).toBe('Foo — Bar + Foo');
+    expect(createKeyTitle('foo', ['bar', 'foo'])).toBe('Foo — Bar + Foo');
   });
 
   it('should return empty string if name is an empty string', () => {
-    expect(getKeyTitle('', ['foo', 'bar'])).toBe(' — Foo + Bar');
+    expect(createKeyTitle('', ['foo', 'bar'])).toBe(' — Foo + Bar');
   });
 
   it('should return keys as strings when provided with non-string values', () => {
-    expect(getKeyTitle('foo', [<any>12, null])).toBe('Foo — 12 + Null');
+    expect(createKeyTitle('foo', [<any>12, null])).toBe('Foo — 12 + Null');
   });
 });
 
-describe('getStyleTitle', () => {
+describe('createTitle', () => {
   it('returns a formatted title', () => {
-    expect(getStyleTitle('foo', 'bar')).toBe('foo — bar');
+    expect(createTitle('foo', 'bar')).toBe('foo — bar');
   });
 });
 

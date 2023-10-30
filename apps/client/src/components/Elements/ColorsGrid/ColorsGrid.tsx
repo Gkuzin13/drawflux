@@ -1,7 +1,7 @@
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import * as PanelStyled from '@/components/Panels/StylePanel/StylePanel.styled';
 import * as Styled from './ColorsGrid.styled';
-import { getStyleTitle } from '@/utils/string';
+import { createTitle } from '@/utils/string';
 import type { NodeColor } from 'shared';
 import ColorCircle from '../ColorCircle/ColorCircle';
 
@@ -45,7 +45,7 @@ const ColorsGrid = ({ withLabel = false, value, onSelect }: Props) => {
               checked={color.value === value}
               value={color.value}
               aria-label={`${color.name} color`}
-              title={getStyleTitle('Color', color.name)}
+              title={createTitle('Color', color.name)}
               color={
                 color.value === value ? 'secondary-dark' : 'secondary-light'
               }

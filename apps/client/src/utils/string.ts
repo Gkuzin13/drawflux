@@ -13,24 +13,27 @@ export function capitalizeFirstLetter(string: string) {
   return string[0].toUpperCase() + string.slice(1).toLowerCase();
 }
 
-export const getKeyTitle = (name: string, keys: string[]) => {
+export const createTitle = (name: string, value: string) =>
+  `${name} — ${value}`;
+
+export const createKeyTitle = (name: string, keys: string[]) => {
   if (typeof name !== 'string') {
     throw new Error('The provided name must be a string');
   }
 
-  const capitalizedName = name.length ? capitalizeFirstLetter(name) : '';
+  const capitalizedName = capitalizeFirstLetter(name);
 
   if (keys.length === 1) {
-    return `${capitalizedName} — ${capitalizeFirstLetter(`${keys[0]}`)}`;
+    const capitalizedKey = capitalizeFirstLetter(keys[0]);
+
+    return createTitle(capitalizedName, capitalizedKey);
   }
 
-  return `${capitalizedName} — ${keys
+  const joinedKeys = keys
     .map((key) => capitalizeFirstLetter(`${key}`))
-    .join(' + ')}`;
-};
+    .join(' + ');
 
-export const getStyleTitle = (name: string, value: string) => {
-  return `${name} — ${value}`;
+  return createTitle(capitalizedName, joinedKeys);
 };
 
 export const hexToRGBa = (hex: string, alpha = 1) => {

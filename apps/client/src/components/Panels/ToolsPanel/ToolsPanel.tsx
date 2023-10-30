@@ -1,7 +1,7 @@
 import { Fragment, memo } from 'react';
 import Divider from '@/components/Elements/Divider/Divider';
 import { TOOLS, type ToolType } from '@/constants/panels/tools';
-import { getKeyTitle } from '@/utils/string';
+import { createKeyTitle } from '@/utils/string';
 import * as Styled from '../Panels.styled';
 import Icon from '@/components/Elements/Icon/Icon';
 
@@ -19,7 +19,7 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
             <Styled.Button
               size="sm"
               color={activeTool === tool.value ? 'primary' : 'secondary'}
-              title={getKeyTitle(tool.name, [tool.key])}
+              title={createKeyTitle(tool.name, [tool.key])}
               data-testid={`tool-button-${tool.value}`}
               onClick={() => onToolSelect(tool.value)}
             >

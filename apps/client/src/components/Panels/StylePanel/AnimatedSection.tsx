@@ -2,7 +2,7 @@ import { memo } from 'react';
 import type { NodeStyle } from 'shared';
 import { ANIMATED } from '@/constants/panels/style';
 import * as Styled from './StylePanel.styled';
-import { getStyleTitle } from '@/utils/string';
+import { createTitle } from '@/utils/string';
 
 type Props = {
   value: NodeStyle['animated'];
@@ -18,7 +18,7 @@ const AnimatedSection = ({ value, isDisabled, onAnimatedChange }: Props) => {
       <Styled.Label>{ANIMATED.name}</Styled.Label>
       <Styled.Toggle
         aria-label="Toggle Animated"
-        title={getStyleTitle(ANIMATED.name, valueTitle)}
+        title={createTitle(ANIMATED.name, valueTitle)}
         pressed={value}
         color={value ? 'primary' : 'secondary-light'}
         disabled={isDisabled}
