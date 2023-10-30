@@ -18,7 +18,7 @@ export const getKeyTitle = (name: string, keys: string[]) => {
     throw new Error('The provided name must be a string');
   }
 
-  const capitalizedName = name.length ? capitalizeFirstLetter(name) : '';
+  const capitalizedName = capitalizeFirstLetter(name);
 
   if (keys.length === 1) {
     return `${capitalizedName} — ${capitalizeFirstLetter(`${keys[0]}`)}`;
