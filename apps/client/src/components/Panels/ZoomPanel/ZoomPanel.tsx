@@ -8,6 +8,7 @@ import { ZOOM, type ZoomAction } from '@/constants/panels/zoom';
 import * as PanelStyled from '../Panels.styled';
 import * as Styled from './ZoomPanel.styled';
 import Icon from '@/components/Elements/Icon/Icon';
+import { createKeyTitle } from '@/utils/string';
 
 type Props = {
   value: number;
@@ -47,14 +48,20 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
       </PanelStyled.Button>
       <PanelStyled.Button
         disabled={value === ZOOM_RANGE.MAX}
-        title={ZOOM.in.name}
+        title={createKeyTitle(ZOOM.in.name, [
+          ZOOM.in.key,
+          ...ZOOM.in.modifierKeys,
+        ])}
         onClick={() => handleZoomAction(ZOOM.in.value)}
       >
         <Icon name={ZOOM.in.icon} size="sm" />
       </PanelStyled.Button>
       <PanelStyled.Button
         disabled={value === ZOOM_RANGE.MIN}
-        title={ZOOM.out.name}
+        title={createKeyTitle(ZOOM.out.name, [
+          ZOOM.out.key,
+          ...ZOOM.out.modifierKeys,
+        ])}
         onClick={() => handleZoomAction(ZOOM.out.value)}
       >
         <Icon name={ZOOM.out.icon} size="sm" />

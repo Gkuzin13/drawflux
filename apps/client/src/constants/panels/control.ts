@@ -1,12 +1,8 @@
 import type { HistoryActionKey } from '@/stores/reducers/history';
 import { type canvasActions } from '@/stores/slices/canvas';
-import { KEYS, type Key } from '../keys';
-import type { Entity } from '@/constants/index';
+import type { ShortcutKeyCombo } from '@/constants/index';
 
-type Control = Entity<HistoryActionKey | keyof typeof canvasActions> & {
-  key: string;
-  modifierKeys: readonly Key[];
-};
+type Control = ShortcutKeyCombo<HistoryActionKey | keyof typeof canvasActions>;
 
 export const CONTROL: readonly Control[] = [
   {
@@ -14,14 +10,14 @@ export const CONTROL: readonly Control[] = [
     value: 'undo',
     icon: 'arrowBackUp',
     key: 'Z',
-    modifierKeys: [KEYS.CTRL],
+    modifierKeys: ['Ctrl'],
   },
   {
     name: 'Redo',
     value: 'redo',
     icon: 'arrowForwardUp',
     key: 'Z',
-    modifierKeys: [KEYS.CTRL, KEYS.SHIFT],
+    modifierKeys: ['Ctrl', 'Shift'],
   },
   {
     name: 'Delete',

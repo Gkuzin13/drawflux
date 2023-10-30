@@ -5,3 +5,8 @@ export type Entity<Value = string | number> = {
   value: Value;
   icon: IconName;
 };
+
+export type ShortcutKeyCombo<Value = string | number> = Entity<Value> & {
+  key: string;
+  modifierKeys: readonly string[];
+};

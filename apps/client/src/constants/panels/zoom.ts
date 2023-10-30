@@ -1,10 +1,10 @@
-import type { Entity } from '../index';
+import type { Entity, ShortcutKeyCombo } from '../index';
 
 export type ZoomAction = (typeof ZOOM)[keyof typeof ZOOM]['value'];
 
 type Zoom = {
-  in: Entity;
-  out: Entity;
+  in: ShortcutKeyCombo;
+  out: ShortcutKeyCombo;
   reset: Omit<Entity, 'icon'>;
 };
 
@@ -13,11 +13,15 @@ export const ZOOM: Zoom = {
     name: 'Zoom In',
     value: 'increase',
     icon: 'plus',
+    key: 'Ctrl',
+    modifierKeys: ['Mouse Wheel++'],
   },
   out: {
     name: 'Zoom Out',
     value: 'decrease',
     icon: 'minus',
+    key: 'Ctrl',
+    modifierKeys: ['Mouse Wheel--'],
   },
   reset: {
     name: 'Reset Zoom',

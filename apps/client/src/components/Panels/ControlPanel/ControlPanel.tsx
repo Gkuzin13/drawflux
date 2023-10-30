@@ -36,7 +36,7 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
           <PanelStyled.Button
             key={control.name}
             title={createKeyTitle(control.name, [
-              ...control.modifierKeys.map((key) => key.replace(/key/i, '')),
+              ...control.modifierKeys,
               control.key,
             ])}
             disabled={getDisabledByControlValue(control.value)}
