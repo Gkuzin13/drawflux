@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import type { NodeSize } from 'shared';
 import { SIZE } from '@/constants/panels/style';
-import { getStyleTitle } from '@/utils/string';
+import { createTitle } from '@/utils/string';
 import Icon from '@/components/Elements/Icon/Icon';
 import { getSizeValue } from '@/utils/shape';
 import * as Styled from './StylePanel.styled';
@@ -26,7 +26,7 @@ const SizeSection = ({ value, onSizeChange }: Props) => {
           return (
             <Styled.Item
               key={size.name}
-              title={getStyleTitle('Size', size.name)}
+              title={createTitle('Size', size.name)}
               value={size.value}
               checked={size.value === value}
               color={

@@ -2,7 +2,7 @@ import { memo } from 'react';
 import type { NodeFill } from 'shared';
 import { FILL } from '@/constants/panels/style';
 import * as Styled from './StylePanel.styled';
-import { getStyleTitle } from '@/utils/string';
+import { createTitle } from '@/utils/string';
 import Icon from '@/components/Elements/Icon/Icon';
 
 type FillValue = Exclude<NodeFill, undefined>;
@@ -28,7 +28,7 @@ const FillSection = ({ value, onFillChange }: Props) => {
             <Styled.Item
               key={fill.value}
               value={fill.value ?? 'none'}
-              title={getStyleTitle('Fill', fill.name)}
+              title={createTitle('Fill', fill.name)}
               checked={fill.value === value}
               color={
                 fill.value === value ? 'secondary-dark' : 'secondary-light'

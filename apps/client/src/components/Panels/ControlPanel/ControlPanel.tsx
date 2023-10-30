@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { CONTROL } from '@/constants/panels/control';
-import { getKeyTitle } from '@/utils/string';
+import { createKeyTitle } from '@/utils/string';
 import * as PanelStyled from '../Panels.styled';
 import Icon from '@/components/Elements/Icon/Icon';
 
@@ -35,7 +35,7 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
         return (
           <PanelStyled.Button
             key={control.name}
-            title={getKeyTitle(control.name, [
+            title={createKeyTitle(control.name, [
               ...control.modifierKeys.map((key) => key.replace(/key/i, '')),
               control.key,
             ])}
