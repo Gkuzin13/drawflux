@@ -41,7 +41,7 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
       <PanelStyled.Button
         disabled={value === DEFAULT_ZOOM_VALUE}
         title={ZOOM.reset.name}
-        data-testId="zoom-reset-button"
+        data-testid="zoom-reset-button"
         css={{ fontSize: '$1', width: 'calc($5 * 1.5)' }}
         onClick={() => handleZoomAction(ZOOM.reset.value)}
       >
@@ -53,7 +53,7 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
           ZOOM.in.key,
           ...ZOOM.in.modifierKeys,
         ])}
-        data-testId="zoom-in-button"
+        data-testid="zoom-in-button"
         onClick={() => handleZoomAction(ZOOM.in.value)}
       >
         <Icon name={ZOOM.in.icon} size="sm" />
@@ -64,7 +64,7 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
           ZOOM.out.key,
           ...ZOOM.out.modifierKeys,
         ])}
-        data-testId="zoom-out-button"
+        data-testid="zoom-out-button"
         onClick={() => handleZoomAction(ZOOM.out.value)}
       >
         <Icon name={ZOOM.out.icon} size="sm" />
