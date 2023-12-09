@@ -119,6 +119,7 @@ const FreePathDrawable = ({
         ref={nodeRef}
         points={flattenedPoints}
         {...config}
+        bezier={true}
         onDragEnd={handleDragEnd}
         onTransformStart={handleTransformStart}
         onTransform={handlTransform}
