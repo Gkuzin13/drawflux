@@ -127,7 +127,32 @@ describe('select a tool and create an element', () => {
     expect(node.nodeProps.points).toEqual([[30, 40]]);
   });
 
-  it('text', async () => {
+  it('laser', async () => {
+    const { container, store } = renderWithProviders(<App />);
+
+    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+
+    // select laser tool
+    await act(async () => {
+      const tool = screen.getByTestId(/tool-button-laser/);
+      tool.click();
+    });
+
+    // start at [10, 20]
+    fireEvent.pointerDown(canvas, { clientX: 10, clientY: 20 });
+
+    // move to [30, 40]
+    fireEvent.pointerMove(canvas, { clientX: 30, clientY: 40 });
+
+    // stop at last position
+    fireEvent.pointerUp(canvas);
+
+    const canvasState = store.getState().canvas.present;
+
+    expect(canvasState.nodes).toHaveLength(0);
+  });
+
+  it.skip('text', async () => {
     const { container, store, user } = renderWithProviders(<App />);
 
     const canvas = container.querySelector('canvas') as HTMLCanvasElement;

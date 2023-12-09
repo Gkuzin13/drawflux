@@ -36,8 +36,10 @@ export const createKeyTitle = (name: string, keys: string[]) => {
   return createTitle(capitalizedName, joinedKeys);
 };
 
+export const getRGB = (hex: string) => Util.getRGB(hex);
+
 export const hexToRGBa = (hex: string, alpha = 1) => {
-  const { r, g, b } = Util.getRGB(hex);
+  const { r, g, b } = getRGB(hex);
 
   return `rgba(${r}, ${g}, ${b}, ${clamp(alpha, [0, 1])})`;
 };

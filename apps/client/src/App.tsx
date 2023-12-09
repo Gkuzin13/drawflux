@@ -45,6 +45,10 @@ const App = () => {
         dispatch(collaborationActions.updateUser(data));
         break;
       }
+      case 'user-left': {
+        dispatch(collaborationActions.removeUser(data));
+        break
+      }
       case 'nodes-set': {
         dispatch(canvasActions.setNodes(data));
         break;
@@ -53,8 +57,8 @@ const App = () => {
         dispatch(canvasActions.addNodes(data));
         break;
       }
-      case 'draft-end': {
-        dispatch(canvasActions.addNodes([data]));
+      case 'draft-finish': {
+        dispatch(canvasActions.addNodes([data.node]));
         break;
       }
       case 'nodes-update': {
@@ -84,7 +88,9 @@ const App = () => {
       case 'draft-text-update': {
         const textNode = store
           .getState()
-          .canvas.present.nodes.find((node) => node.nodeProps.id === data.id);
+          .canvas.present.nodes.find(
+            (node) => node.nodeProps.id === data.nodeId,
+          );
 
         if (textNode) {
           dispatch(

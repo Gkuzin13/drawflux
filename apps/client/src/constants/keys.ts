@@ -16,4 +16,5 @@ export const KEYS = {
   T: 't',
   V: 'v',
   Z: 'z',
+  L: 'l',
 } as const;

@@ -36,3 +36,13 @@ export function drawRectangle(points: [Point, Point]): IRect {
     height: p2[1] - p1[1],
   };
 }
+
+export function calculateCurveControlPoint(
+  prevPoint: Point,
+  currentPoint: Point,
+): Point {
+  return [
+    (prevPoint[0] + currentPoint[0]) / 2,
+    (prevPoint[1] + currentPoint[1]) / 2,
+  ];
+}

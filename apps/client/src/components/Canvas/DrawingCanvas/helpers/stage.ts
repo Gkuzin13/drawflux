@@ -62,7 +62,7 @@ export function getMainLayer(stage: Konva.Stage) {
 }
 
 export function getRelativePointerPosition(stage: Konva.Stage): Point {
-  const { x, y } = stage.getRelativePointerPosition();
+  const { x, y } = stage.getRelativePointerPosition() || { x: 0, y: 0 };
 
   return [x, y];
 }

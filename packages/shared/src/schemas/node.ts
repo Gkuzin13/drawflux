@@ -8,6 +8,7 @@ const Type = z.union([
   z.literal('ellipse'),
   z.literal('draw'),
   z.literal('text'),
+  z.literal('laser'),
 ]);
 
 const Size = z.union([

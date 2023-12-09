@@ -40,6 +40,7 @@ export const appState = z.object({
       ...Schemas.Node.shape.type.options,
       z.literal('hand'),
       z.literal('select'),
+      z.literal('laser'),
     ]),
     selectedNodesIds: z.record(z.string(), z.boolean()),
   }),

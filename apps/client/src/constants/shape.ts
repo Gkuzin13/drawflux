@@ -37,3 +37,12 @@ export const SELECT_RECT = {
   FILL: colors.gray400,
   OPACITY: 0.1,
 };
+
+export const LASER = {
+  TRIM_COUNT: 2,
+  TRIM_INTERVAL: 24,
+  TRIM_DELAY: 225,
+  MAX_LENGTH: 50,
+  WIDTH: 3.25,
+  COLOR: colors.red500,
+};

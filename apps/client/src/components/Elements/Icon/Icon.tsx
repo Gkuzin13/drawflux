@@ -47,6 +47,7 @@ const ICONS = {
   pencil: Icons.TbPencil,
   moon: Icons.TbMoon,
   moonStars: Icons.TbMoonStars,
+  laser: Icons.TbFlare,
 } as const;
 
 const SIZE = {

@@ -65,13 +65,13 @@ function createStyleConfig<T extends NodeType>(
     } as T extends 'text' ? TextNodeStyleConfig : never;
   }
 
-  if (node.type === 'draw' || node.type === 'arrow') {
+  if (node.type === 'draw' || node.type === 'arrow' || node.type === 'laser') {
     return {
       ...baseStyle,
       stroke: colorValue,
       strokeWidth: sizeValue * stageScale,
       dash: getDashStyle(node, sizeValue),
-    } as T extends 'arrow' | 'draw' ? LineNodeStyleConfig : never;
+    } as T extends 'arrow' | 'draw' | 'laser' ? LineNodeStyleConfig : never;
   }
 
   return {
@@ -80,7 +80,7 @@ function createStyleConfig<T extends NodeType>(
     strokeWidth: sizeValue * stageScale,
     fill: getFillValue(node.style.fill, colorValue),
     dash: getDashStyle(node, sizeValue),
-    fillEnabled: node.style.fill && node.style.fill !== 'none',
+    fillEnabled: node.style.fill ? node.style.fill !== 'none' : false,
   } as T extends 'ellipse' | 'rectangle' ? FillableNodeStyleConfig : never;
 }
 
@@ -96,7 +96,7 @@ export const baseConfig: Config = {
 
 function useNode<T extends NodeType>(node: NodeObject<T>, stageScale: number) {
   const theme = useTheme();
-
+  
   const config = useMemo(() => {
     const isDarkTheme = theme.value === 'dark';
     const themeColors = getCurrentThemeColors({ isDarkTheme });
