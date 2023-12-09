@@ -1,4 +1,4 @@
-import matchers from '@testing-library/jest-dom/matchers';
+import * as matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
 import ResizeObserverPolyfill from 'resize-observer-polyfill';
 import 'vitest-canvas-mock';
