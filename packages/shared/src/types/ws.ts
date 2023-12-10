@@ -1,5 +1,5 @@
 import type { colors } from '../design/theme';
-import type { NodeObject, NodeType, Point } from '.';
+import type { NodeObject, Point } from '.';
 
 export type User = {
   id: string;
@@ -33,20 +33,26 @@ type NodesMoveToStart = Message<'nodes-move-to-start', string[]>;
 type NodesMoveToEnd = Message<'nodes-move-to-end', string[]>;
 type NodesMoveForward = Message<'nodes-move-forward', string[]>;
 type NodesMoveBackward = Message<'nodes-move-backward', string[]>;
-type DraftNodeAdd = Message<'draft-add', NodeObject>;
-type DraftNodeDraw = Message<
+type DraftCreate = Message<'draft-create', { node: NodeObject }>;
+type DraftDraw = Message<
   'draft-draw',
   {
-    nodeId: string;
     userId: string;
-    type: Omit<NodeType, 'text'>;
+    nodeId: string;
     position: { start: Point; current: Point };
   }
 >;
-type DraftNodeEnd = Message<'draft-end', NodeObject>;
-type DraftTextNodeUpdate = Message<
+type DraftFinish = Message<
+  'draft-finish',
+  { userId: string; node: NodeObject }
+>;
+type DraftFinishAndKeep = Message<
+  'draft-finish-keep',
+  { userId: string; node: NodeObject }
+>;
+type TextDraftUpdate = Message<
   'draft-text-update',
-  { id: string; text: string }
+  { userId: string; nodeId: string; text: string }
 >;
 type HistoryChange = Message<'history-change', { action: 'undo' | 'redo' }>;
 
@@ -64,8 +70,9 @@ export type WSMessage =
   | NodesMoveToEnd
   | NodesMoveForward
   | NodesMoveBackward
-  | DraftNodeAdd
-  | DraftNodeDraw
-  | DraftNodeEnd
-  | DraftTextNodeUpdate
+  | DraftCreate
+  | DraftDraw
+  | DraftFinishAndKeep
+  | DraftFinish
+  | TextDraftUpdate
   | HistoryChange;

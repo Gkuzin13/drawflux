@@ -11,7 +11,7 @@ export const createNode = (type: NodeType, point: Point): NodeObject => {
     style: {
       opacity: 1,
       line: 'solid',
-      color: 'black',
+      color: type === 'laser' ? 'red600' : 'black',
       size: 'medium',
       animated: false,
     },

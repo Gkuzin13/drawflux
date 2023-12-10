@@ -1,6 +1,5 @@
 import type Konva from 'konva';
-import { useCallback, useRef, useState } from 'react';
-import DrawingCanvas from '@/components/Canvas/DrawingCanvas/DrawingCanvas';
+import { Suspense, lazy, useCallback, useRef, useState } from 'react';
 import {
   getIntersectingNodes,
   getLayerNodes,
@@ -23,6 +22,11 @@ import {
 import usePageMutation from '@/hooks/usePageMutation';
 import { useWebSocket } from '@/contexts/websocket';
 import useAutoFocus from '@/hooks/useAutoFocus/useAutoFocus';
+import Loader from '@/components/Elements/Loader/Loader';
+
+const DrawingCanvas = lazy(
+  () => import('@/components/Canvas/DrawingCanvas/DrawingCanvas'),
+);
 
 const MainLayout = () => {
   const [selectedNodesIds, setSelectedNodesIds] = useState<string[]>([]);
@@ -168,11 +172,13 @@ const MainLayout = () => {
       <Panels stageRef={stageRef} selectedNodesIds={selectedNodesIds} />
       <ContextMenu.Root onContextMenuOpen={handleContextMenuOpen}>
         <ContextMenu.Trigger>
-          <DrawingCanvas
-            ref={stageRef}
-            size={windowSize}
-            onNodesSelect={handleNodesSelect}
-          />
+          <Suspense fallback={<Loader fullScreen>Loading Assets...</Loader>}>
+            <DrawingCanvas
+              ref={stageRef}
+              size={windowSize}
+              onNodesSelect={handleNodesSelect}
+            />
+          </Suspense>
         </ContextMenu.Trigger>
       </ContextMenu.Root>
     </Styled.Container>

@@ -4,6 +4,8 @@ import { useWebSocket } from '@/contexts/websocket';
 import EditableTextInput from './EditableTextInput';
 import ResizableText from './ResizableText';
 import type { KonvaEventObject } from 'konva/lib/Node';
+import { useAppSelector } from '@/stores/hooks';
+import { selectMyUser } from '@/stores/slices/collaboration';
 
 export type OnTextSaveArgs = {
   text: string;
@@ -20,6 +22,7 @@ const EditableText = ({
   const [editing, setEditing] = useState(false);
 
   const ws = useWebSocket();
+  const thisUserId = useAppSelector(selectMyUser);
 
   useEffect(() => {
     if (!node.text) {
@@ -41,15 +44,15 @@ const EditableText = ({
         height,
       },
     });
-
+    
     setEditing(false);
   };
 
   const handleTextUpdate = (text: string) => {
-    if (ws.isConnected) {
+    if (ws.isConnected && thisUserId) {
       ws.send({
         type: 'draft-text-update',
-        data: { id: node.nodeProps.id, text },
+        data: { nodeId: node.nodeProps.id, text, userId: thisUserId },
       });
     }
   };

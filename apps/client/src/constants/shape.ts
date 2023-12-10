@@ -20,6 +20,10 @@ export const ARROW_TRANSFORMER = {
   STROKE: colors.green300,
 };
 
+export const FREE_PATH = {
+  TENSION: 0.5,
+};
+
 export const RECT = {
   CORNER_RADIUS: 6,
   MIN_SIZE: 10,
@@ -35,5 +39,15 @@ export const TEXT = {
 export const SELECT_RECT = {
   STROKE: colors.gray600,
   FILL: colors.gray400,
+  CORNER_RADIUS: 1,
   OPACITY: 0.1,
+};
+
+export const LASER = {
+  TRIM_COUNT: 2,
+  TRIM_INTERVAL: 24,
+  TRIM_DELAY: 225,
+  MAX_LENGTH: 60,
+  WIDTH: 4.25,
+  COLOR: colors.red500,
 };

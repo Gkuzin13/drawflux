@@ -31,6 +31,7 @@ export const colors = {
   indigo600: '#3949AB',
   'deep-purple600': '#5E35B1',
   pink600: '#D81B60',
+  red500: '#F44336',
   red600: '#E53935',
 } as const;
 

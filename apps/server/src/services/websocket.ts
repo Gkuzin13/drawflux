@@ -10,7 +10,7 @@ export const WS_IS_ALIVE_TIMEOUT = 30000;
 
 export class WebSocketService {
   server!: WebSocketServer;
-  private interval!: NodeJS.Timer;
+  private interval!: NodeJS.Timeout;
 
   constructor(
     onConnection: (ws: PatchedWebSocket, req: IncomingMessage) => void,

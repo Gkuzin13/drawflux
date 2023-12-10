@@ -1,6 +1,6 @@
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { Line } from 'react-konva';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
@@ -11,6 +11,7 @@ import { getPointsAbsolutePosition } from '@/utils/position';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import NodeTransformer from '../../Transformer/NodeTransformer';
 import { pairPoints } from './helpers/points';
+import { FREE_PATH } from '@/constants/shape';
 
 const FreePathDrawable = ({
   node,
@@ -28,9 +29,7 @@ const FreePathDrawable = ({
     totalDashLength: getTotalDashLength(config.dash),
   });
 
-  const flattenedPoints = useMemo(() => {
-    return node.nodeProps.points?.flat() || [];
-  }, [node.nodeProps.points]);
+  const flattenedPoints = (node.nodeProps.points ?? []).flat();
 
   const handleDragEnd = useCallback(
     (event: KonvaEventObject<DragEvent>) => {
@@ -119,6 +118,8 @@ const FreePathDrawable = ({
         ref={nodeRef}
         points={flattenedPoints}
         {...config}
+        tension={FREE_PATH.TENSION}
+        bezier={true}
         onDragEnd={handleDragEnd}
         onTransformStart={handleTransformStart}
         onTransform={handlTransform}

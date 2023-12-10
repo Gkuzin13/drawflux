@@ -71,11 +71,23 @@ export function drawRect({ node, position }: DrawFunctionArgs): NodeObject {
   };
 }
 
+export function drawLaser({ node, position }: DrawFunctionArgs): NodeObject {
+  return {
+    ...node,
+    nodeProps: {
+      ...node.nodeProps,
+      point: position.start,
+      points: [position.current],
+    },
+  };
+}
+
 export const drawFunctionsMap: DrawFunctionsMap = {
   arrow: drawArrow,
   ellipse: drawEllipse,
   rectangle: drawRect,
   draw: drawFreePath,
+  laser: drawLaser,
 };
 
 export function drawNodeByType({

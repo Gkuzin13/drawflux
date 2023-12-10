@@ -109,7 +109,7 @@ const EditableTextInput = ({
     event.preventDefault();
     event.stopPropagation();
   };
-
+  
   return (
     <Html
       groupProps={{
@@ -133,6 +133,7 @@ const EditableTextInput = ({
         autoCorrect="false"
         wrap="off"
         onContextMenu={handleOnContextMenu}
+        data-testid="editable-text-input"
       />
     </Html>
   );

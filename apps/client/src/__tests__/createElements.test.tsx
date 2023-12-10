@@ -10,8 +10,9 @@ import App from '@/App';
 
 describe('select a tool and create an element', () => {
   it('rectangle', async () => {
-    const { container, store } = renderWithProviders(<App />);
+    const { store } = renderWithProviders(<App />);
 
+    const container = await screen.findByRole('presentation');
     const canvas = container.querySelector('canvas') as HTMLCanvasElement;
 
     // select rectangle tool
@@ -40,8 +41,9 @@ describe('select a tool and create an element', () => {
   });
 
   it('ellipse', async () => {
-    const { container, store } = renderWithProviders(<App />);
+    const { store } = renderWithProviders(<App />);
 
+    const container = await screen.findByRole('presentation');
     const canvas = container.querySelector('canvas') as HTMLCanvasElement;
 
     // select ellipse tool
@@ -70,8 +72,9 @@ describe('select a tool and create an element', () => {
   });
 
   it('arrow', async () => {
-    const { container, store } = renderWithProviders(<App />);
+    const { store } = renderWithProviders(<App />);
 
+    const container = await screen.findByRole('presentation');
     const canvas = container.querySelector('canvas') as HTMLCanvasElement;
 
     // select arrow tool
@@ -99,8 +102,9 @@ describe('select a tool and create an element', () => {
   });
 
   it('draw', async () => {
-    const { container, store } = renderWithProviders(<App />);
+    const { store } = renderWithProviders(<App />);
 
+    const container = await screen.findByRole('presentation');
     const canvas = container.querySelector('canvas') as HTMLCanvasElement;
 
     // select draw tool
@@ -128,8 +132,9 @@ describe('select a tool and create an element', () => {
   });
 
   it('text', async () => {
-    const { container, store, user } = renderWithProviders(<App />);
+    const { store, user } = renderWithProviders(<App />);
 
+    const container = await screen.findByRole('presentation');
     const canvas = container.querySelector('canvas') as HTMLCanvasElement;
 
     // select text tool
@@ -140,10 +145,15 @@ describe('select a tool and create an element', () => {
 
     // press at [10, 20]
     fireEvent.pointerDown(canvas, { clientX: 10, clientY: 20 });
+
+    // stop at last position
     fireEvent.pointerUp(canvas);
 
     // type 'Hello World!' and press enter
-    await user.type(screen.getByRole('textbox'), 'Hello World!{enter}');
+    await user.type(
+      screen.getByTestId('editable-text-input'),
+      'Hello World!{enter}',
+    );
 
     const canvasState = store.getState().canvas.present;
     const node = canvasState.nodes[0];
@@ -152,5 +162,31 @@ describe('select a tool and create an element', () => {
     expect(node.type).toEqual('text');
     expect(node.nodeProps.point).toEqual([10, 20]);
     expect(node.text).toEqual('Hello World!');
+  });
+
+  it('laser', async () => {
+    const { store } = renderWithProviders(<App />);
+
+    const container = await screen.findByRole('presentation');
+    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+
+    // select laser tool
+    await act(async () => {
+      const tool = screen.getByTestId(/tool-button-laser/);
+      tool.click();
+    });
+
+    // start at [10, 20]
+    fireEvent.pointerDown(canvas, { clientX: 10, clientY: 20 });
+
+    // move to [30, 40]
+    fireEvent.pointerMove(canvas, { clientX: 30, clientY: 40 });
+
+    // stop at last position
+    fireEvent.pointerUp(canvas);
+
+    const canvasState = store.getState().canvas.present;
+
+    expect(canvasState.nodes).toHaveLength(0);
   });
 });
