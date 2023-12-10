@@ -28,6 +28,7 @@ import {
   getMainLayer,
   getRelativePointerPosition,
 } from './helpers/stage';
+import useRefValue from '@/hooks/useRefValue/useRefValue';
 import { calculateStageZoom, isScaleOutOfRange } from './helpers/zoom';
 import { throttleFn } from '@/utils/timed';
 import { WS_THROTTLE_MS } from '@/constants/app';
@@ -40,7 +41,6 @@ import type { IRect } from 'konva/lib/types';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { NodeObject, NodeType, Point } from 'shared';
-import useRefValue from '@/hooks/useRefValue/useRefValue';
 
 const CollaborationLayer = lazy(
   () => import('@/components/Canvas/Layers/CollaborationLayer'),
@@ -62,7 +62,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [],
     );
     const [drawing, setDrawing] = useState(false);
-    const [drafts, dispatchDrafts] = useDrafts();
+    const [drafts, setDrafts] = useDrafts();
     const [draggingStage, setDraggingStage] = useState(false);
 
     const [activeDraftId, setActiveDraftId] = useRefValue<string | null>(null);
@@ -128,15 +128,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
     const updateBackgroundRectPosition = useCallback(
       (stageRect: IRect, stageScale: number) => {
-        if (!backgroundRef.current) {
-          return;
-        }
-
-        const backgroundRect = backgroundRef.current;
+        if (!backgroundRef.current) return;
 
         const { x, y } = getNormalizedInvertedRect(stageRect, stageScale);
 
-        backgroundRect.setPosition({ x, y });
+        backgroundRef.current.setPosition({ x, y });
       },
       [backgroundRef],
     );
@@ -152,7 +148,9 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           selectRect,
         );
 
-        const nodesIds = nodesIntersectedWithSelectRect.map(({ id }) => id());
+        const nodesIds = nodesIntersectedWithSelectRect.map((node) =>
+          node.id(),
+        );
 
         setIntersectedNodesIds(nodesIds);
 
@@ -170,14 +168,14 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       (toolType: NodeType, position: Point) => {
         const node = createNode(toolType, position);
 
-        dispatchDrafts({ type: 'add', payload: { node } });
+        setDrafts({ type: 'add', payload: { node } });
         setActiveDraftId(node.nodeProps.id);
 
         if (ws.isConnected && userId) {
           ws.send({ type: 'draft-create', data: { node } });
         }
       },
-      [ws, userId, setActiveDraftId, dispatchDrafts],
+      [ws, userId, setActiveDraftId, setDrafts],
     );
 
     const handleDraftDraw = useCallback(
@@ -186,7 +184,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
         const nodeId = activeDraftId.current;
 
-        dispatchDrafts({ type: 'draw', payload: { position, nodeId } });
+        setDrafts({ type: 'draw', payload: { position, nodeId } });
 
         if (ws.isConnected && userId) {
           throttledSendWSMessage({
@@ -195,7 +193,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           });
         }
       },
-      [ws, userId, activeDraftId, dispatchDrafts, throttledSendWSMessage],
+      [ws, userId, activeDraftId, setDrafts, throttledSendWSMessage],
     );
 
     const handleDraftFinish = useCallback(
@@ -205,10 +203,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         const shouldResetToolType =
           node.type !== 'draw' && node.type !== 'laser';
 
-        dispatchDrafts({
+        setDrafts({
           type: shouldKeepDraft ? 'finish-keep' : 'finish',
           payload: { nodeId: node.nodeProps.id },
         });
+        setActiveDraftId(null);
 
         const nodeIsValid = isValidNode(node);
 
@@ -232,7 +231,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           isNodeSavable && handlePageUpdate();
         }
       },
-      [ws, userId, handlePageUpdate, dispatch, dispatchDrafts],
+      [ws, userId, handlePageUpdate, dispatch, setDrafts, setActiveDraftId],
     );
 
     const handleNodePress = useCallback(
@@ -338,7 +337,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         ({ node }) => node.nodeProps.id === activeDraftId.current,
       );
 
-      if (draft) {
+      if (draft && draft.node.type !== 'text') {
         handleDraftFinish(draft.node);
       }
     }, [
@@ -427,23 +426,19 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
         if (ws.isConnected) {
           ws.send({ type: 'nodes-update', data: nodes });
-
           handlePageUpdate();
         }
       },
       [ws, handlePageUpdate, dispatch],
     );
 
-    const handleNodeSelfDelete = useCallback(
+    const handleNodeDelete = useCallback(
       (node: NodeObject) => {
         if (!drawing) {
-          dispatchDrafts({
-            type: 'finish',
-            payload: { nodeId: node.nodeProps.id },
-          });
+          setDrafts({ type: 'finish', payload: { nodeId: node.nodeProps.id } });
         }
       },
-      [drawing, dispatchDrafts],
+      [drawing, setDrafts],
     );
 
     return (
@@ -475,7 +470,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
             nodeDrafts={nodeDrafts}
             onNodesChange={handleNodesChange}
             onNodeDraftFinish={handleDraftFinish}
-            onNodesDelete={handleNodeSelfDelete}
+            onNodesDelete={handleNodeDelete}
           />
           {ws.isConnected && (
             <Suspense>

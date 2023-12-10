@@ -112,7 +112,7 @@ const Collaboration = ({ stageScale, stageRef, isDrawing }: Props) => {
     }
   });
 
-  const handleNodeSelfDelete = useCallback(
+  const handleNodeDelete = useCallback(
     (node: NodeObject) => {
       const isDrawing = drafts.some(
         (draft) =>
@@ -138,21 +138,21 @@ const Collaboration = ({ stageScale, stageRef, isDrawing }: Props) => {
             node={node}
             stageScale={stageScale}
             onNodeChange={noop}
-            onNodeDelete={handleNodeSelfDelete}
+            onNodeDelete={handleNodeDelete}
           />
         );
       })}
       {users.map((user) => {
-        if (!user) return null;
-
         return (
-          <UserCursor
-            key={user.id}
-            name={user.name}
-            color={user.color}
-            position={user.position}
-            stageScale={stageScale}
-          />
+          user && (
+            <UserCursor
+              key={user.id}
+              name={user.name}
+              color={user.color}
+              position={user.position}
+              stageScale={stageScale}
+            />
+          )
         );
       })}
     </>

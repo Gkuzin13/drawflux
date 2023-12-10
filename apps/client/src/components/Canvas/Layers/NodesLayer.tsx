@@ -1,4 +1,4 @@
-import Nodes from '../Nodes';
+import Nodes from '../Node/Nodes';
 import type { NodeObject } from 'shared';
 import { useCallback, useMemo } from 'react';
 import NodeGroupTransformer from '../Transformer/NodeGroupTransformer';
@@ -58,18 +58,16 @@ const NodesLayer = ({
     [onNodesChange],
   );
 
-  if (loading) {
-    return null;
-  }
-  
   return (
     <>
-      <Nodes
-        nodes={nodes}
-        selectedNodeId={selectedNodeId}
-        stageScale={stageScale}
-        onNodeChange={handleNodeChange}
-      />
+      {!loading && (
+        <Nodes
+          nodes={nodes}
+          selectedNodeId={selectedNodeId}
+          stageScale={stageScale}
+          onNodeChange={handleNodeChange}
+        />
+      )}
       {nodeDrafts.map((node) => {
         return (
           <NodeDraft

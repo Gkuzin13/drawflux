@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import Node, { type NodeComponentProps } from './Node/Node';
+import Node, { type NodeComponentProps } from './Node';
 import type { NodeObject } from 'shared';
 
 type Props = {

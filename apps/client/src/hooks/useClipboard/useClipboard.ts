@@ -1,22 +1,25 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
+import useRefValue from '../useRefValue/useRefValue';
 
 function useClipboard(resetTimeout = 2000) {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const timeoutRef = useRef<number>();
+  const [timeoutId, setTimeoutId] = useRefValue(0);
 
   function copy(text: string) {
     if ('clipboard' in navigator) {
       window.navigator.clipboard
         .writeText(text)
         .then(() => {
-          clearTimeout(timeoutRef.current);
+          clearTimeout(timeoutId.current);
 
-          timeoutRef.current = window.setTimeout(() => {
-            setCopied(false);
-            error && setError(null);
-          }, resetTimeout);
+          setTimeoutId(
+            window.setTimeout(() => {
+              setCopied(false);
+              error && setError(null);
+            }, resetTimeout),
+          );
 
           setCopied(true);
         })
@@ -31,7 +34,7 @@ function useClipboard(resetTimeout = 2000) {
   function reset() {
     setCopied(false);
     setError(null);
-    clearTimeout(timeoutRef.current);
+    clearTimeout(timeoutId.current);
   }
 
   return { copied, error, copy, reset };
