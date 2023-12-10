@@ -47,7 +47,7 @@ const App = () => {
       }
       case 'user-left': {
         dispatch(collaborationActions.removeUser(data));
-        break
+        break;
       }
       case 'nodes-set': {
         dispatch(canvasActions.setNodes(data));
