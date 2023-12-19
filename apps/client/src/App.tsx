@@ -1,10 +1,11 @@
 import { useEffect, useLayoutEffect } from 'react';
 import { darkTheme } from 'shared';
 import {
-  type AppState,
   LOCAL_STORAGE_KEY,
   appState,
+  libraryState,
   PAGE_URL_SEARCH_PARAM_KEY,
+  LOCAL_STORAGE_LIBRARY_KEY,
 } from '@/constants/app';
 import { useAppDispatch, useAppStore } from '@/stores/hooks';
 import { canvasActions } from '@/stores/slices/canvas';
@@ -16,6 +17,8 @@ import { useTheme } from './contexts/theme';
 import useUrlSearchParams from './hooks/useUrlSearchParams/useUrlSearchParams';
 import { historyActions } from './stores/reducers/history';
 import { collaborationActions } from './stores/slices/collaboration';
+import { libraryActions } from './stores/slices/library';
+import type { Library, AppState } from '@/constants/app';
 
 const App = () => {
   const params = useUrlSearchParams();
@@ -125,6 +128,20 @@ const App = () => {
       dispatch(canvasActions.set(state.page));
     }
   }, [ws, params, dispatch]);
+
+  useEffect(() => {
+    const libraryFromStorage = storage.get<Library>(LOCAL_STORAGE_LIBRARY_KEY);
+    
+    if (libraryFromStorage) {
+      try {
+        libraryState.parse(libraryFromStorage);
+      } catch (error) {
+        return;
+      }
+
+      dispatch(libraryActions.init(libraryFromStorage));
+    }
+  }, [dispatch]);
 
   return <MainLayout />;
 };

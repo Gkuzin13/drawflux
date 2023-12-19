@@ -51,6 +51,20 @@ export const Button = styled('button', {
           border: '1px $secondary solid',
         },
       },
+      danger: {
+        backgroundColor: '$secondary',
+        color: '$red600',
+        '&:hover': {
+          backgroundColor: '$secondary-light',
+        },
+        '&[data-highlighted]': {
+          border: '1px $secondary-light solid',
+        },
+        '&[disabled]': {
+          color: '$gray700',
+          backgroundColor: '$secondary-light',
+        },
+      },
     },
     align: {
       start: {

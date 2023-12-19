@@ -18,11 +18,55 @@ export function getPointsAbsolutePosition<T extends Konva.Node>(
   });
 }
 
+export function getNodesMinMaxPoints(nodes: NodeObject[]) {
+  if (!nodes.length) {
+    return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+  }
+
+  const bounds = {
+    minX: Infinity,
+    minY: Infinity,
+    maxX: -Infinity,
+    maxY: -Infinity,
+  };
+
+  for (const node of nodes) {
+    const { x, y, width, height } = getNodeRect(node);
+
+    if (x < bounds.minX) {
+      bounds.minX = x;
+    }
+
+    if (y < bounds.minY) {
+      bounds.minY = y;
+    }
+
+    if (x + width > bounds.maxX) {
+      bounds.maxX = x + width;
+    }
+
+    if (y + height > bounds.maxY) {
+      bounds.maxY = y + height;
+    }
+  }
+
+  return bounds;
+}
+
 export function getNodeRect(node: NodeObject): IRect {
+  const [x, y] = node.nodeProps.point;
+
   if (node.nodeProps.points) {
-    const points = [...node.nodeProps.points, node.nodeProps.point];
-    const xPoints = points.map(([x]) => x);
-    const yPoints = points.map(([_, y]) => y);
+    const points = [...node.nodeProps.points, [x, y]];
+    const { xPoints, yPoints } = points.reduce(
+      (acc, point) => {
+        acc.xPoints.push(point[0]);
+        acc.yPoints.push(point[1]);
+
+        return acc;
+      },
+      { xPoints: [] as number[], yPoints: [] as number[] },
+    );
 
     const minX = Math.min(...xPoints);
     const minY = Math.min(...yPoints);
@@ -37,20 +81,19 @@ export function getNodeRect(node: NodeObject): IRect {
     };
   }
 
-  let width = node.nodeProps.width ?? 0;
-  let height = node.nodeProps.height ?? 0;
+  const width = node.nodeProps.width ?? 0;
+  const height = node.nodeProps.height ?? 0;
 
   if (node.type === 'ellipse') {
-    width *= 2;
-    height *= 2;
+    return {
+      x: x - width,
+      y: y - height,
+      width: width * 2,
+      height: height * 2,
+    };
   }
 
-  return {
-    x: node.nodeProps.point[0],
-    y: node.nodeProps.point[1],
-    width,
-    height,
-  };
+  return { x, y, width, height };
 }
 
 export function getVisibleBoundaries(rect: IRect, scale: number): IRect {
@@ -153,28 +196,4 @@ export function getNormalizedInvertedRect(rect: IRect, scale: number): IRect {
     width: rect.width / scale,
     height: rect.height / scale,
   };
-}
-
-export function getNodesMinMaxXPoints(nodes: NodeObject[]) {
-  const minX = Math.min(...nodes.map((node) => getNodeRect(node).x));
-  const maxX = Math.max(
-    ...nodes.map((node) => {
-      const { x, width } = getNodeRect(node);
-      return x + width;
-    }),
-  );
-
-  return { minX, maxX };
-}
-
-export function calculateNodesCopyDistance(
-  nodes: NodeObject[],
-  gap = 0,
-): number {
-  const { minX, maxX } = getNodesMinMaxXPoints(nodes);
-
-  const duplicationStartXPoint = maxX + gap;
-  const distance = duplicationStartXPoint - minX;
-
-  return distance;
 }

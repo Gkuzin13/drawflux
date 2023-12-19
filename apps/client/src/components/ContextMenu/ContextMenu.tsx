@@ -9,6 +9,7 @@ import { canvasActions, selectSelectedNodesIds } from '@/stores/slices/canvas';
 import * as Styled from './ContextMenu.styled';
 import usePageMutation from '@/hooks/usePageMutation';
 import { getAddedNodes } from '@/utils/node';
+import { libraryActions } from '@/stores/slices/library';
 
 export type ContextMenuType = 'node-menu' | 'canvas-menu';
 
@@ -134,6 +135,15 @@ const NodeMenu = () => {
     dispatch(canvasActions.copyNodes());
   };
 
+  const handleAddToLibrary = () => {
+    const { nodes, selectedNodesIds } = store.getState().canvas.present;
+    const nodesToAdd = nodes.filter(
+      (node) => node.nodeProps.id in selectedNodesIds,
+    );
+
+    dispatch(libraryActions.addItem(nodesToAdd));
+  };
+
   return (
     <>
       <Styled.Item onSelect={handleCopy}>
@@ -142,6 +152,8 @@ const NodeMenu = () => {
       <Styled.Item onSelect={handleNodesDuplicate}>
         Duplicate <Kbd>Ctrl + D</Kbd>
       </Styled.Item>
+      <Divider orientation="horizontal" />
+      <Styled.Item onSelect={handleAddToLibrary}>Add to library</Styled.Item>
       <Divider orientation="horizontal" />
       <Styled.Item onSelect={() => dispatchNodesAction('moveNodesToEnd')}>
         Bring to front

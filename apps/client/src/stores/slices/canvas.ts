@@ -4,12 +4,12 @@ import type { NodeObject } from 'shared';
 import type { AppState } from '@/constants/app';
 import {
   allNodesInView,
-  duplicateNodes,
   getAddedNodes,
   mapNodesIds,
   makeNodesCopy,
   reorderNodes,
   isValidNode,
+  duplicateNodesToRight,
 } from '@/utils/node';
 import {
   getCenterPosition,
@@ -86,7 +86,7 @@ export const canvasSlice = createSlice({
         nodesIds.has(node.nodeProps.id),
       );
 
-      state.nodes.push(...duplicateNodes(nodesToDuplicate));
+      state.nodes.push(...duplicateNodesToRight(nodesToDuplicate));
     },
     moveNodesToStart: (state, action: PayloadAction<string[]>) => {
       state.nodes = reorderNodes(action.payload, state.nodes).toStart();

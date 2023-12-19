@@ -100,15 +100,17 @@ const {
       fast: '0.075s cubic-bezier(0.645, 0.045, 0.355, 1)',
       normal: '0.125s cubic-bezier(0.645, 0.045, 0.355, 1)',
     },
-    media: {
-      sm: '(min-width: 640px)',
-      md: '(min-width: 768px)',
-      lg: '(min-width: 1024px)',
-    },
     shadows: {
       sm: '0px 2px 8px 0px $colors$gray300',
       md: '0px 4px 10px 0px $colors$gray300',
     },
+  },
+  media: {
+    xs: '(min-width: 520px)',
+    sm: '(min-width: 768px)',
+    md: '(min-width: 1024px)',
+    lg: '(min-width: 1280px)',
+    xl: '(min-width: 1640px)',
   },
 });
 

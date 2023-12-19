@@ -48,6 +48,7 @@ const ICONS = {
   moon: Icons.TbMoon,
   moonStars: Icons.TbMoonStars,
   laser: Icons.TbNorthStar,
+  book: Icons.TbBook
 } as const;
 
 const SIZE = {

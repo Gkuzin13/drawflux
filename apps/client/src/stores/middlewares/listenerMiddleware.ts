@@ -2,16 +2,20 @@ import {
   createListenerMiddleware,
   addListener,
   isAnyOf,
-  type TypedStopListening,
-  type TypedStartListening,
-  type TypedAddListener,
 } from '@reduxjs/toolkit';
-import { type AppState, LOCAL_STORAGE_KEY } from '@/constants/app';
+import { LOCAL_STORAGE_KEY, LOCAL_STORAGE_LIBRARY_KEY } from '@/constants/app';
 import { storage } from '@/utils/storage';
 import { historyActions } from '../reducers/history';
 import { canvasActions } from '../slices/canvas';
 import { collaborationActions } from '../slices/collaboration';
+import { type LibrarySliceState, libraryActions } from '../slices/library';
 import type { RootState, AppDispatch } from '../store';
+import type { AppState, Library } from '@/constants/app';
+import type {
+  TypedAddListener,
+  TypedStartListening,
+  TypedStopListening,
+} from '@reduxjs/toolkit';
 
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
 export type AppStopListening = TypedStopListening<RootState, AppDispatch>;
@@ -44,13 +48,27 @@ export const ACTIONS_TO_LISTEN = [
   canvasActions.setStageConfig,
   canvasActions.setToolType,
   collaborationActions.init,
+  libraryActions.addItem,
+  libraryActions.removeItems,
 ];
+
+const onLibraryAction = (state: LibrarySliceState) => {
+  storage.set<Library>(LOCAL_STORAGE_LIBRARY_KEY, state);
+};
 
 startAppListening({
   matcher: isAnyOf(...ACTIONS_TO_LISTEN),
   effect: (action, listenerApi) => {
     if (collaborationActions.init.match(action)) {
       listenerApi.unsubscribe();
+      return;
+    }
+
+    if (
+      libraryActions.addItem.match(action) ||
+      libraryActions.removeItems.match(action)
+    ) {
+      onLibraryAction(listenerApi.getState().library);
       return;
     }
 
