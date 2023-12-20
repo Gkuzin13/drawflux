@@ -19,10 +19,9 @@ export const Container = styled('div', {
   padding: '$1',
   borderRadius: '$1',
   overflow: 'hidden',
-  outline: '1px transparent solid',
+  border: '1px transparent solid',
   '&:hover': {
-    outline: '1px $secondary-dark solid',
-    boxShadow: '$md',
+    borderColor: '$primary-dark',
   },
   [`&:hover ${Checkbox}[data-state="unchecked"]`]: {
     visibility: 'visible',

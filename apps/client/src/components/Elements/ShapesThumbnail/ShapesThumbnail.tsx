@@ -4,6 +4,8 @@ import Node from '@/components/Canvas/Node/Node';
 import useThemeColors from '@/hooks/useThemeColors';
 import { noop } from '@/utils/is';
 import { getNodesMinMaxPoints } from '@/utils/position';
+import useForceUpdate from '@/hooks/useForceUpdate/useForceUpdate';
+import useEvent from '@/hooks/useEvent';
 import * as Styled from './ShapesThumbnail.styled';
 import type { NodeObject } from 'shared';
 import type Konva from 'konva';
@@ -25,42 +27,32 @@ export type ShapesThumbnailStyle = {
 const ShapesThumbnail = ({
   nodes,
   draggable,
-  width = 64,
-  height = 64,
+  width = 0,
+  height = 0,
   padding = 0,
-  shapesScale = 1,
+  shapesScale = 0,
   onDragStart,
   onDragEnd,
 }: Props) => {
+  const { forceUpdate } = useForceUpdate();
+
   const themeColors = useThemeColors();
 
   const layerRef = useRef<Konva.Layer>(null);
 
+  const canvasElement = layerRef.current?.getCanvas()._canvas;
+
+  useEvent('dragstart', onDragStart, canvasElement);
+  useEvent('dragend', onDragEnd, canvasElement);
+
   useEffect(() => {
-    if (!layerRef.current || !draggable) return;
+    canvasElement?.setAttribute('draggable', draggable ? 'true' : 'false');
 
-    const canvas = layerRef.current.getCanvas()._canvas;
-
-    canvas.setAttribute('draggable', 'true');
-
-    if (onDragStart) {
-      canvas.addEventListener('dragstart', onDragStart);
-    }
-
-    if (onDragEnd) {
-      canvas.addEventListener('dragend', onDragEnd);
-    }
-
-    return () => {
-      if (onDragStart) {
-        canvas.removeEventListener('dragstart', onDragStart);
-      }
-
-      if (onDragEnd) {
-        canvas.removeEventListener('dragend', onDragEnd);
-      }
-    };
-  }, [layerRef, draggable, onDragStart, onDragEnd]);
+    /**
+     * temporary fix, otherwise canvasElement is undefined
+     */
+    forceUpdate();
+  }, [draggable, canvasElement, forceUpdate]);
 
   const { minX, minY, maxX, maxY } = getNodesMinMaxPoints(nodes);
 

@@ -8,7 +8,6 @@ export const Content = styled(Dialog.Content, {
   top: '0',
   width: '100%',
   height: '100%',
-  padding: '$4',
   opacity: 0,
   zIndex: 1,
   transition: 'opacity $normal, transform $normal',

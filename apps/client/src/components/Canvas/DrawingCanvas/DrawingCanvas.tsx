@@ -8,7 +8,7 @@ import {
   useMemo,
   useEffect,
 } from 'react';
-import { Layer, Stage } from 'react-konva';
+import { Stage } from 'react-konva';
 import { useWebSocket } from '@/contexts/websocket';
 import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import {
@@ -18,13 +18,8 @@ import {
   selectToolType,
 } from '@/stores/slices/canvas';
 import { selectMyUser } from '@/stores/slices/collaboration';
-import {
-  createNode,
-  duplicateNodesAtPosition,
-  isValidNode,
-} from '@/utils/node';
+import { createNode, isValidNode } from '@/utils/node';
 import BackgroundLayer from '../Layers/BackgroundLayer';
-import { type DrawPosition } from './helpers/draw';
 import {
   getCursorStyle,
   getIntersectingNodes,
@@ -40,7 +35,9 @@ import usePageMutation from '@/hooks/usePageMutation';
 import useDrafts from '@/hooks/useDrafts';
 import NodesLayer from '../Layers/NodesLayer';
 import SelectRect from '../SelectRect';
+import MainLayer from './MainLayer';
 import { getNormalizedInvertedRect } from '@/utils/position';
+import type { DrawPosition } from './helpers/draw';
 import type { IRect } from 'konva/lib/types';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
@@ -75,8 +72,6 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     );
     const backgroundRef = useRef<Konva.Rect>(null);
     const selectRef = useRef<Konva.Rect>(null);
-
-    const layerRef = useRef<Konva.Layer>(null);
 
     const stageConfig = useAppSelector(selectConfig);
     const toolType = useAppSelector(selectToolType);
@@ -118,55 +113,6 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const throttledOnNodesSelect = useCallback(throttleFn(onNodesSelect, 50), [
       onNodesSelect,
     ]);
-
-    useEffect(() => {
-      if (!layerRef.current) return;
-
-      const canvas = layerRef.current.getCanvas()._canvas;
-
-      function handleDrop(event: DragEvent) {
-        if (!event.dataTransfer || !layerRef.current) return;
-
-        const stage = layerRef.current.getStage();
-
-        stage.setPointersPositions(event);
-
-        const dataJson = event.dataTransfer.getData('library-item-json');
-
-        const pointerPosition = getRelativePointerPosition(stage);
-
-        try {
-          const libraryItem = JSON.parse(dataJson);
-          const duplicated = duplicateNodesAtPosition(
-            libraryItem.elements as NodeObject[],
-            pointerPosition,
-          );
-
-          dispatch(canvasActions.addNodes(duplicated));
-          dispatch(
-            canvasActions.setSelectedNodesIds(
-              duplicated.map(({ nodeProps }) => nodeProps.id),
-            ),
-          );
-        } catch (error) {
-          //
-        }
-
-        event.preventDefault();
-      }
-
-      function handleDragOver(event: DragEvent) {
-        event.preventDefault();
-      }
-
-      canvas.addEventListener('drop', handleDrop);
-      canvas.addEventListener('dragover', handleDragOver);
-
-      return () => {
-        canvas.removeEventListener('drop', handleDrop);
-        canvas.removeEventListener('dragover', handleDragOver);
-      };
-    }, [layerRef, ref, stageConfig.scale, dispatch]);
 
     useEffect(() => {
       setIntersectedNodesIds(Object.keys(selectedNodesIds));
@@ -513,7 +459,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         onDragEnd={handleStageDragEnd}
         onContextMenu={handleOnContextMenu}
       >
-        <Layer ref={layerRef} listening={isLayerListening}>
+        <MainLayer listening={isLayerListening}>
           <BackgroundLayer
             ref={backgroundRef}
             rect={stageRect}
@@ -539,7 +485,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           {isSelectRectActive && (
             <SelectRect ref={selectRef} position={drawingPosition.current} />
           )}
-        </Layer>
+        </MainLayer>
       </Stage>
     );
   },

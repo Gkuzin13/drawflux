@@ -26,7 +26,6 @@ import usePageMutation from '@/hooks/usePageMutation';
 import { PROJECT_FILE_EXT, PROJECT_FILE_NAME } from '@/constants/app';
 import { historyActions } from '@/stores/reducers/history';
 import { selectLibrary } from '@/stores/slices/library';
-import { css } from 'shared';
 import type Konva from 'konva';
 import type { NodeStyle, User } from 'shared';
 import { type MenuPanelActionType } from '@/constants/panels/menu';

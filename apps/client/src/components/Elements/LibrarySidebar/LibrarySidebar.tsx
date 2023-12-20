@@ -1,12 +1,13 @@
+import { useState } from 'react';
 import LibraryItemCard from '@/components/Library/LibraryItemCard/LibraryItemCard';
 import Drawer from '../Drawer/Drawer';
 import Icon from '../Icon/Icon';
-import { useState } from 'react';
 import Badge from '../Badge/Badge';
 import { useAppDispatch } from '@/stores/hooks';
 import { libraryActions } from '@/stores/slices/library';
 import * as Styled from './LibrarySidebar.styled';
 import type { LibraryItem } from '@/constants/app';
+import Divider from '../Divider/Divider';
 
 type Props = {
   items: LibraryItem[];
@@ -62,36 +63,39 @@ const LibrarySidebar = ({ items }: Props) => {
             <Icon name="x" />
           </Drawer.Close>
         </Drawer.Header>
-        <Styled.ItemsHeader>
-          <Styled.Title>Your items</Styled.Title>
-          <Badge content={selectedItemsCount} isInvisible={!hasSelectedItems}>
-            <Styled.removeButton
-              disabled={!hasSelectedItems}
-              onClick={handleRemoveSelectedItems}
-            >
-              <Icon name="trash" />
-            </Styled.removeButton>
-          </Badge>
-        </Styled.ItemsHeader>
-        {hasItems ? (
-          <Styled.Items>
-            {items.map((item, index) => {
-              return (
-                <LibraryItemCard
-                  key={index}
-                  item={item}
-                  selected={item.id in selectedItemsIds}
-                  onChecked={handleItemSelect}
-                  onUnchecked={handleItemUnselect}
-                />
-              );
-            })}
-          </Styled.Items>
-        ) : (
-          <Styled.Empty>
-            <span>Empty here...</span>
-          </Styled.Empty>
-        )}
+        <Divider />
+        <Styled.ItemsSection>
+          <Drawer.Header>
+            <Styled.Title>Your items</Styled.Title>
+            <Badge content={selectedItemsCount} isInvisible={!hasSelectedItems}>
+              <Styled.removeButton
+                disabled={!hasSelectedItems}
+                onClick={handleRemoveSelectedItems}
+              >
+                <Icon name="trash" />
+              </Styled.removeButton>
+            </Badge>
+          </Drawer.Header>
+          {hasItems ? (
+            <Styled.Items>
+              {items.map((item) => {
+                return (
+                  <LibraryItemCard
+                    key={item.id}
+                    item={item}
+                    selected={item.id in selectedItemsIds}
+                    onChecked={handleItemSelect}
+                    onUnchecked={handleItemUnselect}
+                  />
+                );
+              })}
+            </Styled.Items>
+          ) : (
+            <Styled.Empty>
+              <span>Empty here...</span>
+            </Styled.Empty>
+          )}
+        </Styled.ItemsSection>
       </Styled.Content>
     </Drawer>
   );

@@ -3,7 +3,11 @@ import { styled } from 'shared';
 import { Button } from '../Button/Button.styled';
 
 export const Content = styled(Drawer.Content, {
-  maxWidth: 'calc((64px * 4) + ($4 * 2) + 8px)',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '$4',
+  maxWidth: 'calc((64px * 4) + ($4 * 2) + $2)',
+  padding: '$4',
 });
 
 export const Trigger = styled(Drawer.Trigger, Button, {
@@ -15,16 +19,20 @@ export const Trigger = styled(Drawer.Trigger, Button, {
   },
 });
 
+export const ItemsSection = styled('div', {
+  width: '100%'
+});
+
 export const Items = styled('div', {
   display: 'grid',
   gridTemplateColumns: 'repeat(4, 1fr)',
   gap: '$2',
   overflowY: 'auto',
   maxHeight: 'calc(100% / 1.25)',
+  padding: '$4 0',
 });
 
 export const removeButton = styled(Button, {
-  margin: '$1 0 $1 0',
   defaultVariants: {
     squared: true,
     size: 'sm',
@@ -35,10 +43,6 @@ export const removeButton = styled(Button, {
 export const Title = styled('h3', {
   fontSize: '$3',
   fontWeight: 'bold',
-});
-
-export const ItemsHeader = styled(Drawer.Header, {
-  margin: '$4 0 $2 0',
 });
 
 export const Empty = styled('div', {
