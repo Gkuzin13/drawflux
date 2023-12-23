@@ -35,6 +35,6 @@ Drawer.Content = Content;
 Drawer.Header = Styled.Header;
 Drawer.Title = Styled.Title;
 Drawer.Close = Styled.Close;
-Drawer.Trigger = DialogPrimitive.Trigger;
+Drawer.Trigger = Styled.Trigger;
 
 export default Drawer;

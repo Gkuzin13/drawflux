@@ -51,7 +51,8 @@ const ICONS = {
   book: Icons.TbBook
 } as const;
 
-const SIZE = {
+export const SIZE = {
+  xs: 12,
   sm: 16,
   md: 18,
   lg: 20,

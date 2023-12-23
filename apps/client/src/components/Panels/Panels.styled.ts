@@ -21,7 +21,7 @@ export const Panel = styled('div', {
   padding: '$1',
   pointerEvents: 'all',
   boxShadow: '$sm',
-  borderRadius: '$1',
+  borderRadius: '$2',
   backgroundColor: '$bg',
 });
 

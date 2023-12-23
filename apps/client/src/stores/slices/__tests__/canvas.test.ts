@@ -117,20 +117,15 @@ describe('canvas slice', () => {
 
     const previousState: CanvasSliceState = {
       ...initialState,
+      nodes,
       copiedNodes: nodes,
     };
 
     const state = reducer(previousState, canvasActions.pasteNodes());
 
-    expect(state).toEqual({
-      ...previousState,
-      nodes,
-      copiedNodes: null,
-      selectedNodesIds: {
-        [nodes[0].nodeProps.id]: true,
-        [nodes[1].nodeProps.id]: true,
-      },
-    });
+    expect(state.nodes).toHaveLength(4);
+    expect(Object.keys(state.selectedNodesIds)).toHaveLength(2);
+    expect(state.copiedNodes).toBe(null);
   });
 
   it('sets tool type', () => {

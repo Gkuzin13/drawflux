@@ -8,7 +8,7 @@ import { storage } from '@/utils/storage';
 import { historyActions } from '../reducers/history';
 import { canvasActions } from '../slices/canvas';
 import { collaborationActions } from '../slices/collaboration';
-import { type LibrarySliceState, libraryActions } from '../slices/library';
+import { libraryActions } from '../slices/library';
 import type { RootState, AppDispatch } from '../store';
 import type { AppState, Library } from '@/constants/app';
 import type {
@@ -52,10 +52,6 @@ export const ACTIONS_TO_LISTEN = [
   libraryActions.removeItems,
 ];
 
-const onLibraryAction = (state: LibrarySliceState) => {
-  storage.set<Library>(LOCAL_STORAGE_LIBRARY_KEY, state);
-};
-
 startAppListening({
   matcher: isAnyOf(...ACTIONS_TO_LISTEN),
   effect: (action, listenerApi) => {
@@ -68,7 +64,9 @@ startAppListening({
       libraryActions.addItem.match(action) ||
       libraryActions.removeItems.match(action)
     ) {
-      onLibraryAction(listenerApi.getState().library);
+      const libraryState = listenerApi.getState().library;
+
+      storage.set<Library>(LOCAL_STORAGE_LIBRARY_KEY, libraryState);
       return;
     }
 

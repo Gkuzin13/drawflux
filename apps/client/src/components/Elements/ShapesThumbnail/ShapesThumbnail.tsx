@@ -1,28 +1,32 @@
-import { memo, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Layer } from 'react-konva';
 import Node from '@/components/Canvas/Node/Node';
-import useThemeColors from '@/hooks/useThemeColors';
 import { noop } from '@/utils/is';
-import { getNodesMinMaxPoints } from '@/utils/position';
+import {
+  getCanvasCenteredPositionRelativeToNodes,
+  getNodesMinMaxPoints,
+} from '@/utils/position';
 import useForceUpdate from '@/hooks/useForceUpdate/useForceUpdate';
 import useEvent from '@/hooks/useEvent';
 import * as Styled from './ShapesThumbnail.styled';
-import type { NodeObject } from 'shared';
+import type { NodeObject, ThemeColorValue } from 'shared';
 import type Konva from 'konva';
-
-type Props = {
-  nodes: NodeObject[];
-  draggable?: boolean;
-  onDragStart?: (event: DragEvent) => void;
-  onDragEnd?: (event: DragEvent) => void;
-} & Partial<ShapesThumbnailStyle>;
 
 export type ShapesThumbnailStyle = {
   width: number;
   height: number;
   padding: number;
   shapesScale: number;
+  backgroundColor: ThemeColorValue;
 };
+
+type Props = {
+  nodes: NodeObject[];
+  draggable?: boolean;
+  onDragStart?: (event: DragEvent) => void;
+  onDragEnd?: (event: DragEvent) => void;
+  onClick?: (event: MouseEvent) => void;
+} & Partial<ShapesThumbnailStyle>;
 
 const ShapesThumbnail = ({
   nodes,
@@ -31,12 +35,12 @@ const ShapesThumbnail = ({
   height = 0,
   padding = 0,
   shapesScale = 0,
+  backgroundColor,
   onDragStart,
   onDragEnd,
+  onClick,
 }: Props) => {
   const { forceUpdate } = useForceUpdate();
-
-  const themeColors = useThemeColors();
 
   const layerRef = useRef<Konva.Layer>(null);
 
@@ -64,9 +68,11 @@ const ShapesThumbnail = ({
     paddedHeight / (maxY - minY),
   );
 
-  const x = -minX * scale + (paddedWidth - (maxX - minX) * scale) / 2 + padding;
-  const y =
-    -minY * scale + (paddedHeight - (maxY - minY) * scale) / 2 + padding;
+  const { x, y } = getCanvasCenteredPositionRelativeToNodes(nodes, {
+    width: paddedWidth,
+    height: paddedHeight,
+    scale,
+  });
 
   return (
     <Styled.Stage
@@ -74,11 +80,12 @@ const ShapesThumbnail = ({
       height={height}
       scaleX={scale}
       scaleY={scale}
-      x={x}
-      y={y}
+      x={x + padding}
+      y={y + padding}
       listening={false}
       draggable={false}
-      css={{ backgroundColor: themeColors['canvas-bg'].value }}
+      css={{ backgroundColor }}
+      onClick={onClick}
     >
       <Layer ref={layerRef} listening={false} draggable={false}>
         {nodes.map((node) => {
@@ -97,4 +104,4 @@ const ShapesThumbnail = ({
   );
 };
 
-export default memo(ShapesThumbnail);
+export default ShapesThumbnail;

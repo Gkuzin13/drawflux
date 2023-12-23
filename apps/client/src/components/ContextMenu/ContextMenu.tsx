@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import { canvasActions, selectSelectedNodesIds } from '@/stores/slices/canvas';
 import * as Styled from './ContextMenu.styled';
 import usePageMutation from '@/hooks/usePageMutation';
-import { getAddedNodes } from '@/utils/node';
+import { duplicateNodesToRight, mapNodesIds } from '@/utils/node';
 import { libraryActions } from '@/stores/slices/library';
 
 export type ContextMenuType = 'node-menu' | 'canvas-menu';
@@ -49,6 +49,7 @@ const wsNodesActionMap: Record<NodesMenuActionKey, NodesMenuWSMessageType> = {
 const CanvasMenu = () => {
   const store = useAppStore();
   const ws = useWebSocket();
+  
   const { updatePage } = usePageMutation();
 
   const dispatch = useAppDispatch();
@@ -62,12 +63,12 @@ const CanvasMenu = () => {
 
     if (ws.isConnected) {
       const { selectedNodesIds, nodes } = store.getState().canvas.present;
-      const nodesIds = Object.keys(selectedNodesIds);
 
-      ws.send({
-        type: 'nodes-add',
-        data: getAddedNodes(nodes, nodesIds.length),
-      });
+      const pastedNodes = nodes.filter(
+        ({ nodeProps }) => nodeProps.id in selectedNodesIds,
+      );
+
+      ws.send({ type: 'nodes-add', data: pastedNodes });
 
       updatePage({ nodes });
     }
@@ -112,16 +113,22 @@ const NodeMenu = () => {
   };
 
   const handleNodesDuplicate = () => {
-    const nodesIds = Object.keys(selectedNodesIds);
-    dispatch(canvasActions.duplicateNodes(nodesIds));
+    const nodesIds = new Set(Object.keys(selectedNodesIds));
+    const nodes = store.getState().canvas.present.nodes;
+    const nodesToDuplicate = nodes.filter(({ nodeProps }) =>
+      nodesIds.has(nodeProps.id),
+    );
+
+    const duplicatedNodes = duplicateNodesToRight(nodesToDuplicate);
+    const duplicatedNodesIds = mapNodesIds(duplicatedNodes);
+
+    dispatch(canvasActions.addNodes(duplicatedNodes));
+    dispatch(canvasActions.setSelectedNodesIds(duplicatedNodesIds));
 
     if (ws.isConnected) {
-      const currentNodes = store.getState().canvas.present.nodes;
+      ws.send({ type: 'nodes-add', data: duplicatedNodes });
 
-      ws.send({
-        type: 'nodes-add',
-        data: getAddedNodes(currentNodes, nodesIds.length),
-      });
+      const currentNodes = store.getState().canvas.present.nodes;
 
       updatePage({ nodes: currentNodes });
     }
@@ -208,7 +215,7 @@ const Root = ({ onContextMenuOpen, children }: RootProps) => {
     <ContextMenuPrimitive.Root onOpenChange={onContextMenuOpen}>
       {children}
       <ContextMenuPrimitive.Portal>
-        <Styled.Content>
+        <Styled.Content data-testid="context-menu">
           <Menu />
         </Styled.Content>
       </ContextMenuPrimitive.Portal>

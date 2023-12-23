@@ -21,7 +21,7 @@ import SharePanel from './SharePanel/SharePanel';
 import StylePanel from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
-import LibrarySidebar from '../Elements/LibrarySidebar/LibrarySidebar';
+import LibraryDrawer from '../Library/LibraryDrawer/LibraryDrawer';
 import usePageMutation from '@/hooks/usePageMutation';
 import { PROJECT_FILE_EXT, PROJECT_FILE_NAME } from '@/constants/app';
 import { historyActions } from '@/stores/reducers/history';
@@ -231,7 +231,7 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
         )}
         <Styled.TopPanelRightContainer>
           {online && <SharePanel isPageShared={ws.isConnected} />}
-          <LibrarySidebar items={library.items} />
+          <LibraryDrawer items={library.items} />
           <MenuPanel
             disabledItems={disabledMenuItems}
             onAction={handleMenuAction}

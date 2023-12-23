@@ -1,7 +1,7 @@
-import type Konva from 'konva';
-import type { IRect, Vector2d } from 'konva/lib/types';
-import type { NodeObject, Point } from 'shared';
 import { calculateMiddlePoint } from './math';
+import type Konva from 'konva';
+import type { IRect } from 'konva/lib/types';
+import type { NodeObject, Point } from 'shared';
 
 export function getPointsAbsolutePosition<T extends Konva.Node>(
   points: Point[],
@@ -138,6 +138,24 @@ export function isNodePartiallyInView(
   );
 }
 
+export function getCanvasCenteredPositionRelativeToNodes(
+  nodes: NodeObject[],
+  canvasConfig: { width?: number; height?: number; scale?: number },
+) {
+  const { minX, minY, maxX, maxY } = getNodesMinMaxPoints(nodes);
+
+  const { width, height, scale } = {
+    width: canvasConfig.width ?? window.innerWidth,
+    height: canvasConfig.height ?? window.innerHeight,
+    scale: canvasConfig.scale ?? 1,
+  };
+
+  return {
+    x: -minX * scale + (width - (maxX - minX) * scale) / 2,
+    y: -minY * scale + (height - (maxY - minY) * scale) / 2,
+  };
+}
+
 export function getMiddleNode(nodes: NodeObject[]): NodeObject | null {
   if (!nodes.length) {
     return null;
@@ -177,15 +195,12 @@ export function getMiddleNode(nodes: NodeObject[]): NodeObject | null {
   return sortedNodesByPosAsc[midIndex];
 }
 
-export function getCenterPosition(
-  position: Vector2d,
-  scale: number,
-  width: number,
-  height: number,
-) {
+export function getCanvasCenterPosition(rect: IRect, scale: number) {
+  const { x, y, width, height } = rect;
+
   return {
-    x: -position.x * scale + width / 2,
-    y: -position.y * scale + height / 2,
+    x: (-x + width / 2) / scale,
+    y: (-y + height / 2) / scale,
   };
 }
 

@@ -3,7 +3,9 @@ import { styled } from 'shared';
 import * as PanelStyled from '../Panels.styled';
 import ColorCircle from '@/components/Elements/ColorCircle/ColorCircle';
 
-export const Container = styled(PanelStyled.Panel, {});
+export const Container = styled(PanelStyled.Panel, {
+  marginLeft: 'auto'
+});
 
 export const Content = styled(Popover.Content, {
   padding: '$1',
@@ -11,7 +13,7 @@ export const Content = styled(Popover.Content, {
   gap: '$1',
   flexDirection: 'column',
   boxShadow: '$sm',
-  borderRadius: '$1',
+  borderRadius: '$2',
   marginTop: '$2',
   backgroundColor: '$bg',
   button: {

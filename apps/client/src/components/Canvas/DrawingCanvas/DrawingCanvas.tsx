@@ -18,7 +18,7 @@ import {
   selectToolType,
 } from '@/stores/slices/canvas';
 import { selectMyUser } from '@/stores/slices/collaboration';
-import { createNode, isValidNode } from '@/utils/node';
+import { createNode, isValidNode, mapNodesIds } from '@/utils/node';
 import BackgroundLayer from '../Layers/BackgroundLayer';
 import {
   getCursorStyle,
@@ -442,6 +442,32 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [drawing, setDrafts],
     );
 
+    const handleLibraryItemDrop = useCallback(
+      (nodes: NodeObject[]) => {
+        dispatch(canvasActions.addNodes(nodes));
+        dispatch(canvasActions.setSelectedNodesIds(mapNodesIds(nodes)));
+        dispatch(canvasActions.setToolType('select'));
+
+        if (ws.isConnected) {
+          ws.send({ type: 'nodes-add', data: nodes });
+          handlePageUpdate();
+        }
+      },
+      [ws, handlePageUpdate, dispatch],
+    );
+
+    const handleLibraryItemDragOver = useCallback(
+      (position: Point) => {
+        if (ws.isConnected && userId) {
+          throttledSendWSMessage({
+            type: 'user-move',
+            data: { id: userId, position },
+          });
+        }
+      },
+      [ws, userId, throttledSendWSMessage],
+    );
+
     return (
       <Stage
         ref={ref}
@@ -459,7 +485,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         onDragEnd={handleStageDragEnd}
         onContextMenu={handleOnContextMenu}
       >
-        <MainLayer listening={isLayerListening}>
+        <MainLayer
+          listening={isLayerListening}
+          onLibraryItemDrop={handleLibraryItemDrop}
+          onLibraryItemDragOver={handleLibraryItemDragOver}
+        >
           <BackgroundLayer
             ref={backgroundRef}
             rect={stageRect}

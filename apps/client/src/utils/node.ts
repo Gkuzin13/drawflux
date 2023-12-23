@@ -1,7 +1,11 @@
 import type { IRect, Vector2d } from 'konva/lib/types';
-import type { NodeType, Point, NodeObject } from 'shared';
+import type { NodeType, Point, NodeObject, StageConfig } from 'shared';
 import { v4 as uuid } from 'uuid';
-import { getNodesMinMaxPoints, isNodeFullyInView } from './position';
+import {
+  getCanvasCenterPosition,
+  getNodesMinMaxPoints,
+  isNodeFullyInView,
+} from './position';
 import { DUPLICATION_GAP } from '@/constants/app';
 
 export const createNode = (type: NodeType, point: Point): NodeObject => {
@@ -162,27 +166,29 @@ export function duplicateNodesToRight(nodes: NodeObject[]) {
   return duplicateNodes(nodes, distance);
 }
 
+export function duplicateNodesAtCenter(
+  nodes: NodeObject[],
+  stageConfig: StageConfig,
+) {
+  const stageCenter = getCanvasCenterPosition(
+    {
+      x: stageConfig.position.x,
+      y: stageConfig.position.y,
+      width: window.innerWidth,
+      height: window.innerHeight,
+    },
+    stageConfig.scale,
+  );
+
+  return duplicateNodesAtPosition(nodes, [stageCenter.x, stageCenter.y]);
+}
+
 export function allNodesInView(
   nodes: NodeObject[],
   stageRect: IRect,
   stageScale: number,
 ) {
   return nodes.every((node) => isNodeFullyInView(node, stageRect, stageScale));
-}
-
-export function getAddedNodes(
-  nodes: NodeObject[],
-  addedCount: number,
-): NodeObject[] {
-  if (addedCount <= 0 || nodes.length === 0) {
-    return [];
-  }
-
-  if (addedCount >= nodes.length) {
-    return nodes;
-  }
-
-  return nodes.slice(-addedCount);
 }
 
 export function mapNodesIds(nodes: NodeObject[]): string[] {

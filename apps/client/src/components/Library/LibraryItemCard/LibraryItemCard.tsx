@@ -1,22 +1,29 @@
 import { useCallback, useState } from 'react';
 import ShapesThumbnail from '@/components/Elements/ShapesThumbnail/ShapesThumbnail';
-import useThemeColors from '@/hooks/useThemeColors';
 import { LIBRARY, LIBRARY_ITEM } from '@/constants/panels/library';
 import * as Styled from './LibraryItemCard.styled';
 import type { LibraryItem } from '@/constants/app';
 import type { CheckedState } from '@radix-ui/react-checkbox';
+import type { ThemeColorValue } from 'shared';
 
 type Props = {
   item: LibraryItem;
-  selected: boolean;
+  checked: boolean;
+  backgroundColor: ThemeColorValue;
   onChecked: (item: LibraryItem) => void;
   onUnchecked: (item: LibraryItem) => void;
+  onThumbnailClick: (item: LibraryItem) => void;
 };
 
-const LibraryItemCard = ({ item, selected, onChecked, onUnchecked }: Props) => {
+const LibraryItemCard = ({
+  item,
+  checked,
+  backgroundColor,
+  onChecked,
+  onUnchecked,
+  onThumbnailClick,
+}: Props) => {
   const [dragging, setDragging] = useState(false);
-
-  const themeColors = useThemeColors();
 
   const handleCheckedChange = (checked: CheckedState) => {
     if (checked === 'indeterminate') return;
@@ -32,10 +39,10 @@ const LibraryItemCard = ({ item, selected, onChecked, onUnchecked }: Props) => {
     (event: DragEvent) => {
       setDragging(true);
 
-      event.dataTransfer?.setData(
-        LIBRARY.dataTransferFormat,
-        JSON.stringify(item),
-      );
+      if (!event.dataTransfer) return;
+
+      const itemJson = JSON.stringify(item);
+      event.dataTransfer.setData(LIBRARY.dataTransferFormat, itemJson);
     },
     [item],
   );
@@ -44,20 +51,26 @@ const LibraryItemCard = ({ item, selected, onChecked, onUnchecked }: Props) => {
     setDragging(false);
   }, []);
 
+  const handleOnClick = useCallback(() => {
+    onThumbnailClick(item);
+  }, [item, onThumbnailClick]);
+
   return (
-    <Styled.Container css={{ backgroundColor: themeColors['canvas-bg'].value }}>
+    <Styled.Container css={{ backgroundColor }} data-testid="library-item">
       {!dragging && (
         <Styled.Checkbox
-          checked={selected}
+          size="sm"
+          checked={checked}
           onCheckedChange={handleCheckedChange}
         />
       )}
       <ShapesThumbnail
         nodes={item.elements}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
         {...LIBRARY_ITEM.style}
         draggable
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onClick={handleOnClick}
       />
     </Styled.Container>
   );

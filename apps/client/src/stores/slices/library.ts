@@ -14,22 +14,12 @@ export const librarySlice = createSlice({
   name: 'library',
   initialState,
   reducers: {
-    init: (state, action: PayloadAction<LibrarySliceState>) => {
+    init: (_, action: PayloadAction<LibrarySliceState>) => {
       return action.payload;
     },
     addItem: (state, action: PayloadAction<NodeObject[]>) => {
-      const transformedNodesWithNewId = action.payload.map((node) => {
-        return {
-          ...node,
-          nodeProps: {
-            ...node.nodeProps,
-            id: uuid(),
-          },
-        };
-      });
-
       const newLibraryItem: LibraryItem = {
-        elements: transformedNodesWithNewId,
+        elements: action.payload,
         created: Date.now(),
         id: uuid(),
       };

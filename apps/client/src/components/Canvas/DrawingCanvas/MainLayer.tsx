@@ -1,64 +1,72 @@
 import { useCallback, useRef } from 'react';
 import { Layer } from 'react-konva';
 import useEvent from '@/hooks/useEvent';
-import { useAppDispatch } from '@/stores/hooks';
-import { getRelativePointerPosition } from './helpers/stage';
+import { getUnregisteredPointerPosition } from './helpers/stage';
 import { safeJSONParse } from '@/utils/object';
-import { duplicateNodesAtPosition, mapNodesIds } from '@/utils/node';
-import { canvasActions } from '@/stores/slices/canvas';
+import { duplicateNodesAtPosition } from '@/utils/node';
 import { LIBRARY } from '@/constants/panels/library';
 import type Konva from 'konva';
 import type { LibraryItem } from '@/constants/app';
+import type { NodeObject, Point } from 'shared';
 
 type Props = {
-  children: React.ReactNode;
+  onLibraryItemDrop: (nodes: NodeObject[]) => void;
+  onLibraryItemDragOver: (position: Point) => void;
 } & Omit<React.ComponentProps<typeof Layer>, 'ref'>;
 
-const MainLayer = ({ children, ...props }: Props) => {
+const MainLayer = ({
+  onLibraryItemDrop,
+  onLibraryItemDragOver,
+  children,
+  ...restProps
+}: Props) => {
   const layerRef = useRef<Konva.Layer>(null);
 
   const canvasElement = layerRef.current?.getCanvas()._canvas;
 
-  const dispatch = useAppDispatch();
-
   const handleDrop = useCallback(
     (event: DragEvent) => {
+      event.preventDefault();
+
       if (!event.dataTransfer || !layerRef.current) return;
 
       const stage = layerRef.current.getStage();
-      stage.setPointersPositions(event);
-
-      const position = getRelativePointerPosition(stage);
+      const position = getUnregisteredPointerPosition(event, stage);
 
       const dataJSON = event.dataTransfer.getData(LIBRARY.dataTransferFormat);
       const libraryItem = safeJSONParse<LibraryItem>(dataJSON);
 
       if (libraryItem) {
-        const duplicated = duplicateNodesAtPosition(
+        const duplicatedNodes = duplicateNodesAtPosition(
           libraryItem.elements,
           position,
         );
 
-        dispatch(canvasActions.addNodes(duplicated));
-        dispatch(canvasActions.setSelectedNodesIds(mapNodesIds(duplicated)));
-        dispatch(canvasActions.setToolType('select'));
+        onLibraryItemDrop(duplicatedNodes);
       }
-
-      event.preventDefault();
     },
-    [dispatch],
+    [onLibraryItemDrop],
   );
 
   const handleDragOver = useCallback(
-    (event: DragEvent) => event.preventDefault(),
-    [],
+    (event: DragEvent) => {
+      event.preventDefault();
+
+      if (!layerRef.current) return;
+
+      const stage = layerRef.current.getStage();
+      const position = getUnregisteredPointerPosition(event, stage);
+
+      onLibraryItemDragOver(position);
+    },
+    [onLibraryItemDragOver],
   );
 
   useEvent('drop', handleDrop, canvasElement);
   useEvent('dragover', handleDragOver, canvasElement);
 
   return (
-    <Layer ref={layerRef} {...props}>
+    <Layer ref={layerRef} {...restProps}>
       {children}
     </Layer>
   );

@@ -3,11 +3,9 @@ import * as Checkbox from '@radix-ui/react-checkbox';
 
 export const Root = styled(Checkbox.Root, {
   backgroundColor: '$bg',
-  width: '$4',
-  height: '$4',
   border: '1px $gray400 solid',
-  borderRadius: '$1',
-  display: 'grid',
+  display: 'flex',
+  justifyContent: 'center',
   placeItems: 'center',
   boxShadow: '$sm',
   transition: 'background-color $normal',
@@ -15,7 +13,24 @@ export const Root = styled(Checkbox.Root, {
   '&[data-state="checked"]': {
     backgroundColor: '$primary',
     borderColor: '$primary',
-  }
+  },
+  variants: {
+    size: {
+      sm: {
+        width: '$3',
+        height: '$3',
+        borderRadius: '$1',
+      },
+      md: {
+        width: '$4',
+        height: '$4',
+        borderRadius: '$2',
+      },
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
 });
 
 export const Indicator = styled(Checkbox.Indicator, {

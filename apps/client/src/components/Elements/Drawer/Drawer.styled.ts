@@ -1,4 +1,5 @@
 import { styled } from 'shared';
+import { Button } from '../Button/Button.styled';
 import * as Dialog from '@radix-ui/react-dialog';
 
 export const Content = styled(Dialog.Content, {
@@ -6,30 +7,15 @@ export const Content = styled(Dialog.Content, {
   boxShadow: '$sm',
   position: 'absolute',
   top: '0',
-  width: '100%',
-  height: '100%',
-  opacity: 0,
-  zIndex: 1,
-  transition: 'opacity $normal, transform $normal',
+  minHeight: '100vh',
+  maxHeight: '100vh',
+  minWidth: 'min-content',
+  zIndex: 999,
   variants: {
     position: {
       right: {
         right: 0,
-        borderRadius: '$1 0 0 $1',
-        transform: 'translateX(100%) scaleX(0.96)',
-        '&[data-state="open"]': {
-          opacity: 1,
-          transform: 'translateX(0%) scaleX(1)',
-        },
-      },
-      left: {
-        left: 0,
-        borderRadius: '0 $1 $1 0',
-        transform: 'translateX(-100%) scaleX(0.96)',
-        '&[data-state="open"]': {
-          opacity: 1,
-          transform: 'translateX(0%) scaleX(1)',
-        },
+        borderRadius: '$2 0 0 $2',
       },
     },
   },
@@ -37,6 +23,8 @@ export const Content = styled(Dialog.Content, {
     position: 'right',
   },
 });
+
+export const Trigger = styled(Dialog.Trigger, Button);
 
 export const Header = styled('div', {
   display: 'flex',
@@ -53,5 +41,5 @@ export const Close = styled(Dialog.Close, {
 
 export const Title = styled('h3', {
   fontSize: '$4',
-  fontWeight: 'bold'
+  fontWeight: 'bold',
 });

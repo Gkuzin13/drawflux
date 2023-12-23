@@ -7,7 +7,7 @@ export const Checkbox = styled(CheckboxCore, {
   right: '$1',
   zIndex: 1,
   '&[data-state="unchecked"]': {
-    visibility: 'hidden',
+    display: 'none',
   },
 });
 
@@ -17,13 +17,15 @@ export const Container = styled('div', {
   display: 'grid',
   placeItems: 'center',
   padding: '$1',
-  borderRadius: '$1',
+  width: '$8',
+  height: '$8',
+  borderRadius: '$2',
   overflow: 'hidden',
   border: '1px transparent solid',
   '&:hover': {
     borderColor: '$primary-dark',
   },
   [`&:hover ${Checkbox}[data-state="unchecked"]`]: {
-    visibility: 'visible',
+    display: 'initial',
   },
 });

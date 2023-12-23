@@ -3,7 +3,7 @@ import { styled } from 'shared';
 export const Button = styled('button', {
   display: 'flex',
   alignItems: 'center',
-  borderRadius: '$1',
+  borderRadius: '$2',
   border: '1px solid transparent',
   transitionProperty: 'background-color, color',
   transition: '$fast',
@@ -76,6 +76,17 @@ export const Button = styled('button', {
       between: {
         justifyContent: 'space-between',
       },
+    },
+    gap: {
+      sm: {
+        gap: '$1',
+      },
+      md: {
+        gap: '$2',
+      },
+      lg: {
+        gap: '$3',
+      }
     },
     size: {
       xs: {
