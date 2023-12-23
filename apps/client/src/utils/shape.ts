@@ -1,15 +1,15 @@
+import { defaultTheme, darkTheme } from 'shared';
+import { hexToRGBa } from './string';
+import { getShapeLength } from './math';
 import type {
-  ColorTokenValue,
   NodeColor,
   NodeFill,
   NodeLine,
   NodeObject,
   NodeSize,
+  ThemeColorValue,
   ThemeColors,
 } from 'shared';
-import { darkTheme, defaultTheme } from 'shared';
-import { hexToRGBa } from './string';
-import { getShapeLength } from './math';
 import type { ShapeConfig } from 'konva/lib/Shape';
 
 export function getDashValue(
@@ -60,7 +60,7 @@ export function getSizeValue(key: NodeSize) {
 export function getColorValue(
   key: NodeColor,
   themeColors: ThemeColors,
-): ColorTokenValue {
+): ThemeColorValue {
   if (key in themeColors) {
     return themeColors[key].value;
   }
@@ -68,7 +68,7 @@ export function getColorValue(
   return themeColors.black.value;
 }
 
-export function getFillValue(fill: NodeFill, colorValue: ColorTokenValue) {
+export function getFillValue(fill: NodeFill, colorValue: ThemeColorValue) {
   switch (fill) {
     case 'semi': {
       return 'transparent';

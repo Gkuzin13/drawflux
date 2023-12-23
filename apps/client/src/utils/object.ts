@@ -29,3 +29,11 @@ export function deepMerge<T extends ObjectWithAnyProperties>(
 
   return result as T;
 }
+
+export function safeJSONParse<T = unknown>(text: string) {
+  try {
+    return JSON.parse(text) as T;
+  } catch (error) {
+    return null;
+  }
+}

@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-function useForceUpdate(deps: unknown[]) {
+function useForceUpdate(deps?: unknown[]) {
   const [_, setForcedUpdate] = useState(0);
 
-  useEffect(() => {
-    setForcedUpdate((prevValue) => prevValue + 1);
-  }, [...deps]);
+  const forceUpdate = useCallback(
+    () => setForcedUpdate((prevValue) => prevValue + 1),
+    [],
+  );
 
-  return { rerenderCount: _ };
+  useEffect(() => {
+    forceUpdate();
+  }, [...(deps ?? [])]);
+
+  return { forceUpdate, rerenderCount: _ };
 }
 
 export default useForceUpdate;

@@ -3,7 +3,7 @@ import { styled } from 'shared';
 export const Button = styled('button', {
   display: 'flex',
   alignItems: 'center',
-  borderRadius: '$1',
+  borderRadius: '$2',
   border: '1px solid transparent',
   transitionProperty: 'background-color, color',
   transition: '$fast',
@@ -51,6 +51,20 @@ export const Button = styled('button', {
           border: '1px $secondary solid',
         },
       },
+      danger: {
+        backgroundColor: '$secondary',
+        color: '$red600',
+        '&:hover': {
+          backgroundColor: '$secondary-light',
+        },
+        '&[data-highlighted]': {
+          border: '1px $secondary-light solid',
+        },
+        '&[disabled]': {
+          color: '$gray700',
+          backgroundColor: '$secondary-light',
+        },
+      },
     },
     align: {
       start: {
@@ -62,6 +76,17 @@ export const Button = styled('button', {
       between: {
         justifyContent: 'space-between',
       },
+    },
+    gap: {
+      sm: {
+        gap: '$1',
+      },
+      md: {
+        gap: '$2',
+      },
+      lg: {
+        gap: '$3',
+      }
     },
     size: {
       xs: {

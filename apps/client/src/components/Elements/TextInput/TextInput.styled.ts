@@ -6,7 +6,7 @@ export const Container = styled('div', {
 });
 
 export const Input = styled('input', {
-  borderRadius: '$1',
+  borderRadius: '$2',
   border: '1px solid $gray200',
   padding: '$1 $2',
   backgroundColor: '$secondary-light',

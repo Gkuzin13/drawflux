@@ -9,7 +9,7 @@ export const Root = styled(Seperator.Root, {
     width: '100%',
   },
   '&[data-orientation=vertical]': {
-    height: 'calc(100% - $sizes$2)',
+    height: '100%',
     width: '1px',
   },
 });

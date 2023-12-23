@@ -1,10 +1,10 @@
 import { renderHook } from '@testing-library/react';
-import type { ShapeConfig } from 'konva/lib/Shape';
 import { defaultTheme, type StageConfig } from 'shared';
 import { createNode } from '@/utils/node';
 import { getColorValue, getFillValue, getSizeValue } from '@/utils/shape';
 import useNode, { baseConfig } from './useNode';
 import { ThemeProvider } from '@/contexts/theme';
+import type { ShapeConfig } from 'konva/lib/Shape';
 
 describe('useNode', () => {
   const node = createNode('rectangle', [0, 0]);

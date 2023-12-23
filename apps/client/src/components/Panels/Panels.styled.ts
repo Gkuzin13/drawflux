@@ -21,7 +21,7 @@ export const Panel = styled('div', {
   padding: '$1',
   pointerEvents: 'all',
   boxShadow: '$sm',
-  borderRadius: '$1',
+  borderRadius: '$2',
   backgroundColor: '$bg',
 });
 
@@ -45,6 +45,18 @@ export const TopPanel = styled('div', {
 export const TopPanelRightContainer = styled(Panel, {});
 
 export const BottomPanel = styled('div', {
-  display: 'flex',
-  justifyContent: 'center',
+  position: 'relative',
+  display: 'grid',
+  placeItems: 'end center',
+  gap: '$2',
+  variants: {
+    direction: {
+      column: {
+        gridTemplateColumns: 'repeat(1, 1fr)',
+      },
+      row: {
+        gridTemplateColumns: 'repeat(3, 1fr)',
+      },
+    },
+  },
 });

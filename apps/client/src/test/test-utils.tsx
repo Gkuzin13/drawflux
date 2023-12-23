@@ -11,14 +11,17 @@ import historyReducer, {
 import collabReducer, {
   initialState as initialCollabState,
 } from '@/stores/slices/collaboration';
+import libraryReducer, {
+  initialState as initialLibraryState,
+} from '@/stores/slices/library';
 import { WebSocketProvider } from '@/contexts/websocket';
+import { ThemeProvider } from '@/contexts/theme';
+import { NotificationsProvider } from '@/contexts/notifications';
+import { ModalProvider } from '@/contexts/modal';
 import type { PropsWithChildren } from 'react';
 import type { PreloadedState } from '@reduxjs/toolkit';
 import type { RootState } from '@/stores/store';
 import type { Options as UserEventOptions } from '@testing-library/user-event/dist/types/options';
-import { ThemeProvider } from '@/contexts/theme';
-import { NotificationsProvider } from '@/contexts/notifications';
-import { ModalProvider } from '@/contexts/modal';
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
   preloadedState?: PreloadedState<RootState>;
@@ -32,6 +35,7 @@ export const defaultPreloadedState = {
     future: [],
   } as CanvasHistoryState,
   collaboration: initialCollabState,
+  library: initialLibraryState,
 };
 
 export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
@@ -39,6 +43,7 @@ export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
     reducer: {
       canvas: historyReducer(canvasReducer),
       collaboration: collabReducer,
+      library: libraryReducer,
     },
     preloadedState,
   });

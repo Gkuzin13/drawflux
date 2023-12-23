@@ -16,14 +16,14 @@ export const Track = styled(SliderPrimitive.Track, {
   backgroundColor: '$secondary-dark',
   position: 'relative',
   flexGrow: 1,
-  borderRadius: '$1',
+  borderRadius: '$2',
   height: '$1',
 });
 
 export const Range = styled(SliderPrimitive.Range, {
   position: 'absolute',
   backgroundColor: '$green400',
-  borderRadius: '$1',
+  borderRadius: '$2',
   height: '100%',
 });
 

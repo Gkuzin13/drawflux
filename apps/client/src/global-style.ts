@@ -18,7 +18,6 @@ export const globalStyle = globalCss({
   ],
   body: {
     fontFamily: 'Heebo, sans-serif',
-    fontSmooth: 'antialiased',
     overflow: 'hidden',
     color: '$black',
   },

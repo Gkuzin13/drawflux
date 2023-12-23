@@ -11,37 +11,37 @@ import { useTheme } from '@/contexts/theme';
 import { TEXT } from '@/constants/shape';
 import type Konva from 'konva';
 import type {
-  ColorTokenValue,
+  ThemeColorValue,
   NodeObject,
   NodeType,
   ThemeColors,
 } from 'shared';
 
 type Config = Konva.NodeConfig &
-  Konva.ShapeConfig & { stroke?: ColorTokenValue };
+  Konva.ShapeConfig & { stroke?: ThemeColorValue };
 
 interface BaseStyleConfig extends Config {
   opacity: number;
 }
 
 interface TextNodeStyleConfig extends BaseStyleConfig {
-  fill: ColorTokenValue;
+  fill: ThemeColorValue;
   fillEnabled: boolean;
   fontSize: number;
   fontFamily: typeof TEXT.FONT_FAMILY;
 }
 
 interface LineNodeStyleConfig extends BaseStyleConfig {
-  stroke: ColorTokenValue;
+  stroke: ThemeColorValue;
   strokeWidth: number;
   dash: number[];
 }
 
 interface FillableNodeStyleConfig extends BaseStyleConfig {
-  stroke: ColorTokenValue;
+  stroke: ThemeColorValue;
   strokeWidth: number;
   dash: number[];
-  fill: ColorTokenValue;
+  fill: ThemeColorValue;
   fillEnabled: boolean;
 }
 
@@ -96,7 +96,7 @@ export const baseConfig: Config = {
 
 function useNode<T extends NodeType>(node: NodeObject<T>, stageScale: number) {
   const theme = useTheme();
-  
+
   const config = useMemo(() => {
     const isDarkTheme = theme.value === 'dark';
     const themeColors = getCurrentThemeColors({ isDarkTheme });

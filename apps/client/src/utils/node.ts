@@ -1,7 +1,11 @@
-import type { IRect } from 'konva/lib/types';
-import type { NodeType, Point, NodeObject } from 'shared';
+import type { IRect, Vector2d } from 'konva/lib/types';
+import type { NodeType, Point, NodeObject, StageConfig } from 'shared';
 import { v4 as uuid } from 'uuid';
-import { calculateNodesCopyDistance, isNodeFullyInView } from './position';
+import {
+  getCanvasCenterPosition,
+  getNodesMinMaxPoints,
+  isNodeFullyInView,
+} from './position';
 import { DUPLICATION_GAP } from '@/constants/app';
 
 export const createNode = (type: NodeType, point: Point): NodeObject => {
@@ -121,25 +125,62 @@ export function makeNodesCopy(nodes: NodeObject[]): NodeObject[] {
   return nodes.map(cloneNode);
 }
 
-export function duplicateNodes(nodes: NodeObject[]): NodeObject[] {
-  const distance = calculateNodesCopyDistance(nodes, DUPLICATION_GAP);
-
+export function duplicateNodes(
+  nodes: NodeObject[],
+  distance: Vector2d,
+): NodeObject[] {
   return nodes.map((node) => {
     const clonedNode = cloneNode(node);
 
     clonedNode.nodeProps.point = [
-      clonedNode.nodeProps.point[0] + distance,
-      clonedNode.nodeProps.point[1],
+      clonedNode.nodeProps.point[0] + distance.x,
+      clonedNode.nodeProps.point[1] + distance.y,
     ];
 
     if (clonedNode.nodeProps.points) {
       clonedNode.nodeProps.points = clonedNode.nodeProps.points.map(
-        ([x, y]) => [x + distance, y],
+        ([x, y]) => [x + distance.x, y + distance.y],
       );
     }
 
     return clonedNode;
   });
+}
+
+export function duplicateNodesAtPosition(nodes: NodeObject[], position: Point) {
+  const { minX, minY, maxX, maxY } = getNodesMinMaxPoints(nodes);
+
+  const distance = {
+    x: position[0] - (maxX + minX) / 2,
+    y: position[1] - (maxY + minY) / 2,
+  };
+
+  return duplicateNodes(nodes, distance);
+}
+
+export function duplicateNodesToRight(nodes: NodeObject[]) {
+  const { minX, maxX } = getNodesMinMaxPoints(nodes);
+
+  const distance = { x: maxX - minX + DUPLICATION_GAP, y: 0 };
+
+  return duplicateNodes(nodes, distance);
+}
+
+export function duplicateNodesAtCenter(
+  nodes: NodeObject[],
+  stageConfig: StageConfig,
+) {
+  const stageCenter = getCanvasCenterPosition(
+    {
+      x: stageConfig.position.x,
+      y: stageConfig.position.y,
+      width: window.innerWidth,
+      height: window.innerHeight,
+    },
+    stageConfig.scale,
+  );
+
+  return duplicateNodesAtPosition(nodes, [stageCenter.x, stageCenter.y]);
 }
 
 export function allNodesInView(
@@ -148,21 +189,6 @@ export function allNodesInView(
   stageScale: number,
 ) {
   return nodes.every((node) => isNodeFullyInView(node, stageRect, stageScale));
-}
-
-export function getAddedNodes(
-  nodes: NodeObject[],
-  addedCount: number,
-): NodeObject[] {
-  if (addedCount <= 0 || nodes.length === 0) {
-    return [];
-  }
-
-  if (addedCount >= nodes.length) {
-    return nodes;
-  }
-
-  return nodes.slice(-addedCount);
 }
 
 export function mapNodesIds(nodes: NodeObject[]): string[] {

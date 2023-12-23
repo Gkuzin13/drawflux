@@ -1,23 +1,11 @@
-import { createSlice, isAnyOf, type PayloadAction } from '@reduxjs/toolkit';
-import type { Vector2d } from 'konva/lib/types';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { makeNodesCopy, reorderNodes, isValidNode } from '@/utils/node';
+import { getCanvasCenteredPositionRelativeToNodes } from '@/utils/position';
+import { historyActions } from '../reducers/history';
 import type { NodeObject } from 'shared';
 import type { AppState } from '@/constants/app';
-import {
-  allNodesInView,
-  duplicateNodes,
-  getAddedNodes,
-  mapNodesIds,
-  makeNodesCopy,
-  reorderNodes,
-  isValidNode,
-} from '@/utils/node';
-import {
-  getCenterPosition,
-  getMiddleNode,
-  getNodeRect,
-} from '@/utils/position';
-import { historyActions } from '../reducers/history';
-import { type RootState } from '../store';
+import type { RootState } from '../store';
+import type { PayloadAction } from '@reduxjs/toolkit';
 
 export type CanvasSliceState = {
   copiedNodes: NodeObject[] | null;
@@ -79,15 +67,6 @@ export const canvasSlice = createSlice({
         (node) => !nodesIds.has(node.nodeProps.id),
       );
     },
-    duplicateNodes: (state, action: PayloadAction<string[]>) => {
-      const nodesIds = new Set<string>(action.payload);
-
-      const nodesToDuplicate = state.nodes.filter((node) =>
-        nodesIds.has(node.nodeProps.id),
-      );
-
-      state.nodes.push(...duplicateNodes(nodesToDuplicate));
-    },
     moveNodesToStart: (state, action: PayloadAction<string[]>) => {
       state.nodes = reorderNodes(action.payload, state.nodes).toStart();
     },
@@ -101,17 +80,23 @@ export const canvasSlice = createSlice({
       state.nodes = reorderNodes(action.payload, state.nodes).toEnd();
     },
     copyNodes: (state) => {
-      const nodesToCopy = state.nodes.filter(
-        ({ nodeProps }) => nodeProps.id in state.selectedNodesIds,
+      const { nodes, selectedNodesIds } = state;
+
+      state.copiedNodes = nodes.filter(
+        ({ nodeProps }) => nodeProps.id in selectedNodesIds,
       );
-
-      const clonedNodes = makeNodesCopy(nodesToCopy);
-
-      state.copiedNodes = clonedNodes;
     },
     pasteNodes: (state) => {
       if (state.copiedNodes) {
-        state.nodes.push(...state.copiedNodes);
+        const duplicatedNodes = makeNodesCopy(state.copiedNodes);
+
+        state.nodes.push(...duplicatedNodes);
+
+        state.selectedNodesIds = Object.fromEntries(
+          duplicatedNodes.map(({ nodeProps }) => [nodeProps.id, true]),
+        );
+
+        state.copiedNodes = null;
       }
     },
     setToolType: (
@@ -141,29 +126,18 @@ export const canvasSlice = createSlice({
         state.nodes.map((node) => [node.nodeProps.id, true]),
       );
     },
-    focusStage: (state, action: PayloadAction<Vector2d>) => {
-      const { scale } = state.stageConfig;
-      const position = action.payload;
-
-      state.stageConfig.position = getCenterPosition(
-        position,
-        scale,
-        window.innerWidth,
-        window.innerHeight,
-      );
-    },
   },
   extraReducers(builder) {
     builder
-      .addMatcher(canvasSlice.actions.setNodes.match, (state, action) => {
-        const middleNode = getMiddleNode(action.payload);
+      .addMatcher(canvasSlice.actions.setNodes.match, (state) => {
+        const { nodes, stageConfig } = state;
 
-        if (middleNode) {
-          const { caseReducers, actions } = canvasSlice;
+        const centeredPosition = getCanvasCenteredPositionRelativeToNodes(
+          nodes,
+          { scale: stageConfig.scale },
+        );
 
-          const focusPoint = getNodeRect(middleNode);
-          caseReducers.focusStage(state, actions.focusStage(focusPoint));
-        }
+        state.stageConfig.position = centeredPosition;
       })
       .addMatcher(
         isAnyOf(historyActions.redo.match, historyActions.undo.match),
@@ -171,49 +145,6 @@ export const canvasSlice = createSlice({
           state.selectedNodesIds = {};
         },
       )
-      .addMatcher(canvasSlice.actions.pasteNodes.match, (state) => {
-        if (state.copiedNodes) {
-          const { caseReducers, actions } = canvasSlice;
-
-          const copiedNodesIds = mapNodesIds(state.copiedNodes);
-
-          caseReducers.setSelectedNodesIds(
-            state,
-            actions.setSelectedNodesIds(copiedNodesIds),
-          );
-
-          state.copiedNodes = null;
-        }
-      })
-      .addMatcher(canvasSlice.actions.duplicateNodes.match, (state, action) => {
-        const { actions, caseReducers } = canvasSlice;
-        const { nodes, stageConfig } = state;
-
-        const duplicatedNodes = getAddedNodes(nodes, action.payload.length);
-        const nodesIds = mapNodesIds(duplicatedNodes);
-
-        caseReducers.setSelectedNodesIds(
-          state,
-          actions.setSelectedNodesIds(nodesIds),
-        );
-
-        const stageRect = {
-          ...stageConfig.position,
-          width: window.innerWidth,
-          height: window.innerHeight,
-        };
-
-        if (allNodesInView(duplicatedNodes, stageRect, stageConfig.scale)) {
-          return;
-        }
-
-        const nodeInMiddle = getMiddleNode(duplicatedNodes);
-
-        if (nodeInMiddle) {
-          const { x, y } = getNodeRect(nodeInMiddle);
-          caseReducers.focusStage(state, actions.focusStage({ x, y }));
-        }
-      })
       .addMatcher(canvasSlice.actions.deleteNodes.match, (state) => {
         state.selectedNodesIds = {};
       });

@@ -8,7 +8,7 @@ import {
   useMemo,
   useEffect,
 } from 'react';
-import { Layer, Stage } from 'react-konva';
+import { Stage } from 'react-konva';
 import { useWebSocket } from '@/contexts/websocket';
 import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import {
@@ -18,9 +18,8 @@ import {
   selectToolType,
 } from '@/stores/slices/canvas';
 import { selectMyUser } from '@/stores/slices/collaboration';
-import { createNode, isValidNode } from '@/utils/node';
+import { createNode, isValidNode, mapNodesIds } from '@/utils/node';
 import BackgroundLayer from '../Layers/BackgroundLayer';
-import { type DrawPosition } from './helpers/draw';
 import {
   getCursorStyle,
   getIntersectingNodes,
@@ -36,7 +35,9 @@ import usePageMutation from '@/hooks/usePageMutation';
 import useDrafts from '@/hooks/useDrafts';
 import NodesLayer from '../Layers/NodesLayer';
 import SelectRect from '../SelectRect';
+import MainLayer from './MainLayer';
 import { getNormalizedInvertedRect } from '@/utils/position';
+import type { DrawPosition } from './helpers/draw';
 import type { IRect } from 'konva/lib/types';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
@@ -139,9 +140,9 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
     const handleSelectDraw = useCallback(
       (childrenNodes: ReturnType<typeof getLayerNodes>, position: Point) => {
-        const selectRect = selectRef.current?.getClientRect();
+        if (!selectRef.current) return;
 
-        if (!selectRect) return;
+        const selectRect = selectRef.current?.getClientRect();
 
         const nodesIntersectedWithSelectRect = getIntersectingNodes(
           childrenNodes,
@@ -441,6 +442,32 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [drawing, setDrafts],
     );
 
+    const handleLibraryItemDrop = useCallback(
+      (nodes: NodeObject[]) => {
+        dispatch(canvasActions.addNodes(nodes));
+        dispatch(canvasActions.setSelectedNodesIds(mapNodesIds(nodes)));
+        dispatch(canvasActions.setToolType('select'));
+
+        if (ws.isConnected) {
+          ws.send({ type: 'nodes-add', data: nodes });
+          handlePageUpdate();
+        }
+      },
+      [ws, handlePageUpdate, dispatch],
+    );
+
+    const handleLibraryItemDragOver = useCallback(
+      (position: Point) => {
+        if (ws.isConnected && userId) {
+          throttledSendWSMessage({
+            type: 'user-move',
+            data: { id: userId, position },
+          });
+        }
+      },
+      [ws, userId, throttledSendWSMessage],
+    );
+
     return (
       <Stage
         ref={ref}
@@ -458,7 +485,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         onDragEnd={handleStageDragEnd}
         onContextMenu={handleOnContextMenu}
       >
-        <Layer listening={isLayerListening}>
+        <MainLayer
+          listening={isLayerListening}
+          onLibraryItemDrop={handleLibraryItemDrop}
+          onLibraryItemDragOver={handleLibraryItemDragOver}
+        >
           <BackgroundLayer
             ref={backgroundRef}
             rect={stageRect}
@@ -484,7 +515,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           {isSelectRectActive && (
             <SelectRect ref={selectRef} position={drawingPosition.current} />
           )}
-        </Layer>
+        </MainLayer>
       </Stage>
     );
   },

@@ -66,3 +66,12 @@ export function getRelativePointerPosition(stage: Konva.Stage): Point {
 
   return [x, y];
 }
+
+export function getUnregisteredPointerPosition(
+  event: Event,
+  stage: Konva.Stage,
+) {
+  stage.setPointersPositions(event);
+
+  return getRelativePointerPosition(stage);
+}

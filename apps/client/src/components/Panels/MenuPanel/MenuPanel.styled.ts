@@ -17,7 +17,7 @@ export const Content = styled(DropdownMenuPrimitive.Content, {
   gap: '$1',
   padding: '$2',
   boxShadow: '$sm',
-  borderRadius: '$1',
+  borderRadius: '$2',
   marginTop: '$2',
   minWidth: '$11',
   backgroundColor: '$bg',

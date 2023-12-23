@@ -14,7 +14,7 @@ import * as Styled from './MainLayout.styled';
 import useWindowSize from '@/hooks/useWindowSize/useWindowSize';
 import { TOOLS } from '@/constants/panels/tools';
 import { KEYS } from '@/constants/keys';
-import { getAddedNodes } from '@/utils/node';
+import { duplicateNodesToRight, mapNodesIds } from '@/utils/node';
 import {
   type HistoryActionKey,
   historyActions,
@@ -76,15 +76,23 @@ const MainLayout = () => {
           case KEYS.D: {
             event.preventDefault();
 
-            dispatch(canvasActions.duplicateNodes(selectedNodesIds));
+            const nodesIds = new Set(Object.keys(state.selectedNodesIds));
+            const nodesToDuplicate = nodes.filter(({ nodeProps }) =>
+              nodesIds.has(nodeProps.id),
+            );
+
+            const duplicatedNodes = duplicateNodesToRight(nodesToDuplicate);
+            const duplicatedNodesIds = mapNodesIds(duplicatedNodes);
+
+            dispatch(canvasActions.addNodes(duplicatedNodes));
+            dispatch(canvasActions.setSelectedNodesIds(duplicatedNodesIds));
 
             if (ws.isConnected) {
-              ws.send({
-                type: 'nodes-add',
-                data: getAddedNodes(nodes, selectedNodesIds.length),
-              });
+              ws.send({ type: 'nodes-add', data: duplicatedNodes });
 
-              updatePage({ nodes });
+              const currentNodes = store.getState().canvas.present.nodes;
+
+              updatePage({ nodes: currentNodes });
             }
             break;
           }
@@ -96,7 +104,11 @@ const MainLayout = () => {
             dispatch(canvasActions.pasteNodes());
 
             if (ws.isConnected) {
-              const pastedNodes = getAddedNodes(nodes, selectedNodesIds.length);
+              const currentState = store.getState().canvas.present;
+
+              const pastedNodes = currentState.nodes.filter(({ nodeProps }) => {
+                return nodeProps.id in currentState.selectedNodesIds;
+              });
 
               ws.send({ type: 'nodes-add', data: pastedNodes });
 

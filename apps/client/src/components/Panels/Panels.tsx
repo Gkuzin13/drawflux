@@ -1,8 +1,4 @@
-import type Konva from 'konva';
-import { type RefObject, useMemo, lazy, Suspense, useCallback } from 'react';
-import type { NodeStyle, User } from 'shared';
-import { type MenuPanelActionType } from '@/constants/panels/menu';
-import { type ToolType } from '@/constants/panels/tools';
+import { useMemo, lazy, Suspense, useCallback } from 'react';
 import { useModal } from '@/contexts/modal';
 import { useWebSocket } from '@/contexts/websocket';
 import useNetworkState from '@/hooks/useNetworkState/useNetworkState';
@@ -25,13 +21,19 @@ import SharePanel from './SharePanel/SharePanel';
 import StylePanel from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
+import LibraryDrawer from '../Library/LibraryDrawer/LibraryDrawer';
 import usePageMutation from '@/hooks/usePageMutation';
 import { PROJECT_FILE_EXT, PROJECT_FILE_NAME } from '@/constants/app';
 import { historyActions } from '@/stores/reducers/history';
+import { selectLibrary } from '@/stores/slices/library';
+import type Konva from 'konva';
+import type { NodeStyle, User } from 'shared';
+import { type MenuPanelActionType } from '@/constants/panels/menu';
+import { type ToolType } from '@/constants/panels/tools';
 
 type Props = {
   selectedNodesIds: string[];
-  stageRef: RefObject<Konva.Stage>;
+  stageRef: React.RefObject<Konva.Stage>;
 };
 
 const UsersPanel = lazy(() => import('./UsersPanel/UsersPanel'));
@@ -45,6 +47,7 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
   const stageConfig = useAppSelector(selectConfig);
   const toolType = useAppSelector(selectToolType);
   const nodes = useAppSelector(selectNodes);
+  const library = useAppSelector(selectLibrary);
 
   const { past, future } = useAppSelector(selectHistory);
 
@@ -220,7 +223,7 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
           isActive={isStylePanelActive}
           onStyleChange={handleStyleChange}
         />
-        <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
+
         {ws.isConnected && (
           <Suspense>
             <UsersPanel onUserChange={handleUserChange} />
@@ -228,13 +231,15 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
         )}
         <Styled.TopPanelRightContainer>
           {online && <SharePanel isPageShared={ws.isConnected} />}
+          <LibraryDrawer items={library.items} />
           <MenuPanel
             disabledItems={disabledMenuItems}
             onAction={handleMenuAction}
           />
         </Styled.TopPanelRightContainer>
       </Styled.TopPanel>
-      <Styled.BottomPanel>
+      <Styled.BottomPanel direction={{ '@initial': 'column', '@xs': 'row' }}>
+        <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
         <ToolsPanel activeTool={toolType} onToolSelect={handleToolSelect} />
       </Styled.BottomPanel>
     </Styled.Container>

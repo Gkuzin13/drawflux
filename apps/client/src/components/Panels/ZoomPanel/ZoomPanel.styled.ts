@@ -1,6 +1,8 @@
 import { styled } from 'shared';
-import * as PanelStyled from '../Panels.styled';
+import { Panel } from '../Panels.styled';
 
-export const Container = styled(PanelStyled.Panel, {
-  marginRight: 'auto',
+export const Container = styled(Panel, {
+  '@xs': {
+    marginRight: 'auto',
+  },
 });

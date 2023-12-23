@@ -21,3 +21,29 @@ globalThis.jest = vi;
 global.ResizeObserver = ResizeObserverPolyfill;
 global.matchMedia = matchMedia;
 global.localStorage = localStorage;
+
+/**
+ * mock document.fonts load
+ */
+Object.defineProperty(document, 'fonts', {
+  value: { ready: Promise.resolve({}) },
+  configurable: true,
+});
+
+/**
+ * implement missing DragEvent in jsdom 
+ * https://github.com/jsdom/jsdom/issues/2913
+ */
+class DragEvent extends MouseEvent {
+  public clientX: number;
+  public clientY: number;
+
+  constructor(type: string, params: PointerEventInit = {}) {
+    super(type, params);
+    this.clientX = params.clientX ?? 0;
+    this.clientY = params.clientY ?? 0;
+  }
+}
+
+global.DragEvent =
+  global.DragEvent ?? (DragEvent as typeof globalThis.PointerEvent);

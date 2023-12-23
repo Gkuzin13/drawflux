@@ -1,12 +1,12 @@
-import Nodes from '../Node/Nodes';
-import type { NodeObject } from 'shared';
 import { useCallback, useMemo } from 'react';
+import Nodes from '../Node/Nodes';
 import NodeGroupTransformer from '../Transformer/NodeGroupTransformer';
+import NodeDraft from '../Node/NodeDraft';
 import useFontFaceObserver from '@/hooks/useFontFaceObserver';
 import { TEXT } from '@/constants/shape';
 import { useAppSelector } from '@/stores/hooks';
 import { selectNodes } from '@/stores/slices/canvas';
-import NodeDraft from '../Node/NodeDraft';
+import type { NodeObject } from 'shared';
 
 type Props = {
   selectedNodesIds: string[];
@@ -58,16 +58,18 @@ const NodesLayer = ({
     [onNodesChange],
   );
 
+  if (loading) {
+    return null;
+  }
+
   return (
     <>
-      {!loading && (
-        <Nodes
-          nodes={nodes}
-          selectedNodeId={selectedNodeId}
-          stageScale={stageScale}
-          onNodeChange={handleNodeChange}
-        />
-      )}
+      <Nodes
+        nodes={nodes}
+        selectedNodeId={selectedNodeId}
+        stageScale={stageScale}
+        onNodeChange={handleNodeChange}
+      />
       {nodeDrafts.map((node) => {
         return (
           <NodeDraft

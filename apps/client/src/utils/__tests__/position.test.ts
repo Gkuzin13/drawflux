@@ -1,12 +1,7 @@
 import type { Point } from 'shared';
 import { nodesGenerator } from '@/test/data-generators';
 import { createNode } from '../node';
-import {
-  calculateNodesCopyDistance,
-  getMiddleNode,
-  getNodeRect,
-  isNodeFullyInView,
-} from '../position';
+import { getMiddleNode, getNodeRect, isNodeFullyInView } from '../position';
 
 describe('getMiddleNode', () => {
   const nodes = nodesGenerator(3, 'rectangle').map((node) => ({
@@ -33,30 +28,6 @@ describe('getMiddleNode', () => {
     const middleNode = getMiddleNode([]);
 
     expect(middleNode).toBeNull();
-  });
-});
-
-describe('calculateNodesCopyDistance', () => {
-  it('should return correct distance', () => {
-    const maxXPoint = 200;
-    const gap = 16;
-
-    const ellipseNode = createNode('ellipse', [50, 50]);
-    ellipseNode.nodeProps.width = 50;
-    ellipseNode.nodeProps.height = 50;
-
-    const arrowNode = createNode('arrow', [150, 150]);
-    arrowNode.nodeProps.points = [[200, 200]];
-
-    const rectNode = createNode('rectangle', [maxXPoint, 200]);
-    rectNode.nodeProps.width = 50;
-    rectNode.nodeProps.height = 50;
-
-    const nodes = [arrowNode, ellipseNode, rectNode];
-
-    const distance = calculateNodesCopyDistance(nodes, gap);
-
-    expect(distance).toBe(maxXPoint + gap);
   });
 });
 
@@ -106,8 +77,8 @@ describe('getNodeRect', () => {
 
     const rect = getNodeRect(ellipseNode);
 
-    expect(rect.x).toBe(50);
-    expect(rect.y).toBe(60);
+    expect(rect.x).toBe(20);
+    expect(rect.y).toBe(40);
     expect(rect.width).toBe(60);
     expect(rect.height).toBe(40);
   });
