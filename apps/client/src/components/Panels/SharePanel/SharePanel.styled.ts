@@ -9,7 +9,7 @@ export const Content = styled(PopoverPrimitive.Content, {
   flexDirection: 'column',
   boxShadow: '$sm',
   maxWidth: '$11',
-  borderRadius: '$1',
+  borderRadius: '$2',
   marginTop: '$2',
   backgroundColor: '$bg',
 });

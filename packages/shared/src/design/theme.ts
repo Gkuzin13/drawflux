@@ -89,8 +89,9 @@ const {
       6: '36px',
     },
     radii: {
-      1: '8px',
-      2: '16px',
+      1: '4px',
+      2: '8px',
+      3: '16px',
       round: '500px',
     },
     lineHeights: {

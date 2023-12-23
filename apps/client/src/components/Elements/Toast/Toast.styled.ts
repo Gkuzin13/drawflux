@@ -3,7 +3,7 @@ import { hide, slideLeft, styled } from 'shared';
 
 export const Container = styled(ToastPrimitive.Root, {
   backgroundColor: '$bg',
-  borderRadius: '$1',
+  borderRadius: '$2',
   boxShadow: '$sm',
   padding: '$3',
   display: 'grid',

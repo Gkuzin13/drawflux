@@ -7,7 +7,7 @@ export const Content = styled(ContextMenu.Content, {
   flexDirection: 'column',
   gap: '$1',
   backgroundColor: '$bg',
-  borderRadius: '$1',
+  borderRadius: '$2',
   boxShadow: '$sm',
   padding: '$2',
   minWidth: '$11',
