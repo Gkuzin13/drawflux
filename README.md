@@ -2,15 +2,19 @@
 
 **A collaborative virtual whiteboard tool for sketching diagrams.**
 
-![drawflux web app screenshot](./assets/screenshot.png)
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/screenshot-dark.png">
+    <img alt="drawflux" src="./assets/screenshot.png" style="visibility:visible max-width:100%;">
+</picture>
 
 # Features
 
 - Selection of tools - rectangle, ellipse, arrow, free-draw, text.
 - Customizable shape style - color, size, fill, opacity, line style, animation.
+- Shapes library.
+- Live collaboration.
 - Zoom and panning.
 - History undo / redo.
-- Live collaboration.
 - Export to PNG / JSON.
 - Offline support.
 - Dark Mode.
