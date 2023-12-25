@@ -108,6 +108,7 @@ const ResizableText = ({
       {selected && (
         <NodeTransformer
           ref={transformerRef}
+          stageScale={stageScale}
           transformerConfig={{
             enabledAnchors: ['middle-left', 'middle-right'],
           }}

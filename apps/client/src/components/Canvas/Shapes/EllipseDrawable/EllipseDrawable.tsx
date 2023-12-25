@@ -111,6 +111,7 @@ const EllipseDrawable = ({
       {selected && (
         <NodeTransformer
           ref={transformerRef}
+          stageScale={stageScale}
           transformerConfig={{ keepRatio: false }}
         />
       )}

@@ -128,6 +128,7 @@ const FreePathDrawable = ({
       {selected && (
         <NodeTransformer
           ref={transformerRef}
+          stageScale={stageScale}
           transformerConfig={{ rotateEnabled: false }}
         />
       )}

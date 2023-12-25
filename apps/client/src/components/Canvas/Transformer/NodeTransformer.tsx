@@ -8,6 +8,7 @@ import { normalizeTransformerSize } from './helpers/size';
 import useDefaultThemeColors from '@/hooks/useThemeColors';
 
 export type TransformerProps = PropsWithRef<{
+  stageScale: number;
   transformerConfig?: TransformerConfig;
   transformerEvents?: KonvaNodeEvents;
 }>;
@@ -15,7 +16,7 @@ export type TransformerProps = PropsWithRef<{
 type Ref = Konva.Transformer;
 
 const NodeTransformer = forwardRef<Ref, TransformerProps>(
-  ({ transformerConfig, transformerEvents }, ref) => {
+  ({ transformerConfig, transformerEvents, stageScale }, ref) => {
     const themeColors = useDefaultThemeColors();
 
     const handleDragStart = useCallback(
@@ -38,8 +39,8 @@ const NodeTransformer = forwardRef<Ref, TransformerProps>(
         anchorStrokeWidth={TRANSFORMER.ANCHOR_STROKE_WIDTH}
         anchorSize={TRANSFORMER.ANCHOR_SIZE}
         anchorCornerRadius={TRANSFORMER.ANCHOR_CORNER_RADIUS}
-        padding={TRANSFORMER.PADDING}
-        rotateAnchorOffset={TRANSFORMER.ROTATION_ANCHOR_OFFSET}
+        padding={TRANSFORMER.PADDING * stageScale}
+        rotateAnchorOffset={TRANSFORMER.ROTATION_ANCHOR_OFFSET * stageScale}
         rotationSnaps={TRANSFORMER.ROTATION_SNAPS}
         ignoreStroke={true}
         shouldOverdrawWholeArea={true}

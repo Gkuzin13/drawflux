@@ -65,13 +65,15 @@ function createStyleConfig<T extends NodeType>(
     } as T extends 'text' ? TextNodeStyleConfig : never;
   }
 
-  if (node.type === 'draw' || node.type === 'arrow' || node.type === 'laser') {
+  const dash = getDashStyle(node, sizeValue, stageScale);
+
+  if (node.type === 'draw' || node.type === 'arrow') {
     return {
       ...baseStyle,
       stroke: colorValue,
       strokeWidth: sizeValue * stageScale,
-      dash: getDashStyle(node, sizeValue),
-    } as T extends 'arrow' | 'draw' | 'laser' ? LineNodeStyleConfig : never;
+      dash,
+    } as T extends 'arrow' | 'draw' ? LineNodeStyleConfig : never;
   }
 
   return {
@@ -79,8 +81,8 @@ function createStyleConfig<T extends NodeType>(
     stroke: colorValue,
     strokeWidth: sizeValue * stageScale,
     fill: getFillValue(node.style.fill, colorValue),
-    dash: getDashStyle(node, sizeValue),
     fillEnabled: node.style.fill ? node.style.fill !== 'none' : false,
+    dash,
   } as T extends 'ellipse' | 'rectangle' ? FillableNodeStyleConfig : never;
 }
 

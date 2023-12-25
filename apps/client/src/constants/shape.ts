@@ -20,6 +20,11 @@ export const ARROW_TRANSFORMER = {
   STROKE: colors.green300,
 };
 
+export const ARROW = {
+  HEAD_WIDTH: 7,
+  HEAD_LENGTH: 7,
+};
+
 export const FREE_PATH = {
   TENSION: 0.5,
 };
