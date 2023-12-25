@@ -1,9 +1,9 @@
 import { Fragment, memo } from 'react';
-import Divider from '@/components/Elements/Divider/Divider';
 import { TOOLS, type ToolType } from '@/constants/panels/tools';
 import { createKeyTitle } from '@/utils/string';
-import * as Styled from '../Panels.styled';
 import Icon from '@/components/Elements/Icon/Icon';
+import * as Styled from './ToolsPanel.styled';
+import * as PanelStyled from '../Panels.styled';
 
 type Props = {
   activeTool: ToolType;
@@ -12,11 +12,11 @@ type Props = {
 
 const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
   return (
-    <Styled.Panel>
-      {TOOLS.map((tool, index) => {
+    <Styled.Container>
+      {TOOLS.map((tool) => {
         return (
           <Fragment key={tool.value}>
-            <Styled.Button
+            <PanelStyled.Button
               size="sm"
               color={activeTool === tool.value ? 'primary' : 'secondary'}
               title={createKeyTitle(tool.name, [tool.key])}
@@ -24,14 +24,14 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
               onClick={() => onToolSelect(tool.value)}
             >
               <Icon name={tool.icon} size="lg" stroke="md" />
-            </Styled.Button>
-            {index === 1 && (
-              <Divider orientation="vertical" css={{ margin: '0 $1' }} />
+            </PanelStyled.Button>
+            {tool.value === 'hand' && (
+              <Styled.ToolsDivider orientation="vertical" />
             )}
           </Fragment>
         );
       })}
-    </Styled.Panel>
+    </Styled.Container>
   );
 };
 
