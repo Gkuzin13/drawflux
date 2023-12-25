@@ -26,10 +26,13 @@ import usePageMutation from '@/hooks/usePageMutation';
 import { PROJECT_FILE_EXT, PROJECT_FILE_NAME } from '@/constants/app';
 import { historyActions } from '@/stores/reducers/history';
 import { selectLibrary } from '@/stores/slices/library';
-import type Konva from 'konva';
-import type { NodeStyle, User } from 'shared';
 import { type MenuPanelActionType } from '@/constants/panels/menu';
 import { type ToolType } from '@/constants/panels/tools';
+import { calculateCenterPoint } from '@/utils/position';
+import { calculateStageZoomRelativeToPoint } from '../Canvas/DrawingCanvas/helpers/zoom';
+import type Konva from 'konva';
+import type { NodeStyle, User } from 'shared';
+import type { ZoomAction } from '@/constants/panels/zoom';
 
 type Props = {
   selectedNodesIds: string[];
@@ -162,8 +165,24 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
   );
 
   const handleZoomChange = useCallback(
-    (value: number) => {
-      dispatch(canvasActions.setStageConfig({ ...stageConfig, scale: value }));
+    (action: ZoomAction) => {
+      const stagePosition = stageConfig.position;
+      const oldScale = stageConfig.scale;
+      const viewportCenter = calculateCenterPoint(
+        window.innerWidth,
+        window.innerHeight,
+      );
+
+      const direction = action === 'reset' ? 0 : action === 'in' ? 1 : -1;
+
+      const updatedStageConfig = calculateStageZoomRelativeToPoint(
+        oldScale,
+        viewportCenter,
+        stagePosition,
+        direction,
+      );
+
+      dispatch(canvasActions.setStageConfig(updatedStageConfig));
     },
     [stageConfig, dispatch],
   );

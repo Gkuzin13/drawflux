@@ -42,7 +42,9 @@ export const TopPanel = styled('div', {
   gap: '$2',
 });
 
-export const TopPanelRightContainer = styled(Panel, {});
+export const TopPanelRightContainer = styled(Panel, {
+  marginLeft: 'auto'
+});
 
 export const BottomPanel = styled('div', {
   position: 'relative',

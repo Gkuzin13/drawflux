@@ -1,31 +1,42 @@
-import { type Vector2d } from 'konva/lib/types';
-import { ZOOM_RANGE, ZOOM_WHEEL_STEP } from '@/constants/app';
+import {
+  DEFAULT_ZOOM_VALUE,
+  ZOOM_RANGE,
+  ZOOM_WHEEL_STEP,
+} from '@/constants/app';
+import { clamp } from '@/utils/math';
+import type { Vector2d } from 'konva/lib/types';
 
-export function isScaleOutOfRange(scale: number) {
-  return scale < ZOOM_RANGE.MIN || scale > ZOOM_RANGE.MAX;
-}
+type ZoomDirection = -1 | 0 | 1;
 
-export function calculateStageZoom(
-  scale: number,
-  pointerPosition: Vector2d,
+export function calculateStageZoomRelativeToPoint(
+  oldScale: number,
+  point: Vector2d,
   stagePosition: Vector2d,
-  deltaY: number,
+  direction: ZoomDirection,
 ) {
-  const mousePointTo = {
-    x: (pointerPosition.x - stagePosition.x) / scale,
-    y: (pointerPosition.y - stagePosition.y) / scale,
+  const pointTo = {
+    x: (point.x - stagePosition.x) / oldScale,
+    y: (point.y - stagePosition.y) / oldScale,
   };
 
-  const direction = deltaY > 0 ? -1 : 1;
-
-  const step = ZOOM_WHEEL_STEP;
-
-  const newScale = direction > 0 ? scale * step : scale / step;
+  const scale = calculateScaleFromDirection(oldScale, direction);
 
   const position = {
-    x: pointerPosition.x - mousePointTo.x * newScale,
-    y: pointerPosition.y - mousePointTo.y * newScale,
+    x: (point.x / scale - pointTo.x) * scale,
+    y: (point.y / scale - pointTo.y) * scale,
   };
 
-  return { position, scale: newScale };
+  return { position, scale };
+}
+
+function calculateScaleFromDirection(oldScale: number, direction: ZoomDirection) {
+  const step = ZOOM_WHEEL_STEP;
+
+  const isReset = direction === 0;
+
+  if (isReset) {
+    return DEFAULT_ZOOM_VALUE;
+  }
+
+  return clamp(direction > 0 ? oldScale * step : oldScale / step, ZOOM_RANGE);
 }

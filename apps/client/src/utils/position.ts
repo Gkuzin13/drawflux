@@ -212,3 +212,7 @@ export function getNormalizedInvertedRect(rect: IRect, scale: number): IRect {
     height: rect.height / scale,
   };
 }
+
+export function calculateCenterPoint(width: number, height: number) {
+  return { x: width / 2, y: height / 2 };
+}

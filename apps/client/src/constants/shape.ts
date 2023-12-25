@@ -20,6 +20,11 @@ export const ARROW_TRANSFORMER = {
   STROKE: colors.green300,
 };
 
+export const ARROW = {
+  HEAD_WIDTH: 7,
+  HEAD_LENGTH: 7,
+};
+
 export const FREE_PATH = {
   TENSION: 0.5,
 };
@@ -28,6 +33,10 @@ export const RECT = {
   CORNER_RADIUS: 6,
   MIN_SIZE: 10,
 };
+
+export const ELLIPSE = {
+  MIN_RADIUS: 5,
+} as const;
 
 export const TEXT = {
   PADDING: 4,

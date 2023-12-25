@@ -11,6 +11,7 @@ import { getPointsAbsolutePosition } from '@/utils/position';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import ArrowTransformer from './ArrowTransformer';
 import { calculateMinMaxMovementPoints } from './helpers/calc';
+import { ARROW } from '@/constants/shape';
 
 const defaultBend = 0.5;
 
@@ -151,8 +152,8 @@ const ArrowDrawable = ({
       const dy = end[1] - controlY;
 
       const radians = (Math.atan2(dy, dx) + PI2) % PI2;
-      const length = 3 * config.strokeWidth;
-      const width = 4 * config.strokeWidth;
+      const length = (ARROW.HEAD_LENGTH / stageScale) * config.strokeWidth;
+      const width = (ARROW.HEAD_WIDTH / stageScale) * config.strokeWidth;
 
       ctx.save();
 
@@ -168,7 +169,7 @@ const ArrowDrawable = ({
       ctx.restore();
       ctx.fillStrokeShape(shape);
     },
-    [control, end, config.strokeWidth],
+    [control, end, config.strokeWidth, stageScale],
   );
 
   const drawArrowLine = useCallback(

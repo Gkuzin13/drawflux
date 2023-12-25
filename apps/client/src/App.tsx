@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect } from 'react';
-import { darkTheme } from 'shared';
 import {
   LOCAL_STORAGE_KEY,
   appState,
@@ -13,7 +12,6 @@ import { storage } from '@/utils/storage';
 import MainLayout from './components/Layout/MainLayout/MainLayout';
 import { useWebSocket } from './contexts/websocket';
 import useWSMessage from './hooks/useWSMessage';
-import { useTheme } from './contexts/theme';
 import useUrlSearchParams from './hooks/useUrlSearchParams/useUrlSearchParams';
 import { historyActions } from './stores/reducers/history';
 import { collaborationActions } from './stores/slices/collaboration';
@@ -23,18 +21,9 @@ import type { Library, AppState } from '@/constants/app';
 const App = () => {
   const params = useUrlSearchParams();
   const ws = useWebSocket();
-  const theme = useTheme();
   const store = useAppStore();
 
   const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (theme.value === 'dark') {
-      document.documentElement.classList.add(darkTheme);
-    } else {
-      document.documentElement.classList.remove(darkTheme);
-    }
-  }, [theme]);
 
   useWSMessage(ws.connection, (message) => {
     const { type, data } = message;

@@ -81,14 +81,15 @@ export function getFillValue(fill: NodeFill, colorValue: ThemeColorValue) {
   }
 }
 
-export function getDashStyle(node: NodeObject, sizeValue: number) {
+export function getDashStyle(node: NodeObject, sizeValue: number, scale: number) {
   if (node.style.line === 'solid') {
     return [];
   }
 
-  const shapeLength = getShapeLength(node);
+  const shapeLength = getShapeLength(node) * scale;
+  const strokeWidth = sizeValue * scale;
 
-  return getDashValue(shapeLength, sizeValue, node.style.line);
+  return getDashValue(shapeLength, strokeWidth, node.style.line);
 }
 
 export function getTotalDashLength(dash: ShapeConfig['dash']) {

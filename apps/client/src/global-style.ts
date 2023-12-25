@@ -20,6 +20,7 @@ export const globalStyle = globalCss({
     fontFamily: 'Heebo, sans-serif',
     overflow: 'hidden',
     color: '$black',
+    backgroundColor: '$canvas-bg',
   },
   '*:where(:not(html, iframe, canvas, img, svg, video, audio):not(svg *, symbol *))':
     {

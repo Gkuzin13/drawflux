@@ -128,6 +128,7 @@ const RectDrawable = ({
       {selected && (
         <NodeTransformer
           ref={transformerRef}
+          stageScale={stageScale}
           transformerConfig={{ keepRatio: false }}
         />
       )}

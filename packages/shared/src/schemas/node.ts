@@ -30,7 +30,9 @@ const Fill = z.union([
   z.literal('solid'),
 ]);
 
-export const NodePoint = z.tuple([z.number(), z.number()]);
+export const NodePoint = z.tuple([z.number(), z.number()]) as z.ZodTuple<
+  [x: z.ZodNumber, y: z.ZodNumber]
+>;
 
 const NodeProps = z.object({
   id: z.string().uuid(),

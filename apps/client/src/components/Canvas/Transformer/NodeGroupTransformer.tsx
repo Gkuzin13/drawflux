@@ -134,6 +134,7 @@ const NodeGroupTransformer = ({ nodes, stageScale, onDragEnd }: Props) => {
       </Group>
       <NodeTransformer
         ref={transformerRef}
+        stageScale={stageScale}
         transformerConfig={{
           enabledAnchors: [],
           rotateEnabled: false,
