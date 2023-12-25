@@ -29,6 +29,10 @@ export const RECT = {
   MIN_SIZE: 10,
 };
 
+export const ELLIPSE = {
+  MIN_RADIUS: 5,
+} as const;
+
 export const TEXT = {
   PADDING: 4,
   LINE_HEIGHT: 1,

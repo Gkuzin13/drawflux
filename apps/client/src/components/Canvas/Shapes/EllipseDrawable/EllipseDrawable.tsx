@@ -10,6 +10,7 @@ import useTransformer from '@/hooks/useTransformer';
 import { calculateCircumference } from '@/utils/math';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import { getEllipseRadius } from './helpers/calc';
+import { ELLIPSE } from '@/constants/shape';
 
 const EllipseDrawable = ({
   node,
@@ -25,6 +26,9 @@ const EllipseDrawable = ({
     nodeRef,
     totalDashLength: getTotalDashLength(config.dash),
   });
+
+  const radiusX = Math.max(node.nodeProps.width ?? 0, ELLIPSE.MIN_RADIUS);
+  const radiusY = Math.max(node.nodeProps.height ?? 0, ELLIPSE.MIN_RADIUS);
 
   const handleDragEnd = useCallback(
     (event: KonvaEventObject<DragEvent>) => {
@@ -94,8 +98,8 @@ const EllipseDrawable = ({
     <>
       <Ellipse
         ref={nodeRef}
-        radiusX={node.nodeProps.width || 0}
-        radiusY={node.nodeProps.height || 0}
+        radiusX={radiusX}
+        radiusY={radiusY}
         x={node.nodeProps.point[0]}
         y={node.nodeProps.point[1]}
         {...config}
