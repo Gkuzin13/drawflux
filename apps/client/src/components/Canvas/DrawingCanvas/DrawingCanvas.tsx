@@ -28,7 +28,7 @@ import {
   getRelativePointerPosition,
 } from './helpers/stage';
 import useRefValue from '@/hooks/useRefValue/useRefValue';
-import { calculateStageZoom, isScaleOutOfRange } from './helpers/zoom';
+import { calculateStageZoomRelativeToPoint } from './helpers/zoom';
 import { throttleFn } from '@/utils/timed';
 import { WS_THROTTLE_MS } from '@/constants/app';
 import usePageMutation from '@/hooks/usePageMutation';
@@ -353,16 +353,18 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
     const zoomStageRelativeToPointerPosition = useCallback(
       (stage: Konva.Stage, deltaY: number) => {
-        const { position, scale } = calculateStageZoom(
-          stage.scaleX(),
-          stage.getRelativePointerPosition() || { x: 0, y: 0 },
-          stage.getPosition(),
-          deltaY,
+        const pointerPosition = stage.getPointerPosition() || { x: 0, y: 0 };
+        const stagePosition = stage.position();
+        const stageScale = stage.scaleX();
+
+        const updatedStageConfig = calculateStageZoomRelativeToPoint(
+          stageScale,
+          pointerPosition,
+          stagePosition,
+          deltaY > 0 ? -1 : 1,
         );
 
-        if (!isScaleOutOfRange(scale)) {
-          dispatch(canvasActions.setStageConfig({ scale, position }));
-        }
+        dispatch(canvasActions.setStageConfig(updatedStageConfig));
       },
       [dispatch],
     );

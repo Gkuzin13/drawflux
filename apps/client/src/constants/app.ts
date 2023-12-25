@@ -24,10 +24,7 @@ export const USER = {
   maxNameLength: 10,
 };
 
-export const ZOOM_RANGE = {
-  MIN: 0.1,
-  MAX: 2.5,
-};
+export const ZOOM_RANGE: [Min: number, Max: number] = [0.1, 10];
 export const ZOOM_MULTIPLIER_VALUE = 0.1;
 export const ZOOM_WHEEL_STEP = 1.1;
 export const DEFAULT_ZOOM_VALUE = 1;
