@@ -62,7 +62,9 @@ const StylePanel = ({
   const enabledOptions = useMemo(() => {
     const selectedNodesTypes = selectedNodes.map(({ type }) => type);
 
-    if (selectedNodesTypes.includes('text')) {
+    const onlyTextNodes = selectedNodesTypes.every((type) => type === 'text');
+    
+    if(onlyTextNodes) {
       return { line: false, size: true };
     }
 
@@ -118,6 +120,9 @@ const StylePanel = ({
         onValueChange={handleOpacityChange}
         onValueCommit={handleOpacityCommit}
       />
+      {enabledOptions.size && (
+        <SizeSection value={style.size} onSizeChange={handleSizeSelect} />
+      )}
       <FillSection value={fillSectionValue} onFillChange={handleFillChange} />
       {enabledOptions.line && (
         <>
@@ -128,9 +133,6 @@ const StylePanel = ({
             onAnimatedChange={handleAnimatedSelect}
           />
         </>
-      )}
-      {enabledOptions.size && (
-        <SizeSection value={style.size} onSizeChange={handleSizeSelect} />
       )}
     </Styled.Container>
   );

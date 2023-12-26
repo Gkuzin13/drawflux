@@ -1,8 +1,9 @@
 import { memo } from 'react';
 import { CONTROL } from '@/constants/panels/control';
 import { createKeyTitle } from '@/utils/string';
-import * as PanelStyled from '../Panels.styled';
 import Icon from '@/components/Elements/Icon/Icon';
+import * as PanelStyled from '../Panels.styled';
+import * as Styled from './ControlPanel.styled';
 
 export type ControlActionKey = (typeof CONTROL)[number]['value'];
 
@@ -30,7 +31,7 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
   };
 
   return (
-    <PanelStyled.Panel>
+    <Styled.Container>
       {CONTROL.map((control) => {
         return (
           <PanelStyled.Button
@@ -46,7 +47,7 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
           </PanelStyled.Button>
         );
       })}
-    </PanelStyled.Panel>
+    </Styled.Container>
   );
 };
 

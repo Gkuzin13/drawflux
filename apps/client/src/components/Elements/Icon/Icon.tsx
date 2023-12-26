@@ -1,5 +1,9 @@
-import type { IconBaseProps } from 'react-icons';
 import * as Icons from 'react-icons/tb';
+import ExtraLarge from './ExtraLarge/ExtraLarge';
+import FilledSolid from './FilledSolid/FilledSolid';
+import { getIconSize, getIconStrokeWidth } from './getIconProps';
+import type { SIZE, STROKE } from './getIconProps';
+import type { IconBaseProps } from 'react-icons';
 
 export type IconName = keyof typeof ICONS;
 export type IconSize = keyof typeof SIZE;
@@ -23,20 +27,17 @@ const ICONS = {
   circle: Icons.TbCircle,
   filledNone: Icons.TbLayersIntersect,
   filledSemi: Icons.TbLayersSubtract,
-  filledSolid: (props: IconBaseProps) =>
-    Icons.TbSquaresFilled({ transform: 'rotate(-90)', ...props }),
+  filledSolid: FilledSolid,
   lineDashed: Icons.TbLineDashed,
   lineDotted: Icons.TbLineDotted,
   plus: Icons.TbPlus,
   minus: Icons.TbMinus,
-  slash: Icons.TbSlash,
   handStop: Icons.TbHandStop,
   pointer: Icons.TbPointer,
   scribble: Icons.TbScribble,
   square: Icons.TbSquare,
   text: Icons.TbTypography,
   x: Icons.TbX,
-  shapeSize: Icons.TbSlash,
   spinner: Icons.TbLoader2,
   dots: Icons.TbDots,
   link: Icons.TbLink,
@@ -48,34 +49,22 @@ const ICONS = {
   moon: Icons.TbMoon,
   moonStars: Icons.TbMoonStars,
   laser: Icons.TbNorthStar,
-  book: Icons.TbBook
+  book: Icons.TbBook,
+  letterS: Icons.TbLetterS,
+  letterM: Icons.TbLetterM,
+  letterL: Icons.TbLetterL,
+  extraLarge: ExtraLarge,
 } as const;
-
-export const SIZE = {
-  xs: 12,
-  sm: 16,
-  md: 18,
-  lg: 20,
-  xl: 24,
-};
-
-const STROKE = {
-  sm: 1.5,
-  md: 1.75,
-  lg: 2,
-  xl: 2.5,
-};
 
 const Icon = (props: IconProps) => {
   const { name, stroke, size, ...rest } = props;
 
-  const Icon = ICONS[name];
+  const sizeValue = getIconSize(size);
+  const strokeValue = getIconStrokeWidth(stroke);
 
-  const sizeValue = SIZE[size ?? 'md'];
-  const strokeValue =
-    typeof stroke === 'number' ? stroke : STROKE[stroke ?? 'md'];
+  const Component = ICONS[name];
 
-  return <Icon size={sizeValue} strokeWidth={strokeValue} {...rest} />;
+  return <Component size={sizeValue} strokeWidth={strokeValue} {...rest} />;
 };
 
 export default Icon;
