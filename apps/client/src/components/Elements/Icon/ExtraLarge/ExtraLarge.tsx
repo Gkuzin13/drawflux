@@ -1,13 +1,12 @@
-import Icon from '../Icon';
+import { TbLetterL, TbLetterX } from 'react-icons/tb';
 import * as Styled from './ExtraLarge.styled';
-import type { IconProps } from '../Icon';
+import type { IconBaseProps } from 'react-icons';
 
-
-const ExtraLarge = (props: IconProps) => {
+const ExtraLarge = (props: IconBaseProps) => {
   return (
     <Styled.Root>
-      <Icon {...props} name="letterX" size='lg' />
-      <Icon {...props} name="letterL" size='lg' />
+      <TbLetterX {...props} name="letterX" size="lg" />
+      <TbLetterL {...props} name="letterL" size="lg" />
     </Styled.Root>
   );
 };

@@ -1,9 +1,9 @@
 import * as Icons from 'react-icons/tb';
 import ExtraLarge from './ExtraLarge/ExtraLarge';
+import FilledSolid from './FilledSolid/FilledSolid';
 import { getIconSize, getIconStrokeWidth } from './getIconProps';
 import type { SIZE, STROKE } from './getIconProps';
-import type { IconBaseProps, IconType } from 'react-icons';
-import FilledSolid from './FilledSolid/FilledSolid';
+import type { IconBaseProps } from 'react-icons';
 
 export type IconName = keyof typeof ICONS;
 export type IconSize = keyof typeof SIZE;
@@ -32,14 +32,12 @@ const ICONS = {
   lineDotted: Icons.TbLineDotted,
   plus: Icons.TbPlus,
   minus: Icons.TbMinus,
-  slash: Icons.TbSlash,
   handStop: Icons.TbHandStop,
   pointer: Icons.TbPointer,
   scribble: Icons.TbScribble,
   square: Icons.TbSquare,
   text: Icons.TbTypography,
   x: Icons.TbX,
-  shapeSize: Icons.TbSlash,
   spinner: Icons.TbLoader2,
   dots: Icons.TbDots,
   link: Icons.TbLink,
@@ -55,8 +53,7 @@ const ICONS = {
   letterS: Icons.TbLetterS,
   letterM: Icons.TbLetterM,
   letterL: Icons.TbLetterL,
-  letterX: Icons.TbLetterX,
-  extraLarge: ExtraLarge as IconType,
+  extraLarge: ExtraLarge,
 } as const;
 
 const Icon = (props: IconProps) => {
