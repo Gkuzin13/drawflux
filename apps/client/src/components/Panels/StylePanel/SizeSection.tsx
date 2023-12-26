@@ -3,7 +3,6 @@ import type { NodeSize } from 'shared';
 import { SIZE } from '@/constants/panels/style';
 import { createTitle } from '@/utils/string';
 import Icon from '@/components/Elements/Icon/Icon';
-import { getSizeValue } from '@/utils/shape';
 import * as Styled from './StylePanel.styled';
 
 type Props = {
@@ -33,7 +32,7 @@ const SizeSection = ({ value, onSizeChange }: Props) => {
                 size.value === value ? 'secondary-dark' : 'secondary-light'
               }
             >
-              <Icon name={size.icon} stroke={getSizeValue(size.value)} />
+              <Icon name={size.icon} stroke="lg" />
             </Styled.Item>
           );
         })}

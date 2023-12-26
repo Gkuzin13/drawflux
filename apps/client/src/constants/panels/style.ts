@@ -53,21 +53,21 @@ export const SIZE: Entity<NodeSize>[] = [
   {
     value: 'small',
     name: 'Small',
-    icon: 'shapeSize',
+    icon: 'letterS',
   },
   {
     value: 'medium',
     name: 'Medium',
-    icon: 'shapeSize',
+    icon: 'letterM',
   },
   {
     value: 'large',
     name: 'Large',
-    icon: 'shapeSize',
+    icon: 'letterL',
   },
   {
     value: 'extra-large',
     name: 'Extra Large',
-    icon: 'shapeSize',
+    icon: 'extraLarge',
   },
 ];
