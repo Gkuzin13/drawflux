@@ -21,8 +21,8 @@ export const ARROW_TRANSFORMER = {
 };
 
 export const ARROW = {
-  HEAD_WIDTH: 7,
-  HEAD_LENGTH: 7,
+  HEAD_WIDTH: 6,
+  HEAD_LENGTH: 6,
 };
 
 export const FREE_PATH = {
