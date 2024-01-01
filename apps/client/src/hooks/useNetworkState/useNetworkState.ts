@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import useEvent from '@/hooks/useEvent/useEvent';
 
 type NetworkState = {
   online?: boolean;
 };
 
 const isNavigator = typeof navigator !== 'undefined';
+
+const eventOptions = { passive: true };
 
 function getConnectionState(): NetworkState {
   return {
@@ -15,19 +18,12 @@ function getConnectionState(): NetworkState {
 function useNetworkState() {
   const [state, setState] = useState(getConnectionState());
 
-  useEffect(() => {
-    const handleStateChange = () => {
-      setState(getConnectionState());
-    };
+  const handleStateChange = useCallback(() => {
+    setState(getConnectionState());
+  }, []);
 
-    window.addEventListener('online', handleStateChange, { passive: true });
-    window.addEventListener('offline', handleStateChange, { passive: true });
-
-    return () => {
-      window.removeEventListener('online', handleStateChange);
-      window.removeEventListener('offline', handleStateChange);
-    };
-  });
+  useEvent('online', handleStateChange, window, { eventOptions });
+  useEvent('offline', handleStateChange, window, { eventOptions });
 
   return state;
 }

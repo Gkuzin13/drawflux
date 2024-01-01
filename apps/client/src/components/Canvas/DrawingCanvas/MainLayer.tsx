@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { Layer } from 'react-konva';
-import useEvent from '@/hooks/useEvent';
+import useEvent from '@/hooks/useEvent/useEvent';
 import { getUnregisteredPointerPosition } from './helpers/stage';
 import { safeJSONParse } from '@/utils/object';
 import { duplicateNodesAtPosition } from '@/utils/node';

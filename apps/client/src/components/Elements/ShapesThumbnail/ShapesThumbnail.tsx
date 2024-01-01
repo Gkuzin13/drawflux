@@ -7,7 +7,7 @@ import {
   getNodesMinMaxPoints,
 } from '@/utils/position';
 import useForceUpdate from '@/hooks/useForceUpdate/useForceUpdate';
-import useEvent from '@/hooks/useEvent';
+import useEvent from '@/hooks/useEvent/useEvent';
 import * as Styled from './ShapesThumbnail.styled';
 import type { NodeObject, ThemeColorValue } from 'shared';
 import type Konva from 'konva';
