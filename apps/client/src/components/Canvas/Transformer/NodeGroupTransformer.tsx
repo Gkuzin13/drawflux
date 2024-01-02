@@ -1,22 +1,20 @@
-import type Konva from 'konva';
 import { useCallback } from 'react';
 import { Group } from 'react-konva';
-import type { NodeObject } from 'shared';
 import Node from '@/components/Canvas/Node/Node';
 import useForceUpdate from '@/hooks/useForceUpdate/useForceUpdate';
 import useTransformer from '@/hooks/useTransformer';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import NodeTransformer from './NodeTransformer';
 import { mapNodesIds } from '@/utils/node';
+import { noop } from '@/utils/is';
+import type Konva from 'konva';
+import type { NodeObject } from 'shared';
 
 type Props = {
   nodes: NodeObject[];
   stageScale: number;
   onDragEnd: (nodes: NodeObject[]) => void;
 };
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noop = () => {};
 
 const NodeGroupTransformer = ({ nodes, stageScale, onDragEnd }: Props) => {
   // Solves the issue when a nested group inside a tranformer is not updated properly when changed

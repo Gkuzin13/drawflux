@@ -1,26 +1,27 @@
-import * as PopoverPrimitive from '@radix-ui/react-popover';
-import { memo } from 'react';
-import type { QRCodeRequestBody, QRCodeResponse } from 'shared';
-import useFetch from '@/hooks/useFetch';
+import { memo, useState } from 'react';
+import api from '@/services/api';
 import ShareablePageContent from './ShareablePageContent';
 import SharedPageContent from './SharedPageContent';
 import * as Styled from './SharePanel.styled';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
+import type { QRCodeResponse } from 'shared';
 
 type Props = {
   isPageShared: boolean;
 };
 
 const SharePanel = ({ isPageShared }: Props) => {
-  const [{ data, error }, getQRCode] = useFetch<
-    QRCodeResponse,
-    QRCodeRequestBody
-  >('/qrcode', { method: 'POST' }, true);
-
-  const url = window.location.href;
+  const [qrCode, setQRCode] = useState<QRCodeResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handlePopoverOpen = (open: boolean) => {
-    if (isPageShared && !data && open) {
-      getQRCode({ url });
+    if (isPageShared && open && !qrCode) {
+      const url = window.location.href;
+
+      setError(null);
+
+      const [request] = api.makeQRCode({ url });
+      request.then(setQRCode).catch(setError);
     }
   };
 
@@ -30,7 +31,7 @@ const SharePanel = ({ isPageShared }: Props) => {
       <PopoverPrimitive.Portal>
         <Styled.Content align="end" sideOffset={4}>
           {isPageShared ? (
-            <SharedPageContent qrCode={data} error={error} />
+            <SharedPageContent qrCode={qrCode} error={error} />
           ) : (
             <ShareablePageContent />
           )}

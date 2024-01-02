@@ -8,24 +8,26 @@ type DispatchAction<T extends string, P extends NonNullable<unknown>> = {
   payload: P;
 };
 
-type Add = DispatchAction<'add', { node: NodeObject }>;
+type Create = DispatchAction<'create', { node: NodeObject }>;
 type Draw = DispatchAction<'draw', { nodeId: string; position: DrawPosition }>;
-type Finish = DispatchAction<'finish', { nodeId: string }>;
-type FinishAndKeep = DispatchAction<'finish-keep', { nodeId: string }>;
+type Update = DispatchAction<'update', { node: NodeObject; }>;
+type Finish = DispatchAction<'finish', { nodeId: string; keep?: boolean }>;
 
-type NodeDraftAction = Add | Draw | Finish | FinishAndKeep;
+type NodeDraftAction = Create | Draw | Update | Finish;
 
-type NodeDrafts = {
-  [nodeId: string]: { node: NodeObject; drawing: boolean };
+type Drafts = {
+  [nodeId: string]: Draft;
 };
 
+export type Draft = { node: NodeObject; drawing: boolean };
+
 function useDrafts() {
-  const [drafts, setDrafts] = useState<NodeDrafts>({});
+  const [drafts, setDrafts] = useState<Drafts>({});
 
   const dispatchAction = useCallback(({ type, payload }: NodeDraftAction) => {
     setDrafts((prevDrafts) => {
       switch (type) {
-        case 'add': {
+        case 'create': {
           const { node } = payload;
           const newDraftNode = { drawing: true, node };
 
@@ -46,26 +48,34 @@ function useDrafts() {
 
           return prevDrafts;
         }
+        case 'update': {
+          const { node } = payload;
+
+          if (node.nodeProps.id in prevDrafts) {
+            const prevDraft = prevDrafts[node.nodeProps.id];
+
+            const updatedDraft = { drawing: prevDraft.drawing, node };
+
+            return { ...prevDrafts, [node.nodeProps.id]: updatedDraft };
+          }
+
+          return prevDrafts;
+        }
         case 'finish': {
-          const { nodeId } = payload;
+          const { nodeId, keep } = payload;
 
           if (nodeId in prevDrafts) {
             const draftsCopy = { ...prevDrafts };
 
+            if (keep) {
+              const { node } = prevDrafts[nodeId];
+              const updatedDraft = { node, drawing: false };
+
+              return { ...draftsCopy, [nodeId]: updatedDraft };
+            }
+
             delete draftsCopy[nodeId];
-
             return draftsCopy;
-          }
-          return prevDrafts;
-        }
-        case 'finish-keep': {
-          const { nodeId } = payload;
-
-          if (nodeId in prevDrafts) {
-            const { node } = prevDrafts[nodeId];
-            const updatedDraft = { node, drawing: false };
-
-            return { ...prevDrafts, [nodeId]: updatedDraft };
           }
           return prevDrafts;
         }
@@ -74,7 +84,7 @@ function useDrafts() {
       }
     });
   }, []);
-  
+
   return [Object.values(drafts), dispatchAction] as const;
 }
 

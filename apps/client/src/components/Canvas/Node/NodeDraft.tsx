@@ -3,16 +3,8 @@ import { type NodeComponentProps } from './Node';
 
 type Props = Omit<NodeComponentProps, 'selected'>;
 
-const NodeDraft = ({ node, stageScale, onNodeChange, onNodeDelete }: Props) => {
-  return (
-    <Node
-      node={node}
-      selected={false}
-      stageScale={stageScale}
-      onNodeChange={onNodeChange}
-      onNodeDelete={onNodeDelete}
-    />
-  );
+const NodeDraft = (props: Props) => {
+  return <Node selected={false} {...props} />;
 };
 
 export default NodeDraft;

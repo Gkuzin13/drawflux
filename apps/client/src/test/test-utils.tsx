@@ -4,16 +4,16 @@ import { Provider as StoreProvider } from 'react-redux';
 import userEvent from '@testing-library/user-event';
 import canvasReducer, {
   initialState as initialCanvasState,
-} from '@/stores/slices/canvas';
+} from '@/services/canvas/slice';
 import historyReducer, {
   type CanvasHistoryState,
 } from '@/stores/reducers/history';
 import collabReducer, {
   initialState as initialCollabState,
-} from '@/stores/slices/collaboration';
+} from '@/services/collaboration/slice';
 import libraryReducer, {
   initialState as initialLibraryState,
-} from '@/stores/slices/library';
+} from '@/services/library/slice';
 import { WebSocketProvider } from '@/contexts/websocket';
 import { ThemeProvider } from '@/contexts/theme';
 import { NotificationsProvider } from '@/contexts/notifications';
@@ -75,7 +75,7 @@ export function renderWithProviders(
         <StoreProvider store={store}>
           <ModalProvider>
             <NotificationsProvider>
-              <WebSocketProvider>{children}</WebSocketProvider>
+              <WebSocketProvider roomId={null}>{children}</WebSocketProvider>
             </NotificationsProvider>
           </ModalProvider>
         </StoreProvider>

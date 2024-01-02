@@ -1,10 +1,10 @@
 import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { makeNodesCopy, reorderNodes, isValidNode } from '@/utils/node';
 import { getCanvasCenteredPositionRelativeToNodes } from '@/utils/position';
-import { historyActions } from '../reducers/history';
+import { historyActions } from '../../stores/reducers/history';
 import type { NodeObject } from 'shared';
 import type { AppState } from '@/constants/app';
-import type { RootState } from '../store';
+import type { RootState } from '../../stores/store';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 export type CanvasSliceState = {
@@ -25,6 +25,18 @@ export const initialState: CanvasSliceState = {
   copiedNodes: null,
 };
 
+export type ActionMeta = {
+  receivedFromWS?: boolean;
+  broadcast?: boolean;
+};
+
+export const prepareMeta = <T = undefined>(
+  payload: T = undefined as T,
+  meta?: ActionMeta,
+) => {
+  return { payload, meta };
+};
+
 export const canvasSlice = createSlice({
   name: 'canvas',
   initialState,
@@ -37,67 +49,96 @@ export const canvasSlice = createSlice({
       state.stageConfig = stageConfig;
       state.toolType = toolType;
     },
-    setNodes: (state, action: PayloadAction<NodeObject[]>) => {
-      state.nodes = action.payload;
+    setNodes: {
+      reducer: (state, action: PayloadAction<NodeObject[]>) => {
+        state.nodes = action.payload;
+      },
+      prepare: prepareMeta<NodeObject[]>,
     },
-    addNodes: (state, action: PayloadAction<NodeObject[]>) => {
-      const nodesToAdd = action.payload;
+    addNodes: {
+      reducer: (state, action: PayloadAction<NodeObject[]>) => {
+        const nodesToAdd = action.payload;
 
-      if (nodesToAdd.every(isValidNode)) {
-        state.nodes.push(...nodesToAdd);
-      }
+        if (nodesToAdd.every(isValidNode)) {
+          state.nodes.push(...nodesToAdd);
+        }
+      },
+      prepare: prepareMeta<NodeObject[]>,
     },
-    updateNodes: (state, action: PayloadAction<NodeObject[]>) => {
-      const updatedNodesMap = new Map(
-        action.payload.map((node) => [node.nodeProps.id, node]),
-      );
+    updateNodes: {
+      reducer: (state, action: PayloadAction<NodeObject[]>) => {
+        const updatedNodesMap = new Map(
+          action.payload.map((node) => [node.nodeProps.id, node]),
+        );
 
-      const updatedNodes = state.nodes.map((node) => {
-        const updatedNode = updatedNodesMap.get(node.nodeProps.id);
+        const updatedNodes = state.nodes.map((node) => {
+          const updatedNode = updatedNodesMap.get(node.nodeProps.id);
 
-        return updatedNode ?? node;
-      });
+          return updatedNode ?? node;
+        });
 
-      state.nodes = updatedNodes.filter(isValidNode);
+        state.nodes = updatedNodes.filter(isValidNode);
+      },
+      prepare: prepareMeta<NodeObject[]>,
     },
-    deleteNodes: (state, action: PayloadAction<string[]>) => {
-      const nodesIds = new Set<string>(action.payload);
+    deleteNodes: {
+      reducer: (state, action: PayloadAction<string[]>) => {
+        const nodesIds = new Set<string>(action.payload);
 
-      state.nodes = state.nodes.filter(
-        (node) => !nodesIds.has(node.nodeProps.id),
-      );
+        state.nodes = state.nodes.filter(
+          (node) => !nodesIds.has(node.nodeProps.id),
+        );
+      },
+      prepare: prepareMeta<string[]>,
     },
-    moveNodesToStart: (state, action: PayloadAction<string[]>) => {
-      state.nodes = reorderNodes(action.payload, state.nodes).toStart();
+    moveNodesToStart: {
+      reducer: (state, action: PayloadAction<string[]>) => {
+        state.nodes = reorderNodes(action.payload, state.nodes).toStart();
+      },
+      prepare: prepareMeta<string[]>,
     },
-    moveNodesForward: (state, action: PayloadAction<string[]>) => {
-      state.nodes = reorderNodes(action.payload, state.nodes).forward();
+    moveNodesForward: {
+      reducer: (state, action: PayloadAction<string[]>) => {
+        state.nodes = reorderNodes(action.payload, state.nodes).forward();
+      },
+      prepare: prepareMeta<string[]>,
     },
-    moveNodesBackward: (state, action: PayloadAction<string[]>) => {
-      state.nodes = reorderNodes(action.payload, state.nodes).backward();
+    moveNodesBackward: {
+      reducer: (state, action: PayloadAction<string[]>) => {
+        state.nodes = reorderNodes(action.payload, state.nodes).backward();
+      },
+      prepare: prepareMeta<string[]>,
     },
-    moveNodesToEnd: (state, action: PayloadAction<string[]>) => {
-      state.nodes = reorderNodes(action.payload, state.nodes).toEnd();
+    moveNodesToEnd: {
+      reducer: (state, action: PayloadAction<string[]>) => {
+        state.nodes = reorderNodes(action.payload, state.nodes).toEnd();
+      },
+      prepare: prepareMeta<string[]>,
     },
     copyNodes: (state) => {
       const { nodes, selectedNodesIds } = state;
 
-      state.copiedNodes = nodes.filter(
-        ({ nodeProps }) => nodeProps.id in selectedNodesIds,
+      const selectedNodes = nodes.filter(
+        (node) => node.nodeProps.id in selectedNodesIds,
       );
+
+      state.copiedNodes = makeNodesCopy(selectedNodes);
     },
-    pasteNodes: (state) => {
-      if (state.copiedNodes) {
-        const duplicatedNodes = makeNodesCopy(state.copiedNodes);
+    pasteNodes: {
+      reducer: (state) => {
+        const { copiedNodes } = state;
 
-        state.nodes.push(...duplicatedNodes);
+        if (!copiedNodes) {
+          return;
+        }
 
+        state.nodes.push(...copiedNodes);
         state.selectedNodesIds = Object.fromEntries(
-          duplicatedNodes.map(({ nodeProps }) => [nodeProps.id, true]),
+          copiedNodes.map(({ nodeProps }) => [nodeProps.id, true]),
         );
-
         state.copiedNodes = null;
-      }
+      },
+      prepare: prepareMeta,
     },
     setToolType: (
       state,

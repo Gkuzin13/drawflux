@@ -1,15 +1,12 @@
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 import { type PropsWithChildren, type ReactNode, useCallback } from 'react';
-import { type WSMessage } from 'shared';
 import Divider from '@/components/Elements/Divider/Divider';
 import Kbd from '@/components/Elements/Kbd/Kbd';
-import { useWebSocket } from '@/contexts/websocket';
 import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
-import { canvasActions, selectSelectedNodesIds } from '@/stores/slices/canvas';
-import * as Styled from './ContextMenu.styled';
-import usePageMutation from '@/hooks/usePageMutation';
+import { canvasActions, selectSelectedNodesIds } from '@/services/canvas/slice';
+import { libraryActions } from '@/services/library/slice';
 import { duplicateNodesToRight, mapNodesIds } from '@/utils/node';
-import { libraryActions } from '@/stores/slices/library';
+import * as Styled from './ContextMenu.styled';
 
 export type ContextMenuType = 'node-menu' | 'canvas-menu';
 
@@ -20,15 +17,6 @@ type RootProps = PropsWithChildren<{
 
 type TriggerProps = ContextMenuPrimitive.ContextMenuTriggerProps;
 
-type NodesMenuWSMessageType = Extract<
-  WSMessage['type'],
-  | 'nodes-move-to-start'
-  | 'nodes-move-to-end'
-  | 'nodes-move-backward'
-  | 'nodes-move-forward'
-  | 'nodes-delete'
->;
-
 type NodesMenuActionKey = Extract<
   keyof typeof canvasActions,
   | 'moveNodesToStart'
@@ -38,20 +26,7 @@ type NodesMenuActionKey = Extract<
   | 'deleteNodes'
 >;
 
-const wsNodesActionMap: Record<NodesMenuActionKey, NodesMenuWSMessageType> = {
-  moveNodesToStart: 'nodes-move-to-start',
-  moveNodesToEnd: 'nodes-move-to-end',
-  moveNodesBackward: 'nodes-move-backward',
-  moveNodesForward: 'nodes-move-forward',
-  deleteNodes: 'nodes-delete',
-};
-
 const CanvasMenu = () => {
-  const store = useAppStore();
-  const ws = useWebSocket();
-  
-  const { updatePage } = usePageMutation();
-
   const dispatch = useAppDispatch();
 
   const handleSelectAll = useCallback(() => {
@@ -61,18 +36,7 @@ const CanvasMenu = () => {
   const handlePaste = useCallback(() => {
     dispatch(canvasActions.pasteNodes());
 
-    if (ws.isConnected) {
-      const { selectedNodesIds, nodes } = store.getState().canvas.present;
-
-      const pastedNodes = nodes.filter(
-        ({ nodeProps }) => nodeProps.id in selectedNodesIds,
-      );
-
-      ws.send({ type: 'nodes-add', data: pastedNodes });
-
-      updatePage({ nodes });
-    }
-  }, [ws, store, updatePage, dispatch]);
+  }, [dispatch]);
 
   return (
     <>
@@ -90,9 +54,6 @@ const CanvasMenu = () => {
 const NodeMenu = () => {
   const store = useAppStore();
   const selectedNodesIds = useAppSelector(selectSelectedNodesIds);
-  const ws = useWebSocket();
-
-  const { updatePage } = usePageMutation();
 
   const dispatch = useAppDispatch();
 
@@ -101,15 +62,6 @@ const NodeMenu = () => {
     const action = canvasActions[actionKey];
 
     dispatch(action(nodesIds));
-
-    if (ws.isConnected) {
-      const messageType = wsNodesActionMap[actionKey];
-
-      ws.send({ type: messageType, data: nodesIds });
-
-      const currentNodes = store.getState().canvas.present.nodes;
-      updatePage({ nodes: currentNodes });
-    }
   };
 
   const handleNodesDuplicate = () => {
@@ -124,14 +76,6 @@ const NodeMenu = () => {
 
     dispatch(canvasActions.addNodes(duplicatedNodes));
     dispatch(canvasActions.setSelectedNodesIds(duplicatedNodesIds));
-
-    if (ws.isConnected) {
-      ws.send({ type: 'nodes-add', data: duplicatedNodes });
-
-      const currentNodes = store.getState().canvas.present.nodes;
-
-      updatePage({ nodes: currentNodes });
-    }
   };
 
   const handleSelectNone = () => {

@@ -2,7 +2,7 @@ import reducer, {
   type CanvasSliceState,
   canvasActions,
   initialState,
-} from '../canvas';
+} from '../slice';
 import { nodesGenerator } from '@/test/data-generators';
 import type { AppState } from '@/constants/app';
 import type { NodeObject, StageConfig } from 'shared';

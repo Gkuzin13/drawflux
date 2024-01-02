@@ -9,27 +9,26 @@ import {
   selectHistory,
   selectNodes,
   selectToolType,
-} from '@/stores/slices/canvas';
-import { collaborationActions } from '@/stores/slices/collaboration';
+} from '@/services/canvas/slice';
+import { collaborationActions } from '@/services/collaboration/slice';
 import { downloadDataUrlAsFile, importProject } from '@/utils/file';
 import ControlPanel, {
   type ControlActionKey,
 } from './ControlPanel/ControlPanel';
 import MenuPanel, { type MenuKey } from './MenuPanel/MenuPanel';
-import * as Styled from './Panels.styled';
 import SharePanel from './SharePanel/SharePanel';
 import StylePanel from './StylePanel/StylePanel';
 import ToolsPanel from './ToolsPanel/ToolsPanel';
 import ZoomPanel from './ZoomPanel/ZoomPanel';
 import LibraryDrawer from '../Library/LibraryDrawer/LibraryDrawer';
-import usePageMutation from '@/hooks/usePageMutation';
 import { PROJECT_FILE_EXT, PROJECT_FILE_NAME } from '@/constants/app';
 import { historyActions } from '@/stores/reducers/history';
-import { selectLibrary } from '@/stores/slices/library';
-import { type MenuPanelActionType } from '@/constants/panels/menu';
-import { type ToolType } from '@/constants/panels/tools';
+import { selectLibrary } from '@/services/library/slice';
 import { calculateCenterPoint } from '@/utils/position';
 import { calculateStageZoomRelativeToPoint } from '../Canvas/DrawingCanvas/helpers/zoom';
+import * as Styled from './Panels.styled';
+import { type MenuPanelActionType } from '@/constants/panels/menu';
+import { type ToolType } from '@/constants/panels/tools';
 import type Konva from 'konva';
 import type { NodeStyle, User } from 'shared';
 import type { ZoomAction } from '@/constants/panels/zoom';
@@ -45,22 +44,19 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
   const store = useAppStore();
   const ws = useWebSocket();
 
-  const { updatePage } = usePageMutation();
-
   const stageConfig = useAppSelector(selectConfig);
   const toolType = useAppSelector(selectToolType);
   const nodes = useAppSelector(selectNodes);
   const library = useAppSelector(selectLibrary);
 
   const { past, future } = useAppSelector(selectHistory);
-
   const { online } = useNetworkState();
 
   const modal = useModal();
 
-  const isHandTool = toolType === 'hand';
-
   const dispatch = useAppDispatch();
+
+  const isHandTool = toolType === 'hand';
 
   const selectedNodes = useMemo(() => {
     const nodesIds = new Set(selectedNodesIds);
@@ -74,11 +70,11 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
 
   const enabledControls = useMemo(() => {
     return {
-      undo: Boolean(past.length),
-      redo: Boolean(future.length),
+      undo: Boolean(past.length) && !ws.isConnected,
+      redo: Boolean(future.length) && !ws.isConnected,
       deleteSelectedNodes: Boolean(selectedNodesIds.length),
     };
-  }, [past, future, selectedNodesIds]);
+  }, [ws, past, future, selectedNodesIds]);
 
   const disabledMenuItems = useMemo((): MenuKey[] | null => {
     if (ws.isConnected) {
@@ -94,13 +90,8 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
     [dispatch],
   );
 
-  const handleUpdatePage = useCallback(() => {
-    const currentNodes = store.getState().canvas.present.nodes;
-    updatePage({ nodes: currentNodes });
-  }, [store, updatePage]);
-
   const handleStyleChange = useCallback(
-    (style: Partial<NodeStyle>, updateAsync = true) => {
+    (style: Partial<NodeStyle>) => {
       const { nodes, selectedNodesIds } = store.getState().canvas.present;
 
       const updatedNodes = nodes
@@ -110,14 +101,8 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
         });
 
       dispatch(canvasActions.updateNodes(updatedNodes));
-
-      if (ws.isConnected) {
-        ws.send({ type: 'nodes-update', data: updatedNodes });
-
-        updateAsync && handleUpdatePage();
-      }
     },
-    [ws, store, handleUpdatePage, dispatch],
+    [store, dispatch],
   );
 
   const handleMenuAction = useCallback(
@@ -191,41 +176,22 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
     (actionType: ControlActionKey) => {
       if (actionType === 'deleteNodes') {
         dispatch(canvasActions.deleteNodes(selectedNodesIds));
-
-        if (ws.isConnected) {
-          ws.send({
-            type: 'nodes-delete',
-            data: selectedNodesIds,
-          });
-        }
         return;
       }
 
-      if (actionType === 'undo' || actionType === 'redo') {
+      if (!ws.isConnected && (actionType === 'undo' || actionType === 'redo')) {
         const action = historyActions[actionType];
-
         dispatch(action());
-
-        if (ws.isConnected) {
-          const historyAction = actionType === 'redo' ? 'redo' : 'undo';
-          ws.send({ type: 'history-change', data: { action: historyAction } });
-
-          handleUpdatePage();
-        }
       }
     },
-    [ws, selectedNodesIds, dispatch, handleUpdatePage],
+    [ws, selectedNodesIds, dispatch],
   );
 
   const handleUserChange = useCallback(
     (user: User) => {
-      if (ws.isConnected) {
-        ws.send({ type: 'user-change', data: user });
-
-        dispatch(collaborationActions.updateUser(user));
-      }
+      dispatch(collaborationActions.updateUser(user));
     },
-    [ws, dispatch],
+    [dispatch],
   );
 
   return (
@@ -242,7 +208,6 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
           isActive={isStylePanelActive}
           onStyleChange={handleStyleChange}
         />
-
         {ws.isConnected && (
           <Suspense>
             <UsersPanel onUserChange={handleUserChange} />

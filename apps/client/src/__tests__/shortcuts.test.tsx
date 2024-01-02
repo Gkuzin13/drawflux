@@ -6,7 +6,7 @@ import {
 } from '@/test/test-utils';
 import { TOOLS } from '@/constants/panels/tools';
 import { nodesGenerator, stateGenerator } from '@/test/data-generators';
-import { canvasActions } from '@/stores/slices/canvas';
+import { canvasActions } from '@/services/canvas/slice';
 import { mapNodesIds } from '@/utils/node';
 import { historyActions } from '@/stores/reducers/history';
 

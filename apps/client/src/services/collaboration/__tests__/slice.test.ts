@@ -1,31 +1,31 @@
-import reducer, { collaborationActions, initialState } from '../collaboration';
+import reducer, { collaborationActions, initialState } from '../slice';
 import { usersGenerator } from '@/test/data-generators';
-import type { CollaborationSliceState } from '../collaboration';
+import type { CollaborationSliceState } from '../slice';
 import type { User } from 'shared';
 
 describe('collaboration slice', () => {
   it('initializes correctly', () => {
-    const users: CollaborationSliceState['users'] = usersGenerator(4);
-    const userId = users[0].id;
+    const collaborators = usersGenerator(4);
+    const thisUser = collaborators[0];
 
     const state = reducer(
       undefined,
-      collaborationActions.init({ userId, users }),
+      collaborationActions.init({ thisUser, collaborators }),
     );
 
-    expect(state).toEqual({ ...initialState, userId, users });
+    expect(state).toEqual({ ...initialState, thisUser, collaborators });
   });
 
   it('adds a user', () => {
-    const users = usersGenerator(2);
-    const userId = users[0].id;
+    const collaborators = usersGenerator(4);
+    const thisUser = collaborators[0];
 
     const userToAdd = usersGenerator(1)[0];
 
     const previousState: CollaborationSliceState = {
       ...initialState,
-      userId,
-      users,
+      thisUser,
+      collaborators,
     };
 
     const state = reducer(
@@ -35,20 +35,20 @@ describe('collaboration slice', () => {
 
     expect(state).toEqual({
       ...previousState,
-      users: expect.arrayContaining<User>([userToAdd]),
+      collaborators: expect.arrayContaining<User>([userToAdd]),
     });
   });
 
   it('updates a user', () => {
-    const users = usersGenerator(3);
+    const collaborators = usersGenerator(3);
 
     const updatedUser: User = {
-      ...users[0],
+      ...collaborators[0],
       name: 'New name',
       color: 'gray500',
     };
 
-    const previousState: CollaborationSliceState = { ...initialState, users };
+    const previousState: CollaborationSliceState = { ...initialState, collaborators };
 
     const state = reducer(
       previousState,
@@ -57,15 +57,15 @@ describe('collaboration slice', () => {
 
     expect(state).toEqual({
       ...previousState,
-      users: [updatedUser, users[1], users[2]],
+      collaborators: [updatedUser, collaborators[1], collaborators[2]],
     });
   });
 
   it('does not error or update a user if the user is not in the state', () => {
-    const users = usersGenerator(3);
+    const collaborators = usersGenerator(3);
     const userNotInState = usersGenerator(1)[0];
 
-    const previousState: CollaborationSliceState = { ...initialState, users };
+    const previousState: CollaborationSliceState = { ...initialState, collaborators };
 
     const state = reducer(
       previousState,
@@ -76,10 +76,10 @@ describe('collaboration slice', () => {
   });
 
   it('removes a user', () => {
-    const users = usersGenerator(3);
-    const userToRemove = users[0];
+    const collaborators = usersGenerator(3);
+    const userToRemove = collaborators[0];
 
-    const previousState: CollaborationSliceState = { ...initialState, users };
+    const previousState: CollaborationSliceState = { ...initialState, collaborators };
 
     const state = reducer(
       previousState,
@@ -88,7 +88,7 @@ describe('collaboration slice', () => {
 
     expect(state).toEqual({
       ...previousState,
-      users: expect.not.arrayContaining<User>([userToRemove]),
+      collaborators: expect.not.arrayContaining<User>([userToRemove]),
     });
   });
 });

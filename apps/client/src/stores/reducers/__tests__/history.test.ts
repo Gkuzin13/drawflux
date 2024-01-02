@@ -1,7 +1,7 @@
 import reducer, { type CanvasHistoryState, historyActions } from '../history';
 import canvasReducer, {
   initialState as initialCanvasState,
-} from '@/stores/slices/canvas';
+} from '@/services/canvas/slice';
 import { nodesGenerator } from '@/test/data-generators';
 
 describe('history reducer', () => {

@@ -1,134 +1,92 @@
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect } from 'react';
 import {
   LOCAL_STORAGE_KEY,
-  appState,
-  libraryState,
-  PAGE_URL_SEARCH_PARAM_KEY,
   LOCAL_STORAGE_LIBRARY_KEY,
+  PAGE_URL_SEARCH_PARAM_KEY,
 } from '@/constants/app';
-import { useAppDispatch, useAppStore } from '@/stores/hooks';
-import { canvasActions } from '@/stores/slices/canvas';
+import { useAppDispatch } from '@/stores/hooks';
+import { canvasActions } from '@/services/canvas/slice';
 import { storage } from '@/utils/storage';
 import MainLayout from './components/Layout/MainLayout/MainLayout';
 import { useWebSocket } from './contexts/websocket';
-import useWSMessage from './hooks/useWSMessage';
-import useUrlSearchParams from './hooks/useUrlSearchParams/useUrlSearchParams';
-import { historyActions } from './stores/reducers/history';
-import { collaborationActions } from './stores/slices/collaboration';
-import { libraryActions } from './stores/slices/library';
+import { libraryActions } from '@/services/library/slice';
+import {
+  addCollabActionsListeners,
+  subscribeToIncomingCollabMessages,
+} from './services/collaboration/listeners';
+import useParam from './hooks/useParam/useParam';
+import api from './services/api';
+import { useNotifications } from './contexts/notifications';
 import type { Library, AppState } from '@/constants/app';
 
 const App = () => {
-  const params = useUrlSearchParams();
+  const roomId = useParam(PAGE_URL_SEARCH_PARAM_KEY);
+
   const ws = useWebSocket();
-  const store = useAppStore();
+  const { addNotification } = useNotifications();
 
   const dispatch = useAppDispatch();
 
-  useWSMessage(ws.connection, (message) => {
-    const { type, data } = message;
+  useEffect(() => {
+    if (!roomId) return;
 
-    switch (type) {
-      case 'user-joined': {
-        dispatch(collaborationActions.addUser(data));
-        break;
-      }
-      case 'user-change': {
-        dispatch(collaborationActions.updateUser(data));
-        break;
-      }
-      case 'user-left': {
-        dispatch(collaborationActions.removeUser(data));
-        break;
-      }
-      case 'nodes-set': {
-        dispatch(canvasActions.setNodes(data));
-        break;
-      }
-      case 'nodes-add': {
-        dispatch(canvasActions.addNodes(data));
-        break;
-      }
-      case 'draft-finish': {
-        dispatch(canvasActions.addNodes([data.node]));
-        break;
-      }
-      case 'nodes-update': {
-        dispatch(canvasActions.updateNodes(data));
-        break;
-      }
-      case 'nodes-delete': {
-        dispatch(canvasActions.deleteNodes(data));
-        break;
-      }
-      case 'nodes-move-to-start': {
-        dispatch(canvasActions.moveNodesToStart(data));
-        break;
-      }
-      case 'nodes-move-to-end': {
-        dispatch(canvasActions.moveNodesToEnd(data));
-        break;
-      }
-      case 'nodes-move-forward': {
-        dispatch(canvasActions.moveNodesForward(data));
-        break;
-      }
-      case 'nodes-move-backward': {
-        dispatch(canvasActions.moveNodesBackward(data));
-        break;
-      }
-      case 'draft-text-update': {
-        const textNode = store
-          .getState()
-          .canvas.present.nodes.find(
-            (node) => node.nodeProps.id === data.nodeId,
-          );
+    const [request, abortController] = api.getPage(roomId);
 
-        if (textNode) {
-          dispatch(
-            canvasActions.updateNodes([{ ...textNode, text: data.text }]),
-          );
-        }
-        break;
-      }
-      case 'history-change': {
-        const action = historyActions[data.action];
-        dispatch(action());
-      }
-    }
-  });
+    request
+      .then(({ page }) => {
+        dispatch(canvasActions.setNodes(page.nodes, { broadcast: false }));
+        addNotification({
+          title: 'Live collaboration',
+          description: 'You are connected',
+          type: 'success',
+        });
+      })
+      .catch(() => {
+        addNotification({
+          title: 'Live collaboration',
+          description: 'Disconnected',
+          type: 'info',
+        });
+      });
 
-  useLayoutEffect(() => {
-    const pageId = params[PAGE_URL_SEARCH_PARAM_KEY];
+    return () => {
+      if (abortController.signal) {
+        abortController.abort();
+      }
+    };
+  }, [roomId, dispatch, addNotification]);
 
-    if (ws.isConnected || pageId) {
+  useEffect(() => {
+    if (!ws.isConnected || !roomId) {
       return;
     }
 
-    const state = storage.get<AppState>(LOCAL_STORAGE_KEY);
+    const subscribers = subscribeToIncomingCollabMessages(ws, dispatch);
+    const unsubscribe = dispatch(addCollabActionsListeners(ws, roomId));
 
-    if (state) {
-      try {
-        appState.parse(state);
-      } catch (error) {
-        return;
-      }
-
-      dispatch(canvasActions.set(state.page));
-    }
-  }, [ws, params, dispatch]);
+    return () => {
+      subscribers.forEach((unsubscribe) => unsubscribe());
+      unsubscribe({ cancelActive: true });
+    };
+  }, [ws, roomId, dispatch]);
 
   useEffect(() => {
-    const libraryFromStorage = storage.get<Library>(LOCAL_STORAGE_LIBRARY_KEY);
-    
-    if (libraryFromStorage) {
-      try {
-        libraryState.parse(libraryFromStorage);
-      } catch (error) {
-        return;
-      }
+    if (ws.isConnected || ws.isConnecting || roomId) {
+      return;
+    }
 
-      dispatch(libraryActions.init(libraryFromStorage));
+    const storedCanvasState = storage.get<AppState>(LOCAL_STORAGE_KEY);
+
+    if (storedCanvasState) {
+      dispatch(canvasActions.set(storedCanvasState.page));
+    }
+  }, [ws, roomId, dispatch]);
+
+  useEffect(() => {
+    const storedLibrary = storage.get<Library>(LOCAL_STORAGE_LIBRARY_KEY);
+
+    if (storedLibrary) {
+      dispatch(libraryActions.set(storedLibrary));
     }
   }, [dispatch]);
 

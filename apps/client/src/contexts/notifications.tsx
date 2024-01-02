@@ -1,5 +1,5 @@
+import { useState, useCallback } from 'react';
 import { Provider as ToastProvider } from '@radix-ui/react-toast';
-import { type PropsWithChildren, useState, useCallback } from 'react';
 import Toast from '@/components/Elements/Toast/Toast';
 import { createContext } from './createContext';
 
@@ -9,21 +9,22 @@ export type Notification = {
   type: 'error' | 'info' | 'success' | 'warning';
 };
 
+type NotificationsMap = Map<string, Notification>;
+
 type NotificationContextValue = {
-  add: (args: Notification) => void;
-  remove: (id: string) => void;
-  list: Map<string, Notification>;
+  addNotification: (notification: Notification) => void,
+  removeNotification: (id: string) => void
 };
 
 export const [NotificationsContext, useNotifications] =
-  createContext<NotificationContextValue>('Notification');
+  createContext<NotificationContextValue>('Notifications');
 
-export const NotificationsProvider = ({ children }: PropsWithChildren) => {
-  const [notifications, setNotifications] = useState(
-    new Map<string, Notification>(),
+export const NotificationsProvider = ({ children }: React.PropsWithChildren) => {
+  const [notifications, setNotifications] = useState<NotificationsMap>(
+    new Map(),
   );
 
-  const handleNotificationAdd = useCallback((notification: Notification) => {
+  const addNotification = useCallback((notification: Notification) => {
     setNotifications((prev) => {
       const newMap = new Map(prev);
       newMap.set(String(Date.now()), notification);
@@ -31,7 +32,7 @@ export const NotificationsProvider = ({ children }: PropsWithChildren) => {
     });
   }, []);
 
-  const handleNotificationRemove = useCallback((id: string) => {
+  const removeNotification = useCallback((id: string) => {
     setNotifications((prev) => {
       const newMap = new Map(prev);
       newMap.delete(id);
@@ -40,13 +41,7 @@ export const NotificationsProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   return (
-    <NotificationsContext.Provider
-      value={{
-        add: handleNotificationAdd,
-        remove: handleNotificationRemove,
-        list: notifications,
-      }}
-    >
+    <NotificationsContext.Provider value={{ addNotification, removeNotification}}>
       <ToastProvider>
         {children}
         {Array.from(notifications).map(([id, notification]) => {
@@ -55,7 +50,7 @@ export const NotificationsProvider = ({ children }: PropsWithChildren) => {
               key={id}
               title={notification.title}
               description={notification.description}
-              onOpenChange={(open) => !open && handleNotificationRemove(id)}
+              onOpenChange={(open) => !open && removeNotification(id)}
               data-testid="toast"
             />
           );

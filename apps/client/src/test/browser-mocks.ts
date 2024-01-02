@@ -9,9 +9,9 @@ export const matchMedia = vi.fn().mockImplementation((query) => ({
   dispatchEvent: vi.fn(),
 }));
 
-export const localStorage = (() => {
+export const localStorage = vi.fn(() => {
   let storage: Record<string, string> = {};
-
+  
   return {
     getItem: (key: string) => storage[key],
     setItem: (key: string, value: string) => (storage[key] = value),

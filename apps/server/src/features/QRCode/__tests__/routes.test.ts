@@ -8,7 +8,7 @@ describe('POST /qrcode', () => {
     const response = await request(app).post('/qrcode').send({ url });
 
     expect(response.status).toBe(200);
-    expect(response.body.data).toHaveProperty('dataUrl');
-    expect(typeof response.body.data.dataUrl).toBe('string');
+    expect(response.body).toHaveProperty('dataUrl');
+    expect(typeof response.body.dataUrl).toBe('string');
   });
 });
