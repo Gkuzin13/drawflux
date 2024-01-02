@@ -2,7 +2,7 @@ import type { IncomingMessage } from 'http';
 import { type WSMessage, WSMessageUtil } from 'shared';
 import type { RawData } from 'ws';
 import { type PatchedWebSocket } from '@/services/websocket';
-import { findPage, getUnusedUserColor } from './helpers';
+import { createUsername, findPage, getUnusedUserColor } from './helpers';
 import { CollabRoom, CollabUser } from './models';
 
 const rooms = new Map<string, InstanceType<typeof CollabRoom>>();
@@ -29,14 +29,18 @@ export async function initCollabConnection(
   }
 
   const userColor = getUnusedUserColor(room.users);
-  const user = new CollabUser('New User', userColor, ws);
+  const username = createUsername(room);
+
+  const user = new CollabUser(username, userColor, ws);
 
   room.addUser(user);
   rooms.set(room.id, room);
 
+  const collaborators = room.getCollaborators(user.id);
+
   const roomJoinedMessage = WSMessageUtil.serialize({
     type: 'room-joined',
-    data: { users: room.users, userId: user.id, nodes: page.nodes },
+    data: { collaborators, thisUser: user },
   } as WSMessage);
 
   roomJoinedMessage && ws.send(roomJoinedMessage);
@@ -50,20 +54,12 @@ export async function initCollabConnection(
     userJoinedMessage && room.broadcast(user.id, userJoinedMessage);
   }
 
-  ws.on('message', (rawMessage) => onMessage(rawMessage, user, room));
-  ws.on('close', () => onClose(ws, user, room));
+  ws.on('message', (rawMessage) => receiveMessage(rawMessage, user, room));
+  ws.on('close', () => leaveRoom(user, room));
+  ws.on('error', (error) => console.error(error.message));
 }
 
-export function onClose(
-  ws: PatchedWebSocket,
-  user: CollabUser,
-  room: CollabRoom,
-) {
-  leaveRoom(user, room);
-  ws.terminate();
-}
-
-export function onMessage(
+export function receiveMessage(
   rawMessage: RawData,
   user: CollabUser,
   room: CollabRoom,
@@ -79,17 +75,11 @@ export function onMessage(
     room.updateUser(deserializedMessage.data);
   }
 
-  if (room.hasMultipleUsers()) {
-    room.broadcast(user.id, message);
-  }
+  room.broadcast(user.id, message);
 }
 
 export function leaveRoom(user: CollabUser, room: CollabRoom) {
   room.removeUser(user.id);
-
-  if (room.isEmpty()) {
-    return rooms.delete(room.id);
-  }
 
   const message = WSMessageUtil.serialize({
     type: 'user-left',
@@ -97,4 +87,8 @@ export function leaveRoom(user: CollabUser, room: CollabRoom) {
   } as WSMessage);
 
   message && room.broadcast(user.id, message);
+
+  if (room.isEmpty()) {
+    return rooms.delete(room.id);
+  }
 }

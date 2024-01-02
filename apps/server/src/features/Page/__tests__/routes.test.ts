@@ -53,11 +53,11 @@ describe('db queries', () => {
 
       const postResponse = await request(app).post('/p').send(mockPage);
       const response = await request(app)
-        .patch(`/p/${postResponse.body.data.id}`)
+        .patch(`/p/${postResponse.body.id}`)
         .send({ nodes: mockPage.page.nodes });
 
       expect(response.status).toBe(200);
-      expect(typeof response.body.data.id).toBe('string');
+      expect(typeof response.body.id).toBe('string');
     });
   });
 
@@ -73,7 +73,7 @@ describe('db queries', () => {
       const response = await request(app).post('/p').send(mockPage);
 
       expect(response.status).toBe(200);
-      expect(typeof response.body.data.id).toBe('string');
+      expect(typeof response.body.id).toBe('string');
     });
   });
 
@@ -88,19 +88,19 @@ describe('db queries', () => {
 
       const postResponse = await request(app).post('/p').send(mockPage);
       const getResponse = await request(app)
-        .get(`/p/${postResponse.body.data.id}`)
+        .get(`/p/${postResponse.body.id}`)
         .send();
 
       const returnedPage: GetPageResponse = {
         page: {
           ...mockPage.page,
-          id: postResponse.body.data.id,
+          id: postResponse.body.id,
         },
       };
 
       expect(postResponse.statusCode).toBe(200);
       expect(getResponse.status).toBe(200);
-      expect(getResponse.body.data).toMatchObject(returnedPage);
+      expect(getResponse.body).toMatchObject(returnedPage);
     });
   });
 });

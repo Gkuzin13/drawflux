@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import useEvent from '@/hooks/useEvent/useEvent';
 import { LOCAL_STORAGE_THEME_KEY } from '@/constants/app';
 import { storage } from '@/utils/storage';
 import { createContext } from './createContext';
@@ -30,23 +31,20 @@ export const ThemeProvider = ({ children }: React.PropsWithChildren) => {
     }
   }, []);
 
-  useEffect(() => {
-    if (storage.get<ThemeValue>(LOCAL_STORAGE_THEME_KEY)) {
-      return;
-    }
+  const darkColorScheme = useMemo(() => prefersDarkColorScheme(), []);
 
-    const darkColorScheme = prefersDarkColorScheme();
+  const handleColorSchemeChange = useCallback(
+    (event: MediaQueryListEvent) => {
+      if (storage.get<ThemeValue>(LOCAL_STORAGE_THEME_KEY)) {
+        return;
+      }
 
-    const handleColorSchemeChange = (event: MediaQueryListEvent) => {
       handleThemeChange(event.matches ? 'dark' : 'default', false);
-    };
+    },
+    [handleThemeChange],
+  );
 
-    darkColorScheme.addEventListener('change', handleColorSchemeChange);
-
-    return () => {
-      darkColorScheme.removeEventListener('change', handleColorSchemeChange);
-    };
-  }, [handleThemeChange]);
+  useEvent('change', handleColorSchemeChange, darkColorScheme);
 
   return (
     <ThemeContext.Provider value={{ value: theme, set: handleThemeChange }}>

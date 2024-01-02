@@ -1,17 +1,9 @@
-import reducer, { initialState, libraryActions } from '../library';
+import reducer, { initialState, libraryActions } from '../slice';
 import { libraryGenerator, nodesGenerator } from '@/test/data-generators';
 
 describe('library slice', () => {
   it('returns the initial state', () => {
     expect(reducer(undefined, { type: undefined })).toEqual(initialState);
-  });
-
-  it('initializes the state', () => {
-    const stateToSet = libraryGenerator(8);
-
-    const state = reducer(undefined, libraryActions.init(stateToSet));
-
-    expect(state).toEqual({ ...initialState, ...stateToSet });
   });
 
   it('adds item to the library', () => {

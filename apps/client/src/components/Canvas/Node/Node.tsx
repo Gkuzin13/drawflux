@@ -12,6 +12,7 @@ export type NodeComponentProps<Type extends NodeType = NodeType> = {
   stageScale: number;
   onNodeChange: (node: NodeObject<Type>) => void;
   onNodeDelete?: (node: NodeObject<Type>) => void;
+  onTextChange?: (node: NodeObject<Type>) => void;
 };
 
 const elements = {

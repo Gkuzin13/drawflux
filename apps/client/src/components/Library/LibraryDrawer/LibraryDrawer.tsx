@@ -7,11 +7,9 @@ import Divider from '@/components/Elements/Divider/Divider';
 import Text from '@/components/Elements/Text/Text';
 import Button from '@/components/Elements/Button/Button';
 import useThemeColors from '@/hooks/useThemeColors';
-import usePageMutation from '@/hooks/usePageMutation';
-import { useWebSocket } from '@/contexts/websocket';
-import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
-import { libraryActions } from '@/stores/slices/library';
-import { canvasActions, selectConfig } from '@/stores/slices/canvas';
+import { useAppDispatch, useAppSelector } from '@/stores/hooks';
+import { libraryActions } from '@/services/library/slice';
+import { canvasActions, selectConfig } from '@/services/canvas/slice';
 import { duplicateNodesAtCenter, mapNodesIds } from '@/utils/node';
 import * as Styled from './LibraryDrawer.styled';
 import type { LibraryItem } from '@/constants/app';
@@ -27,18 +25,15 @@ const LibraryDrawer = ({ items }: Props) => {
     {},
   );
 
-  const store = useAppStore();
   const stageConfig = useAppSelector(selectConfig);
   const themeColors = useThemeColors();
 
-  const ws = useWebSocket();
 
   const selectedItemsCount = Object.keys(selectedItemsIds).length;
   const hasItems = Boolean(items.length);
   const hasSelectedItems = Boolean(selectedItemsCount);
 
   const dispatch = useAppDispatch();
-  const { updatePage } = usePageMutation();
 
   const handleRemoveSelectedItems = () => {
     dispatch(libraryActions.removeItems(Object.keys(selectedItemsIds)));
@@ -66,14 +61,6 @@ const LibraryDrawer = ({ items }: Props) => {
     dispatch(canvasActions.addNodes(duplicatedNodes));
     dispatch(canvasActions.setSelectedNodesIds(duplicatedNodesIds));
     dispatch(canvasActions.setToolType('select'));
-
-    if (ws.isConnected) {
-      ws.send({ type: 'nodes-add', data: duplicatedNodes });
-
-      const currentNodes = store.getState().canvas.present.nodes;
-
-      updatePage({ nodes: currentNodes });
-    }
   };
 
   const isItemChecked = (id: LibraryItem['id']) => id in selectedItemsIds;

@@ -11,7 +11,7 @@ export const loadRoute = (handler: LoadRouteHandler) => {
     try {
       const response = await handler(req, res, next);
 
-      return res.json({ data: response });
+      return res.json(response);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error(error.message, error.statusCode);

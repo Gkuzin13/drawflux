@@ -1,30 +1,20 @@
 import { useCallback, useMemo } from 'react';
 import Nodes from '../Node/Nodes';
 import NodeGroupTransformer from '../Transformer/NodeGroupTransformer';
-import NodeDraft from '../Node/NodeDraft';
 import useFontFaceObserver from '@/hooks/useFontFaceObserver';
 import { TEXT } from '@/constants/shape';
 import { useAppSelector } from '@/stores/hooks';
-import { selectNodes } from '@/stores/slices/canvas';
+import { selectNodes } from '@/services/canvas/slice';
 import type { NodeObject } from 'shared';
+import type { NodeComponentProps } from '../Node/Node';
 
 type Props = {
   selectedNodesIds: string[];
   stageScale: number;
-  nodeDrafts: NodeObject[];
   onNodesChange: (nodes: NodeObject[]) => void;
-  onNodeDraftFinish: (node: NodeObject) => void;
-  onNodesDelete: (node: NodeObject) => void;
-};
+} & Pick<NodeComponentProps, 'onTextChange'>;
 
-const NodesLayer = ({
-  selectedNodesIds,
-  stageScale,
-  nodeDrafts,
-  onNodesChange,
-  onNodeDraftFinish,
-  onNodesDelete,
-}: Props) => {
+const NodesLayer = ({ selectedNodesIds, stageScale, onNodesChange, onTextChange }: Props) => {
   const nodes = useAppSelector(selectNodes);
 
   /*
@@ -69,18 +59,8 @@ const NodesLayer = ({
         selectedNodeId={selectedNodeId}
         stageScale={stageScale}
         onNodeChange={handleNodeChange}
+        onTextChange={onTextChange}
       />
-      {nodeDrafts.map((node) => {
-        return (
-          <NodeDraft
-            key={node.nodeProps.id}
-            node={node}
-            stageScale={stageScale}
-            onNodeChange={onNodeDraftFinish}
-            onNodeDelete={onNodesDelete}
-          />
-        );
-      })}
       {selectedMultipleNodes ? (
         <NodeGroupTransformer
           nodes={selectedNodes}

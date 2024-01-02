@@ -1,10 +1,9 @@
-const serializer = JSON.stringify;
-const deserializer = JSON.parse;
+import { safeJSONParse } from './object';
 
 export const storage = {
   set: <T>(key: string, value: T) => {
     try {
-      window.localStorage.setItem(key, serializer(value));
+      window.localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
       // Empty
     }
@@ -14,12 +13,8 @@ export const storage = {
       throw new Error('Key must be provided');
     }
 
-    try {
-      const item = window.localStorage.getItem(key);
+    const item = window.localStorage.getItem(key);
 
-      return item ? (deserializer(item) as T) : null;
-    } catch (error) {
-      return null;
-    }
+    return item ? (safeJSONParse(item) as T) : null;
   },
 };

@@ -1,6 +1,6 @@
 import { type Action, createAction, type Reducer } from '@reduxjs/toolkit';
-import { initialState as initialCanvasState } from '../slices/canvas';
-import type { CanvasActionType, CanvasSliceState } from '../slices/canvas';
+import { initialState as initialCanvasState } from '../../services/canvas/slice';
+import type { CanvasActionType, CanvasSliceState } from '../../services/canvas/slice';
 
 export type CanvasHistoryState = {
   past: CanvasSliceState[];

@@ -14,23 +14,19 @@ describe('notifications context', () => {
     ];
 
     await act(async () => {
-      result.current.add(notifications[0]);
+      result.current.addNotification(notifications[0]);
     });
 
     await act(async () => {
-      result.current.add(notifications[1]);
+      result.current.addNotification(notifications[1]);
     });
-
-    const [notification1, notification2] = [...result.current.list.values()];
-
-    expect(result.current.list.size).toBe(2);
-    expect(notification1).toEqual(notifications[0]);
-    expect(notification2).toEqual(notifications[1]);
 
     expect(screen.getAllByTestId(/toast/)).toHaveLength(2);
   });
 
   it.skip('removes notifications', async () => {
+    vi.useFakeTimers();
+
     const { result } = renderHook(() => useNotifications(), {
       wrapper: NotificationsProvider,
     });
@@ -41,26 +37,14 @@ describe('notifications context', () => {
     ];
 
     await act(async () => {
-      result.current.add(notifications[0]);
-      result.current.add(notifications[1]);
+      result.current.addNotification(notifications[0]);
+      result.current.addNotification(notifications[1]);
     });
 
-    const listEntries = [...result.current.list.entries()];
+    expect(screen.getAllByTestId(/toast/)).toHaveLength(2);
 
-    await act(async () => {
-      result.current.remove(listEntries[1][0]);
-    });
+    await vi.advanceTimersByTimeAsync(5000);
 
-    expect(result.current.list.size).toBe(1);
-    expect(listEntries[1][1]).toEqual(notifications[1]);
-
-    await act(async () => {
-      result.current.remove(listEntries[0][0]);
-    });
-
-    expect(result.current.list.size).toBe(0);
-    expect(listEntries[0][1]).toEqual(notifications[0]);
-
-    expect(screen.getAllByTestId(/toast/)).toHaveLength(0);
+    expect(screen.getAllByTestId(/toast/)).toHaveLength(1);
   });
 });

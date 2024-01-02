@@ -9,7 +9,6 @@ import type {
   UpdatePageResponse,
 } from '../schemas/page';
 import type { QRCodeRequestBody, QRCodeResponse } from '../schemas/qrcode';
-import type { BadRequestError } from '../utils/errors';
 import type { defaultTheme, darkTheme } from '../design/theme';
 
 const { nodeProps, style, type } = Node.shape;
@@ -47,10 +46,5 @@ export type UpdatePageResponse = z.infer<typeof UpdatePageResponse>;
 
 export type QRCodeRequestBody = z.infer<typeof QRCodeRequestBody>;
 export type QRCodeResponse = z.infer<typeof QRCodeResponse>;
-
-export type ServerResponse<T> = {
-  error?: typeof BadRequestError;
-  data?: T;
-};
 
 export * from './ws';

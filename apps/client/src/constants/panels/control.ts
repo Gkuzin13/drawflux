@@ -1,5 +1,5 @@
 import type { HistoryActionKey } from '@/stores/reducers/history';
-import { type canvasActions } from '@/stores/slices/canvas';
+import { type canvasActions } from '@/services/canvas/slice';
 import type { ShortcutKeyCombo } from '@/constants/index';
 
 type Control = ShortcutKeyCombo<HistoryActionKey | keyof typeof canvasActions>;

@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
 import type { NodeObject } from 'shared';
-import type { RootState } from '../store';
+import type { RootState } from '@/stores/store';
 import type { Library, LibraryItem } from '@/constants/app';
 
 export type LibrarySliceState = Library;
@@ -14,7 +14,7 @@ export const librarySlice = createSlice({
   name: 'library',
   initialState,
   reducers: {
-    init: (_, action: PayloadAction<LibrarySliceState>) => {
+    set: (_, action: PayloadAction<LibrarySliceState>) => {
       return action.payload;
     },
     addItem: (state, action: PayloadAction<NodeObject[]>) => {
@@ -27,8 +27,8 @@ export const librarySlice = createSlice({
       state.items.push(newLibraryItem);
     },
     removeItems: (state, action: PayloadAction<string[]>) => {
-      state.items = state.items.filter((item) =>
-        !action.payload.includes(item.id),
+      state.items = state.items.filter(
+        (item) => !action.payload.includes(item.id),
       );
     },
   },

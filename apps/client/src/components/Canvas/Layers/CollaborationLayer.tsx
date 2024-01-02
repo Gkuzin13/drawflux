@@ -1,116 +1,65 @@
 import { memo, useCallback, useEffect, useState } from 'react';
-import { WS_THROTTLE_MS } from '@/constants/app';
 import { useWebSocket } from '@/contexts/websocket';
-import useWSMessage from '@/hooks/useWSMessage';
 import { useAppSelector } from '@/stores/hooks';
-import { selectUsers, selectMyUser } from '@/stores/slices/collaboration';
-import { throttleFn } from '@/utils/timed';
+import { selectCollaborators } from '@/services/collaboration/slice';
 import NodeDraft from '../Node/NodeDraft';
 import UserCursor from '../UserCursor';
 import useDrafts from '@/hooks/useDrafts';
 import { noop } from '@/utils/is';
 import type { NodeObject, Point } from 'shared';
-import type Konva from 'konva';
-import type { ForwardedRef } from 'react';
 
 type Props = {
   stageScale: number;
-  stageRef: ForwardedRef<Konva.Stage>;
-  isDrawing: boolean;
 };
 
 type UserPosition = { [id: string]: Point };
 
-const Collaboration = ({ stageScale, stageRef, isDrawing }: Props) => {
+const CollaborationLayer = ({ stageScale }: Props) => {
   const [userPositions, setUserPositions] = useState<UserPosition>({});
-  const [drafts, dispatchDrafts] = useDrafts();
+  const [drafts, setDrafts] = useDrafts();
 
-  const nodeDrafts = drafts.map(({ node }) => node);
-
-  const room = useAppSelector(selectUsers);
-  const thisUserId = useAppSelector(selectMyUser);
-
+  const collaborators = useAppSelector(selectCollaborators);
   const ws = useWebSocket();
 
-  const users = room.map((user) => {
-    if (user.id in userPositions) {
-      return { ...user, position: userPositions[user.id] };
-    }
-    return null;
-  });
-
   useEffect(() => {
-    if (
-      typeof stageRef === 'function' ||
-      !stageRef?.current ||
-      !ws.isConnected ||
-      !thisUserId
-    ) {
+    if (!ws.isConnected) {
       return;
     }
 
-    const stage = stageRef.current;
-    const container = stage.container();
-
-    const handlePointerMove = throttleFn(() => {
-      if (isDrawing) {
-        return;
-      }
-
-      const { x, y } = stage.getRelativePointerPosition() ?? { x: 0, y: 0 };
-
-      ws.send({
-        type: 'user-move',
-        data: { id: thisUserId, position: [x, y] },
+    ws.subscribe('user-move', ({ id, position }) => {
+      setUserPositions((prevPositions) => ({
+        ...prevPositions,
+        [id]: position,
+      }));
+    });
+    ws.subscribe('draft-create', ({ node }) => {
+      setDrafts({ type: 'create', payload: { node } });
+    });
+    ws.subscribe('draft-draw', ({ nodeId, position, userId }) => {
+      setDrafts({ type: 'draw', payload: { nodeId, position } });
+      setUserPositions((prevPositions) => ({
+        ...prevPositions,
+        [userId]: position.current,
+      }));
+    });
+    ws.subscribe('draft-update', ({ node }) => {
+      setDrafts({ type: 'update', payload: { node } });
+    });
+    ws.subscribe('draft-finish', ({ node, keep }) => {
+      setDrafts({
+        type: 'finish',
+        payload: { nodeId: node.nodeProps.id, keep },
       });
-    }, WS_THROTTLE_MS);
-
-    container.addEventListener('pointermove', handlePointerMove);
+    });
 
     return () => {
-      container.removeEventListener('pointermove', handlePointerMove);
+      ws.unsubscribe('user-move');
+      ws.unsubscribe('draft-create');
+      ws.unsubscribe('draft-draw');
+      ws.unsubscribe('draft-update');
+      ws.unsubscribe('draft-finish');
     };
-  }, [stageRef, ws, thisUserId, isDrawing]);
-
-  useWSMessage(ws.connection, ({ type, data }) => {
-    switch (type) {
-      case 'draft-create': {
-        dispatchDrafts({ type: 'add', payload: { node: data.node } });
-        break;
-      }
-      case 'draft-draw': {
-        const { nodeId, position, userId } = data;
-
-        dispatchDrafts({ type: 'draw', payload: { nodeId, position } });
-        setUserPositions((prevPositions) => ({
-          ...prevPositions,
-          [userId]: position.current,
-        }));
-        break;
-      }
-      case 'draft-finish': {
-        dispatchDrafts({
-          type: 'finish',
-          payload: { nodeId: data.node.nodeProps.id },
-        });
-        break;
-      }
-      case 'draft-finish-keep': {
-        dispatchDrafts({
-          type: 'finish-keep',
-          payload: { nodeId: data.node.nodeProps.id },
-        });
-        break;
-      }
-      case 'user-move': {
-        setUserPositions((prevPositions) => ({
-          ...prevPositions,
-          [data.id]: data.position,
-        }));
-        break;
-      }
-    }
-  });
+  }, [ws, setDrafts]);
 
   const handleNodeDelete = useCallback(
     (node: NodeObject) => {
@@ -120,18 +69,18 @@ const Collaboration = ({ stageScale, stageRef, isDrawing }: Props) => {
       );
 
       if (!isDrawing) {
-        dispatchDrafts({
+        setDrafts({
           type: 'finish',
           payload: { nodeId: node.nodeProps.id },
         });
       }
     },
-    [drafts, dispatchDrafts],
+    [drafts, setDrafts],
   );
 
   return (
     <>
-      {nodeDrafts.map((node) => {
+      {drafts.map(({ node }) => {
         return (
           <NodeDraft
             key={node.nodeProps.id}
@@ -142,21 +91,23 @@ const Collaboration = ({ stageScale, stageRef, isDrawing }: Props) => {
           />
         );
       })}
-      {users.map((user) => {
+      {collaborators.map((user) => {
+        const position = userPositions[user.id];
+
+        if (!position) return null;
+
         return (
-          user && (
-            <UserCursor
-              key={user.id}
-              name={user.name}
-              color={user.color}
-              position={user.position}
-              stageScale={stageScale}
-            />
-          )
+          <UserCursor
+            key={user.id}
+            name={user.name}
+            color={user.color}
+            position={position}
+            stageScale={stageScale}
+          />
         );
       })}
     </>
   );
 };
 
-export default memo(Collaboration);
+export default memo(CollaborationLayer);

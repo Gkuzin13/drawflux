@@ -13,7 +13,7 @@ describe('loadRoute', () => {
     await loadRouteHandler(req, res, next);
 
     expect(handler).toHaveBeenCalledWith(req, res, next);
-    expect(res.json).toHaveBeenCalledWith({ data: 42 });
+    expect(res.json).toHaveBeenCalledWith(42);
   });
 
   it('should return an error if the handler throws', async () => {

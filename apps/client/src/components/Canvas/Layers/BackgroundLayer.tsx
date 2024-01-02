@@ -11,7 +11,7 @@ type Props = {
   ref: RefObject<Konva.Rect>;
 };
 
-const BackgroundLayer = forwardRef<Konva.Rect, Props>(
+const Background = forwardRef<Konva.Rect, Props>(
   ({ scale, rect }, ref) => {
     const themeColors = useThemeColors();
 
@@ -32,6 +32,6 @@ const BackgroundLayer = forwardRef<Konva.Rect, Props>(
   },
 );
 
-BackgroundLayer.displayName = 'BackgroundLayer';
+Background.displayName = 'BackgroundLayer';
 
-export default memo(BackgroundLayer);
+export default memo(Background);

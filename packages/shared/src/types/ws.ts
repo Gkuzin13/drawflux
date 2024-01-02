@@ -19,7 +19,7 @@ type Message<T extends string, D extends object> = {
 
 type RoomJoined = Message<
   'room-joined',
-  { userId: string; users: User[]; nodes: NodeObject[] }
+  { thisUser: User; collaborators: User[] }
 >;
 type UserJoined = Message<'user-joined', User>;
 type UserLeft = Message<'user-left', { id: string }>;
@@ -42,19 +42,14 @@ type DraftDraw = Message<
     position: { start: Point; current: Point };
   }
 >;
+type DraftUpdate = Message<
+  'draft-update',
+  { userId: string; node: NodeObject }
+>;
 type DraftFinish = Message<
   'draft-finish',
-  { userId: string; node: NodeObject }
+  { userId: string; node: NodeObject; keep?: boolean }
 >;
-type DraftFinishAndKeep = Message<
-  'draft-finish-keep',
-  { userId: string; node: NodeObject }
->;
-type TextDraftUpdate = Message<
-  'draft-text-update',
-  { userId: string; nodeId: string; text: string }
->;
-type HistoryChange = Message<'history-change', { action: 'undo' | 'redo' }>;
 
 export type WSMessage =
   | RoomJoined
@@ -72,7 +67,5 @@ export type WSMessage =
   | NodesMoveBackward
   | DraftCreate
   | DraftDraw
-  | DraftFinishAndKeep
-  | DraftFinish
-  | TextDraftUpdate
-  | HistoryChange;
+  | DraftUpdate
+  | DraftFinish;

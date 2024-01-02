@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import type { PropsWithChildren } from 'react';
 import useDisclosure from '@/hooks/useDisclosure/useDisclosure';
 import Dialog from '@/components/Elements/Dialog/Dialog';
 import { createContext } from './createContext';
@@ -19,7 +18,7 @@ type ModalContent = {
 export const [ModalContext, useModal] =
   createContext<ModalContextValue>('Modal');
 
-export const ModalProvider = ({ children }: PropsWithChildren) => {
+export const ModalProvider = ({ children }: React.PropsWithChildren) => {
   const [opened, { open, close }] = useDisclosure();
   const [content, setContent] = useState<ModalContent>({
     title: '',

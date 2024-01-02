@@ -20,10 +20,7 @@ import FillSection from './FillSection';
 export type StylePanelProps = {
   selectedNodes: NodeObject[];
   isActive: boolean;
-  onStyleChange: (
-    updatedStyle: Partial<NodeStyle>,
-    updateAsync?: boolean,
-  ) => void;
+  onStyleChange: (updatedStyle: Partial<NodeStyle>) => void;
 };
 
 const StylePanel = ({
@@ -63,8 +60,8 @@ const StylePanel = ({
     const selectedNodesTypes = selectedNodes.map(({ type }) => type);
 
     const onlyTextNodes = selectedNodesTypes.every((type) => type === 'text');
-    
-    if(onlyTextNodes) {
+
+    if (onlyTextNodes) {
       return { line: false, size: true };
     }
 
@@ -95,9 +92,9 @@ const StylePanel = ({
     onStyleChange({ size });
   };
 
-  const handleOpacitySelect = (value: number, commit = false) => {
+  const handleOpacitySelect = (value: number) => {
     const clampedOpacity = clamp(value, [OPACITY.minValue, OPACITY.maxValue]);
-    onStyleChange({ opacity: clampedOpacity }, commit);
+    onStyleChange({ opacity: clampedOpacity });
   };
 
   const handleOpacityChange = (value: number) => {
@@ -105,7 +102,7 @@ const StylePanel = ({
   };
 
   const handleOpacityCommit = (value: number) => {
-    handleOpacitySelect(value, true);
+    handleOpacitySelect(value);
   };
 
   const handleFillChange = (value: NodeFill) => {

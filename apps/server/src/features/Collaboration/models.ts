@@ -30,6 +30,10 @@ export class CollabRoom implements Room {
     this.users = this.users.filter((user) => user.id !== id);
   }
 
+  getCollaborators(userId: string) {
+    return this.users.filter((user) => user.id !== userId);
+  }
+
   broadcast(broadcasterId: string, message: string) {
     this.users.forEach((user) => {
       const ws = user.getWS();

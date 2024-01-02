@@ -9,7 +9,11 @@ import { now } from '@/utils/is';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import type Konva from 'konva';
 
-const LaserDrawable = ({ node, onNodeDelete }: NodeComponentProps<'laser'>) => {
+const LaserDrawable = ({
+  node,
+  stageScale,
+  onNodeDelete,
+}: NodeComponentProps<'laser'>) => {
   const [path, setPath] = useState(node.nodeProps.points ?? []);
   const [lastDrawTime, setLastDrawTime] = useRefValue(now());
 
@@ -91,7 +95,8 @@ const LaserDrawable = ({ node, onNodeDelete }: NodeComponentProps<'laser'>) => {
             controlPoint[1],
           );
 
-          ctx.lineWidth = (1 - pointIndex / path.length) * LASER.WIDTH;
+          ctx.lineWidth =
+            ((1 - pointIndex / path.length) * LASER.WIDTH) / stageScale;
 
           ctx.stroke();
         }

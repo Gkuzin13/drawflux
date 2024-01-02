@@ -7,7 +7,7 @@ import TextInput from '@/components/Elements/TextInput/TextInput';
 import { USER } from '@/constants/app';
 import { KEYS } from '@/constants/keys';
 import { useAppSelector } from '@/stores/hooks';
-import { selectMyUser, selectUsers } from '@/stores/slices/collaboration';
+import { selectThisUser, selectCollaborators } from '@/services/collaboration/slice';
 import * as Styled from './UsersPanel.styled';
 import Icon from '@/components/Elements/Icon/Icon';
 
@@ -18,12 +18,10 @@ type Props = {
 const UsersPanel = ({ onUserChange }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
 
-  const users = useAppSelector(selectUsers);
-  const userId = useAppSelector(selectMyUser);
+  const collaborators = useAppSelector(selectCollaborators);
+  const thisUser = useAppSelector(selectThisUser);
 
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const currentUser = users.find((user) => user.id === userId);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -32,16 +30,16 @@ const UsersPanel = ({ onUserChange }: Props) => {
   }, [isEditing, inputRef]);
 
   const handleColorSelect = (color: User['color']) => {
-    if (currentUser) {
-      onUserChange({ ...currentUser, color });
+    if (thisUser) {
+      onUserChange({ ...thisUser, color });
     }
   };
 
   const handleNameChange = () => {
     const value = inputRef.current?.value;
 
-    if (currentUser && value && currentUser.name !== value) {
-      onUserChange({ ...currentUser, name: value });
+    if (thisUser && value && thisUser.name !== value) {
+      onUserChange({ ...thisUser, name: value });
     }
 
     setIsEditing(!isEditing);
@@ -55,7 +53,7 @@ const UsersPanel = ({ onUserChange }: Props) => {
     }
   };
 
-  if (!currentUser) {
+  if (!thisUser) {
     return null;
   }
 
@@ -68,8 +66,8 @@ const UsersPanel = ({ onUserChange }: Props) => {
       </Styled.Container>
       <PopoverPrimitive.Portal>
         <Styled.Content align="end" sideOffset={4} css={{ minWidth: '$11' }}>
-          {users.map((user) => {
-            const isCurrentUser = user.id === userId;
+          {[thisUser, ...collaborators].map((user) => {
+            const isCurrentUser = user.id === thisUser.id;
             const color = colors[user.color];
 
             return (
@@ -90,7 +88,7 @@ const UsersPanel = ({ onUserChange }: Props) => {
                         alignOffset={-16}
                       >
                         <ColorsGrid
-                          value={currentUser.color}
+                          value={thisUser.color}
                           onSelect={handleColorSelect}
                         />
                       </Styled.Content>
