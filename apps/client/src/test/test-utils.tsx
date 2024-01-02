@@ -18,6 +18,8 @@ import { WebSocketProvider } from '@/contexts/websocket';
 import { ThemeProvider } from '@/contexts/theme';
 import { NotificationsProvider } from '@/contexts/notifications';
 import { ModalProvider } from '@/contexts/modal';
+import { PAGE_URL_SEARCH_PARAM_KEY } from '@/constants/app';
+import { urlSearchParam } from '@/utils/url';
 import type { PropsWithChildren } from 'react';
 import type { PreloadedState } from '@reduxjs/toolkit';
 import type { RootState } from '@/stores/store';
@@ -70,16 +72,18 @@ export function renderWithProviders(
   function Wrapper({
     children,
   }: PropsWithChildren<{ children: React.ReactNode }>) {
+    const roomId = urlSearchParam.get(PAGE_URL_SEARCH_PARAM_KEY);
+
     return (
-      <ThemeProvider>
-        <StoreProvider store={store}>
-          <ModalProvider>
-            <NotificationsProvider>
-              <WebSocketProvider roomId={null}>{children}</WebSocketProvider>
-            </NotificationsProvider>
-          </ModalProvider>
-        </StoreProvider>
-      </ThemeProvider>
+      <StoreProvider store={store}>
+        <WebSocketProvider roomId={roomId}>
+          <ThemeProvider>
+            <ModalProvider>
+              <NotificationsProvider>{children}</NotificationsProvider>
+            </ModalProvider>
+          </ThemeProvider>
+        </WebSocketProvider>
+      </StoreProvider>
     );
   }
 

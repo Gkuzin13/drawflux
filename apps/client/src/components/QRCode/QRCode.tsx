@@ -5,7 +5,12 @@ type Props = {
 };
 
 const QRCode = ({ dataUrl }: Props) => {
-  return <Styled.Background style={{ backgroundImage: `url(${dataUrl})` }} />;
+  return (
+    <Styled.Background
+      style={{ backgroundImage: `url(${dataUrl})` }}
+      data-testid="qr-code"
+    />
+  );
 };
 
 export default QRCode;

@@ -66,6 +66,7 @@
     "eslint-plugin-playwright": "^0.15.3",
     "happy-dom": "^10.9.0",
     "jsdom": "^22.1.0",
+    "msw": "*",
     "resize-observer-polyfill": "^1.5.1",
     "vite-plugin-pwa": "^0.16.4",
     "vitest-canvas-mock": "^0.3.2"

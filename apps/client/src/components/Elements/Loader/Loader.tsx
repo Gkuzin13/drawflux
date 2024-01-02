@@ -5,7 +5,7 @@ type Props = PropsWithChildren<(typeof Styled.Container)['defaultProps']>;
 
 const Loader = ({ children, ...restProps }: Props) => {
   return (
-    <Styled.Container {...restProps}>
+    <Styled.Container {...restProps} data-testid="loader">
       <Styled.InnerContainer>
         <Styled.Spinner name="spinner" size="md" />
         {children}
