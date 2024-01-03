@@ -112,22 +112,6 @@ describe('canvas slice', () => {
     });
   });
 
-  it('should paste copied nodes and select them', () => {
-    const nodes = nodesGenerator(2, 'ellipse');
-
-    const previousState: CanvasSliceState = {
-      ...initialState,
-      nodes,
-      copiedNodes: nodes,
-    };
-
-    const state = reducer(previousState, canvasActions.pasteNodes());
-
-    expect(state.nodes).toHaveLength(4);
-    expect(Object.keys(state.selectedNodesIds)).toHaveLength(2);
-    expect(state.copiedNodes).toBe(null);
-  });
-
   it('sets tool type', () => {
     const toolType: ToolType = 'arrow';
 

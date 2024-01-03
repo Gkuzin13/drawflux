@@ -8,7 +8,7 @@ import type { AppDispatch } from '@/stores/store';
 import type { ActionMeta } from '../canvas/slice';
 
 /**
- * subscribe to collaborrative actions and send messages
+ * subscribe to canvas/collaboration actions and send corresponding messages
  */
 export const addCollabActionsListeners = (
   ws: WebSocketContextValue,
@@ -24,9 +24,8 @@ export const addCollabActionsListeners = (
     canvasActions.moveNodesToEnd,
     canvasActions.moveNodesToStart,
     canvasActions.setNodes,
-    canvasActions.pasteNodes,
   );
-
+  
   return addAppListener({
     matcher,
     effect: (action, listenerApi) => {
@@ -41,6 +40,9 @@ export const addCollabActionsListeners = (
       }
 
       switch (action.type) {
+        case 'collaboration/updateUser':
+          ws.send({ type: 'user-change', data: action.payload });
+          break;
         case 'canvas/addNodes':
           ws.send({ type: 'nodes-add', data: action.payload });
           break;
@@ -65,24 +67,13 @@ export const addCollabActionsListeners = (
         case 'canvas/setNodes':
           ws.send({ type: 'nodes-set', data: action.payload });
           break;
-        case 'canvas/pasteNodes': {
-          const pasteNodes = state.nodes.filter(
-            (node) => node.nodeProps.id in state.selectedNodesIds,
-          );
-
-          ws.send({ type: 'nodes-add', data: pasteNodes });
-          break;
-        }
-        case 'collaboration/updateUser':
-          ws.send({ type: 'user-change', data: action.payload });
-          break;
       }
     },
   });
 };
 
 /**
- * subscribe to incoming ws messages and dispatch actions
+ * subscribe to incoming ws messages and dispatch corresponding actions
  */
 export const subscribeToIncomingCollabMessages = (
   ws: WebSocketContextValue,

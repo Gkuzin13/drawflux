@@ -14,7 +14,8 @@ import { throttleFn } from '@/utils/timed';
 type SubscribeFn = <T extends SubscriberKey>(
   type: T,
   handler: SubscriberHandler<T>,
-) => () => ReturnType<UnsubscribeFn>;
+) => Unsubscribe;
+type Unsubscribe = () => void;
 type UnsubscribeFn = (type: SubscriberKey) => void;
 type SendFn = (message: WSMessage, throttle?: boolean) => void;
 type SubscriberKey = WSMessage['type'];

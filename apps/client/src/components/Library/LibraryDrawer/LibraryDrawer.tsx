@@ -10,7 +10,7 @@ import useThemeColors from '@/hooks/useThemeColors';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { libraryActions } from '@/services/library/slice';
 import { canvasActions, selectConfig } from '@/services/canvas/slice';
-import { duplicateNodesAtCenter, mapNodesIds } from '@/utils/node';
+import { duplicateNodesAtCenter } from '@/utils/node';
 import * as Styled from './LibraryDrawer.styled';
 import type { LibraryItem } from '@/constants/app';
 
@@ -56,10 +56,8 @@ const LibraryDrawer = ({ items }: Props) => {
 
   const handleOnThumbnailClick = (item: LibraryItem) => {
     const duplicatedNodes = duplicateNodesAtCenter(item.elements, stageConfig);
-    const duplicatedNodesIds = mapNodesIds(duplicatedNodes);
 
-    dispatch(canvasActions.addNodes(duplicatedNodes));
-    dispatch(canvasActions.setSelectedNodesIds(duplicatedNodesIds));
+    dispatch(canvasActions.addNodes(duplicatedNodes, { selectNodes: true }));
     dispatch(canvasActions.setToolType('select'));
   };
 
