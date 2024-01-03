@@ -56,7 +56,9 @@ export const LASER = {
   TRIM_COUNT: 2,
   TRIM_INTERVAL: 24,
   TRIM_DELAY: 225,
-  MAX_LENGTH: 60,
-  WIDTH: 4.25,
+  MAX_LENGTH: 50,
+  MIN_WIDTH: 2,
+  MAX_WIDTH: 4.5,
+  WIDTH: 3.25,
   COLOR: colors.red500,
-};
+} as const;
