@@ -1,5 +1,5 @@
 import { createSlice, isAnyOf } from '@reduxjs/toolkit';
-import { makeNodesCopy, reorderNodes, isValidNode } from '@/utils/node';
+import { reorderNodes, isValidNode, duplicateNodesToRight } from '@/utils/node';
 import { getCanvasCenteredPositionRelativeToNodes } from '@/utils/position';
 import { historyActions } from '../../stores/reducers/history';
 import type { NodeObject } from 'shared';
@@ -8,7 +8,7 @@ import type { RootState } from '../../stores/store';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 export type CanvasSliceState = {
-  copiedNodes: NodeObject[] | null;
+  copiedNodes: NodeObject[];
 } & AppState['page'];
 
 export type CanvasAction = (typeof canvasActions)[keyof typeof canvasActions];
@@ -22,12 +22,14 @@ export const initialState: CanvasSliceState = {
   },
   toolType: 'select',
   selectedNodesIds: {},
-  copiedNodes: null,
+  copiedNodes: [],
 };
 
 export type ActionMeta = {
   receivedFromWS?: boolean;
   broadcast?: boolean;
+  duplicate?: boolean;
+  selectNodes?: boolean;
 };
 
 export const prepareMeta = <T = undefined>(
@@ -56,14 +58,23 @@ export const canvasSlice = createSlice({
       prepare: prepareMeta<NodeObject[]>,
     },
     addNodes: {
-      reducer: (state, action: PayloadAction<NodeObject[]>) => {
+      reducer: (
+        state,
+        action: PayloadAction<NodeObject[], string, ActionMeta | undefined>,
+      ) => {
         const nodesToAdd = action.payload;
 
         if (nodesToAdd.every(isValidNode)) {
           state.nodes.push(...nodesToAdd);
         }
       },
-      prepare: prepareMeta<NodeObject[]>,
+      prepare(payload: NodeObject[], meta?: ActionMeta) {
+        if (meta?.duplicate) {
+          return prepareMeta(duplicateNodesToRight(payload), meta);
+        }
+
+        return prepareMeta(payload, meta);
+      },
     },
     updateNodes: {
       reducer: (state, action: PayloadAction<NodeObject[]>) => {
@@ -118,27 +129,9 @@ export const canvasSlice = createSlice({
     copyNodes: (state) => {
       const { nodes, selectedNodesIds } = state;
 
-      const selectedNodes = nodes.filter(
+      state.copiedNodes = nodes.filter(
         (node) => node.nodeProps.id in selectedNodesIds,
       );
-
-      state.copiedNodes = makeNodesCopy(selectedNodes);
-    },
-    pasteNodes: {
-      reducer: (state) => {
-        const { copiedNodes } = state;
-
-        if (!copiedNodes) {
-          return;
-        }
-
-        state.nodes.push(...copiedNodes);
-        state.selectedNodesIds = Object.fromEntries(
-          copiedNodes.map(({ nodeProps }) => [nodeProps.id, true]),
-        );
-        state.copiedNodes = null;
-      },
-      prepare: prepareMeta,
     },
     setToolType: (
       state,
@@ -170,7 +163,7 @@ export const canvasSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addMatcher(canvasSlice.actions.setNodes.match, (state) => {
+      .addMatcher(canvasActions.setNodes.match, (state) => {
         const { nodes, stageConfig } = state;
 
         const centeredPosition = getCanvasCenteredPositionRelativeToNodes(
@@ -180,13 +173,20 @@ export const canvasSlice = createSlice({
 
         state.stageConfig.position = centeredPosition;
       })
+      .addMatcher(canvasActions.addNodes.match, (state, action) => {
+        if (action.meta?.selectNodes) {
+          state.selectedNodesIds = Object.fromEntries(
+            action.payload.map((node) => [node.nodeProps.id, true]),
+          );
+        }
+      })
       .addMatcher(
         isAnyOf(historyActions.redo.match, historyActions.undo.match),
         (state) => {
           state.selectedNodesIds = {};
         },
       )
-      .addMatcher(canvasSlice.actions.deleteNodes.match, (state) => {
+      .addMatcher(canvasActions.deleteNodes.match, (state) => {
         state.selectedNodesIds = {};
       });
   },

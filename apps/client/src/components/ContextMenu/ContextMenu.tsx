@@ -5,7 +5,6 @@ import Kbd from '@/components/Elements/Kbd/Kbd';
 import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import { canvasActions, selectSelectedNodesIds } from '@/services/canvas/slice';
 import { libraryActions } from '@/services/library/slice';
-import { duplicateNodesToRight, mapNodesIds } from '@/utils/node';
 import * as Styled from './ContextMenu.styled';
 
 export type ContextMenuType = 'node-menu' | 'canvas-menu';
@@ -27,6 +26,7 @@ type NodesMenuActionKey = Extract<
 >;
 
 const CanvasMenu = () => {
+  const store = useAppStore();
   const dispatch = useAppDispatch();
 
   const handleSelectAll = useCallback(() => {
@@ -34,9 +34,15 @@ const CanvasMenu = () => {
   }, [dispatch]);
 
   const handlePaste = useCallback(() => {
-    dispatch(canvasActions.pasteNodes());
+    const { copiedNodes } = store.getState().canvas.present;
 
-  }, [dispatch]);
+    dispatch(
+      canvasActions.addNodes(copiedNodes, {
+        duplicate: true,
+        selectNodes: true,
+      }),
+    );
+  }, [store, dispatch]);
 
   return (
     <>
@@ -65,17 +71,18 @@ const NodeMenu = () => {
   };
 
   const handleNodesDuplicate = () => {
-    const nodesIds = new Set(Object.keys(selectedNodesIds));
-    const nodes = store.getState().canvas.present.nodes;
-    const nodesToDuplicate = nodes.filter(({ nodeProps }) =>
-      nodesIds.has(nodeProps.id),
+    const { nodes, selectedNodesIds } = store.getState().canvas.present;
+
+    const nodesToDuplicate = nodes.filter(
+      ({ nodeProps }) => nodeProps.id in selectedNodesIds,
     );
 
-    const duplicatedNodes = duplicateNodesToRight(nodesToDuplicate);
-    const duplicatedNodesIds = mapNodesIds(duplicatedNodes);
-
-    dispatch(canvasActions.addNodes(duplicatedNodes));
-    dispatch(canvasActions.setSelectedNodesIds(duplicatedNodesIds));
+    dispatch(
+      canvasActions.addNodes(nodesToDuplicate, {
+        duplicate: true,
+        selectNodes: true,
+      }),
+    );
   };
 
   const handleSelectNone = () => {

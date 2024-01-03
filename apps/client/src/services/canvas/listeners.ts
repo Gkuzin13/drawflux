@@ -12,11 +12,10 @@ export const addCanvasListener = (startListening: AppStartListening) => {
     matcher: isAnyOf(
       historyActions.undo,
       historyActions.redo,
+      canvasActions.setNodes,
       canvasActions.addNodes,
       canvasActions.updateNodes,
-      canvasActions.setNodes,
       canvasActions.deleteNodes,
-      canvasActions.pasteNodes,
       canvasActions.moveNodesToEnd,
       canvasActions.moveNodesBackward,
       canvasActions.moveNodesForward,

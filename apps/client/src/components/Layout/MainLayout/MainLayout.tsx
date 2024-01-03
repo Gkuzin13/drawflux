@@ -12,7 +12,6 @@ import {
   getMainLayer,
   getPointerRect,
 } from '@/components/Canvas/DrawingCanvas/helpers/stage';
-import { duplicateNodesToRight, mapNodesIds } from '@/utils/node';
 import { historyActions } from '@/stores/reducers/history';
 import { canvasActions } from '@/services/canvas/slice';
 import { TOOLS } from '@/constants/panels/tools';
@@ -43,8 +42,6 @@ const MainLayout = () => {
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
       const state = store.getState().canvas.present;
-      const nodes = state.nodes;
-      const selectedNodesIds = Object.keys(state.selectedNodesIds);
 
       const { key, shiftKey, ctrlKey } = event;
       const lowerCaseKey = key.toLowerCase();
@@ -69,16 +66,16 @@ const MainLayout = () => {
           case KEYS.D: {
             event.preventDefault();
 
-            const nodesIds = new Set(Object.keys(state.selectedNodesIds));
-            const nodesToDuplicate = nodes.filter(({ nodeProps }) =>
-              nodesIds.has(nodeProps.id),
+            const nodesToDuplicate = state.nodes.filter(
+              ({ nodeProps }) => nodeProps.id in state.selectedNodesIds,
             );
 
-            const duplicatedNodes = duplicateNodesToRight(nodesToDuplicate);
-            const duplicatedNodesIds = mapNodesIds(duplicatedNodes);
-
-            dispatch(canvasActions.addNodes(duplicatedNodes));
-            dispatch(canvasActions.setSelectedNodesIds(duplicatedNodesIds));
+            dispatch(
+              canvasActions.addNodes(nodesToDuplicate, {
+                duplicate: true,
+                selectNodes: true,
+              }),
+            );
             break;
           }
           case KEYS.C: {
@@ -86,7 +83,12 @@ const MainLayout = () => {
             break;
           }
           case KEYS.V: {
-            dispatch(canvasActions.pasteNodes());
+            dispatch(
+              canvasActions.addNodes(state.copiedNodes, {
+                duplicate: true,
+                selectNodes: true,
+              }),
+            );
             break;
           }
         }
@@ -97,7 +99,9 @@ const MainLayout = () => {
       }
 
       if (key === KEYS.DELETE) {
-        dispatch(canvasActions.deleteNodes(selectedNodesIds));
+        dispatch(
+          canvasActions.deleteNodes(Object.keys(state.selectedNodesIds)),
+        );
         return;
       }
 

@@ -65,15 +65,12 @@ describe('canvas', () => {
     expect(store.dispatch).toHaveBeenCalledWith(canvasActions.copyNodes());
   });
 
-  it('dispatches pasteNodes action on Ctrl + V key combo', async () => {
+  it('dispatches addNodes with copied nodes action on Ctrl + V key combo', async () => {
     const nodes = nodesGenerator(3, 'rectangle');
 
     const preloadedState = stateGenerator({
       canvas: {
-        present: {
-          nodes,
-          copiedNodes: [nodes[0], nodes[1]],
-        },
+        present: { nodes, copiedNodes: [nodes[0], nodes[1]] },
       },
     });
 
@@ -83,7 +80,25 @@ describe('canvas', () => {
 
     await user.keyboard('{Control>}v{/Control}');
 
-    expect(store.dispatch).toHaveBeenCalledWith(canvasActions.pasteNodes());
+    const { copiedNodes } = store.getState().canvas.present;
+
+    const dispatchPayload = canvasActions.addNodes(copiedNodes, {
+      duplicate: true,
+      selectNodes: true,
+    });
+
+    expect(store.dispatch).toHaveBeenCalledTimes(1);
+    expect(store.dispatch).toHaveBeenCalledWith({
+      ...dispatchPayload,
+      payload: expect.arrayContaining(
+        dispatchPayload.payload.map((node) => {
+          return expect.objectContaining({
+            ...node,
+            nodeProps: { ...node.nodeProps, id: expect.any(String) },
+          });
+        }),
+      ),
+    });
   });
 
   it('duplicated nodes and selects them on Ctrl + D key combo', async () => {
