@@ -1,4 +1,3 @@
-import { urlSearchParam } from '@/utils/url';
 import ResizeObserverPolyfill from 'resize-observer-polyfill';
 
 // matchMedia
@@ -58,11 +57,3 @@ Object.defineProperty(document, 'fonts', {
 
 // resizeObserver
 global.ResizeObserver = ResizeObserverPolyfill;
-
-export function setSearchParam(key: string, value: string) {
-  Object.defineProperty(window, 'location', {
-    value: {
-      search: urlSearchParam.set(key, value).search,
-    },
-  });
-}

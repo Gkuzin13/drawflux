@@ -1,4 +1,5 @@
 import app from '@/app';
+import { CONSTANTS } from 'shared';
 import config from '@/config';
 import * as queries from '@/features/Page/mutators/index';
 import Jobs from '@/jobs/index';
@@ -17,7 +18,7 @@ const httpServer = app.listen(config.port, '0.0.0.0', () => {
 
 const webSocket = new WebSocketService(initCollabConnection, {
   noServer: true,
-  path: '/page',
+  path: `/${CONSTANTS.COLLAB_ROOM_URL_PARAM}`,
 });
 
 httpServer.on('upgrade', (req, socket, head) => {

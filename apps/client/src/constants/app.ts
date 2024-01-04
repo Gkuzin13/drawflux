@@ -9,8 +9,6 @@ export const BASE_WS_URL_DEV = 'ws://localhost:7456';
 
 export const IS_PROD = process.env.NODE_ENV === 'production';
 
-export const PAGE_URL_SEARCH_PARAM_KEY = 'page';
-
 export const LOCAL_STORAGE_KEY = 'drawflux';
 export const LOCAL_STORAGE_LIBRARY_KEY = 'drawflux-library';
 export const LOCAL_STORAGE_THEME_KEY = 'drawflux-theme';

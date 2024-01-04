@@ -16,7 +16,7 @@ export async function initCollabConnection(
   const page = pageId ? await findPage(pageId) : null;
 
   if (!page || !pageId) {
-    return ws.close(1011, 'Page not found');
+    return ws.close(1011, 'Room not found');
   }
 
   const room = rooms.get(pageId) || new CollabRoom(pageId);

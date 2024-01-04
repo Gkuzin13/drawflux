@@ -1,11 +1,12 @@
 import { v4 as uuid } from 'uuid';
 import { createNode } from '@/utils/node';
-import { colors } from 'shared';
+import { CONSTANTS, colors } from 'shared';
 import { defaultPreloadedState } from './test-utils';
 import { deepMerge } from '@/utils/object';
 import type { NodeObject, NodeType, User } from 'shared';
 import type { DeepPartial } from '@reduxjs/toolkit';
 import type { Library } from '@/constants/app';
+import { urlSearchParam } from '@/utils/url';
 
 export const nodesGenerator = (
   length: number,
@@ -56,4 +57,11 @@ export const libraryGenerator = (length: number, shapes = 1): Library => {
       elements: nodesGenerator(shapes, 'rectangle'),
     })),
   };
+};
+
+export const makeCollabRoomURL = (
+  roomId: string,
+  baseUrl = window.origin,
+) => {
+  return urlSearchParam.set(CONSTANTS.COLLAB_ROOM_URL_PARAM, roomId, baseUrl);
 };
