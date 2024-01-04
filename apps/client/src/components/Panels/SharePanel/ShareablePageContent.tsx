@@ -4,11 +4,11 @@ import Divider from '@/components/Elements/Divider/Divider';
 import Loader from '@/components/Elements/Loader/Loader';
 import Icon from '@/components/Elements/Icon/Icon';
 import api from '@/services/api';
-import { PAGE_URL_SEARCH_PARAM_KEY } from '@/constants/app';
 import { useAppSelector } from '@/stores/hooks';
 import { selectNodes, selectConfig } from '@/services/canvas/slice';
 import { urlSearchParam } from '@/utils/url';
 import * as Styled from './SharePanel.styled';
+import { CONSTANTS } from 'shared';
 
 const SharablePageContent = () => {
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ const SharablePageContent = () => {
       .then((data) => {
         if (data?.id) {
           const updatedURL = urlSearchParam.set(
-            PAGE_URL_SEARCH_PARAM_KEY,
+            CONSTANTS.COLLAB_ROOM_URL_PARAM,
             data.id,
           );
 

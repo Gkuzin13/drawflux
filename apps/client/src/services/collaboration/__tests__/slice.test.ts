@@ -39,7 +39,30 @@ describe('collaboration slice', () => {
     });
   });
 
-  it('updates a user', () => {
+  it('updates this user', () => {
+    const [thisUser] = usersGenerator(1);
+    const collaborators = usersGenerator(3);
+
+    const previousState: CollaborationSliceState = {
+      collaborators,
+      thisUser,
+    };
+
+    const updatedThisUser: User = {
+      ...thisUser,
+      name: 'New name',
+      color: 'gray500',
+    };
+
+    const state = reducer(
+      previousState,
+      collaborationActions.updateUser(updatedThisUser),
+    );
+
+    expect(state).toEqual({ ...previousState, thisUser: updatedThisUser });
+  });
+
+  it('updates a collaborator', () => {
     const collaborators = usersGenerator(3);
 
     const updatedUser: User = {
@@ -48,7 +71,10 @@ describe('collaboration slice', () => {
       color: 'gray500',
     };
 
-    const previousState: CollaborationSliceState = { ...initialState, collaborators };
+    const previousState: CollaborationSliceState = {
+      ...initialState,
+      collaborators,
+    };
 
     const state = reducer(
       previousState,
@@ -65,7 +91,10 @@ describe('collaboration slice', () => {
     const collaborators = usersGenerator(3);
     const userNotInState = usersGenerator(1)[0];
 
-    const previousState: CollaborationSliceState = { ...initialState, collaborators };
+    const previousState: CollaborationSliceState = {
+      ...initialState,
+      collaborators,
+    };
 
     const state = reducer(
       previousState,
@@ -79,7 +108,10 @@ describe('collaboration slice', () => {
     const collaborators = usersGenerator(3);
     const userToRemove = collaborators[0];
 
-    const previousState: CollaborationSliceState = { ...initialState, collaborators };
+    const previousState: CollaborationSliceState = {
+      ...initialState,
+      collaborators,
+    };
 
     const state = reducer(
       previousState,

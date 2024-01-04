@@ -1,15 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { type WSMessage, WSMessageUtil } from 'shared';
-import {
-  BASE_WS_URL,
-  BASE_WS_URL_DEV,
-  IS_PROD,
-  PAGE_URL_SEARCH_PARAM_KEY,
-  WS_THROTTLE_MS,
-} from '@/constants/app';
-import { urlSearchParam } from '@/utils/url';
+import { useCallback, useRef, useState } from 'react';
+import { WSMessageUtil } from 'shared';
+import { WS_THROTTLE_MS } from '@/constants/app';
 import { createContext } from './createContext';
 import { throttleFn } from '@/utils/timed';
+import type { WSMessage } from 'shared';
 
 type SubscribeFn = <T extends SubscriberKey>(
   type: T,
@@ -17,6 +11,8 @@ type SubscribeFn = <T extends SubscriberKey>(
 ) => Unsubscribe;
 type Unsubscribe = () => void;
 type UnsubscribeFn = (type: SubscriberKey) => void;
+type ConnectFn = (url: URL | string) => void;
+type DisconnectFn = () => void;
 type SendFn = (message: WSMessage, throttle?: boolean) => void;
 type SubscriberKey = WSMessage['type'];
 type SubscriberHandler<T extends SubscriberKey = SubscriberKey> = (
@@ -30,19 +26,13 @@ export type WebSocketContextValue = {
   isConnected: boolean;
   isConnecting: boolean;
   isDisconnected: boolean;
+  connect: ConnectFn;
+  disconnect: DisconnectFn;
   send: SendFn;
   subscribe: SubscribeFn;
   unsubscribe: UnsubscribeFn;
 };
 type WSStatus = 'idle' | 'connecting' | 'connected' | 'disconnected';
-type WebSocketProviderProps = {
-  roomId: string | null;
-  children: React.ReactNode;
-};
-
-let startedConnecting = false;
-
-const wsBaseUrl = IS_PROD ? BASE_WS_URL : BASE_WS_URL_DEV;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const _sendWSMessage = (message: WSMessage, webSocket: WebSocket) => {
@@ -56,53 +46,45 @@ const _sendWSMessage = (message: WSMessage, webSocket: WebSocket) => {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const _throttledSendWSMessage = throttleFn(_sendWSMessage, WS_THROTTLE_MS);
 
+let initiatedConnection = false;
+
 export const [WebSocketContext, useWebSocket] =
   createContext<WebSocketContextValue>('WebSocket');
 
-export const WebSocketProvider = ({
-  roomId,
-  children,
-}: WebSocketProviderProps) => {
+export const WebSocketProvider = ({ children }: React.PropsWithChildren) => {
   const [status, setStatus] = useState<WSStatus>('idle');
 
   const webSocket = useRef<WebSocket | null>(null);
   const subscribers = useRef<Partial<Subscribers>>({});
 
-  useEffect(() => {
-    if (!roomId) {
-      webSocket.current?.close();
-      startedConnecting = false;
-      return;
-    }
+  const connect = useCallback<ConnectFn>((url) => {
+    if (initiatedConnection) return;
 
-    function createWebSocketConnection(url: URL | string) {
-      webSocket.current = new WebSocket(url);
+    initiatedConnection = true;
 
-      setStatus('connecting');
+    setStatus('connecting');
 
-      webSocket.current.onmessage = (event) => {
-        const message = WSMessageUtil.deserialize(event.data);
+    webSocket.current = new WebSocket(url);
 
-        if (message && message.type in subscribers.current) {
-          const handler = subscribers.current[message.type];
+    webSocket.current.onmessage = (event) => {
+      const message = WSMessageUtil.deserialize(event.data);
 
-          handler && handler(message.data);
-        }
-      };
+      if (message && message.type in subscribers.current) {
+        const handler = subscribers.current[message.type];
 
-      webSocket.current.onopen = () => setStatus('connected');
-      webSocket.current.onclose = () => setStatus('disconnected');
-      webSocket.current.onerror = () => setStatus('disconnected');
-    }
+        handler && handler(message.data);
+      }
+    };
 
-    if (!startedConnecting) {
-      const url = createWSUrl(roomId);
+    webSocket.current.onopen = () => setStatus('connected');
+    webSocket.current.onclose = () => setStatus('disconnected');
+    webSocket.current.onerror = () => setStatus('disconnected');
+  }, []);
 
-      createWebSocketConnection(url);
-
-      startedConnecting = true;
-    }
-  }, [roomId]);
+  const disconnect = useCallback<DisconnectFn>(() => {
+    webSocket.current?.close();
+    initiatedConnection = false;
+  }, []);
 
   const unsubscribe = useCallback<UnsubscribeFn>((type) => {
     delete subscribers.current[type];
@@ -135,6 +117,8 @@ export const WebSocketProvider = ({
         isConnected: status === 'connected',
         isConnecting: status === 'connecting',
         isDisconnected: status === 'disconnected',
+        connect,
+        disconnect,
         send,
         subscribe,
         unsubscribe,
@@ -144,11 +128,3 @@ export const WebSocketProvider = ({
     </WebSocketContext.Provider>
   );
 };
-
-function createWSUrl(roomId: string) {
-  return urlSearchParam.set(
-    'id',
-    roomId,
-    `${wsBaseUrl}/${PAGE_URL_SEARCH_PARAM_KEY}`,
-  );
-}

@@ -11,6 +11,7 @@ beforeAll(() => server.listen());
 afterEach(() => {
   cleanup();
   server.resetHandlers();
+  window.history.replaceState({}, '', window.origin);
 });
 
 afterAll(() => server.close());

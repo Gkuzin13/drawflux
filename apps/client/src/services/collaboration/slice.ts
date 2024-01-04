@@ -30,16 +30,14 @@ export const collaborationSlice = createSlice({
     },
     updateUser: {
       reducer: (state, action: PayloadAction<User>) => {
-        const index = state.collaborators.findIndex(
-          (u) => u.id === action.payload.id,
-        );
-
-        if (index !== -1) {
-          state.collaborators[index] = {
-            ...state.collaborators[index],
-            ...action.payload,
-          };
+        if (state.thisUser?.id === action.payload.id) {
+          state.thisUser = action.payload;
+          return;
         }
+
+        state.collaborators = state.collaborators.map((user) => {
+          return user.id === action.payload.id ? action.payload : user;
+        });
       },
       prepare: prepareMeta<User>,
     },
