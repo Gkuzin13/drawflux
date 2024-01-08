@@ -24,12 +24,12 @@ describe('library', () => {
     fireEvent.contextMenu(canvas, { clientX: 50, clientY: 50 });
 
     // add to library
-    await user.click(screen.getByText(/Add to library/i));
+    await user.click(screen.getByText(/Add to library/));
 
     // open library drawer
-    await user.click(screen.getByText(/Library/i));
+    await user.click(screen.getByText(/Library/));
 
-    const libraryItem = screen.getByTestId(/library-item/i);
+    const libraryItem = screen.getByTestId(/library-item/);
 
     const state = store.getState().library;
 

@@ -5,6 +5,7 @@ import Kbd from '@/components/Elements/Kbd/Kbd';
 import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import { canvasActions, selectSelectedNodesIds } from '@/services/canvas/slice';
 import { libraryActions } from '@/services/library/slice';
+import { useNotifications } from '@/contexts/notifications';
 import * as Styled from './ContextMenu.styled';
 
 export type ContextMenuType = 'node-menu' | 'canvas-menu';
@@ -62,6 +63,7 @@ const NodeMenu = () => {
   const selectedNodesIds = useAppSelector(selectSelectedNodesIds);
 
   const dispatch = useAppDispatch();
+  const { addNotification } = useNotifications();
 
   const dispatchNodesAction = (actionKey: NodesMenuActionKey) => {
     const nodesIds = Object.keys(selectedNodesIds);
@@ -95,11 +97,14 @@ const NodeMenu = () => {
 
   const handleAddToLibrary = () => {
     const { nodes, selectedNodesIds } = store.getState().canvas.present;
+
     const nodesToAdd = nodes.filter(
       (node) => node.nodeProps.id in selectedNodesIds,
     );
 
     dispatch(libraryActions.addItem(nodesToAdd));
+
+    addNotification({ title: 'Added to library', type: 'info' });
   };
 
   return (
