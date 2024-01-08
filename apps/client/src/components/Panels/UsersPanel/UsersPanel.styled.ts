@@ -1,10 +1,10 @@
-import * as Popover from '@radix-ui/react-popover';
 import { styled } from 'shared';
-import * as PanelStyled from '../Panels.styled';
 import ColorCircle from '@/components/Elements/ColorCircle/ColorCircle';
+import * as Popover from '@radix-ui/react-popover';
+import * as PanelStyled from '../Panels.styled';
 
 export const Container = styled(PanelStyled.Panel, {
-  marginLeft: 'auto'
+  margin: '0 $2 0 auto'
 });
 
 export const Content = styled(Popover.Content, {

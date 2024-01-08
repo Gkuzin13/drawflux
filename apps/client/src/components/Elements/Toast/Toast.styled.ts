@@ -6,10 +6,8 @@ export const Container = styled(ToastPrimitive.Root, {
   borderRadius: '$2',
   boxShadow: '$sm',
   padding: '$3',
-  display: 'grid',
-  gridTemplateAreas: "'title close' 'description close'",
-  gridTemplateColumns: 'auto max-content',
-  gap: '$2 $6',
+  display: 'flex',
+  justifyContent: 'space-between',
   fontSize: '$2',
   '&[data-state="open"]': {
     animation: `${slideLeft} $transitions$fast forwards`,
@@ -19,19 +17,20 @@ export const Container = styled(ToastPrimitive.Root, {
   },
 });
 
-export const Title = styled(ToastPrimitive.Title, {
-  gridArea: 'title',
-  fontWeight: 'bold',
+export const Content = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  gap: '$2'
 });
+
+export const Title = styled(ToastPrimitive.Title);
 
 export const Description = styled(ToastPrimitive.Description, {
-  gridArea: 'description',
-  fontSize: '$1',
+  color: '$gray600'
 });
 
-export const Close = styled(ToastPrimitive.Close, {
-  gridArea: 'close',
-});
+export const Close = styled(ToastPrimitive.Close);
 
 export const Viewport = styled(ToastPrimitive.Viewport, {
   position: 'fixed',

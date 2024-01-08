@@ -19,15 +19,10 @@ import FillSection from './FillSection';
 
 export type StylePanelProps = {
   selectedNodes: NodeObject[];
-  isActive: boolean;
   onStyleChange: (updatedStyle: Partial<NodeStyle>) => void;
 };
 
-const StylePanel = ({
-  selectedNodes,
-  isActive,
-  onStyleChange,
-}: StylePanelProps) => {
+const StylePanel = ({ selectedNodes, onStyleChange }: StylePanelProps) => {
   const style = useMemo(() => {
     const styles: NodeStyle[] = selectedNodes.map(({ style }) => style);
 
@@ -110,7 +105,7 @@ const StylePanel = ({
   };
 
   return (
-    <Styled.Container active={isActive}>
+    <Styled.Container>
       <ColorSection value={style.color} onColorChange={handleColorSelect} />
       <OpacitySection
         value={style.opacity}

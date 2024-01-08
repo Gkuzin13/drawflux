@@ -18,7 +18,7 @@ import {
   selectToolType,
 } from '@/services/canvas/slice';
 import { selectThisUser } from '@/services/collaboration/slice';
-import { createNode, mapNodesIds } from '@/utils/node';
+import { createNode } from '@/utils/node';
 import BackgroundLayer from '../Layers/BackgroundLayer';
 import {
   getCursorStyle,
@@ -461,8 +461,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
     const handleLibraryItemDrop = useCallback(
       (nodes: NodeObject[]) => {
-        dispatch(canvasActions.addNodes(nodes));
-        dispatch(canvasActions.setSelectedNodesIds(mapNodesIds(nodes)));
+        dispatch(canvasActions.addNodes(nodes, { selectNodes: true }));
         dispatch(canvasActions.setToolType('select'));
       },
       [dispatch],
