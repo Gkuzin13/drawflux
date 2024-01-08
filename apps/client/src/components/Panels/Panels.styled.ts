@@ -33,20 +33,17 @@ export const Button = styled(ButtonStyled.Button, {
   },
 });
 
-export const TopPanel = styled('div', {
-  position: 'relative',
-  display: 'flex',
-  justifyContent: 'space-between',
-  flexWrap: 'wrap',
-  width: '100%',
-  gap: '$2',
-});
-
-export const TopPanelRightContainer = styled(Panel);
-
-export const BottomPanel = styled('div', {
+export const Panels = styled('div', {
   position: 'relative',
   display: 'grid',
+});
+
+export const TopPanels = styled(Panels, {
+  placeItems: 'start',
+  gridTemplateColumns: '1fr auto auto',
+});
+
+export const BottomPanels = styled(Panels, {
   placeItems: 'end center',
   gap: '$2',
   variants: {

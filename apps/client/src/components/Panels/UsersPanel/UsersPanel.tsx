@@ -1,15 +1,15 @@
-import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { memo, useEffect, useRef, useState } from 'react';
 import { type User, colors } from 'shared';
 import Button from '@/components/Elements/Button/Button';
 import ColorsGrid from '@/components/Elements/ColorsGrid/ColorsGrid';
 import TextInput from '@/components/Elements/TextInput/TextInput';
+import Icon from '@/components/Elements/Icon/Icon';
 import { USER } from '@/constants/app';
 import { KEYS } from '@/constants/keys';
 import { useAppSelector } from '@/stores/hooks';
 import { selectThisUser, selectCollaborators } from '@/services/collaboration/slice';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
 import * as Styled from './UsersPanel.styled';
-import Icon from '@/components/Elements/Icon/Icon';
 
 type Props = {
   onUserChange: (user: User) => void;

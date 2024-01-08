@@ -196,36 +196,37 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
 
   return (
     <Styled.Container>
-      <Styled.TopPanel>
+      <Styled.TopPanels>
         {!isHandTool && (
           <ControlPanel
             onControl={handleControlActions}
             enabledControls={enabledControls}
           />
         )}
-        <StylePanel
-          selectedNodes={selectedNodes}
-          isActive={isStylePanelActive}
-          onStyleChange={handleStyleChange}
-        />
+        {isStylePanelActive && (
+          <StylePanel
+            selectedNodes={selectedNodes}
+            onStyleChange={handleStyleChange}
+          />
+        )}
         {ws.isConnected && (
           <Suspense>
             <UsersPanel onUserChange={handleUserChange} />
           </Suspense>
         )}
-        <Styled.TopPanelRightContainer>
+        <Styled.Panel css={{ marginLeft: 'auto' }}>
           {online && <SharePanel isPageShared={ws.isConnected} />}
           <LibraryDrawer items={library.items} />
           <MenuPanel
             disabledItems={disabledMenuItems}
             onAction={handleMenuAction}
           />
-        </Styled.TopPanelRightContainer>
-      </Styled.TopPanel>
-      <Styled.BottomPanel direction={{ '@initial': 'column', '@xs': 'row' }}>
+        </Styled.Panel>
+      </Styled.TopPanels>
+      <Styled.BottomPanels direction={{ '@initial': 'column', '@xs': 'row' }}>
         <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
         <ToolsPanel activeTool={toolType} onToolSelect={handleToolSelect} />
-      </Styled.BottomPanel>
+      </Styled.BottomPanels>
     </Styled.Container>
   );
 };

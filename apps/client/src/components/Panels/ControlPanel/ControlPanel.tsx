@@ -2,8 +2,8 @@ import { memo } from 'react';
 import { CONTROL } from '@/constants/panels/control';
 import { createKeyTitle } from '@/utils/string';
 import Icon from '@/components/Elements/Icon/Icon';
-import * as PanelStyled from '../Panels.styled';
-import * as Styled from './ControlPanel.styled';
+import * as Styled from '../Panels.styled';
+import type { ComponentProps } from '@stitches/react';
 
 export type ControlActionKey = (typeof CONTROL)[number]['value'];
 
@@ -14,9 +14,9 @@ type Props = {
     redo: boolean;
     deleteSelectedNodes: boolean;
   };
-};
+} & ComponentProps<(typeof Styled)['Panel']>;
 
-const ControlPanel = ({ enabledControls, onControl }: Props) => {
+const ControlPanel = ({ enabledControls, onControl, ...restProps }: Props) => {
   const getDisabledByControlValue = (actionType: ControlActionKey) => {
     switch (actionType) {
       case 'undo':
@@ -31,10 +31,10 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
   };
 
   return (
-    <Styled.Container>
+    <Styled.Panel {...restProps}>
       {CONTROL.map((control) => {
         return (
-          <PanelStyled.Button
+          <Styled.Button
             key={control.name}
             title={createKeyTitle(control.name, [
               ...control.modifierKeys,
@@ -44,10 +44,10 @@ const ControlPanel = ({ enabledControls, onControl }: Props) => {
             onClick={() => onControl(control.value)}
           >
             <Icon name={control.icon} />
-          </PanelStyled.Button>
+          </Styled.Button>
         );
       })}
-    </Styled.Container>
+    </Styled.Panel>
   );
 };
 

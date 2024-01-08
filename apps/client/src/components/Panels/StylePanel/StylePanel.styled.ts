@@ -1,24 +1,17 @@
+import { styled } from 'shared';
+import { Button } from '@/components/Elements/Button/Button.styled';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import * as TogglePrimitive from '@radix-ui/react-toggle';
-import { styled } from 'shared';
 import * as PanelStyled from '../Panels.styled';
-import { Button } from '@/components/Elements/Button/Button.styled';
 
 export const Container = styled(PanelStyled.Panel, {
   position: 'absolute',
   top: '100%',
-  marginTop: '$2',
+  display: 'flex',
   flexDirection: 'column',
-  padding: '$2',
   gap: '$3',
-  display: 'none',
-  variants: {
-    active: {
-      true: {
-        display: 'flex',
-      },
-    },
-  },
+  padding: '$2',
+  marginTop: '$2',
 });
 
 export const InnerContainer = styled(RadioGroupPrimitive.Root, {
