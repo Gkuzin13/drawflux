@@ -30,8 +30,8 @@ const ColorsGrid = ({ withLabel = false, value, onSelect }: Props) => {
   return (
     <RadioGroupPrimitive.Root
       defaultValue={value}
-      aria-label="Color"
-      aria-labelledby="shape-color"
+      aria-label="Colors"
+      aria-labelledby="colors"
       orientation="horizontal"
       value={value}
       onValueChange={onSelect}
