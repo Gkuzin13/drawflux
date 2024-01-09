@@ -68,7 +68,7 @@ const LibraryDrawer = ({ items }: Props) => {
   return (
     <Drawer modal={false}>
       <Drawer.Trigger align="between" color="secondary" size="sm" gap="sm">
-        <Icon name="book" size="lg" />
+        <Icon name="book" />
         <Text size="sm">Library</Text>
       </Drawer.Trigger>
       <Styled.Content onInteractOutside={handleOnInteractionOutside}>
