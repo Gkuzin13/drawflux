@@ -1,14 +1,12 @@
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { memo } from 'react';
-import {
-  type MenuPanelActionType,
-  MENU_PANEL_ACTIONS,
-} from '@/constants/panels/menu';
+import { MENU_PANEL_ACTIONS } from '@/constants/panels/menu';
+import DropdownMenu from '@/components/Elements/DropdownMenu/DropdownMenu';
 import Icon from '@/components/Elements/Icon/Icon';
 import Switch from '@/components/Elements/Switch/Switch';
 import Divider from '@/components/Elements/Divider/Divider';
 import { useTheme } from '@/contexts/theme';
 import * as Styled from './MenuPanel.styled';
+import type { MenuPanelActionType } from '@/constants/panels/menu';
 
 export type MenuKey = (typeof MENU_PANEL_ACTIONS)[number]['value'];
 
@@ -27,15 +25,15 @@ const MenuPanel = ({ disabledItems, onAction }: Props) => {
   };
 
   return (
-    <DropdownMenuPrimitive.Root modal={true}>
-      <Styled.Trigger aria-label="Open Menu">
-        <Icon name="dots" size="lg" />
-      </Styled.Trigger>
-      <DropdownMenuPrimitive.Portal>
+    <DropdownMenu modal={true}>
+      <DropdownMenu.Trigger aria-label="Open Menu">
+        <Icon name="dots" />
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
         <Styled.Content align="end" sideOffset={4}>
           {MENU_PANEL_ACTIONS.map((action) => {
             return (
-              <Styled.Item
+              <DropdownMenu.Item
                 key={action.value}
                 title={action.name}
                 onSelect={() => onAction(action.value)}
@@ -43,11 +41,11 @@ const MenuPanel = ({ disabledItems, onAction }: Props) => {
               >
                 <Icon name={action.icon} />
                 {action.name}
-              </Styled.Item>
+              </DropdownMenu.Item>
             );
           })}
           <Divider css={{ margin: '$1 0' }} />
-          <Styled.Item onSelect={(e) => e.preventDefault()}>
+          <DropdownMenu.Item onSelect={(e) => e.preventDefault()}>
             <Switch
               id="dark-mode"
               label="Dark Mode"
@@ -56,10 +54,10 @@ const MenuPanel = ({ disabledItems, onAction }: Props) => {
               onCheckedChange={handleDarkModeChange}
               data-testid="dark-mode-switch"
             />
-          </Styled.Item>
+          </DropdownMenu.Item>
         </Styled.Content>
-      </DropdownMenuPrimitive.Portal>
-    </DropdownMenuPrimitive.Root>
+      </DropdownMenu.Portal>
+    </DropdownMenu>
   );
 };
 
