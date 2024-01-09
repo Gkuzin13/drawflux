@@ -1,17 +1,17 @@
 import { Suspense, lazy } from 'react';
-import type { QRCodeResponse } from 'shared';
 import Button from '@/components/Elements/Button/Button';
 import Loader from '@/components/Elements/Loader/Loader';
+import Icon from '@/components/Elements/Icon/Icon';
 import useClipboard from '@/hooks/useClipboard/useClipboard';
 import * as Styled from './SharePanel.styled';
-import Icon from '@/components/Elements/Icon/Icon';
+import type { QRCodeResponse } from 'shared';
 
 type Props = {
   qrCode: QRCodeResponse | null;
   error: string | null;
 };
 
-const QRCode = lazy(() => import('@/components/QRCode/QRCode'));
+const QRCode = lazy(() => import('@/components/Elements/QRCode/QRCode'));
 
 const SharedPageContent = ({ qrCode, error }: Props) => {
   const { copied, copy } = useClipboard();
