@@ -1,13 +1,10 @@
 import { memo } from 'react';
 import { Group, Label, Path, Tag, Text } from 'react-konva';
-import type { User, Point } from 'shared';
-import { colors } from 'shared';
-
-type ColorValue = (typeof colors)[User['color']];
+import type { Point } from 'shared';
 
 type Props = {
   name: string;
-  color: User['color'];
+  color: string;
   position: Point;
   stageScale: number;
 };
@@ -50,7 +47,6 @@ const CursorLabel = ({ text, color }: LabelProps) => {
 };
 
 const UserCursor = ({ name, color, position, stageScale }: Props) => {
-  const colorValue: ColorValue = colors[color] || '#000000';
   const normalizedScale = 1 / stageScale;
 
   return (
@@ -65,8 +61,8 @@ const UserCursor = ({ name, color, position, stageScale }: Props) => {
       perfectDrawEnabled={false}
       shadowForStrokeEnabled={false}
     >
-      <CursorHead color={colorValue} />
-      <CursorLabel text={name} color={colorValue} />
+      <CursorHead color={color} />
+      <CursorLabel text={name} color={color} />
     </Group>
   );
 };

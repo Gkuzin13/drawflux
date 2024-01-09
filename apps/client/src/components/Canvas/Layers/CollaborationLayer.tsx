@@ -5,8 +5,10 @@ import { selectCollaborators } from '@/services/collaboration/slice';
 import NodeDraft from '../Node/NodeDraft';
 import UserCursor from '../UserCursor';
 import useDrafts from '@/hooks/useDrafts';
+import useThemeColors from '@/hooks/useThemeColors';
 import { noop } from '@/utils/is';
 import type { NodeObject, Point } from 'shared';
+import { getColorValue } from '@/utils/shape';
 
 type Props = {
   stageScale: number;
@@ -20,6 +22,8 @@ const CollaborationLayer = ({ stageScale }: Props) => {
 
   const collaborators = useAppSelector(selectCollaborators);
   const ws = useWebSocket();
+
+  const themeColors = useThemeColors();
 
   useEffect(() => {
     if (!ws.isConnected) {
@@ -100,7 +104,7 @@ const CollaborationLayer = ({ stageScale }: Props) => {
           <UserCursor
             key={user.id}
             name={user.name}
-            color={user.color}
+            color={getColorValue(user.color, themeColors)}
             position={position}
             stageScale={stageScale}
           />

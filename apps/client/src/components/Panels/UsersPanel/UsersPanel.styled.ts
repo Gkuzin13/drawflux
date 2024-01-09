@@ -1,28 +1,28 @@
 import { styled } from 'shared';
 import ColorCircle from '@/components/Elements/ColorCircle/ColorCircle';
-import * as Popover from '@radix-ui/react-popover';
+import Popover from '@/components/Elements/Popover/Popover';
+import { Button } from '@/components/Elements/Button/Button.styled';
 import * as PanelStyled from '../Panels.styled';
 
 export const Container = styled(PanelStyled.Panel, {
-  margin: '0 $2 0 auto'
+  margin: '0 $2 0 auto',
 });
 
-export const Content = styled(Popover.Content, {
+export const PopoverContent = styled(Popover.Content, {
+  minWidth: '$11',
   padding: '$1',
-  display: 'flex',
-  gap: '$1',
-  flexDirection: 'column',
-  boxShadow: '$sm',
-  borderRadius: '$2',
-  marginTop: '$2',
-  backgroundColor: '$bg',
-  button: {
-    display: 'grid',
-    placeItems: 'center',
-  },
+});
+
+export const ColorsPopoverContent = styled(Popover.Content, {
+  padding: '$1',
 });
 
 export const Trigger = styled(Popover.Trigger, PanelStyled.Button);
+
+export const ColorChangeTrigger = styled(Popover.Trigger, {
+  display: 'grid',
+  placeItems: 'center',
+});
 
 export const Info = styled('div', {
   display: 'flex',
@@ -34,13 +34,17 @@ export const Info = styled('div', {
   marginLeft: '$2',
 });
 
-export const Indicator = styled('span', {
-  color: '$gray500',
-  paddingRight: '$2',
-});
-
-export const Name = styled('span', {});
-
 export const Color = styled(ColorCircle, {
   flexShrink: 0,
+});
+
+export const EditUsernameButton = styled(Button, {
+  marginLeft: 'auto',
+  variants: {
+    editing: {
+      true: {
+        color: '$primary',
+      },
+    },
+  },
 });

@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react';
 
-function useAutoFocus<T extends HTMLElement>() {
+function useAutoFocus<T extends HTMLElement>(deps?: unknown[]) {
   const ref = useRef<T>(null);
 
   useEffect(() => {
     if (ref.current) {
       ref.current.focus();
     }
-  }, [ref]);
+  }, [JSON.stringify(deps)]);
 
   return ref;
 }

@@ -2,8 +2,9 @@ import { memo, useState } from 'react';
 import api from '@/services/api';
 import ShareablePageContent from './ShareablePageContent';
 import SharedPageContent from './SharedPageContent';
+import Popover from '@/components/Elements/Popover/Popover';
+import Button from '@/components/Elements/Button/Button';
 import * as Styled from './SharePanel.styled';
-import * as PopoverPrimitive from '@radix-ui/react-popover';
 import type { QRCodeResponse } from 'shared';
 
 type Props = {
@@ -26,18 +27,22 @@ const SharePanel = ({ isPageShared }: Props) => {
   };
 
   return (
-    <PopoverPrimitive.Root onOpenChange={handlePopoverOpen}>
-      <Styled.Trigger>Share</Styled.Trigger>
-      <PopoverPrimitive.Portal>
-        <Styled.Content align="end" sideOffset={4}>
+    <Popover onOpenChange={handlePopoverOpen}>
+      <Popover.Trigger asChild>
+        <Button color="primary" size="sm">
+          Share
+        </Button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Styled.PopoverContent align="end" sideOffset={14}>
           {isPageShared ? (
             <SharedPageContent qrCode={qrCode} error={error} />
           ) : (
             <ShareablePageContent />
           )}
-        </Styled.Content>
-      </PopoverPrimitive.Portal>
-    </PopoverPrimitive.Root>
+        </Styled.PopoverContent>
+      </Popover.Portal>
+    </Popover>
   );
 };
 
