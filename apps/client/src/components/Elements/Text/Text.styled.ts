@@ -54,7 +54,12 @@ export const Root = (as: TextComponentType, color: ThemeColorKey) =>
         },
         bold: {
           fontWeight: 'bolder',
-        }
+        },
+      },
+      lineHeight: {
+        normal: {
+          lineHeight: '$normal',
+        },
       },
     },
     defaultVariants: {
