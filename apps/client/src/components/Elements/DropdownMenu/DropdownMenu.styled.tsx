@@ -6,7 +6,7 @@ export const Content = styled(DropdownPrimitive.Content, {
   display: 'flex',
   flexDirection: 'column',
   gap: '$1',
-  padding: '$2',
+  padding: '$1',
   boxShadow: '$sm',
   borderRadius: '$2',
   backgroundColor: '$bg',
@@ -21,7 +21,6 @@ export const Trigger = styled(DropdownPrimitive.Trigger, Button, {
 });
 
 export const Item = styled(DropdownPrimitive.Item, Button, {
-  padding: '$1',
   userSelect: 'none',
   outline: 'none',
   defaultVariants: {

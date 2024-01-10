@@ -3,8 +3,8 @@ import { styled } from 'shared';
 
 export const PopoverContent = styled(Popover.Content, {
   maxWidth: '$11',
-  padding: '$3',
-  gap: '$2'
+  padding: '$2',
+  gap: '$2',
 });
 
 export const QRCodeContainer = styled('div', {

@@ -46,7 +46,7 @@ const SharedPageContent = ({ qrCode, error }: Props) => {
         <Icon name={copied ? 'clipboardCheck' : 'copy'} />
       </Button>
       <Text as="p" size="xs" color="gray500" lineHeight="normal">
-        Anyone with the link has access to this page for 24 hours since sharing.
+        Anyone with the link has access to this project for 24 hours since sharing.
       </Text>
     </>
   );
