@@ -1,11 +1,16 @@
 import { CURSOR } from '@/constants/cursor';
 import type { ToolType } from '@/constants/panels/tools';
+import { TRANSFORMER } from '@/constants/shape';
 import type Konva from 'konva';
 import type { IRect, Vector2d } from 'konva/lib/types';
 import { Util } from 'konva/lib/Util';
 import type { Point } from 'shared';
 
 const POINTER_RECT_SIZE = 32;
+
+export function haveIntersection(rect1: IRect, rect2: IRect) {
+  return Util.haveIntersection(rect1, rect2);
+}
 
 export function getIntersectingNodes(
   children: (Konva.Shape | Konva.Group)[],
@@ -21,8 +26,14 @@ export function getIntersectingNodes(
 
       return !!getIntersectingNodes(group.getChildren(), rect).length;
     }
-    return Util.haveIntersection(rect, child.getClientRect());
+    return haveIntersection(rect, child.getClientRect());
   });
+}
+
+export function getLayerTransformers(layer: Konva.Layer) {
+  return layer.getChildren(
+    (child) => child.attrs.type === TRANSFORMER.TYPE,
+  ) as Konva.Transformer[];
 }
 
 export function getPointerRect(position: Vector2d, scale: number): IRect {

@@ -1,147 +1,23 @@
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
-import { type PropsWithChildren, type ReactNode, useCallback } from 'react';
-import Divider from '@/components/Elements/Divider/Divider';
-import Kbd from '@/components/Elements/Kbd/Kbd';
-import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
-import { canvasActions, selectSelectedNodesIds } from '@/services/canvas/slice';
-import { libraryActions } from '@/services/library/slice';
-import { useNotifications } from '@/contexts/notifications';
+import NodeMenu from './NodeMenu';
+import CanvasMenu from './CanvasMenu';
+import useActionManager from './actionManager';
 import * as Styled from './ContextMenu.styled';
+import type { CanvasMenuAction } from './CanvasMenu';
+import type { NodeMenuAction } from './NodeMenu';
 
-export type ContextMenuType = 'node-menu' | 'canvas-menu';
+export type ContextMenuType = keyof typeof menus;
+export type ContextMenuAction = NodeMenuAction | CanvasMenuAction;
 
-type RootProps = PropsWithChildren<{
-  children: ReactNode;
+type RootProps = {
+  menuType: ContextMenuType;
   onContextMenuOpen: (open: boolean) => void;
-}>;
+  children: React.ReactNode;
+};
 
 type TriggerProps = ContextMenuPrimitive.ContextMenuTriggerProps;
 
-type NodesMenuActionKey = Extract<
-  keyof typeof canvasActions,
-  | 'moveNodesToStart'
-  | 'moveNodesToEnd'
-  | 'moveNodesBackward'
-  | 'moveNodesForward'
-  | 'deleteNodes'
->;
-
-const CanvasMenu = () => {
-  const store = useAppStore();
-  const dispatch = useAppDispatch();
-
-  const handleSelectAll = useCallback(() => {
-    dispatch(canvasActions.selectAllNodes());
-  }, [dispatch]);
-
-  const handlePaste = useCallback(() => {
-    const { copiedNodes } = store.getState().canvas.present;
-
-    dispatch(
-      canvasActions.addNodes(copiedNodes, {
-        duplicate: true,
-        selectNodes: true,
-      }),
-    );
-  }, [store, dispatch]);
-
-  return (
-    <>
-      <Styled.Item onSelect={handlePaste}>
-        Paste <Kbd>Ctrl + V</Kbd>
-      </Styled.Item>
-      <Divider orientation="horizontal" />
-      <Styled.Item onSelect={handleSelectAll}>
-        Select All <Kbd>Ctrl + A</Kbd>
-      </Styled.Item>
-    </>
-  );
-};
-
-const NodeMenu = () => {
-  const store = useAppStore();
-  const selectedNodesIds = useAppSelector(selectSelectedNodesIds);
-
-  const dispatch = useAppDispatch();
-  const { addNotification } = useNotifications();
-
-  const dispatchNodesAction = (actionKey: NodesMenuActionKey) => {
-    const nodesIds = Object.keys(selectedNodesIds);
-    const action = canvasActions[actionKey];
-
-    dispatch(action(nodesIds));
-  };
-
-  const handleNodesDuplicate = () => {
-    const { nodes, selectedNodesIds } = store.getState().canvas.present;
-
-    const nodesToDuplicate = nodes.filter(
-      ({ nodeProps }) => nodeProps.id in selectedNodesIds,
-    );
-
-    dispatch(
-      canvasActions.addNodes(nodesToDuplicate, {
-        duplicate: true,
-        selectNodes: true,
-      }),
-    );
-  };
-
-  const handleSelectNone = () => {
-    dispatch(canvasActions.setSelectedNodesIds([]));
-  };
-
-  const handleCopy = () => {
-    dispatch(canvasActions.copyNodes());
-  };
-
-  const handleAddToLibrary = () => {
-    const { nodes, selectedNodesIds } = store.getState().canvas.present;
-
-    const nodesToAdd = nodes.filter(
-      (node) => node.nodeProps.id in selectedNodesIds,
-    );
-
-    dispatch(libraryActions.addItem(nodesToAdd));
-
-    addNotification({ title: 'Added to library', type: 'info' });
-  };
-
-  return (
-    <>
-      <Styled.Item onSelect={handleCopy}>
-        Copy <Kbd>Ctrl + C</Kbd>
-      </Styled.Item>
-      <Styled.Item onSelect={handleNodesDuplicate}>
-        Duplicate <Kbd>Ctrl + D</Kbd>
-      </Styled.Item>
-      <Divider orientation="horizontal" />
-      <Styled.Item onSelect={handleAddToLibrary}>Add to library</Styled.Item>
-      <Divider orientation="horizontal" />
-      <Styled.Item onSelect={() => dispatchNodesAction('moveNodesToEnd')}>
-        Bring to front
-      </Styled.Item>
-      <Styled.Item onSelect={() => dispatchNodesAction('moveNodesForward')}>
-        Bring forward
-      </Styled.Item>
-      <Styled.Item onSelect={() => dispatchNodesAction('moveNodesBackward')}>
-        Send backward
-      </Styled.Item>
-      <Styled.Item onSelect={() => dispatchNodesAction('moveNodesToStart')}>
-        Send to back
-      </Styled.Item>
-      <Divider orientation="horizontal" />
-      <Styled.Item onSelect={handleSelectNone}>Select None</Styled.Item>
-      <Divider orientation="horizontal" />
-      <Styled.Item onSelect={() => dispatchNodesAction('deleteNodes')}>
-        Delete
-        <Kbd>Del</Kbd>
-      </Styled.Item>
-    </>
-  );
-};
-
-const menus: Record<ContextMenuType, React.FC> = {
+const menus = {
   'node-menu': NodeMenu,
   'canvas-menu': CanvasMenu,
 };
@@ -154,25 +30,17 @@ const Trigger = ({ children }: TriggerProps) => {
   );
 };
 
-const Menu = () => {
-  const selectedNodesIds = useAppSelector(selectSelectedNodesIds);
-  const selectedNodesCount = Object.keys(selectedNodesIds).length;
+const Root = ({ menuType, onContextMenuOpen, children }: RootProps) => {
+  const dispatchMenuAction = useActionManager();
 
-  const contextMenuType: ContextMenuType = selectedNodesCount
-    ? 'node-menu'
-    : 'canvas-menu';
+  const MenuComponent = menus[menuType];
 
-  const ActiveMenu = menus[contextMenuType];
-  return <ActiveMenu />;
-};
-
-const Root = ({ onContextMenuOpen, children }: RootProps) => {
   return (
     <ContextMenuPrimitive.Root onOpenChange={onContextMenuOpen}>
       {children}
       <ContextMenuPrimitive.Portal>
         <Styled.Content data-testid="context-menu">
-          <Menu />
+          <MenuComponent onAction={dispatchMenuAction} />
         </Styled.Content>
       </ContextMenuPrimitive.Portal>
     </ContextMenuPrimitive.Root>

@@ -1,5 +1,7 @@
 import { Suspense, lazy, useCallback, useRef, useState } from 'react';
-import ContextMenu from '@/components/ContextMenu/ContextMenu';
+import ContextMenu, {
+  type ContextMenuType,
+} from '@/components/ContextMenu/ContextMenu';
 import Panels from '@/components/Panels/Panels';
 import Loader from '@/components/Elements/Loader/Loader';
 import { useAppDispatch, useAppStore } from '@/stores/hooks';
@@ -9,8 +11,10 @@ import { useWebSocket } from '@/contexts/websocket';
 import {
   getIntersectingNodes,
   getLayerNodes,
+  getLayerTransformers,
   getMainLayer,
   getPointerRect,
+  haveIntersection,
 } from '@/components/Canvas/DrawingCanvas/helpers/stage';
 import { historyActions } from '@/stores/reducers/history';
 import { canvasActions } from '@/services/canvas/slice';
@@ -24,6 +28,7 @@ const DrawingCanvas = lazy(
 );
 
 const MainLayout = () => {
+  const [menuType, setMenuType] = useState<ContextMenuType>('canvas-menu');
   const [selectedNodesIds, setSelectedNodesIds] = useState<string[]>([]);
 
   const store = useAppStore();
@@ -120,32 +125,48 @@ const MainLayout = () => {
         return;
       }
 
-      const layer = getMainLayer(stage);
-      const children = getLayerNodes(layer);
-
-      const selectedNodesIds = store.getState().canvas.present.selectedNodesIds;
-
       const pointerRect = getPointerRect(pointerPosition, stage.scaleX());
-      const nodesInClickArea = getIntersectingNodes(children, pointerRect);
+      const layer = getMainLayer(stage);
+      const layerTransformer = getLayerTransformers(layer)[0];
 
-      const multipleNodesSelected = Object.keys(selectedNodesIds).length > 1;
+      if (layerTransformer) {
+        const clickedOnTransformer = haveIntersection(
+          layerTransformer.getClientRect(),
+          pointerRect,
+        );
+
+        if (clickedOnTransformer) {
+          setMenuType((prevType) => {
+            return prevType === 'node-menu' ? prevType : 'node-menu';
+          });
+          return;
+        }
+      }
+
+      const layerNodes = getLayerNodes(layer);
+      const nodesInClickArea = getIntersectingNodes(layerNodes, pointerRect);
       const clickedOnNodes = Boolean(nodesInClickArea.length);
-      const clickedOnSelectedNodes = nodesInClickArea.some(
-        (node) => node.id() in selectedNodesIds,
-      );
 
-      if (clickedOnNodes && !clickedOnSelectedNodes && !multipleNodesSelected) {
+      if (clickedOnNodes) {
         const nodesIds = nodesInClickArea.map((node) => node.id());
         dispatch(canvasActions.setSelectedNodesIds(nodesIds));
+        setMenuType('node-menu');
+        return;
       }
+
+      dispatch(canvasActions.setSelectedNodesIds([]));
+      setMenuType('canvas-menu');
     },
-    [stageRef, store, dispatch],
+    [dispatch],
   );
 
   return (
     <Styled.Container ref={containerRef} tabIndex={0} onKeyDown={handleKeyDown}>
       <Panels stageRef={stageRef} selectedNodesIds={selectedNodesIds} />
-      <ContextMenu.Root onContextMenuOpen={handleContextMenuOpen}>
+      <ContextMenu.Root
+        menuType={menuType}
+        onContextMenuOpen={handleContextMenuOpen}
+      >
         <ContextMenu.Trigger>
           <Suspense fallback={<Loader fullScreen>Loading Assets...</Loader>}>
             <DrawingCanvas

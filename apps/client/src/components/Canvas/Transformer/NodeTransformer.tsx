@@ -33,6 +33,7 @@ const NodeTransformer = forwardRef<Ref, TransformerProps>(
     return (
       <Transformer
         ref={ref}
+        type={TRANSFORMER.TYPE}
         anchorFill={themeColors['canvas-bg'].value}
         anchorStroke={TRANSFORMER.BORDER_STROKE}
         borderStroke={TRANSFORMER.BORDER_STROKE}

@@ -1,6 +1,6 @@
 import * as ContextMenu from '@radix-ui/react-context-menu';
 import { styled } from 'shared';
-import * as ButtonStyled from '@/components/Elements/Button/Button.styled';
+import { Button } from '@/components/Elements/Button/Button.styled';
 
 export const Content = styled(ContextMenu.Content, {
   display: 'flex',
@@ -9,12 +9,12 @@ export const Content = styled(ContextMenu.Content, {
   backgroundColor: '$bg',
   borderRadius: '$2',
   boxShadow: '$sm',
-  padding: '$2',
+  padding: '$1',
   minWidth: '$11',
   zIndex: 3,
 });
 
-export const Item = styled(ContextMenu.Item, ButtonStyled.Button, {
+export const Item = styled(ContextMenu.Item, Button, {
   userSelect: 'none',
   defaultVariants: {
     size: 'xs',
