@@ -32,7 +32,7 @@ const LineSection = ({ value, onLineChange }: Props) => {
                 line.value === value ? 'secondary-dark' : 'secondary-light'
               }
             >
-              <Icon name={line.icon} size="lg" />
+              <Icon name={line.icon} />
             </Styled.Item>
           );
         })}

@@ -1,6 +1,7 @@
 import { colors } from 'shared';
 
 export const TRANSFORMER = {
+  TYPE: 'transformer',
   MIN_SIZE: 10,
   ROTATION_SNAPS: [0, 90, 180, 270],
   ROTATION_ANCHOR_OFFSET: 14,

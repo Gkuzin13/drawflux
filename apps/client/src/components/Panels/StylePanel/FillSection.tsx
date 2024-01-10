@@ -34,7 +34,7 @@ const FillSection = ({ value, onFillChange }: Props) => {
                 fill.value === value ? 'secondary-dark' : 'secondary-light'
               }
             >
-              <Icon name={fill.icon} size="lg" />
+              <Icon name={fill.icon} />
             </Styled.Item>
           );
         })}

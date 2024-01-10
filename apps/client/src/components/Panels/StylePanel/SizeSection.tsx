@@ -32,7 +32,7 @@ const SizeSection = ({ value, onSizeChange }: Props) => {
                 size.value === value ? 'secondary-dark' : 'secondary-light'
               }
             >
-              <Icon name={size.icon} stroke="lg" />
+              <Icon name={size.icon} />
             </Styled.Item>
           );
         })}

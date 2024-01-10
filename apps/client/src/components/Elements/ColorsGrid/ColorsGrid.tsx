@@ -1,9 +1,9 @@
-import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import { createTitle } from '@/utils/string';
+import ColorCircle from '../ColorCircle/ColorCircle';
+import RadioGroup from '../RadioGroup/RadioGroup';
 import * as PanelStyled from '@/components/Panels/StylePanel/StylePanel.styled';
 import * as Styled from './ColorsGrid.styled';
-import { createTitle } from '@/utils/string';
 import type { NodeColor } from 'shared';
-import ColorCircle from '../ColorCircle/ColorCircle';
 
 type Props = {
   value: string;
@@ -28,7 +28,7 @@ const COLOR: { name: string; value: NodeColor }[] = [
 
 const ColorsGrid = ({ withLabel = false, value, onSelect }: Props) => {
   return (
-    <RadioGroupPrimitive.Root
+    <RadioGroup
       defaultValue={value}
       aria-label="Colors"
       aria-labelledby="colors"
@@ -56,7 +56,7 @@ const ColorsGrid = ({ withLabel = false, value, onSelect }: Props) => {
           );
         })}
       </Styled.Grid>
-    </RadioGroupPrimitive.Root>
+    </RadioGroup>
   );
 };
 

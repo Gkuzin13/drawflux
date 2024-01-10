@@ -1,4 +1,13 @@
 import { useMemo } from 'react';
+import { OPACITY } from '@/constants/panels/style';
+import { clamp } from '@/utils/math';
+import AnimatedSection from './AnimatedSection';
+import ColorSection from './ColorSection';
+import LineSection from './LineSection';
+import OpacitySection from './OpacitySection';
+import FillSection from './FillSection';
+import SizeSection from './SizeSection';
+import * as Styled from './StylePanel.styled';
 import type {
   NodeColor,
   NodeFill,
@@ -7,15 +16,6 @@ import type {
   NodeSize,
   NodeStyle,
 } from 'shared';
-import { OPACITY } from '@/constants/panels/style';
-import { clamp } from '@/utils/math';
-import AnimatedSection from './AnimatedSection';
-import ColorSection from './ColorSection';
-import LineSection from './LineSection';
-import OpacitySection from './OpacitySection';
-import SizeSection from './SizeSection';
-import * as Styled from './StylePanel.styled';
-import FillSection from './FillSection';
 
 export type StylePanelProps = {
   selectedNodes: NodeObject[];

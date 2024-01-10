@@ -5,8 +5,7 @@ export const Button = styled('button', {
   alignItems: 'center',
   borderRadius: '$2',
   border: '1px solid transparent',
-  transitionProperty: 'background-color, color',
-  transition: '$fast',
+  cursor: 'pointer',
   '&[disabled], &[data-disabled]': {
     opacity: 0.5,
     cursor: 'revert',
@@ -92,7 +91,7 @@ export const Button = styled('button', {
       xs: {
         fontSize: '$1',
         gap: '$1',
-        padding: '$1 $1',
+        padding: '$1 $2',
       },
       sm: {
         fontSize: '$2',

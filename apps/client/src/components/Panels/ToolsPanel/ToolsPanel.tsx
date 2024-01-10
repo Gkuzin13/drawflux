@@ -23,7 +23,7 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
               data-testid={`tool-button-${tool.value}`}
               onClick={() => onToolSelect(tool.value)}
             >
-              <Icon name={tool.icon} size="lg" stroke="md" />
+              <Icon name={tool.icon} />
             </PanelStyled.Button>
             {tool.value === 'hand' && (
               <Styled.ToolsDivider orientation="vertical" />

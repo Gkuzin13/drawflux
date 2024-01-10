@@ -5,7 +5,7 @@ type Props = {
 };
 
 const ColorCircle = ({ color }: Props) => {
-  return <Styled.Root name="circleFilled" size="lg" color={color} />;
+  return <Styled.Root name="circleFilled" color={color} />;
 };
 
 export default ColorCircle;
