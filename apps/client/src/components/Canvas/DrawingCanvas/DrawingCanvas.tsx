@@ -443,6 +443,26 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [activeDraftId],
     );
 
+    const handleOnDoubleClick = useCallback(
+      (event: KonvaEventObject<MouseEvent>) => {
+        if (toolType !== 'select') {
+          return;
+        }
+
+        const stage = event.target.getStage();
+        const clickedOnEmpty = event.target === stage;
+
+        if (!clickedOnEmpty) {
+          return;
+        }
+
+        const position = getRelativePointerPosition(stage);
+
+        handleDraftCreate('text', position);
+      },
+      [toolType, handleDraftCreate],
+    );
+
     const handleNodesChange = useCallback(
       (nodes: NodeObject[]) => {
         dispatch(canvasActions.updateNodes(nodes));
@@ -495,6 +515,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         onDragMove={handleStageDragMove}
         onDragEnd={handleStageDragEnd}
         onContextMenu={handleOnContextMenu}
+        onDblClick={handleOnDoubleClick}
       >
         <MainLayer
           listening={isLayerListening}
