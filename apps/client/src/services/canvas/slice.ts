@@ -2,6 +2,10 @@ import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { reorderNodes, isValidNode, duplicateNodesToRight } from '@/utils/node';
 import { getCanvasCenteredPositionRelativeToNodes } from '@/utils/position';
 import { historyActions } from '../../stores/reducers/history';
+import {
+  createParametricSelectorHook,
+  createAppSelector,
+} from '@/stores/hooks';
 import type { NodeObject } from 'shared';
 import type { AppState } from '@/constants/app';
 import type { RootState } from '../../stores/store';
@@ -21,7 +25,7 @@ export const initialState: CanvasSliceState = {
     position: { x: 0, y: 0 },
   },
   toolType: 'select',
-  selectedNodesIds: {},
+  selectedNodeIds: {},
   copiedNodes: [],
 };
 
@@ -44,10 +48,10 @@ export const canvasSlice = createSlice({
   initialState,
   reducers: {
     set: (state, action: PayloadAction<AppState['page']>) => {
-      const { nodes, selectedNodesIds, stageConfig, toolType } = action.payload;
+      const { nodes, selectedNodeIds, stageConfig, toolType } = action.payload;
 
       state.nodes = nodes;
-      state.selectedNodesIds = selectedNodesIds;
+      state.selectedNodeIds = selectedNodeIds;
       state.stageConfig = stageConfig;
       state.toolType = toolType;
     },
@@ -127,10 +131,10 @@ export const canvasSlice = createSlice({
       prepare: prepareMeta<string[]>,
     },
     copyNodes: (state) => {
-      const { nodes, selectedNodesIds } = state;
+      const { nodes, selectedNodeIds } = state;
 
       state.copiedNodes = nodes.filter(
-        (node) => node.nodeProps.id in selectedNodesIds,
+        (node) => node.nodeProps.id in selectedNodeIds,
       );
     },
     setToolType: (
@@ -145,20 +149,23 @@ export const canvasSlice = createSlice({
     ) => {
       state.stageConfig = { ...state.stageConfig, ...action.payload };
     },
-    setSelectedNodesIds: (state, action: PayloadAction<string[]>) => {
+    setSelectedNodeIds: (state, action: PayloadAction<string[]>) => {
       if (!action.payload.length) {
-        state.selectedNodesIds = {};
+        state.selectedNodeIds = {};
         return;
       }
 
-      state.selectedNodesIds = Object.fromEntries(
+      state.selectedNodeIds = Object.fromEntries(
         action.payload.map((nodeId) => [nodeId, true]),
       );
     },
     selectAllNodes: (state) => {
-      state.selectedNodesIds = Object.fromEntries(
+      state.selectedNodeIds = Object.fromEntries(
         state.nodes.map((node) => [node.nodeProps.id, true]),
       );
+    },
+    unselectAllNodes: (state) => {
+      state.selectedNodeIds = {};
     },
   },
   extraReducers(builder) {
@@ -175,7 +182,7 @@ export const canvasSlice = createSlice({
       })
       .addMatcher(canvasActions.addNodes.match, (state, action) => {
         if (action.meta?.selectNodes) {
-          state.selectedNodesIds = Object.fromEntries(
+          state.selectedNodeIds = Object.fromEntries(
             action.payload.map((node) => [node.nodeProps.id, true]),
           );
         }
@@ -183,25 +190,42 @@ export const canvasSlice = createSlice({
       .addMatcher(
         isAnyOf(historyActions.redo.match, historyActions.undo.match),
         (state) => {
-          state.selectedNodesIds = {};
+          state.selectedNodeIds = {};
         },
       )
       .addMatcher(canvasActions.deleteNodes.match, (state) => {
-        state.selectedNodesIds = {};
+        state.selectedNodeIds = {};
       });
   },
 });
 
 export const selectNodes = (state: RootState) => state.canvas.present.nodes;
+
 export const selectConfig = (state: RootState) =>
   state.canvas.present.stageConfig;
+
 export const selectToolType = (state: RootState) =>
   state.canvas.present.toolType;
-export const selectSelectedNodesIds = (state: RootState) =>
-  state.canvas.present.selectedNodesIds;
+
+export const selectSelectedNodeIds = (state: RootState) =>
+  state.canvas.present.selectedNodeIds;
+
+const selectNodesById = createAppSelector(
+  [selectNodes, (_nodes, nodeIds: string[]) => nodeIds],
+  (nodes, nodeIds) => {
+    const selectedNodeIds = Object.fromEntries(nodeIds.map((id) => [id, true]));
+    return nodes.filter((node) => node.nodeProps.id in selectedNodeIds);
+  },
+);
+
+export const useSelectNodesById = createParametricSelectorHook(selectNodesById);
+
 export const selectCopiedNodes = (state: RootState) =>
   state.canvas.present.copiedNodes;
-export const selectHistory = (state: RootState) => state.canvas;
+
+export const selectPastHistory = (state: RootState) => state.canvas.past;
+
+export const selectFutureHistory = (state: RootState) => state.canvas.future;
 
 export const canvasActions = canvasSlice.actions;
 export default canvasSlice.reducer;

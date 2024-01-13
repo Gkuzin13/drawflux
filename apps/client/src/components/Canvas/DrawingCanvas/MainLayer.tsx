@@ -4,7 +4,7 @@ import useEvent from '@/hooks/useEvent/useEvent';
 import { getUnregisteredPointerPosition } from './helpers/stage';
 import { safeJSONParse } from '@/utils/object';
 import { duplicateNodesAtPosition } from '@/utils/node';
-import { LIBRARY } from '@/constants/panels/library';
+import { LIBRARY } from '@/constants/panels';
 import type Konva from 'konva';
 import type { LibraryItem } from '@/constants/app';
 import type { NodeObject, Point } from 'shared';

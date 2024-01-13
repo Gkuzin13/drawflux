@@ -1,8 +1,5 @@
-import type Konva from 'konva';
-import type { KonvaEventObject } from 'konva/lib/Node';
 import { useCallback } from 'react';
 import { Ellipse } from 'react-konva';
-import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import NodeTransformer from '@/components/Canvas/Transformer/NodeTransformer';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
@@ -11,6 +8,8 @@ import { calculateCircumference } from '@/utils/math';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import { getEllipseRadius } from './helpers/calc';
 import { ELLIPSE } from '@/constants/shape';
+import type Konva from 'konva';
+import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 
 const EllipseDrawable = ({
   node,
@@ -31,7 +30,7 @@ const EllipseDrawable = ({
   const radiusY = Math.max(node.nodeProps.height ?? 0, ELLIPSE.MIN_RADIUS);
 
   const handleDragEnd = useCallback(
-    (event: KonvaEventObject<DragEvent>) => {
+    (event: Konva.KonvaEventObject<DragEvent>) => {
       onNodeChange({
         ...node,
         nodeProps: {
@@ -50,7 +49,7 @@ const EllipseDrawable = ({
   }, [node.style.animated, animation]);
 
   const handlTransform = useCallback(
-    (event: KonvaEventObject<Event>) => {
+    (event: Konva.KonvaEventObject<Event>) => {
       const ellipse = event.target as Konva.Ellipse;
 
       const { radiusX, radiusY } = getEllipseRadius(ellipse);
@@ -69,7 +68,7 @@ const EllipseDrawable = ({
   );
 
   const handleTransformEnd = useCallback(
-    (event: KonvaEventObject<Event>) => {
+    (event: Konva.KonvaEventObject<Event>) => {
       const ellipse = event.target as Konva.Ellipse;
 
       const { radiusX, radiusY } = getEllipseRadius(ellipse);

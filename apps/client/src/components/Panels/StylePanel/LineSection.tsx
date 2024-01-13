@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import type { NodeLine } from 'shared';
-import { LINE } from '@/constants/panels/style';
+import { LINE } from '@/constants/panels';
 import * as Styled from './StylePanel.styled';
 import { createTitle } from '@/utils/string';
 import Icon from '@/components/Elements/Icon/Icon';
@@ -31,6 +31,7 @@ const LineSection = ({ value, onLineChange }: Props) => {
               color={
                 line.value === value ? 'secondary-dark' : 'secondary-light'
               }
+              data-testid={`${line.value}-line-button`}
             >
               <Icon name={line.icon} />
             </Styled.Item>

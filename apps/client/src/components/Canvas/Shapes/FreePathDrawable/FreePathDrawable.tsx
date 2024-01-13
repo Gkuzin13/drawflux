@@ -1,8 +1,5 @@
-import type Konva from 'konva';
-import type { KonvaEventObject } from 'konva/lib/Node';
 import { useCallback } from 'react';
 import { Line } from 'react-konva';
-import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
@@ -12,6 +9,9 @@ import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import NodeTransformer from '../../Transformer/NodeTransformer';
 import { pairPoints } from './helpers/points';
 import { FREE_PATH } from '@/constants/shape';
+import type Konva from 'konva';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 
 const FreePathDrawable = ({
   node,

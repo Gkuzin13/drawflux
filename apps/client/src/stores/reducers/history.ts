@@ -25,7 +25,7 @@ const IGNORED_ACTIONS: IgnoreActionType[] = [
   'canvas/setToolType',
   'canvas/setStageConfig',
   'canvas/set',
-  'canvas/setSelectedNodesIds',
+  'canvas/setSelectedNodeIds',
   'canvas/copyNodes',
 ];
 

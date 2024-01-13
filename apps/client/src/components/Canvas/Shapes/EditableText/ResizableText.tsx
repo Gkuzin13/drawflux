@@ -1,17 +1,16 @@
-import type Konva from 'konva';
-import type { KonvaEventObject } from 'konva/lib/Node';
 import { useCallback, useRef } from 'react';
 import { Text } from 'react-konva';
-import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import NodeTransformer from '../../Transformer/NodeTransformer';
 import { TEXT } from '@/constants/shape';
 import { getNodeSize } from './helpers/size';
 import { createSingleClickHandler } from '@/utils/timed';
+import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
+import type Konva from 'konva';
 
 type Props = {
-  onDoubleClick: (event: KonvaEventObject<PointerEvent>) => void;
+  onDoubleClick: (event: Konva.KonvaEventObject<PointerEvent>) => void;
 } & NodeComponentProps<'text'>;
 
 const ResizableText = ({
@@ -30,7 +29,7 @@ const ResizableText = ({
   );
 
   const handleDragEnd = useCallback(
-    (event: KonvaEventObject<DragEvent>) => {
+    (event: Konva.KonvaEventObject<DragEvent>) => {
       onNodeChange({
         ...node,
         nodeProps: {
@@ -42,15 +41,18 @@ const ResizableText = ({
     [node, onNodeChange],
   );
 
-  const handleTransform = useCallback((event: KonvaEventObject<Event>) => {
-    const textNode = event.target as Konva.Text;
+  const handleTransform = useCallback(
+    (event: Konva.KonvaEventObject<Event>) => {
+      const textNode = event.target as Konva.Text;
 
-    textNode.width(getNodeSize(textNode.width(), textNode.scaleX()));
-    textNode.scale({ x: 1, y: 1 });
-  }, []);
+      textNode.width(getNodeSize(textNode.width(), textNode.scaleX()));
+      textNode.scale({ x: 1, y: 1 });
+    },
+    [],
+  );
 
   const handleTransformEnd = useCallback(
-    (event: KonvaEventObject<Event>) => {
+    (event: Konva.KonvaEventObject<Event>) => {
       const textNode = event.target as Konva.Text;
       const joinedText = textNode.textArr.map(({ text }) => text).join('\n');
 
@@ -73,7 +75,7 @@ const ResizableText = ({
 
   // Prevents triggering ContextMenu on double click (touch devices)
   const handleTransformerPointerDown = useCallback(
-    (event: KonvaEventObject<PointerEvent>) => {
+    (event: Konva.KonvaEventObject<PointerEvent>) => {
       if (event.evt.pointerType === 'mouse') {
         return;
       }

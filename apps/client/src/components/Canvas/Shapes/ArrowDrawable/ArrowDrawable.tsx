@@ -1,9 +1,5 @@
-import type Konva from 'konva';
-import { type KonvaEventObject } from 'konva/lib/Node';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Group, Line, Shape } from 'react-konva';
-import type { Point, NodeProps } from 'shared';
-import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import { calculateLengthFromPoints, getValueFromRatio } from '@/utils/math';
@@ -12,6 +8,9 @@ import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import ArrowTransformer from './ArrowTransformer';
 import { calculateMinMaxMovementPoints } from './helpers/calc';
 import { ARROW } from '@/constants/shape';
+import type Konva from 'konva';
+import type { Point, NodeProps } from 'shared';
+import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 
 const defaultBend = 0.5;
 
@@ -70,7 +69,7 @@ const ArrowDrawable = ({
   }, []);
 
   const handleDragEnd = useCallback(
-    (event: KonvaEventObject<DragEvent>) => {
+    (event: Konva.KonvaEventObject<DragEvent>) => {
       const group = event.target as Konva.Group & Konva.Shape;
       const stage = group.getStage() as Konva.Stage;
 

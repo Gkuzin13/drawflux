@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import type { NodeFill } from 'shared';
-import { FILL } from '@/constants/panels/style';
+import { FILL } from '@/constants/panels';
 import * as Styled from './StylePanel.styled';
 import { createTitle } from '@/utils/string';
 import Icon from '@/components/Elements/Icon/Icon';
@@ -33,6 +33,7 @@ const FillSection = ({ value, onFillChange }: Props) => {
               color={
                 fill.value === value ? 'secondary-dark' : 'secondary-light'
               }
+              data-testid={`${fill.value}-fill-button`}
             >
               <Icon name={fill.icon} />
             </Styled.Item>

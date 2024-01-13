@@ -5,6 +5,7 @@ import FreePathDrawable from '@/components/Canvas/Shapes/FreePathDrawable/FreePa
 import RectDrawable from '@/components/Canvas/Shapes/RectDrawable/RectDrawable';
 import EditableText from '../Shapes/EditableText/EditableText';
 import LaserDrawable from '../Shapes/LaserDrawable/LaserDrawable';
+import { memo } from 'react';
 
 export type NodeComponentProps<Type extends NodeType = NodeType> = {
   node: NodeObject<Type>;
@@ -33,4 +34,4 @@ const Node = <T extends NodeType>({
   return <Element node={node} {...restProps} />;
 };
 
-export default Node;
+export default memo(Node);

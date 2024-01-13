@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import ShapesThumbnail from '@/components/Elements/ShapesThumbnail/ShapesThumbnail';
-import { LIBRARY, LIBRARY_ITEM } from '@/constants/panels/library';
+import { LIBRARY, LIBRARY_ITEM } from '@/constants/panels';
 import * as Styled from './LibraryItemCard.styled';
 import type { LibraryItem } from '@/constants/app';
 import type { CheckedState } from '@radix-ui/react-checkbox';

@@ -20,7 +20,7 @@ export const addCanvasListener = (startListening: AppStartListening) => {
       canvasActions.moveNodesBackward,
       canvasActions.moveNodesForward,
       canvasActions.moveNodesToStart,
-      canvasActions.setSelectedNodesIds,
+      canvasActions.setSelectedNodeIds,
       canvasActions.setStageConfig,
       canvasActions.setToolType,
       canvasActions.selectAllNodes,

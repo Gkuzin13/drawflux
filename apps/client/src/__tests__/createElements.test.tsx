@@ -151,7 +151,7 @@ describe('select a tool and create an element', () => {
 
     // type 'Hello World!' and press enter
     await user.type(
-      screen.getByTestId('editable-text-input'),
+      screen.getByTestId(/editable-text-input/),
       'Hello World!{enter}',
     );
 
@@ -188,5 +188,38 @@ describe('select a tool and create an element', () => {
     const canvasState = store.getState().canvas.present;
 
     expect(canvasState.nodes).toHaveLength(0);
+  });
+});
+
+describe('double click on canvas and create an element', () => {
+  it('text', async () => {
+    const { store, user } = renderWithProviders(<App />);
+
+    const container = await screen.findByRole('presentation');
+    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+
+    // double click at [10, 20]
+    await user.pointer([
+      { target: canvas },
+      {
+        keys: '[MouseLeft][MouseLeft]',
+        target: canvas,
+        coords: { clientX: 10, clientY: 20 },
+      },
+    ]);
+
+    // type 'Hello World!' and press enter
+    await user.type(
+      screen.getByTestId('editable-text-input'),
+      'Hello World!{enter}',
+    );
+
+    const canvasState = store.getState().canvas.present;
+    const node = canvasState.nodes[0];
+
+    expect(canvasState.nodes).toHaveLength(1);
+    expect(node.type).toEqual('text');
+    expect(node.nodeProps.point).toEqual([10, 20]);
+    expect(node.text).toEqual('Hello World!');
   });
 });

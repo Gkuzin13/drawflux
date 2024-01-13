@@ -1,13 +1,13 @@
-import { type ChangeEvent, useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { Html } from 'react-konva-utils';
-import { type NodeObject } from 'shared';
 import { KEYS } from '@/constants/keys';
 import { useClickAway } from '@/hooks/useClickAway/useClickAway';
 import { getColorValue, getFontSize, getSizeValue } from '@/utils/shape';
-import type { OnTextSaveArgs } from './EditableText';
 import * as Styled from './EditableTextInput.styled';
 import { getSizePropsFromTextValue } from './helpers/size';
 import useDefaultThemeColors from '@/hooks/useThemeColors';
+import type { NodeObject } from 'shared';
+import type { OnTextSaveArgs } from './EditableText';
 
 type Props = {
   node: NodeObject<'text'>;
@@ -98,7 +98,7 @@ const EditableTextInput = ({
     }
   };
 
-  const handleValueChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleValueChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
 
     setValue(value);
@@ -109,7 +109,7 @@ const EditableTextInput = ({
     event.preventDefault();
     event.stopPropagation();
   };
-  
+
   return (
     <Html
       groupProps={{

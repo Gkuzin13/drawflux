@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import Toggle from '@/components/Elements/Toggle/Toggle';
-import { ANIMATED } from '@/constants/panels/style';
+import { ANIMATED } from '@/constants/panels';
 import { createTitle } from '@/utils/string';
 import * as Styled from './StylePanel.styled';
 import type { NodeStyle } from 'shared';
@@ -26,6 +26,7 @@ const AnimatedSection = ({ value, isDisabled, onAnimatedChange }: Props) => {
         disabled={isDisabled}
         onPressedChange={onAnimatedChange}
         squared
+        data-testid="animated-toggle"
       >
         {valueTitle}
       </Toggle>

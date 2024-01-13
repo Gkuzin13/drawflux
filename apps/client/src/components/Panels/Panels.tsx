@@ -1,4 +1,4 @@
-import { useMemo, lazy, Suspense, useCallback } from 'react';
+import { useMemo, lazy, Suspense, useCallback, memo } from 'react';
 import { useModal } from '@/contexts/modal';
 import { useWebSocket } from '@/contexts/websocket';
 import useNetworkState from '@/hooks/useNetworkState/useNetworkState';
@@ -6,75 +6,61 @@ import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import {
   canvasActions,
   selectConfig,
-  selectHistory,
-  selectNodes,
+  selectFutureHistory,
+  selectPastHistory,
   selectToolType,
+  useSelectNodesById,
 } from '@/services/canvas/slice';
 import { collaborationActions } from '@/services/collaboration/slice';
 import { downloadDataUrlAsFile, importProject } from '@/utils/file';
-import ControlPanel, {
-  type ControlActionKey,
-} from './ControlPanel/ControlPanel';
 import MenuPanel, { type MenuKey } from './MenuPanel/MenuPanel';
 import SharePanel from './SharePanel/SharePanel';
 import StylePanel from './StylePanel/StylePanel';
-import ToolsPanel from './ToolsPanel/ToolsPanel';
-import ZoomPanel from './ZoomPanel/ZoomPanel';
+import ToolButtons from './ToolButtons/ToolButtons';
+import ZoomButtons from './ZoomButtons';
 import LibraryDrawer from '../Library/LibraryDrawer/LibraryDrawer';
+import HistoryButtons from './HistoryButtons';
+import DeleteButton from './DeleteButton';
 import { PROJECT_FILE_EXT, PROJECT_FILE_NAME } from '@/constants/app';
 import { historyActions } from '@/stores/reducers/history';
 import { selectLibrary } from '@/services/library/slice';
 import { calculateCenterPoint } from '@/utils/position';
 import { calculateStageZoomRelativeToPoint } from '../Canvas/DrawingCanvas/helpers/zoom';
 import * as Styled from './Panels.styled';
-import { type MenuPanelActionType } from '@/constants/panels/menu';
-import { type ToolType } from '@/constants/panels/tools';
-import type Konva from 'konva';
+import Konva from 'konva';
+import { shallowEqual } from '@/utils/object';
 import type { NodeStyle, User } from 'shared';
-import type { ZoomAction } from '@/constants/panels/zoom';
+import type {
+  HistoryControlKey,
+  MenuPanelActionType,
+  ZoomActionKey,
+} from '@/constants/panels';
+import type { ToolType } from '@/constants/app';
 
 type Props = {
-  selectedNodesIds: string[];
-  stageRef: React.RefObject<Konva.Stage>;
+  selectedNodeIds: string[];
 };
 
 const UsersPanel = lazy(() => import('./UsersPanel/UsersPanel'));
 
-const Panels = ({ selectedNodesIds, stageRef }: Props) => {
+const Panels = ({ selectedNodeIds }: Props) => {
   const store = useAppStore();
-  const ws = useWebSocket();
-
   const stageConfig = useAppSelector(selectConfig);
   const toolType = useAppSelector(selectToolType);
-  const nodes = useAppSelector(selectNodes);
   const library = useAppSelector(selectLibrary);
+  const past = useAppSelector(selectPastHistory);
+  const future = useAppSelector(selectFutureHistory);
 
-  const { past, future } = useAppSelector(selectHistory);
+  const selectedNodes = useSelectNodesById(selectedNodeIds);
+
+  const ws = useWebSocket();
   const { online } = useNetworkState();
-
   const modal = useModal();
 
   const dispatch = useAppDispatch();
 
   const isHandTool = toolType === 'hand';
-
-  const selectedNodes = useMemo(() => {
-    const nodesIds = new Set(selectedNodesIds);
-
-    return nodes.filter((node) => nodesIds.has(node.nodeProps.id));
-  }, [selectedNodesIds, nodes]);
-
-  const isStylePanelActive = useMemo(() => {
-    return selectedNodes.length > 0 && !isHandTool;
-  }, [selectedNodes.length, isHandTool]);
-
-  const enabledControls = useMemo(() => {
-    return {
-      undo: Boolean(past.length) && !ws.isConnected,
-      redo: Boolean(future.length) && !ws.isConnected,
-      deleteSelectedNodes: Boolean(selectedNodesIds.length),
-    };
-  }, [ws, past, future, selectedNodesIds]);
+  const isStylePanelActive = selectedNodeIds.length > 0 && !isHandTool;
 
   const disabledMenuItems = useMemo((): MenuKey[] | null => {
     if (ws.isConnected) {
@@ -90,26 +76,25 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
     [dispatch],
   );
 
-  const handleStyleChange = useCallback(
-    (style: Partial<NodeStyle>) => {
-      const { nodes, selectedNodesIds } = store.getState().canvas.present;
+  const handleStyleChange = (style: Partial<NodeStyle>) => {
+    const state = store.getState().canvas.present;
 
-      const updatedNodes = nodes
-        .filter((node) => node.nodeProps.id in selectedNodesIds)
-        .map((node) => {
-          return { ...node, style: { ...node.style, ...style } };
-        });
+    const nodesToUpdate = state.nodes.filter((node) => {
+      return node.nodeProps.id in state.selectedNodeIds;
+    });
 
-      dispatch(canvasActions.updateNodes(updatedNodes));
-    },
-    [store, dispatch],
-  );
+    const updatedNodes = nodesToUpdate.map((node) => {
+      return { ...node, style: { ...node.style, ...style } };
+    });
+
+    dispatch(canvasActions.updateNodes(updatedNodes));
+  };
 
   const handleMenuAction = useCallback(
     (type: MenuPanelActionType) => {
       switch (type) {
         case 'export-as-image': {
-          const dataUrl = stageRef.current?.toDataURL();
+          const dataUrl = Konva.stages[0].toDataURL();
 
           if (dataUrl) {
             downloadDataUrlAsFile(dataUrl, PROJECT_FILE_NAME, PROJECT_FILE_EXT);
@@ -146,11 +131,11 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
         }
       }
     },
-    [store, modal, stageRef, dispatch],
+    [store, modal, dispatch],
   );
 
   const handleZoomChange = useCallback(
-    (action: ZoomAction) => {
+    (action: ZoomActionKey) => {
       const stagePosition = stageConfig.position;
       const oldScale = stageConfig.scale;
       const viewportCenter = calculateCenterPoint(
@@ -172,19 +157,15 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
     [stageConfig, dispatch],
   );
 
-  const handleControlActions = useCallback(
-    (actionType: ControlActionKey) => {
-      if (actionType === 'deleteNodes') {
-        dispatch(canvasActions.deleteNodes(selectedNodesIds));
-        return;
-      }
+  const handleHistoryAction = useCallback(
+    (type: HistoryControlKey) => {
+      const action = historyActions[type];
 
-      if (!ws.isConnected && (actionType === 'undo' || actionType === 'redo')) {
-        const action = historyActions[actionType];
+      if (action) {
         dispatch(action());
       }
     },
-    [ws, selectedNodesIds, dispatch],
+    [dispatch],
   );
 
   const handleUserChange = useCallback(
@@ -194,14 +175,25 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
     [dispatch],
   );
 
+  const handleNodesDelete = useCallback(() => {
+    dispatch(canvasActions.deleteNodes(selectedNodeIds));
+  }, [selectedNodeIds, dispatch]);
+
   return (
     <Styled.Container>
       <Styled.TopPanels>
         {!isHandTool && (
-          <ControlPanel
-            onControl={handleControlActions}
-            enabledControls={enabledControls}
-          />
+          <Styled.Panel>
+            <HistoryButtons
+              disabledUndo={!past.length || ws.isConnected}
+              disabledRedo={!future.length || ws.isConnected}
+              onClick={handleHistoryAction}
+            />
+            <DeleteButton
+              disabled={!selectedNodeIds.length}
+              onClick={handleNodesDelete}
+            />
+          </Styled.Panel>
         )}
         {isStylePanelActive && (
           <StylePanel
@@ -224,11 +216,22 @@ const Panels = ({ selectedNodesIds, stageRef }: Props) => {
         </Styled.Panel>
       </Styled.TopPanels>
       <Styled.BottomPanels direction={{ '@initial': 'column', '@xs': 'row' }}>
-        <ZoomPanel value={stageConfig.scale} onZoomChange={handleZoomChange} />
-        <ToolsPanel activeTool={toolType} onToolSelect={handleToolSelect} />
+        <Styled.Panel css={{ '@xs': { marginRight: 'auto' } }}>
+          <ZoomButtons
+            value={stageConfig.scale}
+            onZoomChange={handleZoomChange}
+          />
+        </Styled.Panel>
+        <Styled.Panel css={{ height: '100%' }}>
+          <ToolButtons activeTool={toolType} onToolSelect={handleToolSelect} />
+        </Styled.Panel>
       </Styled.BottomPanels>
     </Styled.Container>
   );
 };
 
-export default Panels;
+const areEqual = (prevProps: Props, nextProps: Props) => {
+  return shallowEqual(prevProps.selectedNodeIds, nextProps.selectedNodeIds);
+};
+
+export default memo(Panels, areEqual);

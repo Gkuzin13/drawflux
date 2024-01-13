@@ -1,26 +1,25 @@
 import { memo } from 'react';
 import { DEFAULT_ZOOM_VALUE, ZOOM_RANGE } from '@/constants/app';
-import { ZOOM, type ZoomAction } from '@/constants/panels/zoom';
-import * as PanelStyled from '../Panels.styled';
-import * as Styled from './ZoomPanel.styled';
+import { ZOOM, type ZoomActionKey } from '@/constants/panels';
 import Icon from '@/components/Elements/Icon/Icon';
 import { createKeyTitle } from '@/utils/string';
+import * as Styled from './Panels.styled';
 
 type Props = {
   value: number;
-  onZoomChange: (action: ZoomAction) => void;
+  onZoomChange: (action: ZoomActionKey) => void;
 };
 
 const ZoomPanel = ({ value, onZoomChange }: Props) => {
   const stageScalePercent = `${Math.round(value * 100)}%`;
 
-  const handleZoomAction = (action: ZoomAction) => {
+  const handleZoomAction = (action: ZoomActionKey) => {
     onZoomChange(action);
   };
 
   return (
-    <Styled.Container>
-      <PanelStyled.Button
+    <>
+      <Styled.Button
         disabled={value === DEFAULT_ZOOM_VALUE}
         title={ZOOM.reset.name}
         data-testid="zoom-reset-button"
@@ -28,8 +27,8 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
         onClick={() => handleZoomAction('reset')}
       >
         {stageScalePercent}
-      </PanelStyled.Button>
-      <PanelStyled.Button
+      </Styled.Button>
+      <Styled.Button
         disabled={value === ZOOM_RANGE[1]}
         title={createKeyTitle(ZOOM.in.name, [
           ZOOM.in.key,
@@ -39,8 +38,8 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
         onClick={() => handleZoomAction('in')}
       >
         <Icon name={ZOOM.in.icon} size="sm" />
-      </PanelStyled.Button>
-      <PanelStyled.Button
+      </Styled.Button>
+      <Styled.Button
         disabled={value === ZOOM_RANGE[0]}
         title={createKeyTitle(ZOOM.out.name, [
           ZOOM.out.key,
@@ -50,8 +49,8 @@ const ZoomPanel = ({ value, onZoomChange }: Props) => {
         onClick={() => handleZoomAction('out')}
       >
         <Icon name={ZOOM.out.icon} size="sm" />
-      </PanelStyled.Button>
-    </Styled.Container>
+      </Styled.Button>
+    </>
   );
 };
 

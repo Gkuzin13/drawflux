@@ -1,37 +1,20 @@
 import * as Styled from './Slider.styled';
+import type { ComponentProps } from '@stitches/react';
 
 type Props = {
-  value: number[];
-  min?: number;
-  max: number;
   label: string;
-  step?: number;
-  onValueChange: (value: number[]) => void;
-  onValueCommit: (value: number[]) => void;
-};
+} & ComponentProps<(typeof Styled)['Container']>;
 
-const Slider = ({
-  value,
-  min = 0,
-  max,
-  step = 1,
-  label,
-  onValueChange,
-  onValueCommit,
-}: Props) => {
+const Slider = ({ step = 1, label, ...restProps }: Props) => {
   return (
-    <Styled.Container
-      value={value}
-      min={min}
-      max={max}
-      step={step}
-      onValueChange={onValueChange}
-      onValueCommit={onValueCommit}
-    >
+    <Styled.Container step={step} {...restProps}>
       <Styled.Track>
         <Styled.Range />
       </Styled.Track>
-      <Styled.Thumb aria-label={label} />
+      <Styled.Thumb
+        aria-label={label}
+        data-testid={`${label.toLowerCase().trim()}-slider`}
+      />
     </Styled.Container>
   );
 };
