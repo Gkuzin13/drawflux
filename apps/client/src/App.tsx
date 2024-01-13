@@ -9,12 +9,8 @@ import {
 import Panels from './components/Panels/Panels';
 import Loader from './components/Elements/Loader/Loader';
 import ContextMenu from './components/ContextMenu/ContextMenu';
-import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
-import {
-  canvasActions,
-  selectCopiedNodes,
-  useSelectNodesById,
-} from '@/services/canvas/slice';
+import { useAppDispatch, useAppStore } from '@/stores/hooks';
+import { canvasActions } from '@/services/canvas/slice';
 import { storage } from '@/utils/storage';
 import useParam from './hooks/useParam/useParam';
 import { useWebSocket } from './contexts/websocket';
