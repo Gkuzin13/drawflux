@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import type { NodeStyle } from 'shared';
 import Slider from '@/components/Elements/Slider/Slider';
-import { OPACITY } from '@/constants/panels/style';
+import { OPACITY } from '@/constants/panels';
 import * as Styled from './StylePanel.styled';
 
 type Props = {

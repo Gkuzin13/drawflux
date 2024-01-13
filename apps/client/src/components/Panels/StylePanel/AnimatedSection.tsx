@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import Toggle from '@/components/Elements/Toggle/Toggle';
-import { ANIMATED } from '@/constants/panels/style';
+import { ANIMATED } from '@/constants/panels';
 import { createTitle } from '@/utils/string';
 import * as Styled from './StylePanel.styled';
 import type { NodeStyle } from 'shared';

@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import type { NodeLine } from 'shared';
-import { LINE } from '@/constants/panels/style';
+import { LINE } from '@/constants/panels';
 import * as Styled from './StylePanel.styled';
 import { createTitle } from '@/utils/string';
 import Icon from '@/components/Elements/Icon/Icon';

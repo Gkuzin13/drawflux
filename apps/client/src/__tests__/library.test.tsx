@@ -96,7 +96,7 @@ describe('library', () => {
 
     const state = store.getState().canvas.present;
 
-    expect(Object.keys(state.selectedNodesIds)).toHaveLength(3);
+    expect(Object.keys(state.selectedNodeIds)).toHaveLength(3);
     expect(state.nodes).toHaveLength(3);
     expect(state.nodes).toEqual(
       expect.arrayContaining(

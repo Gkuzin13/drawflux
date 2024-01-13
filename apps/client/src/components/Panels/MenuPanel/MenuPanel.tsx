@@ -1,12 +1,12 @@
 import { memo } from 'react';
-import { MENU_PANEL_ACTIONS } from '@/constants/panels/menu';
+import { MENU_PANEL_ACTIONS } from '@/constants/panels';
 import DropdownMenu from '@/components/Elements/DropdownMenu/DropdownMenu';
 import Icon from '@/components/Elements/Icon/Icon';
 import Switch from '@/components/Elements/Switch/Switch';
 import Divider from '@/components/Elements/Divider/Divider';
 import { useTheme } from '@/contexts/theme';
 import * as Styled from './MenuPanel.styled';
-import type { MenuPanelActionType } from '@/constants/panels/menu';
+import type { MenuPanelActionType } from '@/constants/panels';
 
 export type MenuKey = (typeof MENU_PANEL_ACTIONS)[number]['value'];
 

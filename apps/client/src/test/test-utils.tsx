@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { render, type RenderOptions } from '@testing-library/react';
+import { render, screen, type RenderOptions } from '@testing-library/react';
 import { Provider as StoreProvider } from 'react-redux';
 import userEvent from '@testing-library/user-event';
 import canvasReducer, {
@@ -62,7 +62,7 @@ export function renderWithProviders(
   ui: React.ReactElement,
   {
     preloadedState = defaultPreloadedState,
-    store = setupStore(preloadedState),
+    store = setupTestStore(preloadedState),
     ...renderOptions
   }: ExtendedRenderOptions = {},
   userEventOptions: UserEventOptions = {},
@@ -88,6 +88,13 @@ export function renderWithProviders(
     user: userEvent.setup(userEventOptions),
     ...render(ui, { wrapper: Wrapper, ...renderOptions }),
   };
+}
+
+export async function findCanvas() {
+  const container = await screen.findByRole('presentation');
+  const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+
+  return { container, canvas };
 }
 
 export function changeJSDOMURL(url: URL | string) {

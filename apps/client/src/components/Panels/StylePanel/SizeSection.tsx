@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import type { NodeSize } from 'shared';
-import { SIZE } from '@/constants/panels/style';
+import { SIZE } from '@/constants/panels';
 import { createTitle } from '@/utils/string';
 import Icon from '@/components/Elements/Icon/Icon';
 import * as Styled from './StylePanel.styled';

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import LibraryItemCard from '@/components/Library/LibraryItemCard/LibraryItemCard';
 import Drawer from '@/components/Elements/Drawer/Drawer';
 import Icon from '@/components/Elements/Icon/Icon';
@@ -126,4 +126,4 @@ const LibraryDrawer = ({ items }: Props) => {
   );
 };
 
-export default LibraryDrawer;
+export default memo(LibraryDrawer);

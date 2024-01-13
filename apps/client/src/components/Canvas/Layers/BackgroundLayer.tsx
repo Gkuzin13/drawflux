@@ -1,5 +1,4 @@
-import type Konva from 'konva';
-import { forwardRef, memo, type RefObject } from 'react';
+import { memo } from 'react';
 import { Rect } from 'react-konva';
 import { getNormalizedInvertedRect } from '@/utils/position';
 import type { IRect } from 'konva/lib/types';
@@ -8,30 +7,24 @@ import useThemeColors from '@/hooks/useThemeColors';
 type Props = {
   rect: IRect;
   scale: number;
-  ref: RefObject<Konva.Rect>;
 };
 
-const Background = forwardRef<Konva.Rect, Props>(
-  ({ scale, rect }, ref) => {
-    const themeColors = useThemeColors();
+const Background = ({ scale, rect }: Props) => {
+  const themeColors = useThemeColors();
 
-    const normalizedRect = getNormalizedInvertedRect(rect, scale);
+  const normalizedRect = getNormalizedInvertedRect(rect, scale);
 
-    return (
-      <Rect
-        ref={ref}
-        {...normalizedRect}
-        perfectDrawEnabled={false}
-        strokeScaleEnabled={false}
-        shadowForStrokeEnabled={false}
-        listening={false}
-        draggable={false}
-        fill={themeColors['canvas-bg'].value}
-      />
-    );
-  },
-);
-
-Background.displayName = 'BackgroundLayer';
+  return (
+    <Rect
+      {...normalizedRect}
+      perfectDrawEnabled={false}
+      strokeScaleEnabled={false}
+      shadowForStrokeEnabled={false}
+      listening={false}
+      draggable={false}
+      fill={themeColors['canvas-bg'].value}
+    />
+  );
+};
 
 export default memo(Background);

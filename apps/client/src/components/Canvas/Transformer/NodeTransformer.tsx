@@ -1,13 +1,14 @@
-import type Konva from 'konva';
-import type { KonvaEventObject } from 'konva/lib/Node';
-import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
-import { type PropsWithRef, forwardRef, useCallback } from 'react';
-import { type KonvaNodeEvents, Transformer } from 'react-konva';
+import { forwardRef, useCallback } from 'react';
+import { Transformer } from 'react-konva';
 import { TRANSFORMER } from '@/constants/shape';
 import { normalizeTransformerSize } from './helpers/size';
 import useDefaultThemeColors from '@/hooks/useThemeColors';
+import type { KonvaNodeEvents } from 'react-konva';
+import type Konva from 'konva';
+import type { KonvaEventObject } from 'konva/lib/Node';
+import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
 
-export type TransformerProps = PropsWithRef<{
+export type TransformerProps = React.PropsWithRef<{
   stageScale: number;
   transformerConfig?: TransformerConfig;
   transformerEvents?: KonvaNodeEvents;

@@ -94,6 +94,6 @@ describe('context menu', () => {
         },
       }),
     );
-    expect(Object.keys(state.selectedNodesIds)).toHaveLength(1);
+    expect(Object.keys(state.selectedNodeIds)).toHaveLength(1);
   });
 });

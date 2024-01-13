@@ -1,22 +1,20 @@
-import type Konva from 'konva';
-import { type KonvaEventObject } from 'konva/lib/Node';
-import type { Vector2d } from 'konva/lib/types';
 import { useCallback, useEffect, useRef } from 'react';
 import { Circle, Group } from 'react-konva';
-import { type Point } from 'shared';
 import { getRatioFromValue } from '@/utils/math';
 import { calculateClampedMidPoint } from './helpers/calc';
 import { ARROW_TRANSFORMER } from '@/constants/shape';
 import useDefaultThemeColors from '@/hooks/useThemeColors';
 import { hexToRGBa } from '@/utils/string';
+import type { Point } from 'shared';
+import type Konva from 'konva';
 
 type ArrowTransformerProps = {
   start: Point;
   end: Point;
   bendPoint: Point;
   bendMovement: {
-    min: Vector2d;
-    max: Vector2d;
+    min: Konva.Vector2d;
+    max: Konva.Vector2d;
   };
   stageScale: number;
   onTranformStart: () => void;
@@ -28,10 +26,10 @@ type AnchorProps = {
   x: number;
   y: number;
   scale: number;
-  onDragStart: (e: KonvaEventObject<DragEvent>) => void;
-  onDragMove: (e: KonvaEventObject<DragEvent>) => void;
-  onDragEnd: (e: KonvaEventObject<DragEvent>) => void;
-  dragBoundFunc?: (position: Vector2d) => void;
+  onDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
+  onDragMove: (e: Konva.KonvaEventObject<DragEvent>) => void;
+  onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
+  dragBoundFunc?: (position: Konva.Vector2d) => void;
 };
 
 const controlIndex = 2;
@@ -47,7 +45,7 @@ const Anchor = ({
   const themeColors = useDefaultThemeColors();
 
   const handleMouseEnter = useCallback(
-    (event: KonvaEventObject<MouseEvent>) => {
+    (event: Konva.KonvaEventObject<MouseEvent>) => {
       const circle = event.target as Konva.Circle;
 
       circle.strokeWidth(ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH_HOVER);
@@ -57,7 +55,7 @@ const Anchor = ({
   );
 
   const handleMouseLeave = useCallback(
-    (event: KonvaEventObject<MouseEvent>) => {
+    (event: Konva.KonvaEventObject<MouseEvent>) => {
       const circle = event.target as Konva.Circle;
 
       circle.strokeWidth(ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH);
@@ -129,7 +127,7 @@ const ArrowTransformer = ({
   );
 
   const handleDragMove = useCallback(
-    (event: KonvaEventObject<DragEvent>) => {
+    (event: Konva.KonvaEventObject<DragEvent>) => {
       const node = event.target as Konva.Circle;
       const stage = node.getStage() as Konva.Stage;
 

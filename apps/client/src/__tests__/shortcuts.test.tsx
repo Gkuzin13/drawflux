@@ -4,7 +4,7 @@ import {
   renderWithProviders,
   setupTestStore,
 } from '@/test/test-utils';
-import { TOOLS } from '@/constants/panels/tools';
+import { TOOLS } from '@/constants/panels';
 import { nodesGenerator, stateGenerator } from '@/test/data-generators';
 import { canvasActions } from '@/services/canvas/slice';
 import { mapNodesIds } from '@/utils/node';
@@ -48,7 +48,7 @@ describe('canvas', () => {
       canvas: {
         present: {
           nodes,
-          selectedNodesIds: {
+          selectedNodeIds: {
             [selectedNodes[0].nodeProps.id]: true,
             [selectedNodes[1].nodeProps.id]: true,
           },
@@ -109,7 +109,7 @@ describe('canvas', () => {
       canvas: {
         present: {
           nodes,
-          selectedNodesIds: {
+          selectedNodeIds: {
             [selectedNodes[0].nodeProps.id]: true,
             [selectedNodes[1].nodeProps.id]: true,
           },
@@ -140,7 +140,7 @@ describe('canvas', () => {
         }),
       ),
     );
-    expect(Object.keys(state.selectedNodesIds)).toHaveLength(2);
+    expect(Object.keys(state.selectedNodeIds)).toHaveLength(2);
   });
 
   it('dispatches deleteNodes on Del key', async () => {
@@ -151,7 +151,7 @@ describe('canvas', () => {
       canvas: {
         present: {
           nodes,
-          selectedNodesIds: {
+          selectedNodeIds: {
             [selectedNodes[0].nodeProps.id]: true,
             [selectedNodes[1].nodeProps.id]: true,
           },

@@ -1,8 +1,5 @@
-import type Konva from 'konva';
-import type { KonvaEventObject } from 'konva/lib/Node';
-import { useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { Rect } from 'react-konva';
-import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import NodeTransformer from '@/components/Canvas/Transformer/NodeTransformer';
 import { RECT } from '@/constants/shape';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
@@ -11,6 +8,8 @@ import useTransformer from '@/hooks/useTransformer';
 import { calculatePerimeter } from '@/utils/math';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import { getRectSize } from './helpers/calc';
+import type Konva from 'konva';
+import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 
 const RectDrawable = ({
   node,
@@ -29,7 +28,7 @@ const RectDrawable = ({
   });
 
   const handleDragEnd = useCallback(
-    (event: KonvaEventObject<DragEvent>) => {
+    (event: Konva.KonvaEventObject<DragEvent>) => {
       onNodeChange({
         ...node,
         nodeProps: {
@@ -48,7 +47,7 @@ const RectDrawable = ({
   }, [node.style.animated, animation]);
 
   const handlTransform = useCallback(
-    (event: KonvaEventObject<Event>) => {
+    (event: Konva.KonvaEventObject<Event>) => {
       const rect = event.target as Konva.Rect;
 
       const { width, height } = getRectSize(rect);
@@ -71,7 +70,7 @@ const RectDrawable = ({
   );
 
   const handleTransformEnd = useCallback(
-    (event: KonvaEventObject<Event>) => {
+    (event: Konva.KonvaEventObject<Event>) => {
       const rect = event.target as Konva.Rect;
 
       const { width, height } = getRectSize(rect);
@@ -109,7 +108,7 @@ const RectDrawable = ({
       ),
     };
   }, [node.nodeProps.width, node.nodeProps.height]);
-
+  
   return (
     <>
       <Rect
@@ -136,4 +135,4 @@ const RectDrawable = ({
   );
 };
 
-export default RectDrawable;
+export default memo(RectDrawable);

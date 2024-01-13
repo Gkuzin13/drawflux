@@ -1,4 +1,5 @@
 import { isArray, isObject } from './is';
+import { shallowEqual as _shallowEqual } from 'react-redux';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ObjectWithAnyProperties = Record<string, any>;
@@ -37,3 +38,5 @@ export function safeJSONParse<T = unknown>(text: string) {
     return null;
   }
 }
+
+export const shallowEqual = _shallowEqual;

@@ -17,6 +17,8 @@ export const WS_THROTTLE_MS = 16;
 
 export const PROJECT_FILE_EXT = 'drawflux';
 export const PROJECT_FILE_NAME = 'project';
+export const PROJECT_PNG_NAME = 'project';
+export const PROJECT_PNG_EXT = 'png';
 
 export const USER = {
   maxNameLength: 10,
@@ -42,7 +44,7 @@ export const appState = z.object({
   page: z.object({
     ...CanvasSchema,
     toolType: z.union([...ShapeTools, z.literal('hand'), z.literal('select')]),
-    selectedNodesIds: z.record(z.string(), z.boolean()),
+    selectedNodeIds: z.record(z.string(), z.boolean()),
   }),
 });
 
@@ -53,3 +55,4 @@ export const libraryState = z.object({
 export type AppState = z.infer<typeof appState>;
 export type LibraryItem = z.infer<typeof LibraryItem>;
 export type Library = z.infer<typeof libraryState>;
+export type ToolType = AppState['page']['toolType'];

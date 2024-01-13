@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { OPACITY } from '@/constants/panels/style';
+import { OPACITY } from '@/constants/panels';
 import { clamp } from '@/utils/math';
 import AnimatedSection from './AnimatedSection';
 import ColorSection from './ColorSection';
@@ -7,22 +7,24 @@ import LineSection from './LineSection';
 import OpacitySection from './OpacitySection';
 import FillSection from './FillSection';
 import SizeSection from './SizeSection';
+import { useSelectNodesById } from '@/services/canvas/slice';
 import * as Styled from './StylePanel.styled';
 import type {
   NodeColor,
   NodeFill,
   NodeLine,
-  NodeObject,
   NodeSize,
   NodeStyle,
 } from 'shared';
 
-export type StylePanelProps = {
-  selectedNodes: NodeObject[];
-  onStyleChange: (updatedStyle: Partial<NodeStyle>) => void;
+type Props = {
+  selectedNodeIds: string[];
+  onStyleChange: (style: Partial<NodeStyle>) => void;
 };
 
-const StylePanel = ({ selectedNodes, onStyleChange }: StylePanelProps) => {
+const StylePanel = ({ selectedNodeIds, onStyleChange }: Props) => {
+  const selectedNodes = useSelectNodesById(selectedNodeIds);
+
   const style = useMemo(() => {
     const styles: NodeStyle[] = selectedNodes.map(({ style }) => style);
 

@@ -1,18 +1,19 @@
 import { Fragment, memo } from 'react';
-import { TOOLS, type ToolType } from '@/constants/panels/tools';
+import { TOOLS } from '@/constants/panels';
 import { createKeyTitle } from '@/utils/string';
 import Icon from '@/components/Elements/Icon/Icon';
-import * as Styled from './ToolsPanel.styled';
 import * as PanelStyled from '../Panels.styled';
+import * as Styled from './ToolButtons.styled';
+import type { ToolType } from '@/constants/app';
 
 type Props = {
   activeTool: ToolType;
   onToolSelect: (type: ToolType) => void;
 };
 
-const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
+const ToolButtons = ({ activeTool, onToolSelect }: Props) => {
   return (
-    <Styled.Container>
+    <>
       {TOOLS.map((tool) => {
         return (
           <Fragment key={tool.value}>
@@ -31,8 +32,8 @@ const ToolsPanel = ({ activeTool, onToolSelect }: Props) => {
           </Fragment>
         );
       })}
-    </Styled.Container>
+    </>
   );
 };
 
-export default memo(ToolsPanel);
+export default memo(ToolButtons);

@@ -27,29 +27,29 @@ function useActionManager() {
         );
       }
       case 'delete-nodes': {
-        const nodesIds = Object.keys(state.selectedNodesIds);
+        const nodesIds = Object.keys(state.selectedNodeIds);
         return dispatch(canvasActions.deleteNodes(nodesIds));
       }
       case 'move-nodes-to-start':
         return dispatch(
-          canvasActions.moveNodesToStart(Object.keys(state.selectedNodesIds)),
+          canvasActions.moveNodesToStart(Object.keys(state.selectedNodeIds)),
         );
       case 'move-nodes-to-end':
         return dispatch(
-          canvasActions.moveNodesToEnd(Object.keys(state.selectedNodesIds)),
+          canvasActions.moveNodesToEnd(Object.keys(state.selectedNodeIds)),
         );
       case 'move-nodes-forward':
         return dispatch(
-          canvasActions.moveNodesForward(Object.keys(state.selectedNodesIds)),
+          canvasActions.moveNodesForward(Object.keys(state.selectedNodeIds)),
         );
       case 'move-nodes-backward': {
         return dispatch(
-          canvasActions.moveNodesBackward(Object.keys(state.selectedNodesIds)),
+          canvasActions.moveNodesBackward(Object.keys(state.selectedNodeIds)),
         );
       }
       case 'duplicate-nodes': {
         const nodesToDuplicate = state.nodes.filter(
-          ({ nodeProps }) => nodeProps.id in state.selectedNodesIds,
+          ({ nodeProps }) => nodeProps.id in state.selectedNodeIds,
         );
 
         return dispatch(
@@ -60,14 +60,14 @@ function useActionManager() {
         );
       }
       case 'select-none': {
-        return dispatch(canvasActions.setSelectedNodesIds([]));
+        return dispatch(canvasActions.unselectAllNodes());
       }
       case 'copy-nodes': {
         return dispatch(canvasActions.copyNodes());
       }
       case 'add-to-library': {
         const nodesToAdd = state.nodes.filter(
-          (node) => node.nodeProps.id in state.selectedNodesIds,
+          (node) => node.nodeProps.id in state.selectedNodeIds,
         );
 
         addNotification({ title: 'Added to library', type: 'info' });

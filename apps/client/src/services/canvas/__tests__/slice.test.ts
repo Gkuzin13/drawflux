@@ -4,9 +4,8 @@ import reducer, {
   initialState,
 } from '../slice';
 import { nodesGenerator } from '@/test/data-generators';
-import type { AppState } from '@/constants/app';
+import type { AppState, ToolType } from '@/constants/app';
 import type { NodeObject, StageConfig } from 'shared';
-import type { ToolType } from '@/constants/panels/tools';
 
 describe('canvas slice', () => {
   it('returns the initial state', () => {
@@ -17,7 +16,7 @@ describe('canvas slice', () => {
     const stateToSet: AppState['page'] = {
       nodes: nodesGenerator(5),
       stageConfig: { position: { x: 50, y: 50 }, scale: 0.5 },
-      selectedNodesIds: {},
+      selectedNodeIds: {},
       toolType: 'select',
     };
 
@@ -66,7 +65,7 @@ describe('canvas slice', () => {
     const previousState: CanvasSliceState = {
       ...initialState,
       nodes,
-      selectedNodesIds: Object.fromEntries(
+      selectedNodeIds: Object.fromEntries(
         nodesIdsToDelete.map((nodeId) => [nodeId, true]),
       ),
     };
@@ -79,7 +78,7 @@ describe('canvas slice', () => {
     expect(state).toEqual({
       ...previousState,
       nodes: [nodes[1], nodes[3], nodes[4]],
-      selectedNodesIds: {},
+      selectedNodeIds: {},
     });
   });
 
@@ -89,7 +88,7 @@ describe('canvas slice', () => {
     const previousState: CanvasSliceState = {
       ...initialState,
       nodes,
-      selectedNodesIds: {
+      selectedNodeIds: {
         [nodes[0].nodeProps.id]: true,
         [nodes[2].nodeProps.id]: true,
       },
@@ -139,7 +138,7 @@ describe('canvas slice', () => {
 
   it('sets selected nodes ids', () => {
     const nodes = nodesGenerator(5, 'ellipse');
-    const selectedNodesIds: CanvasSliceState['selectedNodesIds'] = {
+    const selectedNodeIds: CanvasSliceState['selectedNodeIds'] = {
       [nodes[0].nodeProps.id]: true,
       [nodes[1].nodeProps.id]: true,
     };
@@ -151,19 +150,19 @@ describe('canvas slice', () => {
 
     const state = reducer(
       previousState,
-      canvasActions.setSelectedNodesIds(Object.keys(selectedNodesIds)),
+      canvasActions.setSelectedNodeIds(Object.keys(selectedNodeIds)),
     );
 
-    expect(state).toEqual({ ...previousState, selectedNodesIds });
+    expect(state).toEqual({ ...previousState, selectedNodeIds });
 
     const stateWithoutSelectedNodesIds = reducer(
       previousState,
-      canvasActions.setSelectedNodesIds([]),
+      canvasActions.setSelectedNodeIds([]),
     );
 
     expect(stateWithoutSelectedNodesIds).toEqual({
       ...previousState,
-      selectedNodesIds: {},
+      selectedNodeIds: {},
     });
   });
 
@@ -179,7 +178,7 @@ describe('canvas slice', () => {
 
     expect(state).toEqual({
       ...previousState,
-      selectedNodesIds: Object.fromEntries(
+      selectedNodeIds: Object.fromEntries(
         nodes.map((node) => [node.nodeProps.id, true]),
       ),
     });

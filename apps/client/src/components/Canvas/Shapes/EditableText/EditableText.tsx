@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import EditableTextInput from './EditableTextInput';
 import ResizableText from './ResizableText';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
@@ -71,4 +71,4 @@ const EditableText = ({
     />
   );
 };
-export default EditableText;
+export default memo(EditableText);
