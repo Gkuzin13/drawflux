@@ -1,4 +1,4 @@
-import { createSelectorCreator, lruMemoize } from 'reselect';
+import { createSelectorCreator, lruMemoize, createSelector } from 'reselect';
 import {
   type TypedUseSelectorHook,
   useDispatch,
@@ -13,10 +13,12 @@ export const useAppStore: () => Store<RootState> = useStore;
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-export const createSelectorWithShallowEqual = createSelectorCreator({
+export const createAppSelectorWithShallowEqual = createSelectorCreator({
   memoize: lruMemoize,
   memoizeOptions: shallowEqual,
 });
+
+export const createAppSelector = createSelector.withTypes<RootState>();
 
 export const createParametricSelectorHook = <
   Result,

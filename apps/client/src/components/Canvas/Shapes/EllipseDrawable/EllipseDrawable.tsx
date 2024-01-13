@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Ellipse } from 'react-konva';
 import NodeTransformer from '@/components/Canvas/Transformer/NodeTransformer';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
@@ -118,4 +118,4 @@ const EllipseDrawable = ({
   );
 };
 
-export default memo(EllipseDrawable);
+export default EllipseDrawable;

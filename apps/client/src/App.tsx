@@ -9,7 +9,7 @@ import {
 import Panels from './components/Panels/Panels';
 import Loader from './components/Elements/Loader/Loader';
 import ContextMenu from './components/ContextMenu/ContextMenu';
-import { useAppDispatch, useAppSelector } from '@/stores/hooks';
+import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import {
   canvasActions,
   selectCopiedNodes,
@@ -71,9 +71,7 @@ const App = () => {
   const [selectedNodeIds, setSelectedNodeIds] = useState<string[]>([]);
   const [menuType, setMenuType] = useState<ContextMenuType>('canvas-menu');
 
-  const selectedNodes = useSelectNodesById(selectedNodeIds);
-  const copiedNodes = useAppSelector(selectCopiedNodes);
-
+  const store = useAppStore();
   const roomId = useParam(CONSTANTS.COLLAB_ROOM_URL_PARAM);
   const windowSize = useWindowSize();
   const ws = useWebSocket();
@@ -86,6 +84,8 @@ const App = () => {
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
+      const state = store.getState().canvas.present;
+
       const { key, shiftKey, ctrlKey } = event;
       const lowerCaseKey = key.toLowerCase();
 
@@ -109,6 +109,10 @@ const App = () => {
           case KEYS.D: {
             event.preventDefault();
 
+            const selectedNodes = state.nodes.filter(
+              (node) => node.nodeProps.id in state.selectedNodeIds,
+            );
+
             dispatch(
               canvasActions.addNodes(selectedNodes, {
                 duplicate: true,
@@ -123,7 +127,7 @@ const App = () => {
           }
           case KEYS.V: {
             dispatch(
-              canvasActions.addNodes(copiedNodes, {
+              canvasActions.addNodes(state.copiedNodes, {
                 duplicate: true,
                 selectNodes: true,
               }),
@@ -138,14 +142,14 @@ const App = () => {
       }
 
       if (key === KEYS.DELETE) {
-        dispatch(canvasActions.deleteNodes(selectedNodeIds));
+        dispatch(canvasActions.deleteNodes(Object.keys(state.selectedNodeIds)));
         return;
       }
 
       const toolTypeObj = TOOLS.find((tool) => tool.key === lowerCaseKey);
       toolTypeObj && dispatch(canvasActions.setToolType(toolTypeObj.value));
     },
-    [ws, selectedNodes, selectedNodeIds, copiedNodes, dispatch],
+    [ws, store, dispatch],
   );
 
   const handleContextMenuOpen = useCallback(

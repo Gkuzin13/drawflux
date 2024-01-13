@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Rect } from 'react-konva';
 import NodeTransformer from '@/components/Canvas/Transformer/NodeTransformer';
 import { RECT } from '@/constants/shape';
@@ -135,4 +135,4 @@ const RectDrawable = ({
   );
 };
 
-export default memo(RectDrawable);
+export default RectDrawable;

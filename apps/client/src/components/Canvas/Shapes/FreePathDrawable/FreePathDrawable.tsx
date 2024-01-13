@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Line } from 'react-konva';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
@@ -136,4 +136,4 @@ const FreePathDrawable = ({
   );
 };
 
-export default memo(FreePathDrawable);
+export default FreePathDrawable;

@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import {
   canvasActions,
   selectConfig,
-  selectSelectedNodesIds,
+  selectSelectedNodeIds,
   selectToolType,
 } from '@/services/canvas/slice';
 import { selectThisUser } from '@/services/collaboration/slice';
@@ -69,7 +69,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
     const stageConfig = useAppSelector(selectConfig);
     const toolType = useAppSelector(selectToolType);
-    const storedSelectedNodsIds = useAppSelector(selectSelectedNodesIds);
+    const storedSelectedNodeIds = useAppSelector(selectSelectedNodeIds);
     const thisUser = useAppSelector(selectThisUser);
     const ws = useWebSocket();
 
@@ -96,10 +96,10 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
      * syncs with store state when selected nodes change
      */
     useEffect(() => {
-      const nodesIds = Object.keys(storedSelectedNodsIds);
+      const nodesIds = Object.keys(storedSelectedNodeIds);
       setSelectedNodeIds(nodesIds);
       onNodesSelect(nodesIds);
-    }, [storedSelectedNodsIds, onNodesSelect]);
+    }, [storedSelectedNodeIds, onNodesSelect]);
 
     const throttledOnNodesSelect = useThrottledFn(onNodesSelect);
 

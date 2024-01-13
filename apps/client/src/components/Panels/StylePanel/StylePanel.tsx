@@ -7,25 +7,23 @@ import LineSection from './LineSection';
 import OpacitySection from './OpacitySection';
 import FillSection from './FillSection';
 import SizeSection from './SizeSection';
-import { useSelectNodesById } from '@/services/canvas/slice';
 import * as Styled from './StylePanel.styled';
 import type {
   NodeColor,
   NodeFill,
   NodeLine,
+  NodeObject,
   NodeSize,
   NodeStyle,
 } from 'shared';
 
 type Props = {
-  selectedNodeIds: string[];
+  selectedNodes: NodeObject[];
   onStyleChange: (style: Partial<NodeStyle>) => void;
 };
 
-const StylePanel = ({ selectedNodeIds, onStyleChange }: Props) => {
-  const selectedNodes = useSelectNodesById(selectedNodeIds);
-
-  const style = useMemo(() => {
+const StylePanel = ({ selectedNodes, onStyleChange }: Props) => {
+  const mergedStyle = useMemo(() => {
     const styles: NodeStyle[] = selectedNodes.map(({ style }) => style);
 
     const colors = new Set(styles.map(({ color }) => color));
@@ -67,11 +65,11 @@ const StylePanel = ({ selectedNodeIds, onStyleChange }: Props) => {
 
   const fillSectionValue = useMemo(() => {
     if (selectedNodes.length > 1) {
-      return style.fill;
+      return mergedStyle.fill;
     }
 
-    return style.fill ?? 'none';
-  }, [style.fill, selectedNodes.length]);
+    return mergedStyle.fill ?? 'none';
+  }, [mergedStyle.fill, selectedNodes.length]);
 
   const handleColorSelect = (color: NodeColor) => {
     onStyleChange({ color });
@@ -82,7 +80,7 @@ const StylePanel = ({ selectedNodeIds, onStyleChange }: Props) => {
   };
 
   const handleAnimatedSelect = () => {
-    onStyleChange({ animated: !style.animated });
+    onStyleChange({ animated: !mergedStyle.animated });
   };
 
   const handleSizeSelect = (size: NodeSize) => {
@@ -107,23 +105,29 @@ const StylePanel = ({ selectedNodeIds, onStyleChange }: Props) => {
   };
 
   return (
-    <Styled.Container>
-      <ColorSection value={style.color} onColorChange={handleColorSelect} />
+    <Styled.Container data-testid="style-panel">
+      <ColorSection
+        value={mergedStyle.color}
+        onColorChange={handleColorSelect}
+      />
       <OpacitySection
-        value={style.opacity}
+        value={mergedStyle.opacity}
         onValueChange={handleOpacityChange}
         onValueCommit={handleOpacityCommit}
       />
       {enabledOptions.size && (
-        <SizeSection value={style.size} onSizeChange={handleSizeSelect} />
+        <SizeSection value={mergedStyle.size} onSizeChange={handleSizeSelect} />
       )}
       <FillSection value={fillSectionValue} onFillChange={handleFillChange} />
       {enabledOptions.line && (
         <>
-          <LineSection value={style.line} onLineChange={handleLineSelect} />
+          <LineSection
+            value={mergedStyle.line}
+            onLineChange={handleLineSelect}
+          />
           <AnimatedSection
-            value={style.animated && style.line !== 'solid'}
-            isDisabled={style.line === 'solid'}
+            value={mergedStyle.animated && mergedStyle.line !== 'solid'}
+            isDisabled={mergedStyle.line === 'solid'}
             onAnimatedChange={handleAnimatedSelect}
           />
         </>

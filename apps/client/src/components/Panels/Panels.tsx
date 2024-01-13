@@ -9,6 +9,7 @@ import {
   selectFutureHistory,
   selectPastHistory,
   selectToolType,
+  useSelectNodesById,
 } from '@/services/canvas/slice';
 import { collaborationActions } from '@/services/collaboration/slice';
 import { downloadDataUrlAsFile, importProject } from '@/utils/file';
@@ -27,6 +28,7 @@ import { calculateCenterPoint } from '@/utils/position';
 import { calculateStageZoomRelativeToPoint } from '../Canvas/DrawingCanvas/helpers/zoom';
 import * as Styled from './Panels.styled';
 import Konva from 'konva';
+import { shallowEqual } from '@/utils/object';
 import type { NodeStyle, User } from 'shared';
 import type {
   HistoryControlKey,
@@ -43,25 +45,22 @@ const UsersPanel = lazy(() => import('./UsersPanel/UsersPanel'));
 
 const Panels = ({ selectedNodeIds }: Props) => {
   const store = useAppStore();
-  const ws = useWebSocket();
-
   const stageConfig = useAppSelector(selectConfig);
   const toolType = useAppSelector(selectToolType);
   const library = useAppSelector(selectLibrary);
   const past = useAppSelector(selectPastHistory);
   const future = useAppSelector(selectFutureHistory);
 
-  const { online } = useNetworkState();
+  const selectedNodes = useSelectNodesById(selectedNodeIds);
 
+  const ws = useWebSocket();
+  const { online } = useNetworkState();
   const modal = useModal();
 
   const dispatch = useAppDispatch();
 
-  const isHandTool = useMemo(() => toolType === 'hand', [toolType]);
-
-  const isStylePanelActive = useMemo(() => {
-    return selectedNodeIds.length > 0 && !isHandTool;
-  }, [selectedNodeIds.length, isHandTool]);
+  const isHandTool = toolType === 'hand';
+  const isStylePanelActive = selectedNodeIds.length > 0 && !isHandTool;
 
   const disabledMenuItems = useMemo((): MenuKey[] | null => {
     if (ws.isConnected) {
@@ -77,20 +76,19 @@ const Panels = ({ selectedNodeIds }: Props) => {
     [dispatch],
   );
 
-  const handleStyleChange = useCallback(
-    (style: Partial<NodeStyle>) => {
-      const { nodes, selectedNodeIds } = store.getState().canvas.present;
+  const handleStyleChange = (style: Partial<NodeStyle>) => {
+    const state = store.getState().canvas.present;
 
-      const updatedNodes = nodes
-        .filter((node) => node.nodeProps.id in selectedNodeIds)
-        .map((node) => {
-          return { ...node, style: { ...node.style, ...style } };
-        });
+    const nodesToUpdate = state.nodes.filter((node) => {
+      return node.nodeProps.id in state.selectedNodeIds;
+    });
 
-      dispatch(canvasActions.updateNodes(updatedNodes));
-    },
-    [store, dispatch],
-  );
+    const updatedNodes = nodesToUpdate.map((node) => {
+      return { ...node, style: { ...node.style, ...style } };
+    });
+
+    dispatch(canvasActions.updateNodes(updatedNodes));
+  };
 
   const handleMenuAction = useCallback(
     (type: MenuPanelActionType) => {
@@ -180,7 +178,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
   const handleNodesDelete = useCallback(() => {
     dispatch(canvasActions.deleteNodes(selectedNodeIds));
   }, [selectedNodeIds, dispatch]);
-  
+
   return (
     <Styled.Container>
       <Styled.TopPanels>
@@ -199,7 +197,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
         )}
         {isStylePanelActive && (
           <StylePanel
-            selectedNodeIds={selectedNodeIds}
+            selectedNodes={selectedNodes}
             onStyleChange={handleStyleChange}
           />
         )}
@@ -232,4 +230,8 @@ const Panels = ({ selectedNodeIds }: Props) => {
   );
 };
 
-export default memo(Panels);
+const areEqual = (prevProps: Props, nextProps: Props) => {
+  return shallowEqual(prevProps.selectedNodeIds, nextProps.selectedNodeIds);
+};
+
+export default memo(Panels, areEqual);

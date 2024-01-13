@@ -1,11 +1,4 @@
-import {
-  memo,
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Group, Line, Shape } from 'react-konva';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
@@ -234,4 +227,4 @@ const ArrowDrawable = ({
   );
 };
 
-export default memo(ArrowDrawable);
+export default ArrowDrawable;

@@ -2,14 +2,14 @@ import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { reorderNodes, isValidNode, duplicateNodesToRight } from '@/utils/node';
 import { getCanvasCenteredPositionRelativeToNodes } from '@/utils/position';
 import { historyActions } from '../../stores/reducers/history';
+import {
+  createParametricSelectorHook,
+  createAppSelector,
+} from '@/stores/hooks';
 import type { NodeObject } from 'shared';
 import type { AppState } from '@/constants/app';
 import type { RootState } from '../../stores/store';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import {
-  createParametricSelectorHook,
-  createSelectorWithShallowEqual,
-} from '@/stores/hooks';
 
 export type CanvasSliceState = {
   copiedNodes: NodeObject[];
@@ -207,19 +207,13 @@ export const selectConfig = (state: RootState) =>
 export const selectToolType = (state: RootState) =>
   state.canvas.present.toolType;
 
-export const selectSelectedNodesIds = createSelectorWithShallowEqual(
-  (state: RootState) => state.canvas.present.selectedNodeIds,
-  (selectedNodeIds) => ({ ...selectedNodeIds }),
-);
+export const selectSelectedNodeIds = (state: RootState) =>
+  state.canvas.present.selectedNodeIds;
 
-const selectNodesById = createSelectorWithShallowEqual(
-  [
-    selectNodes,
-    (_nodes, nodeIds: string[]) => {
-      return Object.fromEntries(nodeIds.map((id) => [id, true]));
-    },
-  ],
-  (nodes, selectedNodeIds) => {
+const selectNodesById = createAppSelector(
+  [selectNodes, (_nodes, nodeIds: string[]) => nodeIds],
+  (nodes, nodeIds) => {
+    const selectedNodeIds = Object.fromEntries(nodeIds.map((id) => [id, true]));
     return nodes.filter((node) => node.nodeProps.id in selectedNodeIds);
   },
 );
