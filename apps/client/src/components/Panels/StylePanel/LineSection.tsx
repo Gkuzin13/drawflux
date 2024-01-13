@@ -31,6 +31,7 @@ const LineSection = ({ value, onLineChange }: Props) => {
               color={
                 line.value === value ? 'secondary-dark' : 'secondary-light'
               }
+              data-testid={`${line.value}-line-button`}
             >
               <Icon name={line.icon} />
             </Styled.Item>

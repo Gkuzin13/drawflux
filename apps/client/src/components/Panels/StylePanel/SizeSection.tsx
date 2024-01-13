@@ -31,6 +31,7 @@ const SizeSection = ({ value, onSizeChange }: Props) => {
               color={
                 size.value === value ? 'secondary-dark' : 'secondary-light'
               }
+              data-testid={`${size.value}-size-button`}
             >
               <Icon name={size.icon} />
             </Styled.Item>

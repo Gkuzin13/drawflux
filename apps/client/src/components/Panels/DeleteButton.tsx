@@ -18,6 +18,7 @@ const DeleteButton = ({ disabled, onClick }: Props) => {
       ])}
       disabled={disabled}
       onClick={onClick}
+      data-testid="delete-nodes-button"
     >
       <Icon name={DELETE_NODES.icon} />
     </Styled.Button>

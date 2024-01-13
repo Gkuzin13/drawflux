@@ -33,6 +33,7 @@ const FillSection = ({ value, onFillChange }: Props) => {
               color={
                 fill.value === value ? 'secondary-dark' : 'secondary-light'
               }
+              data-testid={`${fill.value}-fill-button`}
             >
               <Icon name={fill.icon} />
             </Styled.Item>

@@ -26,6 +26,7 @@ const AnimatedSection = ({ value, isDisabled, onAnimatedChange }: Props) => {
         disabled={isDisabled}
         onPressedChange={onAnimatedChange}
         squared
+        data-testid="animated-toggle"
       >
         {valueTitle}
       </Toggle>

@@ -12,7 +12,7 @@ type Props = {
 
 const OpacitySection = ({ value, onValueChange, onValueCommit }: Props) => {
   return (
-    <div aria-labelledby="Opacity">
+    <Styled.InnerContainer aria-labelledby="Opacity">
       <Styled.Label>Opacity</Styled.Label>
       <Slider
         value={[value ?? OPACITY.maxValue]}
@@ -23,7 +23,7 @@ const OpacitySection = ({ value, onValueChange, onValueCommit }: Props) => {
         onValueChange={(values) => onValueChange(values[0])}
         onValueCommit={(values) => onValueCommit(values[0])}
       />
-    </div>
+    </Styled.InnerContainer>
   );
 };
 

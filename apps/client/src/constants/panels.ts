@@ -3,7 +3,7 @@ import { Schemas } from 'shared';
 import type { HistoryActionKey } from '@/stores/reducers/history';
 import type { Entity } from '@/constants/index';
 import type { ShapesThumbnailStyle } from '@/components/Elements/ShapesThumbnail/ShapesThumbnail';
-import type { NodeFill, NodeLine, NodeSize } from 'shared';
+import type { NodeColor, NodeFill, NodeLine, NodeSize } from 'shared';
 import type { ToolType } from './app';
 
 export type HistoryControlKey = Exclude<HistoryActionKey, 'reset'>;
@@ -215,3 +215,18 @@ export const ZOOM = {
     value: 'reset',
   },
 } as const;
+
+export const GRID_COLORS: { name: string; value: NodeColor }[] = [
+  { name: 'Red', value: 'red600' },
+  { name: 'Pink', value: 'pink600' },
+  { name: 'Deep Orange', value: 'deep-orange600' },
+  { name: 'Yellow', value: 'yellow600' },
+  { name: 'Green', value: 'green600' },
+  { name: 'Teal', value: 'teal600' },
+  { name: 'Light Blue', value: 'light-blue600' },
+  { name: 'Blue', value: 'blue600' },
+  { name: 'Deep Purple', value: 'deep-purple600' },
+  { name: 'Indigo', value: 'indigo600' },
+  { name: 'Black', value: 'black' },
+  { name: 'Gray', value: 'gray600' },
+];
