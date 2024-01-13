@@ -40,6 +40,7 @@
     "react-konva": "^18.2.10",
     "react-konva-utils": "^1.0.5",
     "react-redux": "^8.0.5",
+    "reselect": "^5.1.0",
     "shared": "workspace:^",
     "uuid": "^9.0.0"
   },
