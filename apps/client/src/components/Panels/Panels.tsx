@@ -21,7 +21,7 @@ import ZoomButtons from './ZoomButtons';
 import LibraryDrawer from '../Library/LibraryDrawer/LibraryDrawer';
 import HistoryButtons from './HistoryButtons';
 import DeleteButton from './DeleteButton';
-import { PROJECT_FILE_EXT, PROJECT_FILE_NAME } from '@/constants/app';
+import { PROJECT_FILE_EXT, PROJECT_FILE_NAME, PROJECT_PNG_EXT } from '@/constants/app';
 import { historyActions } from '@/stores/reducers/history';
 import { selectLibrary } from '@/services/library/slice';
 import { calculateCenterPoint } from '@/utils/position';
@@ -97,7 +97,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
           const dataUrl = Konva.stages[0].toDataURL();
 
           if (dataUrl) {
-            downloadDataUrlAsFile(dataUrl, PROJECT_FILE_NAME, PROJECT_FILE_EXT);
+            downloadDataUrlAsFile(dataUrl, PROJECT_FILE_NAME, PROJECT_PNG_EXT);
           }
           break;
         }
