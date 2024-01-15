@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Group, Line, Shape } from 'react-konva';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
@@ -28,8 +28,6 @@ const ArrowDrawable = ({
     node.nodeProps.bend ?? defaultBend,
   );
 
-  const [dragging, setDragging] = useState(false);
-
   const { config } = useNode(node, stageScale);
 
   const lineRef = useRef<Konva.Line>(null);
@@ -42,12 +40,11 @@ const ArrowDrawable = ({
 
   const [start, end] = points;
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setPoints([
       node.nodeProps.point,
       ...(node.nodeProps?.points || [node.nodeProps.point]),
     ]);
-
     setBendValue(node.nodeProps.bend ?? defaultBend);
   }, [node.nodeProps.point, node.nodeProps.points, node.nodeProps.bend]);
 
@@ -63,10 +60,6 @@ const ArrowDrawable = ({
   }, [bendValue, minPoint, maxPoint]);
 
   const flattenedPoints = useMemo(() => points.flat(), [points]);
-
-  const handleDragStart = useCallback(() => {
-    setDragging(true);
-  }, []);
 
   const handleDragEnd = useCallback(
     (event: Konva.KonvaEventObject<DragEvent>) => {
@@ -91,8 +84,6 @@ const ArrowDrawable = ({
       });
 
       group.position({ x: 0, y: 0 });
-
-      setDragging(false);
     },
     [node, points, onNodeChange],
   );
@@ -121,8 +112,6 @@ const ArrowDrawable = ({
   );
 
   const handleTransformEnd = useCallback(() => {
-    setPoints(points);
-
     onNodeChange({
       ...node,
       nodeProps: {
@@ -139,8 +128,8 @@ const ArrowDrawable = ({
   }, [node, bendValue, points, animation, onNodeChange]);
 
   const shouldTransformerRender = useMemo(() => {
-    return selected && !dragging && node.nodeProps.visible;
-  }, [selected, dragging, node.nodeProps.visible]);
+    return selected && node.nodeProps.visible;
+  }, [selected, node.nodeProps.visible]);
 
   const drawArrowHead = useCallback(
     (ctx: Konva.Context, shape: Konva.Shape) => {
@@ -186,31 +175,28 @@ const ArrowDrawable = ({
   );
 
   return (
-    <>
-      <Group
-        id={node.nodeProps.id}
-        visible={node.nodeProps.visible}
-        opacity={node.style.opacity}
-        draggable={config.draggable}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <Shape
-          {...config}
-          draggable={false}
-          x={end[0]}
-          y={end[1]}
-          dash={[]}
-          sceneFunc={drawArrowHead}
-        />
-        <Line
-          ref={lineRef}
-          {...config}
-          draggable={false}
-          points={flattenedPoints}
-          sceneFunc={drawArrowLine}
-        />
-      </Group>
+    <Group
+      id={node.nodeProps.id}
+      visible={node.nodeProps.visible}
+      opacity={node.style.opacity}
+      draggable={config.draggable}
+      onDragEnd={handleDragEnd}
+    >
+      <Shape
+        {...config}
+        draggable={false}
+        x={end[0]}
+        y={end[1]}
+        dash={[]}
+        sceneFunc={drawArrowHead}
+      />
+      <Line
+        ref={lineRef}
+        {...config}
+        draggable={false}
+        points={flattenedPoints}
+        sceneFunc={drawArrowLine}
+      />
       {shouldTransformerRender && (
         <ArrowTransformer
           start={start}
@@ -223,7 +209,7 @@ const ArrowDrawable = ({
           onTransformEnd={handleTransformEnd}
         />
       )}
-    </>
+    </Group>
   );
 };
 
