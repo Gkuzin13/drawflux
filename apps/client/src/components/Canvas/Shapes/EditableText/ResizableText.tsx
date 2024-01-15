@@ -1,32 +1,19 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { Text } from 'react-konva';
 import useNode from '@/hooks/useNode/useNode';
 import useTransformer from '@/hooks/useTransformer';
 import NodeTransformer from '../../Transformer/NodeTransformer';
 import { TEXT } from '@/constants/shape';
 import { getNodeSize } from './helpers/size';
-import { createSingleClickHandler } from '@/utils/timed';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 import type Konva from 'konva';
 
-type Props = {
-  onDoubleClick: (event: Konva.KonvaEventObject<PointerEvent>) => void;
-} & NodeComponentProps<'text'>;
+type Props = NodeComponentProps<'text'>;
 
-const ResizableText = ({
-  node,
-  selected,
-  stageScale,
-  onNodeChange,
-  onDoubleClick,
-}: Props) => {
+const ResizableText = ({ node, selected, stageScale, onNodeChange }: Props) => {
   const { nodeRef, transformerRef } = useTransformer<Konva.Text>([selected]);
 
   const { config } = useNode(node, stageScale);
-
-  const singleClickHandler = useRef(
-    createSingleClickHandler((callback) => callback()),
-  );
 
   const handleDragEnd = useCallback(
     (event: Konva.KonvaEventObject<DragEvent>) => {
@@ -73,25 +60,6 @@ const ResizableText = ({
     [node, onNodeChange],
   );
 
-  // Prevents triggering ContextMenu on double click (touch devices)
-  const handleTransformerPointerDown = useCallback(
-    (event: Konva.KonvaEventObject<PointerEvent>) => {
-      if (event.evt.pointerType === 'mouse') {
-        return;
-      }
-
-      event.evt.stopPropagation();
-      const stage = event.target?.getStage();
-
-      if (stage) {
-        singleClickHandler.current(() =>
-          stage.container().dispatchEvent(event.evt),
-        );
-      }
-    },
-    [],
-  );
-
   return (
     <>
       <Text
@@ -113,10 +81,7 @@ const ResizableText = ({
           stageScale={stageScale}
           transformerConfig={{
             enabledAnchors: ['middle-left', 'middle-right'],
-          }}
-          transformerEvents={{
-            onPointerDblClick: onDoubleClick,
-            onPointerDown: handleTransformerPointerDown,
+            type: TEXT.TRANSFORMER_TYPE,
           }}
         />
       )}

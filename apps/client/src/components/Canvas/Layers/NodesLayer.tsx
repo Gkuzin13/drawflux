@@ -10,12 +10,14 @@ import type { NodeComponentProps } from '../Node/Node';
 
 type Props = {
   selectedNodeIds: string[];
+  editingNodeId: string | null;
   stageScale: number;
   onNodesChange: (nodes: NodeObject[]) => void;
-} & Pick<NodeComponentProps, 'onTextChange'>;
+} & Omit<NodeComponentProps, 'node' | 'selected' | 'editing' | 'onNodeChange'>;
 
 const NodesLayer = ({
   selectedNodeIds,
+  editingNodeId,
   stageScale,
   onNodesChange,
   onTextChange,
@@ -49,12 +51,13 @@ const NodesLayer = ({
   if (loading) {
     return null;
   }
-  
+
   return (
     <>
       <Nodes
         nodes={nodes}
         selectedNodeId={selectedNodeId}
+        editingNodeId={editingNodeId}
         stageScale={stageScale}
         onNodeChange={handleNodeChange}
         onTextChange={onTextChange}

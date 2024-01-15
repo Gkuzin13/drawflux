@@ -149,10 +149,10 @@ describe('select a tool and create an element', () => {
     // stop at last position
     fireEvent.pointerUp(canvas);
 
-    // type 'Hello World!' and press enter
+    // type 'Hello World!' and press Escape
     await user.type(
       screen.getByTestId(/editable-text-input/),
-      'Hello World!{enter}',
+      'Hello World!{escape}',
     );
 
     const canvasState = store.getState().canvas.present;
@@ -208,10 +208,10 @@ describe('double click on canvas and create an element', () => {
       },
     ]);
 
-    // type 'Hello World!' and press enter
+    // type 'Hello World!' and press Escape
     await user.type(
       screen.getByTestId('editable-text-input'),
-      'Hello World!{enter}',
+      'Hello World!{escape}',
     );
 
     const canvasState = store.getState().canvas.present;

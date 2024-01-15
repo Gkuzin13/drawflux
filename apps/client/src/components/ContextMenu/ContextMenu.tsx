@@ -24,9 +24,7 @@ const menus = {
 
 const Trigger = ({ children }: TriggerProps) => {
   return (
-    <ContextMenuPrimitive.Trigger asChild>
-      <div>{children}</div>
-    </ContextMenuPrimitive.Trigger>
+    <ContextMenuPrimitive.Trigger>{children}</ContextMenuPrimitive.Trigger>
   );
 };
 

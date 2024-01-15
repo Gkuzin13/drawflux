@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Html } from 'react-konva-utils';
 import { KEYS } from '@/constants/keys';
 import { useClickAway } from '@/hooks/useClickAway/useClickAway';
 import { getColorValue, getFontSize, getSizeValue } from '@/utils/shape';
-import * as Styled from './EditableTextInput.styled';
 import { getSizePropsFromTextValue } from './helpers/size';
 import useDefaultThemeColors from '@/hooks/useThemeColors';
+import useAutoFocus from '@/hooks/useAutoFocus/useAutoFocus';
+import * as Styled from './EditableTextInput.styled';
 import type { NodeObject } from 'shared';
 import type { OnTextSaveArgs } from './EditableText';
 
@@ -15,8 +16,6 @@ type Props = {
   onChange: (args: OnTextSaveArgs) => void;
   onUpdate: (value: string) => void;
 };
-
-const textSaveKeys = [KEYS.ENTER, KEYS.ESCAPE] as string[];
 
 function getStyle(fontSize: number, color: string): React.CSSProperties {
   const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
@@ -49,22 +48,17 @@ const EditableTextInput = ({
 
   const themeColors = useDefaultThemeColors();
 
-  const ref = useRef<HTMLTextAreaElement>(null);
+  const ref = useAutoFocus<HTMLTextAreaElement>();
 
   useClickAway(ref, () => handleTextChange(value));
 
   useEffect(() => {
-    const element = ref.current;
-
-    if (element) {
-      element.focus();
-
-      const textLength = initialValue.length;
-      const hasText = textLength > 0;
-
-      hasText && element.setSelectionRange(0, textLength);
+    if (!ref.current || initialValue.length <= 0) {
+      return;
     }
-  }, [ref, initialValue.length]);
+    
+    ref.current.setSelectionRange(0, initialValue.length);
+  }, [ref, initialValue]);
 
   const fontSize = useMemo(() => {
     return getFontSize(getSizeValue(node.style.size));
@@ -77,24 +71,30 @@ const EditableTextInput = ({
   const { width, height } = getSizePropsFromTextValue(value, fontSize);
 
   const handleTextChange = (text: string) => {
-    if (ref.current) {
-      onChange({
-        text,
-        width: ref.current.scrollWidth,
-        height: ref.current.scrollHeight,
-      });
+    if (!ref.current) {
+      return;
     }
+
+    const { scrollWidth, scrollHeight } = ref.current;
+
+    onChange({ text: text.trim(), width: scrollWidth, height: scrollHeight });
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     event.stopPropagation();
 
-    if (event.shiftKey) {
+    if (event.shiftKey || !ref.current) {
       return;
     }
 
-    if (textSaveKeys.includes(event.key) && ref.current) {
-      handleTextChange(ref.current.value);
+    const newTextValue = ref.current.value;
+
+    if (event.key === KEYS.ESCAPE) {
+      handleTextChange(newTextValue);
+    }
+
+    if (event.key === KEYS.ENTER && event.ctrlKey) {
+      handleTextChange(newTextValue);
     }
   };
 

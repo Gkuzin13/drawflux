@@ -1,5 +1,3 @@
-import type { IRect, Vector2d } from 'konva/lib/types';
-import type { NodeType, Point, NodeObject, StageConfig } from 'shared';
 import { v4 as uuid } from 'uuid';
 import {
   getCanvasCenterPosition,
@@ -7,8 +5,13 @@ import {
   isNodeFullyInView,
 } from './position';
 import { DUPLICATION_GAP } from '@/constants/app';
+import type { IRect, Vector2d } from 'konva/lib/types';
+import type { NodeType, Point, NodeObject, StageConfig } from 'shared';
 
-export const createNode = (type: NodeType, point: Point): NodeObject => {
+export const createNode = <T extends NodeType>(
+  type: T,
+  point: Point,
+): NodeObject<T> => {
   return {
     type,
     text: null,

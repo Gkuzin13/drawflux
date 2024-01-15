@@ -126,6 +126,7 @@ const NodeGroupTransformer = ({ nodes, stageScale, onNodesChange }: Props) => {
         <Nodes
           nodes={nodes}
           selectedNodeId={null}
+          editingNodeId={null}
           stageScale={stageScale}
           onNodeChange={noop}
         />
