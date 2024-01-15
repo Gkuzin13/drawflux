@@ -5,9 +5,15 @@ import type { NodeObject } from 'shared';
 type Props = {
   nodes: NodeObject[];
   selectedNodeId: string | null;
-} & Pick<NodeComponentProps, 'onNodeChange'| 'onTextChange' | 'stageScale'>;
+  editingNodeId: string | null;
+} & Omit<NodeComponentProps, 'node' | 'selected' | 'editing'>;
 
-const Nodes = ({ nodes, selectedNodeId, stageScale, onNodeChange, onTextChange }: Props) => {
+const Nodes = ({
+  nodes,
+  selectedNodeId,
+  editingNodeId,
+  ...restProps
+}: Props) => {
   return (
     <>
       {nodes.map((node) => {
@@ -16,9 +22,8 @@ const Nodes = ({ nodes, selectedNodeId, stageScale, onNodeChange, onTextChange }
             key={node.nodeProps.id}
             node={node}
             selected={selectedNodeId === node.nodeProps.id}
-            stageScale={stageScale}
-            onNodeChange={onNodeChange}
-            onTextChange={onTextChange}
+            editing={editingNodeId === node.nodeProps.id}
+            {...restProps}
           />
         );
       })}

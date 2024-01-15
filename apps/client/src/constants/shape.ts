@@ -44,6 +44,7 @@ export const TEXT = {
   LINE_HEIGHT: 1,
   FONT_FAMILY: 'Klee One',
   FONT_WEIGHT: 'bold',
+  TRANSFORMER_TYPE: 'text-transformer',
 };
 
 export const SELECT_RECT = {

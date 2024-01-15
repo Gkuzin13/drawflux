@@ -36,6 +36,7 @@ import NodesLayer from '../Layers/NodesLayer';
 import SelectRect from '../SelectRect';
 import MainLayer from './MainLayer';
 import Drafts from '../Node/Drafts';
+import { TEXT } from '@/constants/shape';
 import type { DrawPosition } from './helpers/draw';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
@@ -58,11 +59,12 @@ const initialDrawingPosition: DrawPosition = { start: [0, 0], current: [0, 0] };
 const DrawingCanvas = forwardRef<Konva.Stage, Props>(
   ({ size, onNodesSelect }, ref) => {
     const [selectedNodeIds, setSelectedNodeIds] = useState<string[]>([]);
+    const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
     const [drawing, setDrawing] = useState(false);
-    const [drafts, setDrafts] = useDrafts();
     const [draggingStage, setDraggingStage] = useState(false);
 
-    const [activeDraftId, setActiveDraftId] = useRefValue<string | null>(null);
+    const [drafts, setDrafts] = useDrafts();
+
     const [drawingPosition, setDrawingPosition] = useRefValue(
       initialDrawingPosition,
     );
@@ -146,20 +148,20 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         const node = createNode(toolType, position);
 
         setDrafts({ type: 'create', payload: { node } });
-        setActiveDraftId(node.nodeProps.id);
+        setEditingNodeId(node.nodeProps.id);
 
         if (ws.isConnected) {
           ws.send({ type: 'draft-create', data: { node } });
         }
       },
-      [ws, setActiveDraftId, setDrafts],
+      [ws, setDrafts],
     );
 
     const handleDraftDraw = useCallback(
       (position: DrawPosition) => {
-        if (!activeDraftId.current) return;
+        if (!editingNodeId) return;
 
-        const nodeId = activeDraftId.current;
+        const nodeId = editingNodeId;
 
         setDrafts({ type: 'draw', payload: { position, nodeId } });
 
@@ -173,7 +175,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           );
         }
       },
-      [ws, thisUser, activeDraftId, setDrafts],
+      [ws, thisUser, editingNodeId, setDrafts],
     );
 
     const handleDraftTextChange = useCallback(
@@ -203,12 +205,13 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         const shouldKeepDraft = node.type === 'laser';
         const shouldResetToolType =
           node.type !== 'draw' && node.type !== 'laser';
+
         setDrafts({
           type: 'finish',
           payload: { nodeId: node.nodeProps.id, keep: shouldKeepDraft },
         });
 
-        setActiveDraftId(null);
+        setEditingNodeId(null);
 
         if (shouldResetToolType) {
           dispatch(canvasActions.setToolType('select'));
@@ -226,7 +229,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           });
         }
       },
-      [ws, thisUser, dispatch, setDrafts, setActiveDraftId],
+      [ws, thisUser, dispatch, setDrafts],
     );
 
     const handleNodePress = useCallback(
@@ -255,12 +258,8 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
             handleNodePress(nodeId);
           }
 
-          if (!hasSelectedNodes) {
-            event.evt.stopPropagation();
-          }
           return;
         }
-        event.evt.stopPropagation();
 
         const pointerPosition = getRelativePointerPosition(stage);
 
@@ -339,6 +338,18 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           return;
         }
 
+        /**
+         * [TODO]: temporary fix
+         *
+         *         pointerup is not being triggered in the parent element
+         *
+         *         either a bug in radix-ui or Konva, or maybe something else
+         *
+         *         it is working when the stage size is small
+         *         tested with: 500x500 and it is working. window.innerWidth/Height is not
+         */
+        stage.container().dispatchEvent(new Event(event.type, event.evt));
+
         setDrawing(false);
 
         if (isSelecting) {
@@ -351,7 +362,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         }
 
         const draft = drafts.find(
-          ({ node }) => node.nodeProps.id === activeDraftId.current,
+          ({ node }) => node.nodeProps.id === editingNodeId,
         );
 
         if (draft && draft.node.type !== 'text') {
@@ -362,7 +373,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         isSelecting,
         drafts,
         selectedNodeIds,
-        activeDraftId,
+        editingNodeId,
         dispatch,
         handleDraftFinish,
         handleSelectDraw,
@@ -430,24 +441,33 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
     const handleOnContextMenu = useCallback(
       (event: KonvaEventObject<PointerEvent>) => {
-        if (activeDraftId.current) {
+        if (editingNodeId) {
           event.evt.preventDefault();
           event.evt.stopPropagation();
         }
       },
-      [activeDraftId],
+      [editingNodeId],
     );
 
-    const handleOnDoubleClick = useCallback(
-      (event: KonvaEventObject<MouseEvent>) => {
-        if (toolType !== 'select') {
+    const handleDoublePress = useCallback(
+      (event: KonvaEventObject<MouseEvent | Event>) => {
+        if ('button' in event.evt && event.evt.button !== 0) {
           return;
         }
 
         const stage = event.target.getStage();
         const clickedOnEmpty = event.target === stage;
 
-        if (!clickedOnEmpty) {
+        if (!clickedOnEmpty || toolType !== 'select') {
+          const element = event.target;
+          const clickedOnTextNode =
+            element.parent?.attrs.type === TEXT.TRANSFORMER_TYPE;
+
+          if (clickedOnTextNode) {
+            const transformer = element.parent as Konva.Transformer;
+
+            setEditingNodeId(transformer.getNode().id());
+          }
           return;
         }
 
@@ -462,6 +482,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const handleNodesChange = useCallback(
       (nodes: NodeObject[]) => {
         dispatch(canvasActions.updateNodes(nodes));
+        setEditingNodeId(null);
       },
       [dispatch],
     );
@@ -511,7 +532,8 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         onDragMove={handleStageDragMove}
         onDragEnd={handleStageDragEnd}
         onContextMenu={handleOnContextMenu}
-        onDblClick={handleOnDoubleClick}
+        onDblClick={handleDoublePress}
+        onDblTap={handleDoublePress}
       >
         <MainLayer
           listening={isLayerListening}
@@ -521,6 +543,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           <BackgroundLayer rect={stageRect} scale={stageConfig.scale} />
           <NodesLayer
             selectedNodeIds={!isHandTool ? selectedNodeIds : []}
+            editingNodeId={!isHandTool ? editingNodeId : null}
             stageScale={stageConfig.scale}
             onNodesChange={handleNodesChange}
             onTextChange={handleNodeTextChange}
@@ -529,6 +552,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
             <Drafts
               drafts={drafts}
               stageScale={stageConfig.scale}
+              editingNodeId={!isHandTool ? editingNodeId : null}
               onNodeChange={handleDraftFinish}
               onTextChange={handleDraftTextChange}
               onNodeDelete={handleDraftDelete}

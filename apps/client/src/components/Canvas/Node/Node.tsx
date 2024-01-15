@@ -10,6 +10,7 @@ import { memo } from 'react';
 export type NodeComponentProps<Type extends NodeType = NodeType> = {
   node: NodeObject<Type>;
   selected: boolean;
+  editing?: boolean;
   stageScale: number;
   onNodeChange: (node: NodeObject<Type>) => void;
   onNodeDelete?: (node: NodeObject<Type>) => void;
