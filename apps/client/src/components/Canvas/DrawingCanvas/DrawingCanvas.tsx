@@ -19,7 +19,7 @@ import {
   selectToolType,
 } from '@/services/canvas/slice';
 import { selectThisUser } from '@/services/collaboration/slice';
-import { createNode } from '@/utils/node';
+import { createNode, isValidNode } from '@/utils/node';
 import BackgroundLayer from '../Layers/BackgroundLayer';
 import {
   getCursorStyle,
@@ -215,8 +215,13 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
         if (shouldResetToolType) {
           dispatch(canvasActions.setToolType('select'));
-          dispatch(canvasActions.setSelectedNodeIds([node.nodeProps.id]));
         }
+
+        if (!isValidNode(node)) {
+          return;
+        }
+
+        dispatch(canvasActions.setSelectedNodeIds([node.nodeProps.id]));
 
         if (isNodeSavable) {
           dispatch(canvasActions.addNodes([node]));
