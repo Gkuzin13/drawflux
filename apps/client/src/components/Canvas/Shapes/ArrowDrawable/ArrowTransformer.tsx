@@ -8,14 +8,16 @@ import { hexToRGBa } from '@/utils/string';
 import type { Point } from 'shared';
 import type Konva from 'konva';
 
+type BendMovement = {
+  min: Konva.Vector2d;
+  max: Konva.Vector2d;
+};
+
 type ArrowTransformerProps = {
   start: Point;
   end: Point;
   bendPoint: Point;
-  bendMovement: {
-    min: Konva.Vector2d;
-    max: Konva.Vector2d;
-  };
+  bendMovement: BendMovement;
   stageScale: number;
   onTranformStart: () => void;
   onTransform: (updatedPoints: Point[], bend?: number) => void;
@@ -32,6 +34,21 @@ type AnchorProps = {
   dragBoundFunc?: (position: Konva.Vector2d) => void;
 };
 
+const getBendValue = (dragPosition: Point, bendMovement: BendMovement) => {
+  const bendX = getRatioFromValue(
+    dragPosition[0],
+    bendMovement.min.x,
+    bendMovement.max.x,
+  );
+  const bendY = getRatioFromValue(
+    dragPosition[1],
+    bendMovement.min.y,
+    bendMovement.max.y,
+  );
+
+  return +((bendX + bendY) / 2).toFixed(2);
+};
+
 const controlIndex = 2;
 
 const Anchor = ({
@@ -46,6 +63,8 @@ const Anchor = ({
 
   const handleMouseEnter = useCallback(
     (event: Konva.KonvaEventObject<MouseEvent>) => {
+      event.cancelBubble = true;
+
       const circle = event.target as Konva.Circle;
 
       circle.strokeWidth(ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH_HOVER);
@@ -56,6 +75,8 @@ const Anchor = ({
 
   const handleMouseLeave = useCallback(
     (event: Konva.KonvaEventObject<MouseEvent>) => {
+      event.cancelBubble = true;
+
       const circle = event.target as Konva.Circle;
 
       circle.strokeWidth(ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH);
@@ -106,28 +127,21 @@ const ArrowTransformer = ({
     if (transformerRef.current) {
       transformerRef.current.moveToTop();
     }
-  }, [transformerRef]);
+  }, []);
 
-  const getBendValue = useCallback(
-    (dragPosition: Point) => {
-      const bendX = getRatioFromValue(
-        dragPosition[0],
-        bendMovement.min.x,
-        bendMovement.max.x,
-      );
-      const bendY = getRatioFromValue(
-        dragPosition[1],
-        bendMovement.min.y,
-        bendMovement.max.y,
-      );
+  const handleAnchorDragStart = useCallback(
+    (event: Konva.KonvaEventObject<DragEvent>) => {
+      event.cancelBubble = true;
 
-      return +((bendX + bendY) / 2).toFixed(2);
+      onTranformStart();
     },
-    [bendMovement],
+    [onTranformStart],
   );
 
-  const handleDragMove = useCallback(
+  const handleAnchorDragMove = useCallback(
     (event: Konva.KonvaEventObject<DragEvent>) => {
+      event.cancelBubble = true;
+
       const node = event.target as Konva.Circle;
       const stage = node.getStage() as Konva.Stage;
 
@@ -142,7 +156,7 @@ const ArrowTransformer = ({
 
         node.position({ x: clampedX, y: clampedY });
 
-        const updatedBend = getBendValue([clampedX, clampedY]);
+        const updatedBend = getBendValue([clampedX, clampedY], bendMovement);
 
         onTransform([start, end], updatedBend);
 
@@ -155,7 +169,16 @@ const ArrowTransformer = ({
 
       onTransform(updatedPoints);
     },
-    [start, end, getBendValue, onTransform],
+    [start, end, bendMovement, onTransform],
+  );
+
+  const handleAnchorDragEnd = useCallback(
+    (event: Konva.KonvaEventObject<DragEvent>) => {
+      event.cancelBubble = true;
+
+      onTransformEnd();
+    },
+    [onTransformEnd],
   );
 
   return (
@@ -167,9 +190,9 @@ const ArrowTransformer = ({
             x={x}
             y={y}
             scale={normalizedScale}
-            onDragStart={onTranformStart}
-            onDragMove={handleDragMove}
-            onDragEnd={onTransformEnd}
+            onDragStart={handleAnchorDragStart}
+            onDragMove={handleAnchorDragMove}
+            onDragEnd={handleAnchorDragEnd}
           />
         );
       })}

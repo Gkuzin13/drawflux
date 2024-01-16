@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Group, Line, Shape } from 'react-konva';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
@@ -7,7 +7,7 @@ import { getPointsAbsolutePosition } from '@/utils/position';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import ArrowTransformer from './ArrowTransformer';
 import { calculateMinMaxMovementPoints } from './helpers/calc';
-import { ARROW } from '@/constants/shape';
+import { drawArrowHead, drawArrowLine } from './helpers/draw';
 import type Konva from 'konva';
 import type { Point, NodeProps } from 'shared';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
@@ -20,15 +20,13 @@ const ArrowDrawable = ({
   stageScale,
   onNodeChange,
 }: NodeComponentProps<'arrow'>) => {
-  const [points, setPoints] = useState<Point[]>([
+  const [points, setPoints] = useState([
     node.nodeProps.point,
     ...(node.nodeProps?.points || [node.nodeProps.point]),
   ]);
   const [bendValue, setBendValue] = useState(
     node.nodeProps.bend ?? defaultBend,
   );
-
-  const [dragging, setDragging] = useState(false);
 
   const { config } = useNode(node, stageScale);
 
@@ -42,31 +40,32 @@ const ArrowDrawable = ({
 
   const [start, end] = points;
 
-  useLayoutEffect(() => {
-    setPoints([
-      node.nodeProps.point,
-      ...(node.nodeProps?.points || [node.nodeProps.point]),
-    ]);
-
-    setBendValue(node.nodeProps.bend ?? defaultBend);
-  }, [node.nodeProps.point, node.nodeProps.points, node.nodeProps.bend]);
-
-  const { minPoint, maxPoint } = useMemo(() => {
+  const bendMovement = useMemo(() => {
     return calculateMinMaxMovementPoints(start, end);
   }, [start, end]);
 
   const control = useMemo((): Point => {
+    const { min, max } = bendMovement;
+
     return [
-      getValueFromRatio(bendValue, minPoint.x, maxPoint.x),
-      getValueFromRatio(bendValue, minPoint.y, maxPoint.y),
+      getValueFromRatio(bendValue, min.x, max.x),
+      getValueFromRatio(bendValue, min.y, max.y),
     ];
-  }, [bendValue, minPoint, maxPoint]);
+  }, [bendValue, bendMovement]);
 
-  const flattenedPoints = useMemo(() => points.flat(), [points]);
+  const pointsWithControl = [start, control, end];
 
-  const handleDragStart = useCallback(() => {
-    setDragging(true);
-  }, []);
+  const shouldTransformerRender = useMemo(() => {
+    return selected && node.nodeProps.visible;
+  }, [selected, node.nodeProps.visible]);
+
+  useEffect(() => {
+    setPoints([
+      node.nodeProps.point,
+      ...(node.nodeProps?.points || [node.nodeProps.point]),
+    ]);
+    setBendValue(node.nodeProps.bend ?? defaultBend);
+  }, [node.nodeProps.point, node.nodeProps.points, node.nodeProps.bend]);
 
   const handleDragEnd = useCallback(
     (event: Konva.KonvaEventObject<DragEvent>) => {
@@ -91,8 +90,6 @@ const ArrowDrawable = ({
       });
 
       group.position({ x: 0, y: 0 });
-
-      setDragging(false);
     },
     [node, points, onNodeChange],
   );
@@ -104,7 +101,7 @@ const ArrowDrawable = ({
   }, [node.style.animated, animation]);
 
   const handleTransform = useCallback(
-    (updatedPoints: Point[], bend: NodeProps['bend']) => {
+    (updatedPoints: Point[], bend?: NodeProps['bend']) => {
       setPoints(updatedPoints);
       setBendValue(bend ?? bendValue);
 
@@ -121,8 +118,6 @@ const ArrowDrawable = ({
   );
 
   const handleTransformEnd = useCallback(() => {
-    setPoints(points);
-
     onNodeChange({
       ...node,
       nodeProps: {
@@ -138,92 +133,41 @@ const ArrowDrawable = ({
     }
   }, [node, bendValue, points, animation, onNodeChange]);
 
-  const shouldTransformerRender = useMemo(() => {
-    return selected && !dragging && node.nodeProps.visible;
-  }, [selected, dragging, node.nodeProps.visible]);
-
-  const drawArrowHead = useCallback(
-    (ctx: Konva.Context, shape: Konva.Shape) => {
-      const [controlX, controlY] = control;
-
-      const PI2 = Math.PI * 2;
-      const dx = end[0] - controlX;
-      const dy = end[1] - controlY;
-
-      const radians = (Math.atan2(dy, dx) + PI2) % PI2;
-      const length = (ARROW.HEAD_LENGTH / stageScale) * config.strokeWidth;
-      const width = (ARROW.HEAD_WIDTH / stageScale) * config.strokeWidth;
-
-      ctx.save();
-
-      ctx.beginPath();
-      ctx.rotate(radians);
-
-      ctx.moveTo(0, 0);
-      ctx.lineTo(-length, width / 2);
-
-      ctx.moveTo(0, 0);
-      ctx.lineTo(-length, -width / 2);
-
-      ctx.restore();
-      ctx.fillStrokeShape(shape);
-    },
-    [control, end, config.strokeWidth, stageScale],
-  );
-
-  const drawArrowLine = useCallback(
-    (ctx: Konva.Context, shape: Konva.Shape) => {
-      const [controlX, controlY] = control;
-
-      ctx.beginPath();
-      ctx.moveTo(start[0], start[1]);
-
-      ctx.quadraticCurveTo(controlX, controlY, end[0], end[1]);
-
-      ctx.fillStrokeShape(shape);
-    },
-    [end, control, start],
-  );
-
   return (
-    <>
-      <Group
-        id={node.nodeProps.id}
-        visible={node.nodeProps.visible}
-        opacity={node.style.opacity}
-        draggable={config.draggable}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <Shape
-          {...config}
-          draggable={false}
-          x={end[0]}
-          y={end[1]}
-          dash={[]}
-          sceneFunc={drawArrowHead}
-        />
-        <Line
-          ref={lineRef}
-          {...config}
-          draggable={false}
-          points={flattenedPoints}
-          sceneFunc={drawArrowLine}
-        />
-      </Group>
+    <Group
+      id={node.nodeProps.id}
+      visible={node.nodeProps.visible}
+      opacity={node.style.opacity}
+      draggable={config.draggable}
+      onDragEnd={handleDragEnd}
+    >
+      <Shape
+        {...config}
+        draggable={false}
+        points={pointsWithControl}
+        dash={undefined}
+        sceneFunc={drawArrowHead}
+      />
+      <Line
+        ref={lineRef}
+        {...config}
+        draggable={false}
+        points={pointsWithControl.flat()}
+        sceneFunc={drawArrowLine}
+      />
       {shouldTransformerRender && (
         <ArrowTransformer
           start={start}
           end={end}
           bendPoint={control}
-          bendMovement={{ min: minPoint, max: maxPoint }}
+          bendMovement={bendMovement}
           stageScale={stageScale}
           onTranformStart={handleTransformStart}
           onTransform={handleTransform}
           onTransformEnd={handleTransformEnd}
         />
       )}
-    </>
+    </Group>
   );
 };
 

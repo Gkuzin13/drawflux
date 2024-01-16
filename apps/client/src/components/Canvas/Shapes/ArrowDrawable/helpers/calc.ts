@@ -4,6 +4,14 @@ export function calculateMidPointAndPerp(start: Point, end: Point) {
   const dx = end[0] - start[0];
   const dy = end[1] - start[1];
 
+  if (dx === 0 && dy === 0) {
+    return {
+      length: 0,
+      mid: { x: start[0], y: start[1] },
+      perp: { x: start[0], y: start[1] },
+    };
+  }
+
   const length = Math.sqrt(dx ** 2 + dy ** 2);
 
   const mid = {
@@ -24,17 +32,17 @@ export function calculateMinMaxMovementPoints(start: Point, end: Point) {
 
   const maxDist = length / 2;
 
-  const minPoint = {
+  const min = {
     x: mid.x - perp.x * maxDist,
     y: mid.y - perp.y * maxDist,
   };
 
-  const maxPoint = {
+  const max = {
     x: mid.x + perp.x * maxDist,
     y: mid.y + perp.y * maxDist,
   };
 
-  return { minPoint, maxPoint };
+  return { min, max };
 }
 
 export function calculateClampedMidPoint(

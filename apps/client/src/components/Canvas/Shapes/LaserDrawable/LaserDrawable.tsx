@@ -76,7 +76,6 @@ const LaserDrawable = ({
         if (!path.length) return;
 
         const startPoint = path[0];
-
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.strokeStyle = LASER.COLOR;
@@ -87,6 +86,7 @@ const LaserDrawable = ({
         for (const [pointIndex, point] of path.entries()) {
           const prevPoint = path[pointIndex - 1] ?? point;
           const controlPoint = calculateCurveControlPoint(prevPoint, point);
+          const pointIndexRatio = pointIndex / path.length;
 
           ctx.quadraticCurveTo(
             prevPoint[0],
@@ -95,8 +95,8 @@ const LaserDrawable = ({
             controlPoint[1],
           );
 
-          ctx.lineWidth =
-            ((1 - pointIndex / path.length) * LASER.WIDTH) / stageScale;
+          ctx.globalAlpha = 1 - pointIndexRatio;
+          ctx.lineWidth = ((1 - pointIndexRatio) * LASER.WIDTH) / stageScale;
 
           ctx.stroke();
         }

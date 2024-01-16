@@ -1,11 +1,10 @@
-import { forwardRef, useCallback } from 'react';
+import { forwardRef } from 'react';
 import { Transformer } from 'react-konva';
 import { TRANSFORMER } from '@/constants/shape';
 import { normalizeTransformerSize } from './helpers/size';
 import useDefaultThemeColors from '@/hooks/useThemeColors';
 import type { KonvaNodeEvents } from 'react-konva';
 import type Konva from 'konva';
-import type { KonvaEventObject } from 'konva/lib/Node';
 import type { TransformerConfig } from 'konva/lib/shapes/Transformer';
 
 export type TransformerProps = React.PropsWithRef<{
@@ -19,17 +18,6 @@ type Ref = Konva.Transformer;
 const NodeTransformer = forwardRef<Ref, TransformerProps>(
   ({ transformerConfig, transformerEvents, stageScale }, ref) => {
     const themeColors = useDefaultThemeColors();
-
-    const handleDragStart = useCallback(
-      (event: KonvaEventObject<DragEvent>) => {
-        event.target.visible(false);
-      },
-      [],
-    );
-
-    const handleDragEnd = useCallback((event: KonvaEventObject<DragEvent>) => {
-      event.target.visible(true);
-    }, []);
 
     return (
       <Transformer
@@ -47,8 +35,6 @@ const NodeTransformer = forwardRef<Ref, TransformerProps>(
         ignoreStroke={true}
         shouldOverdrawWholeArea={true}
         boundBoxFunc={normalizeTransformerSize}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
         {...transformerConfig}
         {...transformerEvents}
       />
