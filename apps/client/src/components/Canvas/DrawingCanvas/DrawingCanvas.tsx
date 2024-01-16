@@ -73,18 +73,16 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
     const [drafts, setDrafts] = useDrafts();
 
-    const [drawingPosition, setDrawingPosition] = useRefValue(
-      initialDrawingPosition,
-    );
-
-    const layerRef = useRef<Konva.Layer>(null);
-
     const stageConfig = useAppSelector(selectConfig);
     const toolType = useAppSelector(selectToolType);
     const storedSelectedNodeIds = useAppSelector(selectSelectedNodeIds);
     const thisUser = useAppSelector(selectThisUser);
     const ws = useWebSocket();
 
+    const [drawingPosition, setDrawingPosition] = useRefValue(
+      initialDrawingPosition,
+    );
+    const layerRef = useRef<Konva.Layer>(null);
     const selectRectRef = useRef<Konva.Rect>(null);
 
     const dispatch = useAppDispatch();
@@ -213,10 +211,10 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
     const handleDraftFinish = useCallback(
       (node: NodeObject) => {
-        const isNodeSavable = node.type !== 'laser';
-        const shouldKeepDraft = node.type === 'laser';
-        const shouldResetToolType =
-          node.type !== 'draw' && node.type !== 'laser';
+        const isLaserType = node.type === 'laser';
+        const isNodeSavable = !isLaserType;
+        const shouldKeepDraft = isLaserType;
+        const shouldResetToolType = node.type !== 'draw' && !isLaserType;
 
         setDrafts({
           type: 'finish',
@@ -229,11 +227,13 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           dispatch(canvasActions.setToolType('select'));
         }
 
+        if (!isLaserType) {
+          dispatch(canvasActions.setSelectedNodeIds([node.nodeProps.id]));
+        }
+
         if (!isValidNode(node)) {
           return;
         }
-
-        dispatch(canvasActions.setSelectedNodeIds([node.nodeProps.id]));
 
         if (isNodeSavable) {
           dispatch(canvasActions.addNodes([node]));
@@ -370,12 +370,8 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         setDrawing(false);
 
         if (isSelecting) {
-          const layer = getMainLayer(stage);
-          const children = getLayerNodes(layer);
-          const pointerPosition = getRelativePointerPosition(stage);
-
-          handleSelectDraw(children, pointerPosition);
-          return dispatch(canvasActions.setSelectedNodeIds(selectedNodeIds));
+          dispatch(canvasActions.setSelectedNodeIds(selectedNodeIds));
+          return;
         }
 
         const draft = drafts.find(
@@ -388,12 +384,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       },
       [
         isSelecting,
-        drafts,
         selectedNodeIds,
+        drafts,
         editingNodeId,
         dispatch,
         handleDraftFinish,
-        handleSelectDraw,
       ],
     );
 
