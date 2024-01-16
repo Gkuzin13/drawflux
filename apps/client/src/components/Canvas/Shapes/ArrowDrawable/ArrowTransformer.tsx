@@ -63,6 +63,8 @@ const Anchor = ({
 
   const handleMouseEnter = useCallback(
     (event: Konva.KonvaEventObject<MouseEvent>) => {
+      event.cancelBubble = true;
+
       const circle = event.target as Konva.Circle;
 
       circle.strokeWidth(ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH_HOVER);
@@ -73,6 +75,8 @@ const Anchor = ({
 
   const handleMouseLeave = useCallback(
     (event: Konva.KonvaEventObject<MouseEvent>) => {
+      event.cancelBubble = true;
+
       const circle = event.target as Konva.Circle;
 
       circle.strokeWidth(ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH);
