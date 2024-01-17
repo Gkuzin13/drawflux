@@ -19,11 +19,13 @@ export const ARROW_TRANSFORMER = {
   ANCHOR_STROKE_WIDTH_HOVER: 11,
   HIT_STROKE_WIDTH: 16,
   STROKE: colors.green300,
-};
+  TYPE: 'arrow-transformer',
+} as const;
 
 export const ARROW = {
   HEAD_WIDTH: 6,
   HEAD_LENGTH: 6,
+  DEFAULT_BEND: 0.5,
 };
 
 export const FREE_PATH = {

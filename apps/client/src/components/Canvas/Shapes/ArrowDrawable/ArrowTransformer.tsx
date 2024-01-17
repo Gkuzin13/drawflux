@@ -49,7 +49,7 @@ const getBendValue = (dragPosition: Point, bendMovement: BendMovement) => {
   return +((bendX + bendY) / 2).toFixed(2);
 };
 
-const controlIndex = 2;
+const bendPointIndex = 2;
 
 const Anchor = ({
   x,
@@ -96,6 +96,7 @@ const Anchor = ({
       strokeWidth={ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH}
       hitStrokeWidth={ARROW_TRANSFORMER.HIT_STROKE_WIDTH}
       radius={ARROW_TRANSFORMER.RADIUS}
+      type={ARROW_TRANSFORMER.TYPE}
       fillAfterStrokeEnabled={true}
       draggable={true}
       perfectDrawEnabled={false}
@@ -124,30 +125,21 @@ const ArrowTransformer = ({
   const normalizedScale = 1 / stageScale;
 
   useEffect(() => {
-    if (transformerRef.current) {
-      transformerRef.current.moveToTop();
-    }
+    transformerRef.current?.moveToTop();
   }, []);
 
-  const handleAnchorDragStart = useCallback(
-    (event: Konva.KonvaEventObject<DragEvent>) => {
-      event.cancelBubble = true;
-
-      onTranformStart();
-    },
-    [onTranformStart],
-  );
+  const handleAnchorDragStart = useCallback(() => {
+    onTranformStart();
+  }, [onTranformStart]);
 
   const handleAnchorDragMove = useCallback(
     (event: Konva.KonvaEventObject<DragEvent>) => {
-      event.cancelBubble = true;
-
       const node = event.target as Konva.Circle;
       const stage = node.getStage() as Konva.Stage;
 
       const { x, y } = node.getAbsolutePosition(stage);
 
-      if (node.index === controlIndex) {
+      if (node.index === bendPointIndex) {
         const { x: clampedX, y: clampedY } = calculateClampedMidPoint(
           [x, y],
           start,
@@ -173,11 +165,7 @@ const ArrowTransformer = ({
   );
 
   const handleAnchorDragEnd = useCallback(
-    (event: Konva.KonvaEventObject<DragEvent>) => {
-      event.cancelBubble = true;
-
-      onTransformEnd();
-    },
+    () => onTransformEnd(),
     [onTransformEnd],
   );
 
