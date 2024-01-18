@@ -127,6 +127,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
 
             if (project) {
               dispatch(canvasActions.set(project));
+              setCursorByToolType(Konva.stages[0], project.toolType);
             } else {
               modal.open({
                 title: 'Error',
