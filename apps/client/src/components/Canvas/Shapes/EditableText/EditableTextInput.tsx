@@ -89,11 +89,7 @@ const EditableTextInput = ({
 
     const newTextValue = ref.current.value;
 
-    if (event.key === KEYS.ESCAPE) {
-      handleTextChange(newTextValue);
-    }
-
-    if (event.key === KEYS.ENTER && event.ctrlKey) {
+    if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
       handleTextChange(newTextValue);
     }
   };

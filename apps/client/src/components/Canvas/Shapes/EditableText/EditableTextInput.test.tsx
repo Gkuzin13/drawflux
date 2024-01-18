@@ -76,7 +76,7 @@ describe('EditableTextInput', () => {
     });
   });
 
-  it('calls onChange when user presses CTRL + Escape', async () => {
+  it('calls onChange when user presses Enter', async () => {
     const onChange = vi.fn();
 
     const { user } = renderWithProviders(
@@ -86,7 +86,7 @@ describe('EditableTextInput', () => {
             node={node}
             initialValue={initialValue}
             onChange={onChange}
-            onUpdate={vi.fn}
+            onUpdate={() => vi.fn()}
           />
         </Layer>
       </Stage>,
@@ -94,7 +94,7 @@ describe('EditableTextInput', () => {
 
     const textArea = screen.getByTestId(/editable-text-input/);
 
-    await user.keyboard('{Control>}{Enter}');
+    await user.keyboard('{Enter}');
 
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenCalledWith({
