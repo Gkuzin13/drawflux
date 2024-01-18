@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Circle, Group } from 'react-konva';
 import { getRatioFromValue } from '@/utils/math';
-import { calculateClampedMidPoint } from './helpers/calc';
+import { calculateClampedMidPoint } from './helpers';
 import { ARROW_TRANSFORMER } from '@/constants/shape';
 import useDefaultThemeColors from '@/hooks/useThemeColors';
 import { hexToRGBa } from '@/utils/string';
@@ -174,10 +174,9 @@ const ArrowTransformer = ({
     [start, end, bendMovement, onTransform],
   );
 
-  const handleAnchorDragEnd = useCallback(
-    () => onTransformEnd(),
-    [onTransformEnd],
-  );
+  const handleAnchorDragEnd = useCallback(() => {
+    onTransformEnd();
+  }, [onTransformEnd]);
 
   return (
     <Group ref={transformerRef}>

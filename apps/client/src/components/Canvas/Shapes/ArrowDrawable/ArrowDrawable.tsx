@@ -2,13 +2,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Group, Line, Shape } from 'react-konva';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
+import ArrowTransformer from './ArrowTransformer';
 import { calculateLengthFromPoints, getValueFromRatio } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
-import ArrowTransformer from './ArrowTransformer';
-import { calculateMinMaxMovementPoints } from './helpers/calc';
-import { drawArrowHead, drawArrowLine } from './helpers/draw';
-import { ARROW } from '@/constants/shape';
+import {
+  calculateMinMaxMovementPoints,
+  drawArrowHead,
+  drawArrowLine,
+  getBendValue,
+  getPoints,
+} from './helpers';
 import type Konva from 'konva';
 import type { Point, NodeProps } from 'shared';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
@@ -19,13 +23,8 @@ const ArrowDrawable = ({
   stageScale,
   onNodeChange,
 }: NodeComponentProps<'arrow'>) => {
-  const [points, setPoints] = useState([
-    node.nodeProps.point,
-    ...(node.nodeProps?.points || [node.nodeProps.point]),
-  ]);
-  const [bendValue, setBendValue] = useState(
-    node.nodeProps.bend ?? ARROW.DEFAULT_BEND,
-  );
+  const [points, setPoints] = useState(getPoints(node));
+  const [bendValue, setBendValue] = useState(getBendValue(node));
   const [dragging, setDragging] = useState(false);
 
   const { config } = useNode(node, stageScale);
@@ -60,11 +59,9 @@ const ArrowDrawable = ({
   }, [selected, node.nodeProps.visible, dragging]);
 
   useEffect(() => {
-    setPoints([
-      node.nodeProps.point,
-      ...(node.nodeProps?.points || [node.nodeProps.point]),
-    ]);
-  }, [node.nodeProps.point, node.nodeProps.points, node.nodeProps.bend]);
+    setPoints(getPoints(node));
+    setBendValue(getBendValue(node));
+  }, [node]);
 
   const handleDragStart = useCallback(() => setDragging(true), []);
 
@@ -106,10 +103,13 @@ const ArrowDrawable = ({
   const handleTransform = useCallback(
     (updatedPoints: Point[], bend?: NodeProps['bend']) => {
       setPoints(updatedPoints);
-      setBendValue(bend ?? bendValue);
+
+      if (bend) {
+        setBendValue(bend);
+      }
 
       const lineLength = calculateLengthFromPoints(updatedPoints);
-      
+
       const dash = getDashValue(
         lineLength,
         getSizeValue(node.style.size),
@@ -118,7 +118,7 @@ const ArrowDrawable = ({
 
       lineRef.current?.dash(dash.map((d) => d * stageScale));
     },
-    [bendValue, node.style.line, node.style.size, stageScale],
+    [node.style.line, node.style.size, stageScale],
   );
 
   const handleTransformEnd = useCallback(() => {

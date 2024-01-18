@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback } from 'react';
 import { Group } from 'react-konva';
 import Nodes from '../Node/Nodes';
 import useTransformer from '@/hooks/useTransformer';
@@ -22,86 +22,89 @@ const transformerConfig: Konva.TransformerConfig = {
 };
 
 function setSelectedNodesVisibility(
-  layer: Konva.Layer,
+  layer: Konva.Layer | null,
   selectedNodes: NodeObject[],
   visible: boolean,
 ) {
+  if (!layer) {
+    return;
+  }
+
   const nodesIds = new Set(mapNodesIds(selectedNodes));
 
   const selectedLayerNodes = layer.getChildren((child) =>
     nodesIds.has(child.id()),
   );
 
-  selectedLayerNodes.forEach((child) => child.visible(visible));
+  selectedLayerNodes.forEach((child) => {
+    child.visible(visible);
+    child.listening(visible);
+  });
 }
 
 const NodeGroupTransformer = ({ nodes, stageScale, onNodesChange }: Props) => {
-  const [isDragging, setIsDragging] = useState(false);
-
   const { transformerRef, nodeRef } = useTransformer<Konva.Group>([nodes]);
 
-  const handleDragStart = useCallback(() => {
-    const layer = nodeRef.current?.getLayer();
+  const handleDragStart = useCallback(
+    (event: Konva.KonvaEventObject<DragEvent>) => {
+      const group = event.target as Konva.Group;
 
-    if (!layer) return;
-
-    setIsDragging(true);
-
-    setSelectedNodesVisibility(layer, nodes, false);
-  }, [nodeRef, nodes]);
+      group.visible(true);
+      setSelectedNodesVisibility(group.getLayer(), nodes, false);
+    },
+    [nodes],
+  );
 
   const handleDragEnd = useCallback(
     (event: Konva.KonvaEventObject<DragEvent>) => {
       const group = event.target as Konva.Group;
-      const stage = group?.getStage();
-      const layer = group?.getLayer();
+      const stage = group.getStage();
 
-      if (!group || !layer || !stage) return;
+      if (!group || !stage) {
+        return;
+      }
 
-      const groupChildren = group.getChildren();
+      const childrenMap = new Map(
+        group.getChildren().map((child) => [child.id(), child]),
+      );
 
-      const nodesMap = new Map(nodes.map((node) => [node.nodeProps.id, node]));
+      const updatedNodes: NodeObject[] = nodes.map((node) => {
+        const nodeInGroup = childrenMap.get(node.nodeProps.id);
 
-      const updatedNodes = groupChildren
-        .map((child) => {
-          const node = nodesMap.get(child.id());
+        if (!nodeInGroup) return node;
 
-          if (!node) return;
+        if (node.nodeProps.points) {
+          const points = [node.nodeProps.point, ...node.nodeProps.points];
 
-          if (node.nodeProps.points) {
-            const points = [node.nodeProps.point, ...node.nodeProps.points];
-
-            const [firstPoint, ...restPoints] = getPointsAbsolutePosition(
-              points,
-              child,
-              stage,
-            );
-
-            return {
-              ...node,
-              nodeProps: {
-                ...node.nodeProps,
-                point: firstPoint,
-                points: restPoints,
-              },
-            };
-          }
-
-          const { x, y } = child.getAbsolutePosition(stage);
+          const [firstPoint, ...restPoints] = getPointsAbsolutePosition(
+            points,
+            nodeInGroup,
+            stage,
+          );
 
           return {
             ...node,
-            nodeProps: { ...node.nodeProps, point: [x, y] },
+            nodeProps: {
+              ...node.nodeProps,
+              point: firstPoint,
+              points: restPoints,
+            },
           };
-        })
-        .filter(Boolean) as NodeObject[];
+        }
+
+        const { x, y } = nodeInGroup.getAbsolutePosition(stage);
+
+        return {
+          ...node,
+          nodeProps: { ...node.nodeProps, point: [x, y] },
+        };
+      });
 
       onNodesChange(updatedNodes);
 
-      setSelectedNodesVisibility(layer, nodes, true);
+      setSelectedNodesVisibility(group.getLayer(), nodes, true);
 
-      setIsDragging(false);
-
+      group.visible(false);
       group.position({ x: 0, y: 0 });
     },
     [nodes, onNodesChange],
@@ -111,7 +114,7 @@ const NodeGroupTransformer = ({ nodes, stageScale, onNodesChange }: Props) => {
     <>
       <Group
         ref={nodeRef}
-        visible={isDragging}
+        visible={false}
         draggable={true}
         listening={false}
         onDragStart={handleDragStart}

@@ -1,10 +1,9 @@
-import type Konva from 'konva';
-import { type Transformer } from 'konva/lib/shapes/Transformer';
 import { useEffect, useRef } from 'react';
+import type Konva from 'konva';
 
 const useTransformer = <T extends Konva.Node>(deps: unknown[]) => {
   const nodeRef = useRef<T>(null);
-  const transformerRef = useRef<Transformer>(null);
+  const transformerRef = useRef<Konva.Transformer>(null);
 
   useEffect(() => {
     if (transformerRef.current && nodeRef.current) {
