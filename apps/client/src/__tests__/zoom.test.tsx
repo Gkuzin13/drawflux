@@ -1,15 +1,15 @@
 import App from '@/App';
-import { renderWithProviders } from '@/test/test-utils';
-import { fireEvent, screen } from '@testing-library/react';
+import { findCanvas, renderWithProviders } from '@/test/test-utils';
+import { fireEvent } from '@testing-library/react';
 
 describe('zoom', () => {
   describe('CTRL + Mousewheel', () => {
     it('zooms in', async () => {
       const { store } = renderWithProviders(<App />);
 
-      const container = await screen.findByRole('presentation');
+      const { canvas } = await findCanvas();
 
-      fireEvent.wheel(container, { deltaY: -100, ctrlKey: true });
+      fireEvent.wheel(canvas, { deltaY: -100, ctrlKey: true });
 
       const state = store.getState().canvas.present;
 
@@ -19,9 +19,9 @@ describe('zoom', () => {
     it('zooms out', async () => {
       const { store } = renderWithProviders(<App />);
 
-      const container = await screen.findByRole('presentation');
+      const { canvas } = await findCanvas();
 
-      fireEvent.wheel(container, { deltaY: 100, ctrlKey: true });
+      fireEvent.wheel(canvas, { deltaY: 100, ctrlKey: true });
 
       const state = store.getState().canvas.present;
 
