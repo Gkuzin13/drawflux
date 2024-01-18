@@ -4,7 +4,6 @@ import { stateGenerator } from '@/test/data-generators';
 import { renderWithProviders } from '@/test/test-utils';
 import { createNode } from '@/utils/node';
 import DrawingCanvas from './DrawingCanvas';
-import { noop } from '@/utils/is';
 import { getLayerNodes, getMainLayer } from './helpers/stage';
 
 /**
@@ -37,8 +36,9 @@ describe('DrawingCanvas', () => {
 
     renderWithProviders(
       <DrawingCanvas
-        size={{ width: window.innerWidth, height: window.innerHeight }}
-        onNodesSelect={noop}
+        width={window.innerWidth}
+        height={window.innerHeight}
+        onNodesSelect={() => vi.fn()}
       />,
       { preloadedState },
     );

@@ -57,17 +57,15 @@ const CollaborationLayer = lazy(
 );
 
 type Props = {
-  size: {
-    width: number;
-    height: number;
-  };
+  width: number;
+  height: number;
   onNodesSelect: (nodesIds: string[]) => void;
 };
 
 const initialDrawingPosition: DrawPosition = { start: [0, 0], current: [0, 0] };
 
 const DrawingCanvas = forwardRef<Konva.Stage, Props>(
-  ({ size, onNodesSelect }, forwardedRef) => {
+  ({ width, height, onNodesSelect }, forwardedRef) => {
     const [selectedNodeIds, setSelectedNodeIds] = useState<string[]>([]);
     const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
     const [drawing, setDrawing] = useState(false);
@@ -92,8 +90,8 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const dispatch = useAppDispatch();
 
     const stageRect = useMemo(() => {
-      return { ...size, ...stageConfig.position };
-    }, [stageConfig.position, size]);
+      return { width, height, ...stageConfig.position };
+    }, [stageConfig.position, width, height]);
 
     const isHandTool = toolType === 'hand';
     const isSelectTool = toolType === 'select';

@@ -284,7 +284,8 @@ const App = () => {
           <ContextMenu.Trigger>
             <DrawingCanvas
               ref={stageRef}
-              size={windowSize}
+              width={windowSize.width}
+              height={windowSize.height}
               onNodesSelect={setSelectedNodeIds}
             />
           </ContextMenu.Trigger>
