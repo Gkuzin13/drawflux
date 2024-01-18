@@ -5,6 +5,10 @@ import { calculateClampedMidPoint } from './helpers/calc';
 import { ARROW_TRANSFORMER } from '@/constants/shape';
 import useDefaultThemeColors from '@/hooks/useThemeColors';
 import { hexToRGBa } from '@/utils/string';
+import {
+  resetCursor,
+  setCursor,
+} from '@/components/Canvas/DrawingCanvas/helpers/cursor';
 import type { Point } from 'shared';
 import type Konva from 'konva';
 
@@ -65,10 +69,13 @@ const Anchor = ({
     (event: Konva.KonvaEventObject<MouseEvent>) => {
       event.cancelBubble = true;
 
+      const stage = event.target.getStage();
       const circle = event.target as Konva.Circle;
 
       circle.strokeWidth(ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH_HOVER);
       circle.stroke(hexToRGBa(ARROW_TRANSFORMER.STROKE, 0.75));
+
+      setCursor(stage, 'grab');
     },
     [],
   );
@@ -77,10 +84,13 @@ const Anchor = ({
     (event: Konva.KonvaEventObject<MouseEvent>) => {
       event.cancelBubble = true;
 
+      const stage = event.target.getStage();
       const circle = event.target as Konva.Circle;
 
       circle.strokeWidth(ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH);
       circle.stroke(ARROW_TRANSFORMER.STROKE);
+
+      resetCursor(stage);
     },
     [],
   );
@@ -96,7 +106,7 @@ const Anchor = ({
       strokeWidth={ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH}
       hitStrokeWidth={ARROW_TRANSFORMER.HIT_STROKE_WIDTH}
       radius={ARROW_TRANSFORMER.RADIUS}
-      type={ARROW_TRANSFORMER.TYPE}
+      name={ARROW_TRANSFORMER.ANCHOR_NAME}
       fillAfterStrokeEnabled={true}
       draggable={true}
       perfectDrawEnabled={false}

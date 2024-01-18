@@ -1,9 +1,7 @@
-import { CURSOR } from '@/constants/cursor';
 import { TRANSFORMER } from '@/constants/shape';
 import { Util } from 'konva/lib/Util';
 import type Konva from 'konva';
 import type { IRect, Vector2d } from 'konva/lib/types';
-import type { ToolType } from '@/constants/app';
 import type { Point } from 'shared';
 
 const POINTER_RECT_SIZE = 32;
@@ -53,23 +51,12 @@ export function getLayerNodes(
   return layer.getChildren((child) => Boolean(child.id()));
 }
 
-export function getCursorStyle(
-  toolType: ToolType,
-  dragging: boolean,
-  drawing: boolean,
-) {
-  switch (toolType) {
-    case 'hand':
-      return dragging ? CURSOR.GRABBING : CURSOR.GRAB;
-    case 'select':
-      return CURSOR.DEFAULT;
-    default:
-      return drawing ? CURSOR.CROSSHAIR : CURSOR.DEFAULT;
-  }
-}
-
 export function getMainLayer(stage: Konva.Stage) {
   return stage.getLayers()[0];
+}
+
+export function getCanvas(stage: Konva.Stage | null) {
+  return stage && getMainLayer(stage).getCanvas()._canvas;
 }
 
 export function getRelativePointerPosition(stage: Konva.Stage): Point {

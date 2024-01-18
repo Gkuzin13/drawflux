@@ -13,15 +13,21 @@ export type TransformerProps = React.PropsWithRef<{
   transformerEvents?: KonvaNodeEvents;
 }>;
 
-type Ref = Konva.Transformer;
-
-const NodeTransformer = forwardRef<Ref, TransformerProps>(
-  ({ transformerConfig, transformerEvents, stageScale }, ref) => {
+const NodeTransformer = forwardRef<Konva.Transformer, TransformerProps>(
+  ({ transformerConfig, transformerEvents, stageScale }, forwardedRef) => {
     const themeColors = useDefaultThemeColors();
+
+    const handleDragStart = (event: Konva.KonvaEventObject<DragEvent>) => {
+      event.target.visible(false);
+    };
+
+    const handleDragEnd = (event: Konva.KonvaEventObject<DragEvent>) => {
+      event.target.visible(true);
+    };
 
     return (
       <Transformer
-        ref={ref}
+        ref={forwardedRef}
         type={TRANSFORMER.TYPE}
         anchorFill={themeColors['canvas-bg'].value}
         anchorStroke={TRANSFORMER.BORDER_STROKE}
@@ -35,6 +41,9 @@ const NodeTransformer = forwardRef<Ref, TransformerProps>(
         ignoreStroke={true}
         shouldOverdrawWholeArea={true}
         boundBoxFunc={normalizeTransformerSize}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        rotateAnchorCursor="grab"
         {...transformerConfig}
         {...transformerEvents}
       />

@@ -19,7 +19,8 @@ export const ARROW_TRANSFORMER = {
   ANCHOR_STROKE_WIDTH_HOVER: 11,
   HIT_STROKE_WIDTH: 16,
   STROKE: colors.green300,
-  TYPE: 'arrow-transformer',
+  NAME: 'arrow-transformer',
+  ANCHOR_NAME: 'arrow-transformer-anchor',
 } as const;
 
 export const ARROW = {

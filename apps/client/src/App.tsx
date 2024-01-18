@@ -43,6 +43,7 @@ import {
   getPointerRect,
   haveIntersection,
 } from './components/Canvas/DrawingCanvas/helpers/stage';
+import { setCursorByToolType } from './components/Canvas/DrawingCanvas/helpers/cursor';
 import * as Styled from './App.styled';
 import type { Library, AppState } from '@/constants/app';
 import type { HistoryActionKey } from './stores/reducers/history';
@@ -142,8 +143,12 @@ const App = () => {
         return;
       }
 
-      const toolTypeObj = TOOLS.find((tool) => tool.key === lowerCaseKey);
-      toolTypeObj && dispatch(canvasActions.setToolType(toolTypeObj.value));
+      const toolByKey = TOOLS.find((tool) => tool.key === lowerCaseKey);
+
+      if (toolByKey) {
+        dispatch(canvasActions.setToolType(toolByKey.value));
+        setCursorByToolType(stageRef.current, toolByKey.value);
+      }
     },
     [ws, store, dispatch],
   );

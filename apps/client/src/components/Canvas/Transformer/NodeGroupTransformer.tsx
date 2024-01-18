@@ -6,7 +6,6 @@ import NodeTransformer from './NodeTransformer';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import { mapNodesIds } from '@/utils/node';
 import { noop } from '@/utils/is';
-import type { KonvaNodeEvents } from 'react-konva';
 import type Konva from 'konva';
 import type { NodeObject } from 'shared';
 
@@ -20,11 +19,6 @@ const transformerConfig: Konva.TransformerConfig = {
   enabledAnchors: [],
   rotateEnabled: false,
   resizeEnabled: false,
-};
-
-const transformerEvents: KonvaNodeEvents = {
-  onDragStart: noop,
-  onDragEnd: noop,
 };
 
 function setSelectedNodesVisibility(
@@ -135,7 +129,6 @@ const NodeGroupTransformer = ({ nodes, stageScale, onNodesChange }: Props) => {
         ref={transformerRef}
         stageScale={stageScale}
         transformerConfig={transformerConfig}
-        transformerEvents={transformerEvents}
       />
     </>
   );
