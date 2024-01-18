@@ -292,10 +292,15 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           setSelectedNodeIds([]);
           dispatch(canvasActions.setSelectedNodeIds([]));
         }
+
+        if(editingNodeId) {
+          setEditingNodeId(null);
+        }
       },
       [
         toolType,
         hasSelectedNodes,
+        editingNodeId,
         handleDraftCreate,
         setDrawingPosition,
         handleNodePress,
