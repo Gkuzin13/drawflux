@@ -2,17 +2,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Group, Line, Shape } from 'react-konva';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
+import ArrowTransformer from './ArrowTransformer';
 import { calculateLengthFromPoints, getValueFromRatio } from '@/utils/math';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
-import ArrowTransformer from './ArrowTransformer';
-import { calculateMinMaxMovementPoints } from './helpers/calc';
-import { drawArrowHead, drawArrowLine } from './helpers/draw';
+import {
+  calculateMinMaxMovementPoints,
+  drawArrowHead,
+  drawArrowLine,
+  getBendValue,
+  getPoints,
+} from './helpers';
 import type Konva from 'konva';
 import type { Point, NodeProps } from 'shared';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
-
-const defaultBend = 0.5;
 
 const ArrowDrawable = ({
   node,
@@ -20,13 +23,9 @@ const ArrowDrawable = ({
   stageScale,
   onNodeChange,
 }: NodeComponentProps<'arrow'>) => {
-  const [points, setPoints] = useState([
-    node.nodeProps.point,
-    ...(node.nodeProps?.points || [node.nodeProps.point]),
-  ]);
-  const [bendValue, setBendValue] = useState(
-    node.nodeProps.bend ?? defaultBend,
-  );
+  const [points, setPoints] = useState(getPoints(node));
+  const [bendValue, setBendValue] = useState(getBendValue(node));
+  const [dragging, setDragging] = useState(false);
 
   const { config } = useNode(node, stageScale);
 
@@ -56,16 +55,15 @@ const ArrowDrawable = ({
   const pointsWithControl = [start, control, end];
 
   const shouldTransformerRender = useMemo(() => {
-    return selected && node.nodeProps.visible;
-  }, [selected, node.nodeProps.visible]);
+    return selected && node.nodeProps.visible && !dragging;
+  }, [selected, node.nodeProps.visible, dragging]);
 
   useEffect(() => {
-    setPoints([
-      node.nodeProps.point,
-      ...(node.nodeProps?.points || [node.nodeProps.point]),
-    ]);
-    setBendValue(node.nodeProps.bend ?? defaultBend);
-  }, [node.nodeProps.point, node.nodeProps.points, node.nodeProps.bend]);
+    setPoints(getPoints(node));
+    setBendValue(getBendValue(node));
+  }, [node]);
+
+  const handleDragStart = useCallback(() => setDragging(true), []);
 
   const handleDragEnd = useCallback(
     (event: Konva.KonvaEventObject<DragEvent>) => {
@@ -89,6 +87,8 @@ const ArrowDrawable = ({
         },
       });
 
+      setDragging(false);
+
       group.position({ x: 0, y: 0 });
     },
     [node, points, onNodeChange],
@@ -103,9 +103,13 @@ const ArrowDrawable = ({
   const handleTransform = useCallback(
     (updatedPoints: Point[], bend?: NodeProps['bend']) => {
       setPoints(updatedPoints);
-      setBendValue(bend ?? bendValue);
+
+      if (bend) {
+        setBendValue(bend);
+      }
 
       const lineLength = calculateLengthFromPoints(updatedPoints);
+
       const dash = getDashValue(
         lineLength,
         getSizeValue(node.style.size),
@@ -114,7 +118,7 @@ const ArrowDrawable = ({
 
       lineRef.current?.dash(dash.map((d) => d * stageScale));
     },
-    [bendValue, node.style.line, node.style.size, stageScale],
+    [node.style.line, node.style.size, stageScale],
   );
 
   const handleTransformEnd = useCallback(() => {
@@ -134,27 +138,30 @@ const ArrowDrawable = ({
   }, [node, bendValue, points, animation, onNodeChange]);
 
   return (
-    <Group
-      id={node.nodeProps.id}
-      visible={node.nodeProps.visible}
-      opacity={node.style.opacity}
-      draggable={config.draggable}
-      onDragEnd={handleDragEnd}
-    >
-      <Shape
-        {...config}
-        draggable={false}
-        points={pointsWithControl}
-        dash={undefined}
-        sceneFunc={drawArrowHead}
-      />
-      <Line
-        ref={lineRef}
-        {...config}
-        draggable={false}
-        points={pointsWithControl.flat()}
-        sceneFunc={drawArrowLine}
-      />
+    <>
+      <Group
+        id={node.nodeProps.id}
+        visible={node.nodeProps.visible}
+        opacity={node.style.opacity}
+        draggable={config.draggable}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <Shape
+          {...config}
+          draggable={false}
+          points={pointsWithControl}
+          dashEnabled={false}
+          sceneFunc={drawArrowHead}
+        />
+        <Line
+          ref={lineRef}
+          {...config}
+          draggable={false}
+          points={pointsWithControl.flat()}
+          sceneFunc={drawArrowLine}
+        />
+      </Group>
       {shouldTransformerRender && (
         <ArrowTransformer
           start={start}
@@ -167,7 +174,7 @@ const ArrowDrawable = ({
           onTransformEnd={handleTransformEnd}
         />
       )}
-    </Group>
+    </>
   );
 };
 

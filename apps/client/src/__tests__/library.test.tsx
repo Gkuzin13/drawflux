@@ -1,6 +1,6 @@
 import App from '@/App';
 import { fireEvent, screen, within } from '@testing-library/react';
-import { renderWithProviders } from '@/test/test-utils';
+import { findCanvas, renderWithProviders } from '@/test/test-utils';
 import { libraryGenerator, stateGenerator } from '@/test/data-generators';
 import { createNode } from '@/utils/node';
 
@@ -17,8 +17,7 @@ describe('library', () => {
 
     const { user, store } = renderWithProviders(<App />, { preloadedState });
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     // open context menu
     fireEvent.contextMenu(canvas, { clientX: 50, clientY: 50 });
@@ -74,8 +73,7 @@ describe('library', () => {
 
     const { user, store } = renderWithProviders(<App />, { preloadedState });
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     const libraryTrigger = screen.getByText(/Library/i).closest('button');
 

@@ -21,7 +21,11 @@ import ZoomButtons from './ZoomButtons';
 import LibraryDrawer from '../Library/LibraryDrawer/LibraryDrawer';
 import HistoryButtons from './HistoryButtons';
 import DeleteButton from './DeleteButton';
-import { PROJECT_FILE_EXT, PROJECT_FILE_NAME, PROJECT_PNG_EXT } from '@/constants/app';
+import {
+  PROJECT_FILE_EXT,
+  PROJECT_FILE_NAME,
+  PROJECT_PNG_EXT,
+} from '@/constants/app';
 import { historyActions } from '@/stores/reducers/history';
 import { selectLibrary } from '@/services/library/slice';
 import { calculateCenterPoint } from '@/utils/position';
@@ -29,6 +33,7 @@ import { calculateStageZoomRelativeToPoint } from '../Canvas/DrawingCanvas/helpe
 import * as Styled from './Panels.styled';
 import Konva from 'konva';
 import { shallowEqual } from '@/utils/object';
+import { setCursorByToolType } from '../Canvas/DrawingCanvas/helpers/cursor';
 import type { NodeStyle, User } from 'shared';
 import type {
   HistoryControlKey,
@@ -72,6 +77,9 @@ const Panels = ({ selectedNodeIds }: Props) => {
   const handleToolSelect = useCallback(
     (type: ToolType) => {
       dispatch(canvasActions.setToolType(type));
+
+      const stage = Konva.stages[0];
+      setCursorByToolType(stage, type);
     },
     [dispatch],
   );
@@ -119,6 +127,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
 
             if (project) {
               dispatch(canvasActions.set(project));
+              setCursorByToolType(Konva.stages[0], project.toolType);
             } else {
               modal.open({
                 title: 'Error',

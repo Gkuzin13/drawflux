@@ -91,7 +91,8 @@ export function renderWithProviders(
 }
 
 export async function findCanvas() {
-  const container = await screen.findByRole('presentation');
+  const container = (await screen.findByRole('presentation'))
+    .parentElement as HTMLDivElement;
   const canvas = container.querySelector('canvas') as HTMLCanvasElement;
 
   return { container, canvas };

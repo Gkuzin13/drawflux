@@ -1,6 +1,6 @@
 import App from '@/App';
 import { screen, within } from '@testing-library/react';
-import { renderWithProviders } from '@/test/test-utils';
+import { findCanvas, renderWithProviders } from '@/test/test-utils';
 import { stateGenerator } from '@/test/data-generators';
 import { createNode } from '@/utils/node';
 
@@ -8,8 +8,7 @@ describe('context menu', () => {
   it('opens canvas context menu', async () => {
     const { user } = renderWithProviders(<App />);
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     await user.pointer({ keys: '[MouseRight]', target: canvas });
 
@@ -32,8 +31,7 @@ describe('context menu', () => {
 
     const { user } = renderWithProviders(<App />, { preloadedState });
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     await user.pointer({
       keys: '[MouseRight]',
@@ -67,8 +65,7 @@ describe('context menu', () => {
 
     const { user, store } = renderWithProviders(<App />, { preloadedState });
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     await user.pointer({
       keys: '[MouseRight]',

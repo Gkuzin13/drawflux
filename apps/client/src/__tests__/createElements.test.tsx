@@ -5,15 +5,14 @@
  */
 import { fireEvent, screen } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
-import { renderWithProviders } from '@/test/test-utils';
+import { findCanvas, renderWithProviders } from '@/test/test-utils';
 import App from '@/App';
 
 describe('select a tool and create an element', () => {
   it('rectangle', async () => {
     const { store } = renderWithProviders(<App />);
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     // select rectangle tool
     await act(async () => {
@@ -43,8 +42,7 @@ describe('select a tool and create an element', () => {
   it('ellipse', async () => {
     const { store } = renderWithProviders(<App />);
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     // select ellipse tool
     await act(async () => {
@@ -74,8 +72,7 @@ describe('select a tool and create an element', () => {
   it('arrow', async () => {
     const { store } = renderWithProviders(<App />);
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     // select arrow tool
     await act(async () => {
@@ -104,8 +101,7 @@ describe('select a tool and create an element', () => {
   it('draw', async () => {
     const { store } = renderWithProviders(<App />);
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     // select draw tool
     await act(async () => {
@@ -134,8 +130,7 @@ describe('select a tool and create an element', () => {
   it('text', async () => {
     const { store, user } = renderWithProviders(<App />);
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     // select text tool
     await act(async () => {
@@ -148,6 +143,9 @@ describe('select a tool and create an element', () => {
 
     // stop at last position
     fireEvent.pointerUp(canvas);
+
+    // should reset tool type
+    expect(store.getState().canvas.present.toolType).toBe('select');
 
     // type 'Hello World!' and press Escape
     await user.type(
@@ -167,8 +165,7 @@ describe('select a tool and create an element', () => {
   it('laser', async () => {
     const { store } = renderWithProviders(<App />);
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     // select laser tool
     await act(async () => {
@@ -195,8 +192,7 @@ describe('double click on canvas and create an element', () => {
   it('text', async () => {
     const { store, user } = renderWithProviders(<App />);
 
-    const container = await screen.findByRole('presentation');
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement;
+    const { canvas } = await findCanvas();
 
     // double click at [10, 20]
     await user.pointer([
@@ -207,6 +203,9 @@ describe('double click on canvas and create an element', () => {
         coords: { clientX: 10, clientY: 20 },
       },
     ]);
+
+    // should reset tool type
+    expect(store.getState().canvas.present.toolType).toBe('select');
 
     // type 'Hello World!' and press Escape
     await user.type(
