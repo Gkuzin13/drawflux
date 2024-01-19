@@ -26,6 +26,7 @@ import {
   PROJECT_FILE_NAME,
   PROJECT_PNG_EXT,
 } from '@/constants/app';
+import { DRAWING_CANVAS } from '@/constants/canvas';
 import { historyActions } from '@/stores/reducers/history';
 import { selectLibrary } from '@/services/library/slice';
 import { calculateCenterPoint } from '@/utils/position';
@@ -34,6 +35,7 @@ import * as Styled from './Panels.styled';
 import Konva from 'konva';
 import { shallowEqual } from '@/utils/object';
 import { setCursorByToolType } from '../Canvas/DrawingCanvas/helpers/cursor';
+import { findStageByName } from '@/utils/node';
 import type { NodeStyle, User } from 'shared';
 import type {
   HistoryControlKey,
@@ -102,7 +104,8 @@ const Panels = ({ selectedNodeIds }: Props) => {
     (type: MenuPanelActionType) => {
       switch (type) {
         case 'export-as-image': {
-          const dataUrl = Konva.stages[0].toDataURL();
+          const stage = findStageByName(DRAWING_CANVAS.NAME);
+          const dataUrl = stage?.toDataURL();
 
           if (dataUrl) {
             downloadDataUrlAsFile(dataUrl, PROJECT_FILE_NAME, PROJECT_PNG_EXT);
@@ -127,7 +130,10 @@ const Panels = ({ selectedNodeIds }: Props) => {
 
             if (project) {
               dispatch(canvasActions.set(project));
-              setCursorByToolType(Konva.stages[0], project.toolType);
+
+              const stage = findStageByName(DRAWING_CANVAS.NAME);
+
+              setCursorByToolType(stage, project.toolType);
             } else {
               modal.open({
                 title: 'Error',

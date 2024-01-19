@@ -1,6 +1,6 @@
 import { memo } from 'react';
-import NodeDraft from './NodeDraft';
-import type { NodeComponentProps } from './Node';
+import NodeDraft from '../Node/NodeDraft';
+import type { NodeComponentProps } from '../Node/Node';
 import type { Draft } from '@/hooks/useDrafts';
 
 type Props = {

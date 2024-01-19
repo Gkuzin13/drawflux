@@ -3,7 +3,7 @@ import { drawRectangle } from '@/utils/draw';
 import { SELECT_RECT } from '@/constants/shape';
 import { baseConfig } from '@/hooks/useNode/useNode';
 import { forwardRef } from 'react';
-import type { DrawPosition } from './DrawingCanvas/helpers/draw';
+import type { DrawPosition } from './helpers/draw';
 import type Konva from 'konva';
 
 export type Props = {

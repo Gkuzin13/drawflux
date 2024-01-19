@@ -1,15 +1,12 @@
-import React, {
+import {
   forwardRef,
   useState,
   useCallback,
   useRef,
-  lazy,
-  Suspense,
-  useMemo,
   useEffect,
   memo,
 } from 'react';
-import { Layer, Stage } from 'react-konva';
+import { Layer } from 'react-konva';
 import { useWebSocket } from '@/contexts/websocket';
 import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import {
@@ -24,7 +21,6 @@ import {
   duplicateNodesAtPosition,
   isValidNode,
 } from '@/utils/node';
-import BackgroundLayer from './BackgroundLayer';
 import {
   getCanvas,
   getIntersectingNodes,
@@ -38,23 +34,22 @@ import { calculateStageZoomRelativeToPoint } from './helpers/zoom';
 import useThrottledFn from '@/hooks/useThrottledFn';
 import useDrafts from '@/hooks/useDrafts';
 import useEvent from '@/hooks/useEvent/useEvent';
-import NodesLayer from './NodesLayer';
-import SelectRect from '../SelectRect';
-import Drafts from '../Node/Drafts';
+import Nodes from './Nodes';
+import CanvasBackground from './CanvasBackground';
+import SelectRect from './SelectRect';
+import Drafts from './Drafts';
 import useSharedRef from '@/hooks/useSharedRef';
 import { resetCursor, setCursor, setCursorByToolType } from './helpers/cursor';
 import { ARROW_TRANSFORMER, TEXT } from '@/constants/shape';
 import { safeJSONParse } from '@/utils/object';
 import { LIBRARY } from '@/constants/panels';
+import { DRAWING_CANVAS } from '@/constants/canvas';
+import * as Styled from './DrawingCanvas.styled';
 import type { DrawPosition } from './helpers/draw';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { NodeObject, NodeType, Point } from 'shared';
 import type { LibraryItem } from '@/constants/app';
-
-const CollaborationLayer = lazy(
-  () => import('@/components/Canvas/DrawingCanvas/CollaborationLayer'),
-);
 
 type Props = {
   width: number;
@@ -89,16 +84,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
     const dispatch = useAppDispatch();
 
-    const stageRect = useMemo(() => {
-      return { width, height, ...stageConfig.position };
-    }, [stageConfig.position, width, height]);
-
     const isHandTool = toolType === 'hand';
     const isSelectTool = toolType === 'select';
     const isSelecting = drawing && isSelectTool;
     const isLayerListening = !isHandTool && !drawing && isSelectTool;
     const hasSelectedNodes = selectedNodeIds.length > 0;
-    const hasDrafts = drafts.length > 0;
 
     /**
      * syncs with store state when selected nodes change
@@ -116,6 +106,56 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       const { toolType } = store.getState().canvas.present;
       setCursorByToolType(stageRef.current, toolType);
     }, [store]);
+
+    const handleDrop = useCallback(
+      (event: DragEvent) => {
+        event.preventDefault();
+
+        if (!event.dataTransfer || !stageRef.current) return;
+
+        const stage = stageRef.current;
+        const position = getUnregisteredPointerPosition(event, stage);
+
+        const dataJSON = event.dataTransfer.getData(LIBRARY.dataTransferFormat);
+        const libraryItem = safeJSONParse<LibraryItem>(dataJSON);
+
+        if (libraryItem) {
+          const duplicatedNodes = duplicateNodesAtPosition(
+            libraryItem.elements,
+            position,
+          );
+
+          dispatch(
+            canvasActions.addNodes(duplicatedNodes, { selectNodes: true }),
+          );
+          dispatch(canvasActions.setToolType('select'));
+        }
+      },
+      [dispatch],
+    );
+
+    useEvent('drop', handleDrop, getCanvas(stageRef.current));
+
+    const handleDragOver = useCallback(
+      (event: DragEvent) => {
+        event.preventDefault();
+
+        if (!stageRef.current) return;
+
+        const stage = stageRef.current;
+        const position = getUnregisteredPointerPosition(event, stage);
+
+        if (ws.isConnected && thisUser) {
+          ws.send(
+            { type: 'user-move', data: { id: thisUser.id, position } },
+            true,
+          );
+        }
+      },
+      [ws, thisUser],
+    );
+
+    useEvent('dragover', handleDragOver, getCanvas(stageRef.current));
 
     const throttledOnNodesSelect = useThrottledFn(onNodesSelect);
 
@@ -231,7 +271,11 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         }
 
         if (isNodeSavable) {
-          dispatch(canvasActions.addNodes([node], { selectNodes: true }));
+          dispatch(
+            canvasActions.addNodes([node], {
+              selectNodes: shouldResetToolType,
+            }),
+          );
         }
 
         if (ws.isConnected && thisUser) {
@@ -293,7 +337,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           dispatch(canvasActions.setSelectedNodeIds([]));
         }
 
-        if(editingNodeId) {
+        if (editingNodeId) {
           setEditingNodeId(null);
         }
       },
@@ -546,63 +590,17 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [ws],
     );
 
-    const handleDrop = useCallback(
-      (event: DragEvent) => {
-        event.preventDefault();
-
-        if (!event.dataTransfer || !stageRef.current) return;
-
-        const stage = stageRef.current;
-        const position = getUnregisteredPointerPosition(event, stage);
-
-        const dataJSON = event.dataTransfer.getData(LIBRARY.dataTransferFormat);
-        const libraryItem = safeJSONParse<LibraryItem>(dataJSON);
-
-        if (libraryItem) {
-          const duplicatedNodes = duplicateNodesAtPosition(
-            libraryItem.elements,
-            position,
-          );
-
-          dispatch(
-            canvasActions.addNodes(duplicatedNodes, { selectNodes: true }),
-          );
-          dispatch(canvasActions.setToolType('select'));
-        }
-      },
-      [dispatch],
-    );
-
-    const handleDragOver = useCallback(
-      (event: DragEvent) => {
-        event.preventDefault();
-
-        if (!stageRef.current) return;
-
-        const stage = stageRef.current;
-        const position = getUnregisteredPointerPosition(event, stage);
-
-        if (ws.isConnected && thisUser) {
-          ws.send(
-            { type: 'user-move', data: { id: thisUser.id, position } },
-            true,
-          );
-        }
-      },
-      [ws, thisUser],
-    );
-
-    useEvent('drop', handleDrop, getCanvas(stageRef.current));
-    useEvent('dragover', handleDragOver, getCanvas(stageRef.current));
-
     return (
-      <Stage
+      <Styled.Stage
         ref={sharedStageRef}
         tabIndex={0}
-        {...stageRect}
+        name={DRAWING_CANVAS.NAME}
+        x={stageConfig.position.x}
+        y={stageConfig.position.y}
+        width={width}
+        height={height}
         scaleX={stageConfig.scale}
         scaleY={stageConfig.scale}
-        style={{ touchAction: 'none' }}
         draggable={isHandTool}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -616,29 +614,28 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         onDblTap={handleDoublePress}
       >
         <Layer listening={isLayerListening}>
-          <BackgroundLayer rect={stageRect} scale={stageConfig.scale} />
-          <NodesLayer
+          <CanvasBackground
+            x={stageConfig.position.x}
+            y={stageConfig.position.y}
+            width={width}
+            height={height}
+            stageScale={stageConfig.scale}
+          />
+          <Nodes
             selectedNodeIds={isSelectTool ? selectedNodeIds : []}
             editingNodeId={isSelectTool ? editingNodeId : null}
             stageScale={stageConfig.scale}
             onNodesChange={handleNodesChange}
             onTextChange={handleNodeTextChange}
           />
-          {hasDrafts && (
-            <Drafts
-              drafts={drafts}
-              stageScale={stageConfig.scale}
-              editingNodeId={isSelectTool ? editingNodeId : null}
-              onNodeChange={handleDraftFinish}
-              onTextChange={handleDraftTextChange}
-              onNodeDelete={handleDraftDelete}
-            />
-          )}
-          {ws.isConnected && (
-            <Suspense>
-              <CollaborationLayer stageScale={stageConfig.scale} />
-            </Suspense>
-          )}
+          <Drafts
+            drafts={drafts}
+            stageScale={stageConfig.scale}
+            editingNodeId={isSelectTool ? editingNodeId : null}
+            onNodeChange={handleDraftFinish}
+            onTextChange={handleDraftTextChange}
+            onNodeDelete={handleDraftDelete}
+          />
           {isSelecting && (
             <SelectRect
               ref={selectRectRef}
@@ -646,7 +643,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
             />
           )}
         </Layer>
-      </Stage>
+      </Styled.Stage>
     );
   },
 );

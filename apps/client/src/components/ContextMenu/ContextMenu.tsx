@@ -28,7 +28,7 @@ const Trigger = ({ children }: TriggerProps) => {
   );
 };
 
-const Root = ({ menuType, onContextMenuOpen, children }: RootProps) => {
+const ContextMenu = ({ menuType, onContextMenuOpen, children }: RootProps) => {
   const dispatchMenuAction = useActionManager();
 
   const MenuComponent = menus[menuType];
@@ -45,7 +45,6 @@ const Root = ({ menuType, onContextMenuOpen, children }: RootProps) => {
   );
 };
 
-export default {
-  Root,
-  Trigger,
-};
+ContextMenu.Trigger = Trigger;
+
+export default ContextMenu;

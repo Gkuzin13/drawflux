@@ -4,7 +4,8 @@ import {
   getNodesMinMaxPoints,
   isNodeFullyInView,
 } from './position';
-import { DUPLICATION_GAP } from '@/constants/app';
+import { DUPLICATION_GAP } from '@/constants/canvas';
+import Konva from 'konva';
 import type { IRect, Vector2d } from 'konva/lib/types';
 import type { NodeType, Point, NodeObject, StageConfig } from 'shared';
 
@@ -216,4 +217,8 @@ export function isValidNode(node: NodeObject) {
   }
 
   return true;
+}
+
+export function findStageByName(name: string) {
+  return Konva.stages.find((stage) => stage.name() === name) ?? null;
 }

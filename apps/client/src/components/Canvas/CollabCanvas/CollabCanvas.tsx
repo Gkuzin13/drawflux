@@ -1,25 +1,31 @@
 import { memo, useCallback, useEffect, useState } from 'react';
+import { Layer } from 'react-konva';
 import { useWebSocket } from '@/contexts/websocket';
 import { useAppSelector } from '@/stores/hooks';
 import { selectCollaborators } from '@/services/collaboration/slice';
 import NodeDraft from '../Node/NodeDraft';
-import UserCursor from '../UserCursor';
+import UserCursor from './UserCursor';
 import useDrafts from '@/hooks/useDrafts';
 import useThemeColors from '@/hooks/useThemeColors';
+import { selectConfig } from '@/services/canvas/slice';
 import { noop } from '@/utils/is';
-import type { NodeObject, Point } from 'shared';
 import { getColorValue } from '@/utils/shape';
+import * as Styled from './CollabCanvas.styled';
+import type { NodeObject, Point } from 'shared';
+import { COLLAB_CANVAS } from '@/constants/canvas';
 
 type Props = {
-  stageScale: number;
+  width: number;
+  height: number;
 };
 
 type UserPosition = { [id: string]: Point };
 
-const CollaborationLayer = ({ stageScale }: Props) => {
+const CollaborationCanvas = ({ width, height }: Props) => {
   const [userPositions, setUserPositions] = useState<UserPosition>({});
   const [drafts, setDrafts] = useDrafts();
 
+  const stageConfig = useAppSelector(selectConfig);
   const collaborators = useAppSelector(selectCollaborators);
   const ws = useWebSocket();
 
@@ -83,35 +89,46 @@ const CollaborationLayer = ({ stageScale }: Props) => {
   );
 
   return (
-    <>
-      {drafts.map(({ node }) => {
-        return (
-          <NodeDraft
-            key={node.nodeProps.id}
-            node={node}
-            stageScale={stageScale}
-            onNodeChange={noop}
-            onNodeDelete={handleNodeDelete}
-          />
-        );
-      })}
-      {collaborators.map((user) => {
-        const position = userPositions[user.id];
+    <Styled.Stage
+      name={COLLAB_CANVAS.NAME}
+      x={stageConfig.position.x}
+      y={stageConfig.position.y}
+      width={width}
+      height={height}
+      scaleX={stageConfig.scale}
+      scaleY={stageConfig.scale}
+      listening={false}
+    >
+      <Layer listening={false}>
+        {drafts.map(({ node }) => {
+          return (
+            <NodeDraft
+              key={node.nodeProps.id}
+              node={node}
+              stageScale={stageConfig.scale}
+              onNodeChange={noop}
+              onNodeDelete={handleNodeDelete}
+            />
+          );
+        })}
+        {collaborators.map((user) => {
+          const position = userPositions[user.id];
 
-        if (!position) return null;
+          if (!position) return null;
 
-        return (
-          <UserCursor
-            key={user.id}
-            name={user.name}
-            color={getColorValue(user.color, themeColors)}
-            position={position}
-            stageScale={stageScale}
-          />
-        );
-      })}
-    </>
+          return (
+            <UserCursor
+              key={user.id}
+              name={user.name}
+              color={getColorValue(user.color, themeColors)}
+              position={position}
+              stageScale={stageConfig.scale}
+            />
+          );
+        })}
+      </Layer>
+    </Styled.Stage>
   );
 };
 
-export default memo(CollaborationLayer);
+export default memo(CollaborationCanvas);
