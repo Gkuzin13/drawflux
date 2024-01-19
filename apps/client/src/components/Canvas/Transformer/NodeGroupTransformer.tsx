@@ -1,8 +1,8 @@
 import { memo, useCallback } from 'react';
 import { Group } from 'react-konva';
-import Nodes from '../Node/Nodes';
 import useTransformer from '@/hooks/useTransformer';
 import NodeTransformer from './NodeTransformer';
+import Node from '../Node/Node';
 import { getPointsAbsolutePosition } from '@/utils/position';
 import { mapNodesIds } from '@/utils/node';
 import { noop } from '@/utils/is';
@@ -120,13 +120,17 @@ const NodeGroupTransformer = ({ nodes, stageScale, onNodesChange }: Props) => {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <Nodes
-          nodes={nodes}
-          selectedNodeId={null}
-          editingNodeId={null}
-          stageScale={stageScale}
-          onNodeChange={noop}
-        />
+        {nodes.map((node) => {
+          return (
+            <Node
+              key={node.nodeProps.id}
+              node={node}
+              selected={false}
+              stageScale={stageScale}
+              onNodeChange={noop}
+            />
+          );
+        })}
       </Group>
       <NodeTransformer
         ref={transformerRef}

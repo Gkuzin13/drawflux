@@ -1,18 +1,20 @@
 import { memo } from 'react';
 import { Rect } from 'react-konva';
 import { getNormalizedInvertedRect } from '@/utils/position';
-import type { IRect } from 'konva/lib/types';
 import useThemeColors from '@/hooks/useThemeColors';
+import type { IRect } from 'konva/lib/types';
 
 type Props = {
-  rect: IRect;
-  scale: number;
-};
+  stageScale: number;
+} & IRect;
 
-const Background = ({ scale, rect }: Props) => {
+const CanvasBackground = ({ x, y, width, height, stageScale }: Props) => {
   const themeColors = useThemeColors();
 
-  const normalizedRect = getNormalizedInvertedRect(rect, scale);
+  const normalizedRect = getNormalizedInvertedRect(
+    { x, y, width, height },
+    stageScale,
+  );
 
   return (
     <Rect
@@ -27,4 +29,4 @@ const Background = ({ scale, rect }: Props) => {
   );
 };
 
-export default memo(Background);
+export default memo(CanvasBackground);

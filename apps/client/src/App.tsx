@@ -17,6 +17,7 @@ import { useWebSocket } from './contexts/websocket';
 import { useNotifications } from './contexts/notifications';
 import { urlSearchParam } from './utils/url';
 import useWindowSize from './hooks/useWindowSize/useWindowSize';
+import useFontFaceObserver from './hooks/useFontFaceObserver';
 import useAutoFocus from './hooks/useAutoFocus/useAutoFocus';
 import {
   LOCAL_STORAGE_KEY,
@@ -24,6 +25,7 @@ import {
   BASE_WS_URL,
   BASE_WS_URL_DEV,
   IS_PROD,
+  LOADING_TEXT,
 } from '@/constants/app';
 import { CONSTANTS } from 'shared';
 import { TOOLS } from './constants/panels';
@@ -44,14 +46,18 @@ import {
   haveIntersection,
 } from './components/Canvas/DrawingCanvas/helpers/stage';
 import { setCursorByToolType } from './components/Canvas/DrawingCanvas/helpers/cursor';
+import { TEXT } from './constants/shape';
 import * as Styled from './App.styled';
 import type { Library, AppState } from '@/constants/app';
 import type { HistoryActionKey } from './stores/reducers/history';
 import type Konva from 'konva';
 import type { ContextMenuType } from './components/ContextMenu/ContextMenu';
 
+const CollabCanvas = lazy(
+  () => import('@/components/Canvas/CollabCanvas/CollabCanvas'),
+);
 const DrawingCanvas = lazy(
-  () => import('./components/Canvas/DrawingCanvas/DrawingCanvas'),
+  () => import('@/components/Canvas/DrawingCanvas/DrawingCanvas'),
 );
 
 const wsBaseUrl = IS_PROD ? BASE_WS_URL : BASE_WS_URL_DEV;
@@ -72,6 +78,12 @@ const App = () => {
   const roomId = useParam(CONSTANTS.COLLAB_ROOM_URL_PARAM);
   const windowSize = useWindowSize();
   const ws = useWebSocket();
+
+  /*
+   * Triggers re-render when font is loaded
+   * to make sure font is loaded before rendering nodes
+   */
+  const { loading } = useFontFaceObserver(TEXT.FONT_FAMILY);
 
   const appWrapperRef = useAutoFocus<HTMLDivElement>();
   const stageRef = useRef<Konva.Stage>(null);
@@ -276,20 +288,28 @@ const App = () => {
       onKeyDown={handleKeyDown}
     >
       <Panels selectedNodeIds={selectedNodeIds} />
-      <Suspense fallback={<Loader fullScreen>Loading Assets...</Loader>}>
-        <ContextMenu.Root
-          menuType={menuType}
-          onContextMenuOpen={handleContextMenuOpen}
-        >
-          <ContextMenu.Trigger>
-            <DrawingCanvas
-              ref={stageRef}
-              width={windowSize.width}
-              height={windowSize.height}
-              onNodesSelect={setSelectedNodeIds}
-            />
-          </ContextMenu.Trigger>
-        </ContextMenu.Root>
+      {loading && <Loader fullScreen>{LOADING_TEXT}</Loader>}
+      {!loading && (
+        <Suspense fallback={<Loader fullScreen>{LOADING_TEXT}</Loader>}>
+          <ContextMenu
+            menuType={menuType}
+            onContextMenuOpen={handleContextMenuOpen}
+          >
+            <ContextMenu.Trigger>
+              <DrawingCanvas
+                ref={stageRef}
+                width={windowSize.width}
+                height={windowSize.height}
+                onNodesSelect={setSelectedNodeIds}
+              />
+            </ContextMenu.Trigger>
+          </ContextMenu>
+        </Suspense>
+      )}
+      <Suspense>
+        {ws.isConnected && (
+          <CollabCanvas width={windowSize.width} height={windowSize.height} />
+        )}
       </Suspense>
     </Styled.AppWrapper>
   );

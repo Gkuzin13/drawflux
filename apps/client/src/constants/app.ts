@@ -20,6 +20,8 @@ export const PROJECT_FILE_NAME = 'project';
 export const PROJECT_PNG_NAME = 'project';
 export const PROJECT_PNG_EXT = 'png';
 
+export const LOADING_TEXT = 'Loading assets...';
+
 export const USER = {
   maxNameLength: 10,
 };
@@ -28,8 +30,6 @@ export const ZOOM_RANGE: [Min: number, Max: number] = [0.1, 10];
 export const ZOOM_MULTIPLIER_VALUE = 0.1;
 export const ZOOM_WHEEL_STEP = 1.1;
 export const DEFAULT_ZOOM_VALUE = 1;
-
-export const DUPLICATION_GAP = 16;
 
 const CanvasSchema = Schemas.Page.shape.page.shape;
 const ShapeTools = Schemas.Node.shape.type.options;
