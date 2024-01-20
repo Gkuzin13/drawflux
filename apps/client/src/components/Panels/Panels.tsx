@@ -22,6 +22,7 @@ import LibraryDrawer from '../Library/LibraryDrawer/LibraryDrawer';
 import HistoryButtons from './HistoryButtons';
 import DeleteButton from './DeleteButton';
 import {
+  LOCAL_STORAGE_COLLAB_KEY,
   PROJECT_FILE_EXT,
   PROJECT_FILE_NAME,
   PROJECT_PNG_EXT,
@@ -35,13 +36,14 @@ import * as Styled from './Panels.styled';
 import { shallowEqual } from '@/utils/object';
 import { setCursorByToolType } from '../Canvas/DrawingCanvas/helpers/cursor';
 import { findStageByName } from '@/utils/node';
+import { storage } from '@/utils/storage';
 import type { NodeStyle, User } from 'shared';
 import type {
   HistoryControlKey,
   MenuPanelActionType,
   ZoomActionKey,
 } from '@/constants/panels';
-import type { ToolType } from '@/constants/app';
+import type { StoredCollabState, ToolType } from '@/constants/app';
 
 type Props = {
   selectedNodeIds: string[];
@@ -186,6 +188,10 @@ const Panels = ({ selectedNodeIds }: Props) => {
   const handleUserChange = useCallback(
     (user: User) => {
       dispatch(collaborationActions.updateUser(user));
+
+      storage.set<StoredCollabState>(LOCAL_STORAGE_COLLAB_KEY, {
+        user: { name: user.name, color: user.color },
+      });
     },
     [dispatch],
   );
