@@ -22,6 +22,14 @@ type Props = {
   onStyleChange: (style: Partial<NodeStyle>) => void;
 };
 
+const getValueIfAllIdentical = <
+  T extends string | number | boolean | undefined,
+>(
+  set: Set<T>,
+): T | undefined => {
+  return set.size === 1 ? [...set][0] : undefined;
+};
+
 const StylePanel = ({ selectedNodes, onStyleChange }: Props) => {
   const mergedStyle = useMemo(() => {
     const styles: NodeStyle[] = selectedNodes.map(({ style }) => style);
@@ -32,14 +40,6 @@ const StylePanel = ({ selectedNodes, onStyleChange }: Props) => {
     const sizes = new Set(styles.map(({ size }) => size));
     const opacities = new Set(styles.map(({ opacity }) => opacity));
     const allShapesAnimated = styles.every(({ animated }) => animated);
-
-    const getValueIfAllIdentical = <
-      T extends string | number | boolean | undefined,
-    >(
-      set: Set<T>,
-    ): T | undefined => {
-      return set.size === 1 ? [...set][0] : undefined;
-    };
 
     return {
       color: getValueIfAllIdentical(colors),

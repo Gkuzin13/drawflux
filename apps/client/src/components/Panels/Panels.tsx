@@ -32,7 +32,6 @@ import { selectLibrary } from '@/services/library/slice';
 import { calculateCenterPoint } from '@/utils/position';
 import { calculateStageZoomRelativeToPoint } from '../Canvas/DrawingCanvas/helpers/zoom';
 import * as Styled from './Panels.styled';
-import Konva from 'konva';
 import { shallowEqual } from '@/utils/object';
 import { setCursorByToolType } from '../Canvas/DrawingCanvas/helpers/cursor';
 import { findStageByName } from '@/utils/node';
@@ -80,7 +79,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
     (type: ToolType) => {
       dispatch(canvasActions.setToolType(type));
 
-      const stage = Konva.stages[0];
+      const stage = findStageByName(DRAWING_CANVAS.NAME);
       setCursorByToolType(stage, type);
     },
     [dispatch],
@@ -98,6 +97,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
     });
 
     dispatch(canvasActions.updateNodes(updatedNodes));
+    dispatch(canvasActions.setCurrentNodeStyle(style));
   };
 
   const handleMenuAction = useCallback(
@@ -133,7 +133,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
 
               const stage = findStageByName(DRAWING_CANVAS.NAME);
 
-              setCursorByToolType(stage, project.toolType);
+              setCursorByToolType(stage, project.toolType ?? 'select');
             } else {
               modal.open({
                 title: 'Error',

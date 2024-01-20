@@ -3,8 +3,8 @@ import reducer, {
   canvasActions,
   initialState,
 } from '../slice';
-import { nodesGenerator } from '@/test/data-generators';
-import type { AppState, ToolType } from '@/constants/app';
+import { nodesGenerator, stateGenerator } from '@/test/data-generators';
+import type { ToolType } from '@/constants/app';
 import type { NodeObject, StageConfig } from 'shared';
 
 describe('canvas slice', () => {
@@ -13,16 +13,15 @@ describe('canvas slice', () => {
   });
 
   it('sets the state', () => {
-    const stateToSet: AppState['page'] = {
-      nodes: nodesGenerator(5),
-      stageConfig: { position: { x: 50, y: 50 }, scale: 0.5 },
-      selectedNodeIds: {},
-      toolType: 'select',
-    };
+    const stateToSet = stateGenerator({
+      canvas: {
+        present: { nodes: nodesGenerator(5, 'ellipse') },
+      },
+    }).canvas.present;
 
     const state = reducer(undefined, canvasActions.set(stateToSet));
 
-    expect(state).toEqual({ ...initialState, ...stateToSet });
+    expect(state).toEqual(stateToSet);
   });
 
   /**
@@ -35,6 +34,49 @@ describe('canvas slice', () => {
     const state = reducer(undefined, canvasActions.addNodes(nodes));
 
     expect(state).toEqual({ ...initialState, nodes });
+  });
+
+  it('adds nodes and selects them if selectNodes is true', () => {
+    const nodes = nodesGenerator(5, 'ellipse');
+
+    const state = reducer(
+      undefined,
+      canvasActions.addNodes(nodes, { selectNodes: true }),
+    );
+
+    const selectedNodeIds = Object.fromEntries(
+      nodes.map((node) => [node.nodeProps.id, true]),
+    );
+
+    expect(state).toEqual({ ...initialState, nodes, selectedNodeIds });
+  });
+
+  it('adds nodes and duplicates them if duplicate is true', () => {
+    const nodes = nodesGenerator(5, 'ellipse');
+
+    const previousState: CanvasSliceState = { ...initialState, nodes };
+
+    const state = reducer(
+      previousState,
+      canvasActions.addNodes(nodes, { duplicate: true }),
+    );
+
+    expect(state.nodes).toHaveLength(10);
+    expect(state.nodes.slice(0, 5)).toEqual(nodes);
+    expect(state.nodes.slice(5)).toEqual(
+      expect.arrayContaining(
+        nodes.map((node) => {
+          return expect.objectContaining({
+            ...node,
+            nodeProps: {
+              ...node.nodeProps,
+              id: expect.any(String),
+              point: [expect.any(Number), expect.any(Number)],
+            },
+          });
+        }),
+      ),
+    );
   });
 
   it('updates nodes', () => {
@@ -182,5 +224,22 @@ describe('canvas slice', () => {
         nodes.map((node) => [node.nodeProps.id, true]),
       ),
     });
+  });
+
+  it('unselects all nodes', () => {
+    const nodes = nodesGenerator(5, 'ellipse');
+
+    const previousState: CanvasSliceState = {
+      ...initialState,
+      nodes,
+      selectedNodeIds: {
+        [nodes[0].nodeProps.id]: true,
+        [nodes[3].nodeProps.id]: true,
+      },
+    };
+
+    const state = reducer(previousState, canvasActions.unselectAllNodes());
+
+    expect(state).toEqual({ ...previousState, selectedNodeIds: {} });
   });
 });

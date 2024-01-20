@@ -54,7 +54,7 @@ describe('style panel', () => {
 
   describe('colors grid', () => {
     GRID_COLORS.forEach((color) => {
-      it(`dispatches nodes update with ${color.name} color`, async () => {
+      it(`dispatches updateNodes and setCurrentNodeStyle with ${color.value} color`, async () => {
         const { store, user } = renderWithProviders(
           <Panels selectedNodeIds={selectedNodeIdsArray} />,
           { preloadedState },
@@ -68,6 +68,9 @@ describe('style panel', () => {
               return { ...node, style: { ...node.style, color: color.value } };
             }),
           ),
+        );
+        expect(store.dispatch).toHaveBeenCalledWith(
+          canvasActions.setCurrentNodeStyle({ color: color.value }),
         );
       });
     });
@@ -91,7 +94,7 @@ describe('style panel', () => {
   });
 
   describe('opacity', () => {
-    it('dispatches nodes update with new opacity value', async () => {
+    it('dispatches updateNodes and setCurrentNodeStyle with new opacity value', async () => {
       const { user, store } = renderWithProviders(
         <Panels selectedNodeIds={selectedNodeIdsArray} />,
         {
@@ -103,22 +106,27 @@ describe('style panel', () => {
 
       await user.keyboard('[ArrowLeft]');
 
+      const updatedOpacity = OPACITY.maxValue - OPACITY.step;
+
       expect(store.dispatch).toHaveBeenCalledWith(
         canvasActions.updateNodes(
           selectedNodes.map((node) => {
             return {
               ...node,
-              style: { ...node.style, opacity: 1 - OPACITY.step },
+              style: { ...node.style, opacity: updatedOpacity },
             };
           }),
         ),
+      );
+      expect(store.dispatch).toHaveBeenCalledWith(
+        canvasActions.setCurrentNodeStyle({ opacity: updatedOpacity }),
       );
     });
   });
 
   describe('size', () => {
     SIZE.forEach((size) => {
-      it(`dispatches nodes update with ${size.name} size`, async () => {
+      it(`dispatches updateNodes and setCurrentNodeStyle with ${size.value} size`, async () => {
         const { store, user } = renderWithProviders(
           <Panels selectedNodeIds={selectedNodeIdsArray} />,
           { preloadedState },
@@ -133,13 +141,16 @@ describe('style panel', () => {
             }),
           ),
         );
+        expect(store.dispatch).toHaveBeenCalledWith(
+          canvasActions.setCurrentNodeStyle({ size: size.value }),
+        );
       });
     });
   });
 
   describe('fill', () => {
     FILL.forEach((fill) => {
-      it(`dispatches nodes update with ${fill.name} fill`, async () => {
+      it(`dispatches updateNodes and setCurrentNodeStyle with ${fill.value} fill`, async () => {
         const { store, user } = renderWithProviders(
           <Panels selectedNodeIds={selectedNodeIdsArray} />,
           { preloadedState },
@@ -154,13 +165,16 @@ describe('style panel', () => {
             }),
           ),
         );
+        expect(store.dispatch).toHaveBeenCalledWith(
+          canvasActions.setCurrentNodeStyle({ fill: fill.value }),
+        );
       });
     });
   });
 
   describe('line', () => {
     LINE.forEach((line) => {
-      it(`dispatches nodes update with ${line.name} fill`, async () => {
+      it(`dispatches updateNodes and setCurrentNodeStyle with ${line.value} fill`, async () => {
         const { store, user } = renderWithProviders(
           <Panels selectedNodeIds={selectedNodeIdsArray} />,
           { preloadedState },
@@ -175,12 +189,15 @@ describe('style panel', () => {
             }),
           ),
         );
+        expect(store.dispatch).toHaveBeenCalledWith(
+          canvasActions.setCurrentNodeStyle({ line: line.value }),
+        );
       });
     });
   });
 
   describe('animated', () => {
-    it(`dispatches nodes update with new animated value`, async () => {
+    it(`dispatches updateNodes and setCurrentNodeStyle with new animated value`, async () => {
       const { store, user } = renderWithProviders(
         <Panels selectedNodeIds={selectedNodeIdsArray} />,
         { preloadedState },
@@ -194,6 +211,9 @@ describe('style panel', () => {
             return { ...node, style: { ...node.style, animated: true } };
           }),
         ),
+      );
+      expect(store.dispatch).toHaveBeenCalledWith(
+        canvasActions.setCurrentNodeStyle({ animated: true }),
       );
     });
   });

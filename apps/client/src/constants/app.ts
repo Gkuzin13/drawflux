@@ -45,6 +45,7 @@ export const appState = z.object({
     ...CanvasSchema,
     toolType: z.union([...ShapeTools, z.literal('hand'), z.literal('select')]),
     selectedNodeIds: z.record(z.string(), z.boolean()),
+    currentNodeStyle: Schemas.Node.shape.style,
   }),
 });
 

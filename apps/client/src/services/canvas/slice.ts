@@ -6,7 +6,7 @@ import {
   createParametricSelectorHook,
   createAppSelector,
 } from '@/stores/hooks';
-import type { NodeObject } from 'shared';
+import type { NodeObject, NodeStyle } from 'shared';
 import type { AppState } from '@/constants/app';
 import type { RootState } from '../../stores/store';
 import type { PayloadAction } from '@reduxjs/toolkit';
@@ -27,6 +27,13 @@ export const initialState: CanvasSliceState = {
   toolType: 'select',
   selectedNodeIds: {},
   copiedNodes: [],
+  currentNodeStyle: {
+    color: 'black',
+    size: 'medium',
+    animated: false,
+    line: 'solid',
+    opacity: 1,
+  },
 };
 
 export type ActionMeta = {
@@ -47,13 +54,8 @@ export const canvasSlice = createSlice({
   name: 'canvas',
   initialState,
   reducers: {
-    set: (state, action: PayloadAction<AppState['page']>) => {
-      const { nodes, selectedNodeIds, stageConfig, toolType } = action.payload;
-
-      state.nodes = nodes;
-      state.selectedNodeIds = selectedNodeIds;
-      state.stageConfig = stageConfig;
-      state.toolType = toolType;
+    set: (state, action: PayloadAction<Partial<AppState['page']>>) => {
+      return { ...state, ...action.payload };
     },
     setNodes: {
       reducer: (state, action: PayloadAction<NodeObject[]>) => {
@@ -167,6 +169,9 @@ export const canvasSlice = createSlice({
     unselectAllNodes: (state) => {
       state.selectedNodeIds = {};
     },
+    setCurrentNodeStyle: (state, action: PayloadAction<Partial<NodeStyle>>) => {
+      state.currentNodeStyle = { ...state.currentNodeStyle, ...action.payload };
+    },
   },
   extraReducers(builder) {
     builder
@@ -219,6 +224,9 @@ const selectNodesById = createAppSelector(
 );
 
 export const useSelectNodesById = createParametricSelectorHook(selectNodesById);
+
+export const selectCurrentNodeStyle = (state: RootState) =>
+  state.canvas.present.currentNodeStyle;
 
 export const selectCopiedNodes = (state: RootState) =>
   state.canvas.present.copiedNodes;

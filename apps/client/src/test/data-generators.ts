@@ -62,3 +62,7 @@ export const libraryGenerator = (length: number, shapes = 1): Library => {
 export const makeCollabRoomURL = (roomId: string, baseUrl = window.origin) => {
   return urlSearchParam.set(CONSTANTS.COLLAB_ROOM_URL_PARAM, roomId, baseUrl);
 };
+
+export const nodeTypeGenerator = (): NodeType[] => {
+  return ['arrow', 'draw', 'ellipse', 'laser', 'rectangle', 'text'];
+};
