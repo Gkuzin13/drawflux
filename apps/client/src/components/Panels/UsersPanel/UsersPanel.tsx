@@ -63,6 +63,8 @@ const EditableUserInfo = ({
   };
 
   const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    event.stopPropagation();
+    
     if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {
       handleIsEditingToggle();
     }
