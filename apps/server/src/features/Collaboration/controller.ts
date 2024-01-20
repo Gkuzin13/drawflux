@@ -1,9 +1,10 @@
-import type { IncomingMessage } from 'http';
-import { type WSMessage, WSMessageUtil } from 'shared';
-import type { RawData } from 'ws';
-import { type PatchedWebSocket } from '@/services/websocket';
-import { createUsername, findPage, getUnusedUserColor } from './helpers';
 import { CollabRoom, CollabUser } from './models';
+import { findPage } from './helpers';
+import { WSMessageUtil } from 'shared';
+import type { IncomingMessage } from 'http';
+import type { WSMessage } from 'shared';
+import type { RawData } from 'ws';
+import type { PatchedWebSocket } from '@/services/websocket';
 
 const rooms = new Map<string, InstanceType<typeof CollabRoom>>();
 
@@ -28,10 +29,7 @@ export async function initCollabConnection(
     );
   }
 
-  const userColor = getUnusedUserColor(room.users);
-  const username = createUsername(room);
-
-  const user = new CollabUser(username, userColor, ws);
+  const user = new CollabUser(ws);
 
   room.addUser(user);
   rooms.set(room.id, room);

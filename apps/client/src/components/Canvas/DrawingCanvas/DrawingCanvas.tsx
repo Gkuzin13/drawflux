@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector, useAppStore } from '@/stores/hooks';
 import {
   canvasActions,
   selectConfig,
+  selectCurrentNodeStyle,
   selectSelectedNodeIds,
   selectToolType,
 } from '@/services/canvas/slice';
@@ -71,6 +72,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const stageConfig = useAppSelector(selectConfig);
     const toolType = useAppSelector(selectToolType);
     const storedSelectedNodeIds = useAppSelector(selectSelectedNodeIds);
+    const currentNodeStyle = useAppSelector(selectCurrentNodeStyle);
     const thisUser = useAppSelector(selectThisUser);
     const ws = useWebSocket();
 
@@ -188,7 +190,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       (toolType: NodeType, position: Point) => {
         const shouldResetToolType = toolType === 'text';
 
-        const node = createNode(toolType, position);
+        const node = createNode(toolType, position, currentNodeStyle);
 
         setDrafts({ type: 'create', payload: { node } });
         setEditingNodeId(node.nodeProps.id);
@@ -202,7 +204,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           ws.send({ type: 'draft-create', data: { node } });
         }
       },
-      [ws, dispatch, setDrafts],
+      [ws, currentNodeStyle, dispatch, setDrafts],
     );
 
     const handleDraftDraw = useCallback(
@@ -332,7 +334,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           handleDraftCreate(toolType, pointerPosition);
         }
 
-        if (hasSelectedNodes) {
+        if (hasSelectedNodes && toolType === 'select') {
           setSelectedNodeIds([]);
           dispatch(canvasActions.setSelectedNodeIds([]));
         }

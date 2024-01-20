@@ -1,7 +1,13 @@
 import { randomUUID } from 'crypto';
-import type { Room, User } from 'shared';
 import WebSocket from 'ws';
-import { MAX_USERS } from './constants';
+import {
+  COLORS,
+  DEFAULT_COLOR,
+  DEFAULT_NAME,
+  MAX_USERS,
+  USER_NAMES,
+} from './constants';
+import type { Room, User } from 'shared';
 
 export class CollabRoom implements Room {
   id;
@@ -12,6 +18,11 @@ export class CollabRoom implements Room {
   }
 
   addUser(user: InstanceType<typeof CollabUser>) {
+    const color = this.#getUnusedUserColor();
+    const name = this.#getUnusedUsername();
+
+    user.update({ color, name });
+
     this.users.push(user);
   }
 
@@ -55,18 +66,25 @@ export class CollabRoom implements Room {
   isEmpty() {
     return this.users.length === 0;
   }
+
+  #getUnusedUserColor() {
+    const usedColors = new Set(this.users.map(({ color }) => color));
+    return COLORS.find((color) => !usedColors.has(color)) ?? DEFAULT_COLOR;
+  }
+
+  #getUnusedUsername() {
+    const usedUserNames = new Set(this.users.map(({ name }) => name));
+    return USER_NAMES.find((name) => !usedUserNames.has(name)) ?? DEFAULT_NAME;
+  }
 }
 
 export class CollabUser implements User {
-  id;
-  name;
-  color;
-  #ws: WebSocket;
+  id = randomUUID();
+  name = DEFAULT_NAME;
+  color = DEFAULT_COLOR;
+  #ws;
 
-  constructor(name: string, color: User['color'], ws: WebSocket) {
-    this.id = randomUUID();
-    this.name = name;
-    this.color = color;
+  constructor(ws: WebSocket) {
     this.#ws = ws;
   }
 

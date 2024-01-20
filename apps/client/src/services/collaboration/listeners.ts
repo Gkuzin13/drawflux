@@ -2,10 +2,13 @@ import { addAppListener } from '@/stores/middlewares/listenerMiddleware';
 import { isAnyOf } from '@reduxjs/toolkit';
 import { collaborationActions } from './slice';
 import { canvasActions } from '../canvas/slice';
+import { storage } from '@/utils/storage';
 import api from '@/services/api';
+import { LOCAL_STORAGE_COLLAB_KEY } from '@/constants/app';
 import type { WebSocketContextValue } from '@/contexts/websocket';
 import type { AppDispatch } from '@/stores/store';
 import type { ActionMeta } from '../canvas/slice';
+import type { StoredCollabState } from '@/constants/app';
 
 /**
  * subscribe to canvas/collaboration actions and send corresponding messages
@@ -83,7 +86,19 @@ export const subscribeToIncomingCollabMessages = (
 
   const subscribers = [
     ws.subscribe('room-joined', (data) => {
-      dispatch(collaborationActions.init(data));
+      const collabState = storage.get<StoredCollabState>(
+        LOCAL_STORAGE_COLLAB_KEY,
+      );
+
+      if (collabState) {
+        const thisUser = { ...data.thisUser, ...collabState.user };
+
+        ws.send({ type: 'user-change', data: thisUser });
+
+        dispatch(collaborationActions.init({ ...data, thisUser }));
+      } else {
+        dispatch(collaborationActions.init(data));
+      }
     }),
     ws.subscribe('user-joined', (data) =>
       dispatch(collaborationActions.addUser(data)),

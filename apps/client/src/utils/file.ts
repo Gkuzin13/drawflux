@@ -1,4 +1,5 @@
-import { PROJECT_FILE_EXT, appState } from '@/constants/app';
+import { type AppState, PROJECT_FILE_EXT, appState } from '@/constants/app';
+import { safeJSONParse } from './object';
 
 export function downloadDataUrlAsFile(
   dataUrl: string,
@@ -48,9 +49,9 @@ export async function importProject() {
 
     if (!fileContents || !isJsonString(fileContents)) return null;
 
-    const data = JSON.parse(fileContents);
+    const data = safeJSONParse<Partial<AppState>>(fileContents);
 
-    return (await appState.shape.page.parseAsync(data)) ?? null;
+    return await appState.shape.page.partial().parseAsync(data);
   } catch (error) {
     return null;
   }

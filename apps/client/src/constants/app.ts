@@ -1,5 +1,6 @@
 import { Schemas } from 'shared';
 import { z } from 'zod';
+import type { User } from 'shared';
 
 export const BASE_URL = 'https://drawflux-api.onrender.com';
 export const BASE_URL_DEV = 'http://localhost:7456';
@@ -12,6 +13,7 @@ export const IS_PROD = process.env.NODE_ENV === 'production';
 export const LOCAL_STORAGE_KEY = 'drawflux';
 export const LOCAL_STORAGE_LIBRARY_KEY = 'drawflux-library';
 export const LOCAL_STORAGE_THEME_KEY = 'drawflux-theme';
+export const LOCAL_STORAGE_COLLAB_KEY = 'drawflux-collab';
 
 export const WS_THROTTLE_MS = 16;
 
@@ -45,6 +47,7 @@ export const appState = z.object({
     ...CanvasSchema,
     toolType: z.union([...ShapeTools, z.literal('hand'), z.literal('select')]),
     selectedNodeIds: z.record(z.string(), z.boolean()),
+    currentNodeStyle: Schemas.Node.shape.style,
   }),
 });
 
@@ -56,3 +59,4 @@ export type AppState = z.infer<typeof appState>;
 export type LibraryItem = z.infer<typeof LibraryItem>;
 export type Library = z.infer<typeof libraryState>;
 export type ToolType = AppState['page']['toolType'];
+export type StoredCollabState = { user: Omit<User, 'id'> };

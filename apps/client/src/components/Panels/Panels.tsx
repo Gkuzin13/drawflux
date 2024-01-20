@@ -22,6 +22,7 @@ import LibraryDrawer from '../Library/LibraryDrawer/LibraryDrawer';
 import HistoryButtons from './HistoryButtons';
 import DeleteButton from './DeleteButton';
 import {
+  LOCAL_STORAGE_COLLAB_KEY,
   PROJECT_FILE_EXT,
   PROJECT_FILE_NAME,
   PROJECT_PNG_EXT,
@@ -32,17 +33,17 @@ import { selectLibrary } from '@/services/library/slice';
 import { calculateCenterPoint } from '@/utils/position';
 import { calculateStageZoomRelativeToPoint } from '../Canvas/DrawingCanvas/helpers/zoom';
 import * as Styled from './Panels.styled';
-import Konva from 'konva';
 import { shallowEqual } from '@/utils/object';
 import { setCursorByToolType } from '../Canvas/DrawingCanvas/helpers/cursor';
 import { findStageByName } from '@/utils/node';
+import { storage } from '@/utils/storage';
 import type { NodeStyle, User } from 'shared';
 import type {
   HistoryControlKey,
   MenuPanelActionType,
   ZoomActionKey,
 } from '@/constants/panels';
-import type { ToolType } from '@/constants/app';
+import type { StoredCollabState, ToolType } from '@/constants/app';
 
 type Props = {
   selectedNodeIds: string[];
@@ -80,7 +81,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
     (type: ToolType) => {
       dispatch(canvasActions.setToolType(type));
 
-      const stage = Konva.stages[0];
+      const stage = findStageByName(DRAWING_CANVAS.NAME);
       setCursorByToolType(stage, type);
     },
     [dispatch],
@@ -98,6 +99,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
     });
 
     dispatch(canvasActions.updateNodes(updatedNodes));
+    dispatch(canvasActions.setCurrentNodeStyle(style));
   };
 
   const handleMenuAction = useCallback(
@@ -133,7 +135,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
 
               const stage = findStageByName(DRAWING_CANVAS.NAME);
 
-              setCursorByToolType(stage, project.toolType);
+              setCursorByToolType(stage, project.toolType ?? 'select');
             } else {
               modal.open({
                 title: 'Error',
@@ -186,6 +188,10 @@ const Panels = ({ selectedNodeIds }: Props) => {
   const handleUserChange = useCallback(
     (user: User) => {
       dispatch(collaborationActions.updateUser(user));
+
+      storage.set<StoredCollabState>(LOCAL_STORAGE_COLLAB_KEY, {
+        user: { name: user.name, color: user.color },
+      });
     },
     [dispatch],
   );

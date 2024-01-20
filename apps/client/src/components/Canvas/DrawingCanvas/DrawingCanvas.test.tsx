@@ -1,7 +1,10 @@
+/**
+ * @vitest-environment happy-dom
+ */
 import Konva from 'konva';
-import { waitFor } from '@testing-library/react';
+import { fireEvent, waitFor } from '@testing-library/react';
 import { stateGenerator } from '@/test/data-generators';
-import { renderWithProviders } from '@/test/test-utils';
+import { findCanvas, renderWithProviders } from '@/test/test-utils';
 import { createNode } from '@/utils/node';
 import DrawingCanvas from './DrawingCanvas';
 import { getLayerNodes, getMainLayer } from './helpers/stage';
@@ -30,8 +33,9 @@ describe('DrawingCanvas', () => {
   const text = createNode('text', [120, 120]);
   text.text = 'Hello World';
 
+  const nodes = [arrow, rectangle, ellipse, draw, text];
+
   it('renders shapes', async () => {
-    const nodes = [arrow, rectangle, ellipse, draw, text];
     const preloadedState = stateGenerator({ canvas: { present: { nodes } } });
 
     renderWithProviders(
@@ -54,6 +58,52 @@ describe('DrawingCanvas', () => {
         layerNodes.every((layerNode) => {
           return nodes.find((node) => node.nodeProps.id === layerNode.id());
         }),
+      );
+    });
+  });
+
+  it('inherits style from currentNodeStyle', async () => {
+    const preloadedState = stateGenerator({
+      canvas: {
+        present: {
+          toolType: 'rectangle',
+          currentNodeStyle: {
+            color: 'blue700',
+            line: 'dashed',
+            fill: 'solid',
+            opacity: 0.5,
+            animated: true,
+          },
+        },
+      },
+    });
+
+    const { store } = renderWithProviders(
+      <DrawingCanvas
+        width={window.innerWidth}
+        height={window.innerHeight}
+        onNodesSelect={() => vi.fn()}
+      />,
+      { preloadedState },
+    );
+
+    const { canvas } = await findCanvas();
+
+    // start at [10, 20]
+    fireEvent.pointerDown(canvas, { clientX: 10, clientY: 20 });
+
+    // move to [30, 40]
+    fireEvent.pointerMove(canvas, { clientX: 30, clientY: 40 });
+
+    // stop at last position
+    fireEvent.pointerUp(canvas);
+
+    await waitFor(() => {
+      const canvasState = store.getState().canvas.present;
+      const node = canvasState.nodes[0];
+
+      expect(node.style).toEqual(
+        preloadedState.canvas.present.currentNodeStyle,
       );
     });
   });

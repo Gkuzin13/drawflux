@@ -7,19 +7,26 @@ import {
 import { DUPLICATION_GAP } from '@/constants/canvas';
 import Konva from 'konva';
 import type { IRect, Vector2d } from 'konva/lib/types';
-import type { NodeType, Point, NodeObject, StageConfig } from 'shared';
+import type {
+  NodeType,
+  Point,
+  NodeObject,
+  StageConfig,
+  NodeStyle,
+} from 'shared';
 
 export const createNode = <T extends NodeType>(
   type: T,
   point: Point,
+  style?: NodeStyle,
 ): NodeObject<T> => {
   return {
     type,
     text: null,
-    style: {
+    style: style ?? {
       opacity: 1,
       line: 'solid',
-      color: type === 'laser' ? 'red600' : 'black',
+      color: 'black',
       size: 'medium',
       animated: false,
     },
