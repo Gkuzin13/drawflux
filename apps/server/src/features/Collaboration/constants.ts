@@ -9,4 +9,12 @@ export const COLORS = [
   'gray600',
 ] as User['color'][];
 
-export const DEFAULT_COLOR: User['color'] = 'gray600';
+export const USER_NAMES = [
+  'Blue Cactus',
+  'Golden Mango',
+  'Smooth Avocado',
+  'Ultimate Potato',
+] as const;
+
+export const DEFAULT_COLOR = COLORS[3];
+export const DEFAULT_NAME = 'New User';

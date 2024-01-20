@@ -1,6 +1,12 @@
 import { WSMessageUtil, type User, type WSMessage } from 'shared';
 import WebSocket from 'ws';
-import { MAX_USERS } from '../constants';
+import {
+  COLORS,
+  DEFAULT_COLOR,
+  DEFAULT_NAME,
+  MAX_USERS,
+  USER_NAMES,
+} from '../constants';
 import { CollabRoom, CollabUser } from '../models';
 
 vi.mock('ws');
@@ -26,9 +32,9 @@ describe('CollabRoom', () => {
   });
 
   it('should broadcast to all users except the broadcaster', () => {
-    const user1 = new CollabUser('User-1', 'black', new ws());
-    const user2 = new CollabUser('User-2', 'blue600', new ws());
-    const user3 = new CollabUser('User-3', 'green600', new ws());
+    const user1 = new CollabUser(new ws());
+    const user2 = new CollabUser(new ws());
+    const user3 = new CollabUser(new ws());
 
     room.addUser(user1);
     room.addUser(user2);
@@ -47,15 +53,19 @@ describe('CollabRoom', () => {
     expect(user3.getWS().send).toHaveBeenCalledOnce();
   });
 
-  it('should add user to the room', () => {
-    const user = new CollabUser('User', 'black', new ws());
+  it('initializes and adds a new user', () => {
+    const user = new CollabUser(new ws());
 
     room.addUser(user);
+
+    expect(room.users).toHaveLength(1);
     expect(room.users).toContain(user);
+    expect(COLORS.includes(room.users[0].color)).toBe(true);
+    expect(USER_NAMES.includes(room.users[0].name as never)).toBe(true);
   });
 
   it('should remove user from the room', () => {
-    const user = new CollabUser('User', 'black', new ws());
+    const user = new CollabUser(new ws());
 
     room.addUser(user);
     room.removeUser(user.id);
@@ -64,7 +74,7 @@ describe('CollabRoom', () => {
   });
 
   it('should update user', () => {
-    const user = new CollabUser('User', 'black', new ws());
+    const user = new CollabUser(new ws());
     room.addUser(user);
 
     const updatedUser: User = { id: user.id, name: 'User-2', color: 'blue600' };
@@ -77,7 +87,7 @@ describe('CollabRoom', () => {
     expect(room.hasReachedMaxUsers()).toBe(false);
 
     for (let i = 0; i < MAX_USERS; i++) {
-      const user = new CollabUser('User', 'black', new ws());
+      const user = new CollabUser(new ws());
       room.addUser(user);
     }
 
@@ -85,8 +95,8 @@ describe('CollabRoom', () => {
   });
 
   it('should check if room has multiple users', () => {
-    const user1 = new CollabUser('User-1', 'black', new ws());
-    const user2 = new CollabUser('User-2', 'blue600', new ws());
+    const user1 = new CollabUser(new ws());
+    const user2 = new CollabUser(new ws());
 
     room.addUser(user1);
     expect(room.hasMultipleUsers()).toBe(false);
@@ -96,7 +106,7 @@ describe('CollabRoom', () => {
   });
 
   it('should check if room is empty', () => {
-    const user = new CollabUser('User', 'black', new ws());
+    const user = new CollabUser(new ws());
 
     room.addUser(user);
     expect(room.isEmpty()).toBe(false);
@@ -108,15 +118,15 @@ describe('CollabRoom', () => {
 
 describe('CollabUser', () => {
   it('should init a user correctly', () => {
-    const user = new CollabUser('User', 'black', new ws());
+    const user = new CollabUser(new ws());
 
     expect(user.id).toHaveLength(36);
-    expect(user.name).toBe('User');
-    expect(user.color).toBe('black');
+    expect(user.name).toBe(DEFAULT_NAME);
+    expect(user.color).toBe(DEFAULT_COLOR);
   });
 
   it('should update user', () => {
-    const user = new CollabUser('User', 'black', new ws());
+    const user = new CollabUser(new ws());
 
     user.update({ color: 'blue700', name: 'User-2' });
 
@@ -127,7 +137,7 @@ describe('CollabUser', () => {
   it('should get ws instance', () => {
     const wsInstance = new ws();
 
-    const user = new CollabUser('User', 'black', wsInstance);
+    const user = new CollabUser(wsInstance);
 
     expect(user.getWS()).toBe(wsInstance);
   });
