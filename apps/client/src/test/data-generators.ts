@@ -66,3 +66,10 @@ export const makeCollabRoomURL = (roomId: string, baseUrl = window.origin) => {
 export const nodeTypeGenerator = (): NodeType[] => {
   return ['arrow', 'draw', 'ellipse', 'laser', 'rectangle', 'text'];
 };
+
+export const simpleObjectsGenerator = (length = 1) => {
+  return Array.from({ length }, () => ({
+    id: Date.now(),
+    name: `test${Date.now()}`,
+  }));
+};
