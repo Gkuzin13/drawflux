@@ -24,6 +24,8 @@ export const addCanvasListener = (startListening: AppStartListening) => {
       canvasActions.setStageConfig,
       canvasActions.setToolType,
       canvasActions.selectAllNodes,
+      canvasActions.unselectAllNodes,
+      canvasActions.setCurrentNodeStyle,
     ),
     effect: (_, listenerApi) => {
       const canvasState = listenerApi.getState().canvas.present;
