@@ -3,11 +3,10 @@ import { render, screen, type RenderOptions } from '@testing-library/react';
 import { Provider as StoreProvider } from 'react-redux';
 import userEvent from '@testing-library/user-event';
 import canvasReducer, {
+  ignoredActionsInHistory,
   initialState as initialCanvasState,
 } from '@/services/canvas/slice';
-import historyReducer, {
-  type CanvasHistoryState,
-} from '@/stores/reducers/history';
+import historyReducer from '@/stores/reducers/history';
 import collabReducer, {
   initialState as initialCollabState,
 } from '@/services/collaboration/slice';
@@ -28,12 +27,12 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
   store?: ReturnType<typeof setupStore>;
 }
 
-export const defaultPreloadedState = {
+export const defaultPreloadedState: RootState = {
   canvas: {
     past: [],
     present: initialCanvasState,
     future: [],
-  } as CanvasHistoryState,
+  },
   collaboration: initialCollabState,
   library: initialLibraryState,
 };
@@ -41,7 +40,11 @@ export const defaultPreloadedState = {
 export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
   return configureStore({
     reducer: {
-      canvas: historyReducer(canvasReducer),
+      canvas: historyReducer(
+        canvasReducer,
+        initialCanvasState,
+        ignoredActionsInHistory,
+      ),
       collaboration: collabReducer,
       library: libraryReducer,
     },

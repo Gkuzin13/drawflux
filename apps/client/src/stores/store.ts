@@ -1,13 +1,22 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { listenerMiddleware } from './middlewares/listenerMiddleware';
 import historyReducer from './reducers/history';
-import canvas from '../services/canvas/slice';
+import canvasReducer, {
+  ignoredActionsInHistory,
+  initialState,
+} from '../services/canvas/slice';
 import collaboration from '../services/collaboration/slice';
 import library from '@/services/library/slice';
 
+const canvas = historyReducer(
+  canvasReducer,
+  initialState,
+  ignoredActionsInHistory,
+);
+
 export const store = configureStore({
   reducer: {
-    canvas: historyReducer(canvas),
+    canvas,
     collaboration,
     library,
   },

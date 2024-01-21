@@ -1,16 +1,14 @@
-import { type Action, createAction, type Reducer } from '@reduxjs/toolkit';
-import { initialState as initialCanvasState } from '../../services/canvas/slice';
-import type { CanvasActionType, CanvasSliceState } from '../../services/canvas/slice';
+import { createAction, isAnyOf } from '@reduxjs/toolkit';
+import type { AnyAction, Reducer } from '@reduxjs/toolkit';
 
-export type CanvasHistoryState = {
-  past: CanvasSliceState[];
-  present: CanvasSliceState;
-  future: CanvasSliceState[];
+export type HistoryState<T> = {
+  past: T[];
+  present: T;
+  future: T[];
 };
 
-export type HistoryActionType =
-  (typeof historyActions)[keyof typeof historyActions]['type'];
-
+export type HistoryAction = (typeof historyActions)[HistoryActionKey];
+export type HistoryActionType = HistoryAction['type'];
 export type HistoryActionKey = keyof typeof historyActions;
 
 export const historyActions = {
@@ -19,43 +17,25 @@ export const historyActions = {
   reset: createAction('history/reset'),
 };
 
-export type IgnoreActionType = HistoryActionType | CanvasActionType;
-
-const IGNORED_ACTIONS: IgnoreActionType[] = [
-  'canvas/setToolType',
-  'canvas/setStageConfig',
-  'canvas/set',
-  'canvas/setSelectedNodeIds',
-  'canvas/copyNodes',
-];
-
-function isIgnoredActionType(type: string) {
-  return IGNORED_ACTIONS.includes(type as IgnoreActionType);
-}
-
-function historyReducer(
-  reducer: Reducer<
-    CanvasSliceState,
-    Action<HistoryActionType | CanvasActionType | undefined>
-  >,
-) {
-  const initialState: CanvasHistoryState = {
+function historyReducer<R extends Reducer, S extends ReturnType<R>>(
+  reducer: R,
+  initialState: S,
+  ignoredActions?: readonly AnyAction[],
+): Reducer<HistoryState<S>> {
+  const initialHistoryState: HistoryState<S> = {
     past: [],
-    present: reducer(initialCanvasState, { type: undefined }),
+    present: reducer(initialState, { type: undefined }),
     future: [],
   };
 
-  return function (
-    state = initialState,
-    action: Action<HistoryActionType | CanvasActionType>,
-  ) {
+  const ignoredActionMatchers = ignoredActions?.map((action) => action.match);
+  const isAnyOfIgnoredActions = isAnyOf(...(ignoredActionMatchers ?? []));
+
+  return function (state = initialHistoryState, action) {
     const { past, present, future } = state;
 
-    if (isIgnoredActionType(action.type)) {
-      return {
-        ...state,
-        present: reducer(present, action),
-      };
+    if (ignoredActions && isAnyOfIgnoredActions(action as AnyAction)) {
+      return { past, present: reducer(present, action), future };
     }
 
     switch (action.type) {

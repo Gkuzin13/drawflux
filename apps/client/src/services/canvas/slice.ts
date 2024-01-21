@@ -14,9 +14,21 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 export type CanvasSliceState = {
   copiedNodes: NodeObject[];
 } & AppState['page'];
-
 export type CanvasAction = (typeof canvasActions)[keyof typeof canvasActions];
 export type CanvasActionType = CanvasAction['type'];
+export type ActionMeta = {
+  receivedFromWS?: boolean;
+  broadcast?: boolean;
+  duplicate?: boolean;
+  selectNodes?: boolean;
+};
+
+export const prepareMeta = <T = undefined>(
+  payload: T = undefined as T,
+  meta?: ActionMeta,
+) => {
+  return { payload, meta };
+};
 
 export const initialState: CanvasSliceState = {
   nodes: [],
@@ -34,20 +46,6 @@ export const initialState: CanvasSliceState = {
     line: 'solid',
     opacity: 1,
   },
-};
-
-export type ActionMeta = {
-  receivedFromWS?: boolean;
-  broadcast?: boolean;
-  duplicate?: boolean;
-  selectNodes?: boolean;
-};
-
-export const prepareMeta = <T = undefined>(
-  payload: T = undefined as T,
-  meta?: ActionMeta,
-) => {
-  return { payload, meta };
 };
 
 export const canvasSlice = createSlice({
@@ -236,4 +234,16 @@ export const selectPastHistory = (state: RootState) => state.canvas.past;
 export const selectFutureHistory = (state: RootState) => state.canvas.future;
 
 export const canvasActions = canvasSlice.actions;
+
+export const ignoredActionsInHistory = [
+  canvasActions.setToolType,
+  canvasActions.setStageConfig,
+  canvasActions.set,
+  canvasActions.setSelectedNodeIds,
+  canvasActions.selectAllNodes,
+  canvasActions.unselectAllNodes,
+  canvasActions.copyNodes,
+  canvasActions.setCurrentNodeStyle,
+] as const;
+
 export default canvasSlice.reducer;
