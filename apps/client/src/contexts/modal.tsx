@@ -1,13 +1,11 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import useDisclosure from '@/hooks/useDisclosure/useDisclosure';
 import Dialog from '@/components/Elements/Dialog/Dialog';
 import { createContext } from './createContext';
 
 type ModalContextValue = {
-  opened: boolean;
-  content: ModalContent;
-  open: (content: ModalContent) => void;
-  close: () => void;
+  openModal: (content: ModalContent) => void;
+  closeModal: () => void;
 };
 
 type ModalContent = {
@@ -25,13 +23,18 @@ export const ModalProvider = ({ children }: React.PropsWithChildren) => {
     description: '',
   });
 
-  const openModal = (content: ModalContent) => {
-    setContent(content);
-    open();
-  };
+  const openModal = useCallback(
+    (content: ModalContent) => {
+      setContent(content);
+      open();
+    },
+    [open],
+  );
+
+  const closeModal = useCallback(() => close(), [close]);
 
   return (
-    <ModalContext.Provider value={{ opened, content, open: openModal, close }}>
+    <ModalContext.Provider value={{ openModal, closeModal }}>
       {children}
       <Dialog open={opened} {...content} onClose={close} />
     </ModalContext.Provider>
