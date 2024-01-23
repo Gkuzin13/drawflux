@@ -8,21 +8,9 @@ export type UseDisclosureReturn = [
 const useDisclosure = (initialState = false): UseDisclosureReturn => {
   const [opened, setOpened] = useState(initialState);
 
-  const open = () => {
-    setOpened((prevState) => {
-      return prevState ? prevState : true;
-    });
-  };
-
-  const close = () => {
-    setOpened((prevState) => {
-      return !prevState ? prevState : false;
-    });
-  };
-
-  const toggle = () => {
-    opened ? close() : open();
-  };
+  const open = () => setOpened(true);
+  const close = () => setOpened(false);
+  const toggle = () => setOpened((prevOpened) => !prevOpened);
 
   return [opened, { open, close, toggle }];
 };
