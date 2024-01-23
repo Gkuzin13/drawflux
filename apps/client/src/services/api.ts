@@ -9,6 +9,11 @@ import type {
   UpdatePageResponse,
 } from 'shared';
 
+type QueryReturn<D> = {
+  data: D | null;
+  error: HTTPError | null;
+};
+
 const baseUrl = IS_PROD ? BASE_URL : BASE_URL_DEV;
 
 class HTTPError extends Error {}
@@ -17,23 +22,23 @@ const createQuery = (
   baseUrl: RequestInfo | URL = '',
   baseInit?: RequestInit,
 ) => {
-  return <T>(url: RequestInfo | URL, init?: RequestInit) => {
-    const controller = new AbortController();
-    const signal = controller.signal;
+  return async <D>(
+    url: RequestInfo | URL,
+    init?: RequestInit,
+  ): Promise<QueryReturn<D>> => {
+    try {
+      const res = await fetch(`${baseUrl}${url}`, { ...baseInit, ...init });
 
-    const result = fetch(`${baseUrl}${url}`, {
-      ...baseInit,
-      ...init,
-      signal,
-    }).then((res) => {
       if (!res.ok) {
         throw new HTTPError(res.statusText, { cause: res });
       }
+      
+      const data = await res.json();
 
-      return res.json() as Promise<T>;
-    });
-
-    return [result, controller] as const;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: error as HTTPError };
+    }
   };
 };
 
@@ -59,8 +64,8 @@ const api = {
 };
 
 export default {
-  getPage: (pageId: string) => {
-    return api.get<GetPageResponse>(`/p/${pageId}`);
+  getPage: (pageId: string, init?: RequestInit) => {
+    return api.get<GetPageResponse>(`/p/${pageId}`, init);
   },
   updatePage: (pageId: string, body: UpdatePageRequestBody) => {
     return api.patch<UpdatePageResponse>(`/p/${pageId}`, body);
