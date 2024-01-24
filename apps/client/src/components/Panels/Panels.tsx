@@ -68,7 +68,8 @@ const Panels = ({ selectedNodeIds }: Props) => {
   const dispatch = useAppDispatch();
 
   const isHandTool = toolType === 'hand';
-  const isStylePanelActive = selectedNodeIds.length > 0 && !isHandTool;
+  const showStylePanel =
+    selectedNodeIds.length > 0 && toolType !== 'laser' && !isHandTool;
 
   const disabledMenuItems = useMemo((): MenuKey[] | null => {
     if (ws.isConnected) {
@@ -216,7 +217,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
             />
           </Styled.Panel>
         )}
-        {isStylePanelActive && (
+        {showStylePanel && (
           <StylePanel
             selectedNodes={selectedNodes}
             onStyleChange={handleStyleChange}

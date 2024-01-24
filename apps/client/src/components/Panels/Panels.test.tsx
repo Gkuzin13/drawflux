@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { nodesGenerator, stateGenerator } from '@/test/data-generators';
 import { renderWithProviders } from '@/test/test-utils';
 import Panels from './Panels';
@@ -40,16 +40,44 @@ describe('style panel', () => {
     canvas: { present: { nodes, selectedNodeIds } },
   });
 
-  it('toggles render state based on selectedNodeIds', () => {
-    const { rerender } = renderWithProviders(
-      <Panels selectedNodeIds={selectedNodeIdsArray} />,
-    );
+  describe('hide/show', () => {
+    it('hidden when no nodes are selected', () => {
+      const { rerender } = renderWithProviders(
+        <Panels selectedNodeIds={selectedNodeIdsArray} />,
+        { preloadedState },
+      );
 
-    expect(screen.getByTestId(/style-panel/)).toBeInTheDocument();
+      expect(screen.getByTestId(/style-panel/)).toBeInTheDocument();
 
-    rerender(<Panels selectedNodeIds={[]} />);
+      rerender(<Panels selectedNodeIds={[]} />);
 
-    expect(screen.queryByTestId(/style-panel/)).toBeNull();
+      expect(screen.queryByTestId(/style-panel/)).toBeNull();
+    });
+
+    it('hidden when laser or hand tools are selected', async () => {
+      const { store } = renderWithProviders(
+        <Panels selectedNodeIds={selectedNodeIdsArray} />,
+        { preloadedState },
+      );
+
+      await act(async () => {
+        store.dispatch(canvasActions.setToolType('hand'));
+      });
+
+      expect(screen.queryByTestId(/style-panel/)).toBeNull();
+
+      await act(async () => {
+        store.dispatch(canvasActions.setToolType('select'));
+      });
+
+      expect(screen.getByTestId(/style-panel/)).toBeInTheDocument();
+
+      await act(async () => {
+        store.dispatch(canvasActions.setToolType('laser'));
+      });
+
+      expect(screen.queryByTestId(/style-panel/)).toBeNull();
+    });
   });
 
   describe('colors grid', () => {
