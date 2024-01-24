@@ -1,13 +1,12 @@
+import { useEffect, useState } from 'react';
 import { Shape } from 'react-konva';
 import { baseConfig } from '@/hooks/useNode/useNode';
-import { useEffect, useRef, useState } from 'react';
 import { Animation } from 'konva/lib/Animation';
 import useRefValue from '@/hooks/useRefValue/useRefValue';
 import { LASER } from '@/constants/shape';
 import { calculateCurveControlPoint } from '@/utils/draw';
 import { now } from '@/utils/is';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
-import type Konva from 'konva';
 
 const LaserDrawable = ({
   node,
@@ -15,9 +14,8 @@ const LaserDrawable = ({
   onNodeDelete,
 }: NodeComponentProps<'laser'>) => {
   const [path, setPath] = useState(node.nodeProps.points ?? []);
+  
   const [lastDrawTime, setLastDrawTime] = useRefValue(now());
-
-  const shapeRef = useRef<Konva.Shape>(null);
 
   useEffect(() => {
     setPath((prevPath) => {
@@ -66,18 +64,17 @@ const LaserDrawable = ({
 
   return (
     <Shape
-      ref={shapeRef}
       {...baseConfig}
       draggable={false}
       listening={false}
       shadowEnabled={false}
       dashEnabled={false}
-      sceneFunc={(ctx: Konva.Context, shape: Konva.Shape) => {
+      sceneFunc={(ctx, shape) => {
         if (!path.length) return;
-
+        
         const startPoint = path[0];
+
         ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
         ctx.strokeStyle = LASER.COLOR;
 
         ctx.moveTo(startPoint[0], startPoint[0]);
@@ -95,7 +92,6 @@ const LaserDrawable = ({
             controlPoint[1],
           );
 
-          ctx.globalAlpha = 1 - pointIndexRatio;
           ctx.lineWidth = ((1 - pointIndexRatio) * LASER.WIDTH) / stageScale;
 
           ctx.stroke();
