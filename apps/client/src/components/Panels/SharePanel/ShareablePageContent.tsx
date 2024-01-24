@@ -16,30 +16,30 @@ const SharablePageContent = () => {
   const nodes = useAppSelector(selectNodes);
   const stageConfig = useAppSelector(selectConfig);
 
-  const handlePageShare = () => {
+  const handlePageShare = async () => {
     if (!nodes.length) {
       return;
     }
 
     setLoading(true);
-
-    const [request] = api.sharePage({
+    
+    const { data, error } = await api.sharePage({
       page: { nodes, stageConfig },
     });
 
-    request
-      .then((data) => {
-        if (data?.id) {
-          const updatedURL = urlSearchParam.set(
-            CONSTANTS.COLLAB_ROOM_URL_PARAM,
-            data.id,
-          );
+    if (data?.id) {
+      const updatedURL = urlSearchParam.set(
+        CONSTANTS.COLLAB_ROOM_URL_PARAM,
+        data.id,
+      );
 
-          window.history.pushState({}, '', updatedURL);
-          window.location.reload();
-        }
-      })
-      .catch(() => setLoading(false));
+      window.history.pushState({}, '', updatedURL);
+      window.location.reload();
+    }
+
+    if (error) {
+      setLoading(false);
+    }
   };
 
   return (

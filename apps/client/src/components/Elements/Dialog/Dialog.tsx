@@ -20,8 +20,8 @@ const Dialog = ({ title, description, open, onClose }: Props) => {
     <DialogPrimitive.Root open={open} onOpenChange={handleOpenChange}>
       <DialogPrimitive.Portal>
         <Styled.Overlay />
-        <Styled.Content>
-          <Styled.Close>
+        <Styled.Content data-testid="dialog-content">
+          <Styled.Close data-testid="close-dialog-button">
             <Icon name="x" size="lg" />
           </Styled.Close>
           <Styled.Title>{title}</Styled.Title>

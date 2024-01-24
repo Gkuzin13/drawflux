@@ -212,18 +212,32 @@ const App = () => {
   useEffect(() => {
     if (!roomId) return;
 
-    const [request, abortController] = api.getPage(roomId);
+    const abortController = new AbortController();
 
-    request.then(({ page }) => {
-      dispatch(canvasActions.setNodes(page.nodes, { broadcast: false }));
-    });
+    (async () => {
+      const { data, error } = await api.getPage(roomId, {
+        signal: abortController.signal,
+      });
+
+      if (data) {
+        dispatch(canvasActions.setNodes(data.page.nodes, { broadcast: false }));
+      }
+
+      if (error) {
+        addNotification({
+          title: 'Live collaboration',
+          description: 'Could not load shapes',
+          type: 'error',
+        });
+      }
+    })();
 
     return () => {
       if (abortController.signal) {
         abortController.abort();
       }
     };
-  }, [roomId, dispatch]);
+  }, [roomId, dispatch, addNotification]);
 
   useEffect(() => {
     if (!roomId) return;
@@ -246,20 +260,16 @@ const App = () => {
 
     const unsubscribe = dispatch(addCollabActionsListeners(ws, roomId));
 
+    addNotification({
+      title: 'Live collaboration',
+      description: 'You are connected',
+      type: 'success',
+    });
+
     return () => {
       unsubscribe({ cancelActive: true });
     };
-  }, [ws, roomId, dispatch]);
-
-  useEffect(() => {
-    if (ws.isConnected) {
-      addNotification({
-        title: 'Live collaboration',
-        description: 'You are connected',
-        type: 'success',
-      });
-    }
-  }, [ws.isConnected, addNotification]);
+  }, [ws, roomId, addNotification, dispatch]);
 
   useEffect(() => {
     if (ws.isConnected || ws.isConnecting || roomId) {

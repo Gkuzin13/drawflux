@@ -15,14 +15,20 @@ const SharePanel = ({ isPageShared }: Props) => {
   const [qrCode, setQRCode] = useState<QRCodeResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handlePopoverOpen = (open: boolean) => {
+  const handlePopoverOpen = async (open: boolean) => {
     if (isPageShared && open && !qrCode) {
       const url = window.location.href;
 
-      setError(null);
+      const { data, error } = await api.makeQRCode({ url });
 
-      const [request] = api.makeQRCode({ url });
-      request.then(setQRCode).catch(setError);
+      if (data) {
+        setQRCode(data);
+        setError(null);
+      }
+
+      if (error) {
+        setError(error.message);
+      }
     }
   };
 

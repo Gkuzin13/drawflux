@@ -63,7 +63,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
 
   const ws = useWebSocket();
   const { online } = useNetworkState();
-  const modal = useModal();
+  const { openModal } = useModal();
 
   const dispatch = useAppDispatch();
 
@@ -137,7 +137,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
 
               setCursorByToolType(stage, project.toolType ?? 'select');
             } else {
-              modal.open({
+              openModal({
                 title: 'Error',
                 description: 'Could not load file',
               });
@@ -148,7 +148,7 @@ const Panels = ({ selectedNodeIds }: Props) => {
         }
       }
     },
-    [store, modal, dispatch],
+    [store, openModal, dispatch],
   );
 
   const handleZoomChange = useCallback(
