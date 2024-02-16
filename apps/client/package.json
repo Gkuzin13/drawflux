@@ -33,7 +33,7 @@
     "@radix-ui/react-visually-hidden": "^1.0.3",
     "@reduxjs/toolkit": "^1.9.3",
     "fontfaceobserver": "^2.3.0",
-    "konva": "^9.2.0",
+    "konva": "^9.3.3",
     "react": "*",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
