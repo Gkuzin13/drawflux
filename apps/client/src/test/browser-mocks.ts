@@ -38,11 +38,13 @@ Object.defineProperty(window, 'localStorage', {
 export class DragEvent extends MouseEvent {
   public clientX: number;
   public clientY: number;
-
+  public ctrlKey: boolean;
+  
   constructor(type: string, params: PointerEventInit = {}) {
     super(type, params);
     this.clientX = params.clientX ?? 0;
     this.clientY = params.clientY ?? 0;
+    this.ctrlKey = params.ctrlKey ?? false;
   }
 }
 

@@ -18,7 +18,9 @@ export type SnappingEdges = Record<Orientation, SnapEdge[]>;
 const GUIDELINE_OFFSET = 8;
 
 // get all possible line guide stops
-function getLineGuideStops(transformer: Konva.Transformer): LineGuideStops {
+export function getLineGuideStops(
+  transformer: Konva.Transformer,
+): LineGuideStops {
   const layer = transformer.getLayer() as Konva.Layer;
 
   const vertical: number[][] = [];
@@ -42,7 +44,9 @@ function getLineGuideStops(transformer: Konva.Transformer): LineGuideStops {
 }
 
 // get snapping edges of the transformer box
-function getObjectSnappingEdges(transformer: Konva.Transformer): SnappingEdges {
+export function getObjectSnappingEdges(
+  transformer: Konva.Transformer,
+): SnappingEdges {
   const box = transformer.__getNodeRect();
   const absPosition = transformer.getAbsolutePosition();
 
@@ -84,19 +88,17 @@ function getObjectSnappingEdges(transformer: Konva.Transformer): SnappingEdges {
   };
 }
 
-function getNearbySnaps(
+export function getNearbySnaps(
   orientation: Orientation,
   lineGuideStops: LineGuideStops,
   transformerSnapEdges: SnappingEdges,
 ) {
-  const result: SnapLineGuide[] = [];
-
-  lineGuideStops[orientation].forEach((guide) => {
+  return lineGuideStops[orientation].reduce((acc: SnapLineGuide[], guide) => {
     transformerSnapEdges[orientation].forEach((edge) => {
       const diff = Math.abs(guide - edge.guide);
 
       if (diff < GUIDELINE_OFFSET) {
-        result.push({
+        acc.push({
           guide,
           diff,
           orientation,
@@ -105,9 +107,9 @@ function getNearbySnaps(
         });
       }
     });
-  });
 
-  return result;
+    return acc;
+  }, []);
 }
 
 export function getLineGuides(transformer: Konva.Transformer) {
@@ -192,6 +194,8 @@ export function snapNodesToEdges(
   });
 }
 
-function findClosestSnap(lineGuides: SnapLineGuide[]) {
-  return lineGuides.sort((a, b) => a.diff - b.diff)[0];
+export function findClosestSnap(lineGuides: SnapLineGuide[]) {
+  const min = Math.min(...lineGuides.map(({ diff }) => diff));
+
+  return lineGuides.find(({ diff }) => diff === min);
 }

@@ -53,6 +53,7 @@ const LineGuide = ({ lineGuide, stageConfig }: Props) => {
       stroke={defaultTheme.colors.green400.value}
       opacity={0.7}
       {...config}
+      name={`${lineGuide.orientation}-line-guide`}
     />
   );
 };
