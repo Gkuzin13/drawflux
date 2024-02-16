@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo } from 'react';
-import NodeGroupTransformer from '../Transformer/NodeGroupTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectNodes, useSelectNodesById } from '@/services/canvas/slice';
+import NodesTransformer from '../Transformer/NodesTransformer';
 import Node from '../Node/Node';
 import type { NodeObject } from 'shared';
 import type { NodeComponentProps } from '../Node/Node';
@@ -56,8 +56,8 @@ const Nodes = ({
         );
       })}
       {selectedMultipleNodes && (
-        <NodeGroupTransformer
-          nodes={selectedNodes}
+        <NodesTransformer
+          selectedNodes={selectedNodes}
           stageScale={stageScale}
           onNodesChange={onNodesChange}
         />

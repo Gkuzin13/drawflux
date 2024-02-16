@@ -28,6 +28,7 @@ const NodeTransformer = forwardRef<Konva.Transformer, TransformerProps>(
     return (
       <Transformer
         ref={forwardedRef}
+        name={TRANSFORMER.NAME}
         type={TRANSFORMER.TYPE}
         anchorFill={themeColors['canvas-bg'].value}
         anchorStroke={TRANSFORMER.BORDER_STROKE}

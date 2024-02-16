@@ -41,13 +41,16 @@ import SelectRect from './SelectRect';
 import Drafts from './Drafts';
 import useSharedRef from '@/hooks/useSharedRef';
 import { resetCursor, setCursor, setCursorByToolType } from './helpers/cursor';
-import { ARROW_TRANSFORMER, TEXT } from '@/constants/shape';
+import { ARROW_TRANSFORMER, TEXT, TRANSFORMER } from '@/constants/shape';
 import { safeJSONParse } from '@/utils/object';
 import { LIBRARY } from '@/constants/panels';
 import { DRAWING_CANVAS } from '@/constants/canvas';
+import SnapLineGuides from '../SnapLineGuides/SnapLineGuides';
+import { getLineGuides, snapNodesToEdges } from './helpers/snap';
 import * as Styled from './DrawingCanvas.styled';
-import type { DrawPosition } from './helpers/draw';
+import type { SnapLineGuide } from './helpers/snap';
 import type Konva from 'konva';
+import type { DrawPosition } from './helpers/draw';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { NodeObject, NodeType, Point } from 'shared';
 import type { LibraryItem } from '@/constants/app';
@@ -65,6 +68,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const [selectedNodeIds, setSelectedNodeIds] = useState<string[]>([]);
     const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
     const [drawing, setDrawing] = useState(false);
+    const [snapLineGuides, setSnapLineGuides] = useState<SnapLineGuide[]>([]);
 
     const [drafts, setDrafts] = useDrafts();
 
@@ -474,7 +478,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [zoomStageRelativeToPointerPosition],
     );
 
-    const handleDragStart = useCallback(
+    const handleStageDragStart = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
         const stage = event.target.getStage();
 
@@ -490,7 +494,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [toolType],
     );
 
-    const handleDragMove = useCallback(
+    const handleStageDragMove = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
         const stage = event.target.getStage();
 
@@ -510,7 +514,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       [ws, thisUser],
     );
 
-    const handleDragEnd = useCallback(
+    const handleStageDragEnd = useCallback(
       (event: KonvaEventObject<DragEvent>) => {
         const stage = event.target.getStage();
 
@@ -535,6 +539,34 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
       },
       [toolType, dispatch],
     );
+
+    const handleLayerDragMove = useCallback(
+      (event: Konva.KonvaEventObject<DragEvent>) => {
+        if (!event.evt.ctrlKey) {
+          setSnapLineGuides([]);
+          return;
+        }
+
+        if (!event.target.hasName(TRANSFORMER.NAME)) {
+          return;
+        }
+
+        const transformer = event.target as unknown as Konva.Transformer;
+
+        const guides = getLineGuides(transformer);
+
+        setSnapLineGuides(guides);
+
+        if (guides.length) {
+          snapNodesToEdges(guides, transformer);
+        }
+      },
+      [],
+    );
+
+    const handleLayerDragEnd = useCallback(() => {
+      setSnapLineGuides([]);
+    }, []);
 
     const handleOnContextMenu = useCallback(
       (event: KonvaEventObject<PointerEvent>) => {
@@ -608,14 +640,18 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onWheel={handleOnWheel}
-        onDragStart={handleDragStart}
-        onDragMove={handleDragMove}
-        onDragEnd={handleDragEnd}
+        onDragStart={handleStageDragStart}
+        onDragMove={handleStageDragMove}
+        onDragEnd={handleStageDragEnd}
         onContextMenu={handleOnContextMenu}
         onDblClick={handleDoublePress}
         onDblTap={handleDoublePress}
       >
-        <Layer listening={isLayerListening}>
+        <Layer
+          listening={isLayerListening}
+          onDragMove={handleLayerDragMove}
+          onDragEnd={handleLayerDragEnd}
+        >
           <CanvasBackground
             x={stageConfig.position.x}
             y={stageConfig.position.y}
@@ -644,6 +680,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
               position={drawingPosition.current}
             />
           )}
+          <SnapLineGuides lineGuides={snapLineGuides} />
         </Layer>
       </Styled.Stage>
     );
