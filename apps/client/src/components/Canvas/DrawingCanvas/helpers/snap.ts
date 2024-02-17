@@ -12,7 +12,7 @@ export type SnapLineGuide = SnapEdge & {
   diff: number;
   orientation: Orientation;
 };
-export type LineGuideStops = Record<Orientation, number[]>;
+export type LineGuideStops = Record<Orientation, SnapEdge['guide'][]>;
 export type SnappingEdges = Record<Orientation, SnapEdge[]>;
 
 const GUIDELINE_OFFSET = 8;
@@ -195,7 +195,11 @@ export function snapNodesToEdges(
 }
 
 export function findClosestSnap(lineGuides: SnapLineGuide[]) {
+  if(!lineGuides.length) {
+    return null;
+  }
+
   const min = Math.min(...lineGuides.map(({ diff }) => diff));
 
-  return lineGuides.find(({ diff }) => diff === min);
+  return lineGuides.find(({ diff }) => diff === min) ?? null;
 }

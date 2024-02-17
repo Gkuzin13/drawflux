@@ -4,40 +4,38 @@ import {
   getNearbySnaps,
   findClosestSnap,
   getObjectSnappingEdges,
+  snapNodesToEdges,
 } from '../snap';
 import { renderScene } from '@/test/test-utils';
 import type { SnapLineGuide, SnappingEdges, LineGuideStops } from '../snap';
 
-const rect = new Konva.Rect({
-  id: 'rect',
-  x: 50,
-  y: 50,
-  width: 50,
-  height: 50,
-});
-const ellipse = new Konva.Ellipse({
-  id: 'ellipse',
-  x: 150,
-  y: 150,
-  radiusX: 100,
-  radiusY: 100,
-});
-
-const rect2 = new Konva.Rect({
-  id: 'rect2',
-  x: 55,
-  y: 75,
-  width: 50,
-  height: 20,
-});
-
-const transformer = new Konva.Transformer({
-  id: 'tr',
-  nodes: [rect, ellipse],
-});
-
 describe('getLineGuideStops', () => {
   const scene = renderScene();
+
+  const rect = new Konva.Rect({
+    id: 'rect',
+    x: 50,
+    y: 50,
+    width: 50,
+    height: 50,
+  });
+  const ellipse = new Konva.Ellipse({
+    id: 'ellipse',
+    x: 150,
+    y: 150,
+    radiusX: 100,
+    radiusY: 100,
+  });
+
+  const rect2 = new Konva.Rect({
+    id: 'rect2',
+    x: 55,
+    y: 75,
+    width: 50,
+    height: 20,
+  });
+
+  const transformer = new Konva.Transformer({ nodes: [rect, ellipse] });
 
   afterEach(() => {
     scene.layer.removeChildren();
@@ -45,11 +43,7 @@ describe('getLineGuideStops', () => {
   });
 
   it('returns nodes vertical and horizontal guides', () => {
-    scene.layer.add(rect);
-    scene.layer.add(ellipse);
-    scene.layer.add(rect2);
-    scene.layer.add(transformer);
-
+    scene.layer.add(rect, rect2, ellipse, transformer);
     scene.layer.batchDraw();
 
     const result = getLineGuideStops(transformer);
@@ -60,10 +54,7 @@ describe('getLineGuideStops', () => {
   });
 
   it('returns empty line guide stops when theres no nodes on layer', () => {
-    scene.layer.add(rect);
-    scene.layer.add(ellipse);
-    scene.layer.add(transformer);
-
+    scene.layer.add(rect, ellipse, transformer);
     scene.layer.batchDraw();
 
     const result = getLineGuideStops(transformer);
@@ -74,9 +65,28 @@ describe('getLineGuideStops', () => {
 });
 
 describe('getObjectSnappingEdges', () => {
-  const scene = renderScene();
+  it('returns correct snapping edges', () => {
+    const scene = renderScene();
 
-  it('returns correct snapping edges for a transformer with a rectangle', () => {
+    const rect = new Konva.Rect({
+      id: 'rect',
+      x: 50,
+      y: 50,
+      width: 50,
+      height: 50,
+    });
+    const ellipse = new Konva.Ellipse({
+      id: 'ellipse',
+      x: 150,
+      y: 150,
+      radiusX: 100,
+      radiusY: 100,
+    });
+
+    const transformer = new Konva.Transformer({ nodes: [rect, ellipse] });
+
+    scene.layer.add(rect, ellipse, transformer);
+
     const result = getObjectSnappingEdges(transformer);
 
     expect(result.vertical).toEqual([
@@ -216,9 +226,49 @@ describe('findClosestSnap', () => {
     expect(result).toEqual(snapLineGuides[1]);
   });
 
-  it('returns undefined if there are no snaps', () => {
+  it('returns null if there are no snaps', () => {
     const result = findClosestSnap([]);
 
-    expect(result).toEqual(undefined);
+    expect(result).toEqual(null);
+  });
+});
+
+describe('snapNodesToEdges', () => {
+  it('snaps nodes to vertical and horizontal edges', () => {
+    const scene = renderScene();
+
+    const rect1 = new Konva.Rect({ x: 50, y: 50, width: 50, height: 50 });
+    const rect2 = new Konva.Rect({ x: 110, y: 110, width: 20, height: 20 });
+    const rect3 = new Konva.Rect({ x: 150, y: 150, width: 50, height: 50 });
+
+    const transformer = new Konva.Transformer({ nodes: [rect2, rect3] });
+
+    scene.layer.add(rect1, rect2, rect3, transformer);
+    scene.layer.batchDraw();
+
+    const lineGuides: SnapLineGuide[] = [
+      {
+        guide: 50,
+        diff: 10,
+        orientation: 'vertical',
+        snap: 'center',
+        offset: 20,
+      },
+      {
+        guide: 50,
+        diff: 10,
+        orientation: 'horizontal',
+        snap: 'end',
+        offset: 20,
+      },
+    ];
+
+    snapNodesToEdges(lineGuides, transformer);
+
+    expect(rect2.absolutePosition()).toEqual({ x: 70, y: 70 });
+    expect(rect3.absolutePosition()).toEqual({ x: 110, y: 110 });
+
+    scene.layer.removeChildren();
+    scene.destroy();
   });
 });
