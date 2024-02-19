@@ -21,6 +21,9 @@ importers:
         specifier: ^3.21.4
         version: 3.22.4
     devDependencies:
+      '@types/node':
+        specifier: ^20.11.19
+        version: 20.11.19
       '@types/react':
         specifier: ^18.0.31
         version: 18.2.38
@@ -41,7 +44,7 @@ importers:
         version: 4.9.5
       vite:
         specifier: ^4.4.9
-        version: 4.5.0(@types/node@18.18.11)
+        version: 4.5.0(@types/node@20.11.19)
       vitest:
         specifier: ^0.34.1
         version: 0.34.6(happy-dom@10.11.2)(jsdom@22.1.0)
@@ -94,8 +97,8 @@ importers:
         specifier: ^2.3.0
         version: 2.3.0
       konva:
-        specifier: ^9.2.0
-        version: 9.2.3
+        specifier: ^9.3.3
+        version: 9.3.3
       react:
         specifier: '*'
         version: 18.2.0
@@ -107,10 +110,10 @@ importers:
         version: 4.12.0(react@18.2.0)
       react-konva:
         specifier: ^18.2.10
-        version: 18.2.10(konva@9.2.3)(react-dom@18.2.0)(react@18.2.0)
+        version: 18.2.10(konva@9.3.3)(react-dom@18.2.0)(react@18.2.0)
       react-konva-utils:
         specifier: ^1.0.5
-        version: 1.0.5(konva@9.2.3)(react-dom@18.2.0)(react@18.2.0)
+        version: 1.0.5(konva@9.3.3)(react-dom@18.2.0)(react@18.2.0)
       react-redux:
         specifier: ^8.0.5
         version: 8.1.3(@types/react-dom@18.2.16)(@types/react@18.2.38)(react-dom@18.2.0)(react@18.2.0)(redux@4.2.1)
@@ -134,8 +137,8 @@ importers:
         specifier: ^7.21.0
         version: 7.23.3(@babel/core@7.23.3)
       '@playwright/test':
-        specifier: ^1.36.2
-        version: 1.40.0
+        specifier: ^1.41.2
+        version: 1.41.2
       '@redux-devtools/core':
         specifier: ^3.13.1
         version: 3.13.3(react-redux@8.1.3)(react@18.2.0)(redux@4.2.1)
@@ -151,9 +154,6 @@ importers:
       '@types/fontfaceobserver':
         specifier: ^2.1.0
         version: 2.1.3
-      '@types/node':
-        specifier: ^18.15.11
-        version: 18.18.11
       '@types/react':
         specifier: ^18.0.31
         version: 18.2.38
@@ -182,8 +182,8 @@ importers:
         specifier: workspace:eslint-config-bases@latest
         version: link:../../packages/eslint-config-bases
       eslint-plugin-playwright:
-        specifier: ^0.15.3
-        version: 0.15.3(eslint@8.54.0)
+        specifier: ^1.2.0
+        version: 1.2.0(eslint@8.54.0)
       happy-dom:
         specifier: ^10.9.0
         version: 10.11.2
@@ -1990,7 +1990,7 @@ packages:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
       '@types/yargs': 17.0.32
       chalk: 4.1.2
     dev: true
@@ -2100,12 +2100,12 @@ packages:
     resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
     dev: true
 
-  /@playwright/test@1.40.0:
-    resolution: {integrity: sha512-PdW+kn4eV99iP5gxWNSDQCbhMaDVej+RXL5xr6t04nbKLCBwYtA046t7ofoczHOm8u6c+45hpDKQVZqtqwkeQg==}
+  /@playwright/test@1.41.2:
+    resolution: {integrity: sha512-qQB9h7KbibJzrDpkXkYvsmiDJK14FULCCZgEcoe2AvFAS64oCirWTwzTlAYEbKaRxWs5TFesE1Na6izMv3HfGg==}
     engines: {node: '>=16'}
     hasBin: true
     dependencies:
-      playwright: 1.40.0
+      playwright: 1.41.2
     dev: true
 
   /@radix-ui/number@1.0.1:
@@ -3178,7 +3178,7 @@ packages:
   /@types/connect@3.4.38:
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
     dependencies:
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
 
   /@types/cookie@0.4.1:
     resolution: {integrity: sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==}
@@ -3226,7 +3226,7 @@ packages:
   /@types/express-serve-static-core@4.17.41:
     resolution: {integrity: sha512-OaJ7XLaelTgrvlZD8/aa0vvvxZdUmlCn6MtWeB7TkiKW70BQLc9XEPpDLPdbo52ZhXUCrznlWdCHWxJWtdyajA==}
     dependencies:
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
       '@types/qs': 6.9.10
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -3301,6 +3301,11 @@ packages:
     dependencies:
       undici-types: 5.26.5
 
+  /@types/node@20.11.19:
+    resolution: {integrity: sha512-7xMnVEcZFu0DikYjWOlRq7NTPETrm7teqUT2WkQjrTIkEgUyyGdWsj/Zg8bEJt5TNklzbPD1X3fqfsHw3SpapQ==}
+    dependencies:
+      undici-types: 5.26.5
+
   /@types/pg@8.10.9:
     resolution: {integrity: sha512-UksbANNE/f8w0wOMxVKKIrLCbEMV+oM1uKejmwXr39olg4xqcfBDbXxObJAt6XxHbDa4XTKOlUEcEltXDX+XLQ==}
     dependencies:
@@ -3345,7 +3350,7 @@ packages:
   /@types/resolve@1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
     dev: true
 
   /@types/scheduler@0.16.7:
@@ -3359,14 +3364,14 @@ packages:
     resolution: {integrity: sha512-x2EM6TJOybec7c52BX0ZspPodMsQUd5L6PRwOunVyVUhXiBSKf3AezDL8Dgvgt5o0UfKNfuA0eMLr2wLT4AiBA==}
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
 
   /@types/serve-static@1.15.5:
     resolution: {integrity: sha512-PDRk21MnK70hja/YF8AHfC7yIsiQHn1rcXx7ijCFBX/k+XQJhQT/gw3xekXKJvx+5SXaMMS8oqQy09Mzvz2TuQ==}
     dependencies:
       '@types/http-errors': 2.0.4
       '@types/mime': 3.0.4
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
 
   /@types/stack-utils@2.0.3:
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
@@ -3380,7 +3385,7 @@ packages:
     resolution: {integrity: sha512-GMaOrnnUsjChvH8zlzdDPARRXky8bU3E8xsU/fOclgqsINekbwDu1+wzJzJaGzZP91SGpOutf5Te5pm5M/qCWg==}
     dependencies:
       '@types/cookiejar': 2.1.5
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
     dev: true
 
   /@types/supertest@2.0.16:
@@ -3567,7 +3572,7 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.23.3(@babel/core@7.23.3)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.0
-      vite: 4.5.0(@types/node@18.18.11)
+      vite: 4.5.0(@types/node@20.11.19)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -5058,16 +5063,18 @@ packages:
       object.fromentries: 2.0.7
     dev: true
 
-  /eslint-plugin-playwright@0.15.3(eslint@8.54.0):
-    resolution: {integrity: sha512-LQMW5y0DLK5Fnpya7JR1oAYL2/7Y9wDiYw6VZqlKqcRGSgjbVKNqxraphk7ra1U3Bb5EK444xMgUlQPbMg2M1g==}
+  /eslint-plugin-playwright@1.2.0(eslint@8.54.0):
+    resolution: {integrity: sha512-D7kY1gutJx5VWrqev4DmUs1HVTItR0iVjCAZl7PG4xI7G+amtjvvuM6EzWUL433JUH9vMk1e5afh53A5pHXWfg==}
+    engines: {node: '>=16.6.0'}
     peerDependencies:
-      eslint: '>=7'
+      eslint: '>=8.40.0'
       eslint-plugin-jest: '>=25'
     peerDependenciesMeta:
       eslint-plugin-jest:
         optional: true
     dependencies:
       eslint: 8.54.0
+      globals: 13.23.0
     dev: true
 
   /eslint-plugin-react-hooks@4.6.0(eslint@8.54.0):
@@ -6208,7 +6215,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -6219,7 +6226,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: true
@@ -6228,7 +6235,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
       merge-stream: 2.0.0
       supports-color: 8.1.1
     dev: true
@@ -6368,8 +6375,8 @@ packages:
       json-buffer: 3.0.1
     dev: true
 
-  /konva@9.2.3:
-    resolution: {integrity: sha512-oQ6VQ6kUL9IlhOGuEKKhxqnv6g/t8jZpVuWahQQ6hCqAsO8Ydi1zFGv7ef4EOq5GoPNq/d6Fyj/3i5Y/a5NooA==}
+  /konva@9.3.3:
+    resolution: {integrity: sha512-cg/AHxnfawZ1rKxygCnzx0TZY7hQiQiAKgAHPinEwMn49MVrBkeKLj2d0EaleoFG/0y0XhEKTD0dFZiPPdWlCQ==}
     dev: false
 
   /language-subtag-registry@0.3.22:
@@ -7139,18 +7146,18 @@ packages:
       pathe: 1.1.1
     dev: true
 
-  /playwright-core@1.40.0:
-    resolution: {integrity: sha512-fvKewVJpGeca8t0ipM56jkVSU6Eo0RmFvQ/MaCQNDYm+sdvKkMBBWTE1FdeMqIdumRaXXjZChWHvIzCGM/tA/Q==}
+  /playwright-core@1.41.2:
+    resolution: {integrity: sha512-VaTvwCA4Y8kxEe+kfm2+uUUw5Lubf38RxF7FpBxLPmGe5sdNkSg5e3ChEigaGrX7qdqT3pt2m/98LiyvU2x6CA==}
     engines: {node: '>=16'}
     hasBin: true
     dev: true
 
-  /playwright@1.40.0:
-    resolution: {integrity: sha512-gyHAgQjiDf1m34Xpwzaqb76KgfzYrhK7iih+2IzcOCoZWr/8ZqmdBw+t0RU85ZmfJMgtgAiNtBQ/KS2325INXw==}
+  /playwright@1.41.2:
+    resolution: {integrity: sha512-v0bOa6H2GJChDL8pAeLa/LZC4feoAMbSQm1/jF/ySsWWoaNItvrMP7GEkvEEFyCTUYKMxjQKaTSg5up7nR6/8A==}
     engines: {node: '>=16'}
     hasBin: true
     dependencies:
-      playwright-core: 1.40.0
+      playwright-core: 1.41.2
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
@@ -7377,21 +7384,21 @@ packages:
   /react-is@18.2.0:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
 
-  /react-konva-utils@1.0.5(konva@9.2.3)(react-dom@18.2.0)(react@18.2.0):
+  /react-konva-utils@1.0.5(konva@9.3.3)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-MQco0bre5ohm2lS34wAr/QJgT5PCnKbS3V1/aeYDldc8mq5X1UwcjxZWSL7YxGw3jQSHOm6XyX0YgLXQYUWBuQ==}
     peerDependencies:
       konva: ^8.3.5 || ^9.0.0
       react: ^18.2.0
       react-dom: ^18.2.0
     dependencies:
-      konva: 9.2.3
+      konva: 9.3.3
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-      react-konva: 18.2.10(konva@9.2.3)(react-dom@18.2.0)(react@18.2.0)
+      react-konva: 18.2.10(konva@9.3.3)(react-dom@18.2.0)(react@18.2.0)
       use-image: 1.1.1(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
-  /react-konva@18.2.10(konva@9.2.3)(react-dom@18.2.0)(react@18.2.0):
+  /react-konva@18.2.10(konva@9.3.3)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-ohcX1BJINL43m4ynjZ24MxFI1syjBdrXhqVxYVDw2rKgr3yuS0x/6m1Y2Z4sl4T/gKhfreBx8KHisd0XC6OT1g==}
     peerDependencies:
       konva: ^8.0.1 || ^7.2.5 || ^9.0.0
@@ -7400,7 +7407,7 @@ packages:
     dependencies:
       '@types/react-reconciler': 0.28.8
       its-fine: 1.1.1(react@18.2.0)
-      konva: 9.2.3
+      konva: 9.3.3
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       react-reconciler: 0.29.0(react@18.2.0)
@@ -8616,7 +8623,7 @@ packages:
     engines: {node: '>= 0.8'}
     dev: false
 
-  /vite-node@0.34.6(@types/node@18.18.11):
+  /vite-node@0.34.6(@types/node@20.11.19):
     resolution: {integrity: sha512-nlBMJ9x6n7/Amaz6F3zJ97EBwR2FkzhBRxF5e+jE6LA3yi6Wtc2lyTij1OnDMIr34v5g/tVQtsVAzhT0jc5ygA==}
     engines: {node: '>=v14.18.0'}
     hasBin: true
@@ -8626,7 +8633,7 @@ packages:
       mlly: 1.4.2
       pathe: 1.1.1
       picocolors: 1.0.0
-      vite: 4.5.0(@types/node@18.18.11)
+      vite: 4.5.0(@types/node@20.11.19)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -8649,14 +8656,14 @@ packages:
       debug: 4.3.4
       fast-glob: 3.3.2
       pretty-bytes: 6.1.1
-      vite: 4.5.0(@types/node@18.18.11)
+      vite: 4.5.0(@types/node@20.11.19)
       workbox-build: 7.0.0
       workbox-window: 7.0.0
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /vite@4.5.0(@types/node@18.18.11):
+  /vite@4.5.0(@types/node@20.11.19):
     resolution: {integrity: sha512-ulr8rNLA6rkyFAlVWw2q5YJ91v098AFQ2R0PRFwPzREXOUJQPtFUG0t+/ZikhaOCDqFoDhN6/v8Sq0o4araFAw==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -8684,7 +8691,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
       esbuild: 0.18.20
       postcss: 8.4.31
       rollup: 3.29.4
@@ -8734,7 +8741,7 @@ packages:
     dependencies:
       '@types/chai': 4.3.11
       '@types/chai-subset': 1.3.5
-      '@types/node': 18.18.11
+      '@types/node': 20.11.19
       '@vitest/expect': 0.34.6
       '@vitest/runner': 0.34.6
       '@vitest/snapshot': 0.34.6
@@ -8755,8 +8762,8 @@ packages:
       strip-literal: 1.3.0
       tinybench: 2.5.1
       tinypool: 0.7.0
-      vite: 4.5.0(@types/node@18.18.11)
-      vite-node: 0.34.6(@types/node@18.18.11)
+      vite: 4.5.0(@types/node@20.11.19)
+      vite-node: 0.34.6(@types/node@20.11.19)
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less

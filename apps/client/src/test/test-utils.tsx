@@ -17,6 +17,7 @@ import { WebSocketProvider } from '@/contexts/websocket';
 import { ThemeProvider } from '@/contexts/theme';
 import { NotificationsProvider } from '@/contexts/notifications';
 import { ModalProvider } from '@/contexts/modal';
+import Konva from 'konva';
 import type { PropsWithChildren } from 'react';
 import type { PreloadedState } from '@reduxjs/toolkit';
 import type { RootState } from '@/stores/store';
@@ -103,4 +104,25 @@ export async function findCanvas() {
 
 export function changeJSDOMURL(url: URL | string) {
   history.replaceState(history.state, '', url);
+}
+
+export function renderScene() {
+  const container = document.createElement('div');
+  document.body.append(container);
+
+  const stage = new Konva.Stage({
+    container,
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+  const layer = new Konva.Layer();
+
+  stage.add(layer);
+
+  const destroy = () => {
+    stage.destroy();
+    container.remove();
+  };
+
+  return { stage, layer, destroy };
 }

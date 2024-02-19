@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo } from 'react';
-import NodeGroupTransformer from '../Transformer/NodeGroupTransformer';
 import { useAppSelector } from '@/stores/hooks';
 import { selectNodes, useSelectNodesById } from '@/services/canvas/slice';
+import NodesTransformer from '../Transformer/NodesTransformer';
 import Node from '../Node/Node';
 import type { NodeObject } from 'shared';
 import type { NodeComponentProps } from '../Node/Node';
@@ -29,17 +29,13 @@ const Nodes = ({
     return selectedSingleNode ? selectedNodes[0].nodeProps.id : null;
   }, [selectedNodes]);
 
-  const selectedMultipleNodes = useMemo(() => {
-    return selectedNodes.length > 1;
-  }, [selectedNodes.length]);
-
   const handleNodeChange = useCallback(
     (node: NodeObject) => {
       onNodesChange([node]);
     },
     [onNodesChange],
   );
-  
+
   return (
     <>
       {nodes.map((node) => {
@@ -55,13 +51,11 @@ const Nodes = ({
           />
         );
       })}
-      {selectedMultipleNodes && (
-        <NodeGroupTransformer
-          nodes={selectedNodes}
-          stageScale={stageScale}
-          onNodesChange={onNodesChange}
-        />
-      )}
+      <NodesTransformer
+        selectedNodes={selectedNodes}
+        stageScale={stageScale}
+        onNodesChange={onNodesChange}
+      />
     </>
   );
 };

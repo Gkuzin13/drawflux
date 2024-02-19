@@ -4,7 +4,7 @@ import { ARROW_TRANSFORMER } from '@/constants/shape';
 import { stateGenerator } from '@/test/data-generators';
 import { findCanvas, renderWithProviders } from '@/test/test-utils';
 import { createNode } from '@/utils/node';
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import Konva from 'konva';
 import type { NodeType } from 'shared';
 
@@ -143,12 +143,16 @@ describe('cursor', () => {
       const { container } = await findCanvas();
 
       // fire dragStart event
-      Konva.stages[0].fire('dragstart');
+      await act(async () => {
+        Konva.stages[0].fire('dragstart');
+      });
 
       expect(container.style.cursor).toBe('grabbing');
 
       // fire dragEnd event
-      Konva.stages[0].fire('dragend');
+      await act(async () => {
+        Konva.stages[0].fire('dragend');
+      });
 
       expect(container.style.cursor).toBe('grab');
     });
@@ -163,12 +167,16 @@ describe('cursor', () => {
       const { container } = await findCanvas();
 
       // fire dragStart event
-      Konva.stages[0].fire('dragstart');
+      await act(async () => {
+        Konva.stages[0].fire('dragstart');
+      });
 
       expect(container.style.cursor).toBe('all-scroll');
 
       // fire dragEnd event
-      Konva.stages[0].fire('dragend');
+      await act(async () => {
+        Konva.stages[0].fire('dragend');
+      });
 
       expect(container.style.cursor).toBe('');
     });

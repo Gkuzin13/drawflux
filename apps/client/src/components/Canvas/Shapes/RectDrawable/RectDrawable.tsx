@@ -1,10 +1,8 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { Rect } from 'react-konva';
-import NodeTransformer from '@/components/Canvas/Transformer/NodeTransformer';
 import { RECT } from '@/constants/shape';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
-import useTransformer from '@/hooks/useTransformer';
 import { calculatePerimeter } from '@/utils/math';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import { getRectSize } from './helpers/calc';
@@ -13,32 +11,16 @@ import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 
 const RectDrawable = ({
   node,
-  selected,
   stageScale,
-  onNodeChange,
 }: NodeComponentProps<'rectangle'>) => {
-  const { nodeRef, transformerRef } = useTransformer<Konva.Rect>([selected]);
+  const nodeRef = useRef<Konva.Rect>(null);
 
   const { config } = useNode(node, stageScale);
-
   const { animation } = useAnimatedDash({
     enabled: node.style.animated,
     nodeRef,
     totalDashLength: getTotalDashLength(config.dash),
   });
-
-  const handleDragEnd = useCallback(
-    (event: Konva.KonvaEventObject<DragEvent>) => {
-      onNodeChange({
-        ...node,
-        nodeProps: {
-          ...node.nodeProps,
-          point: [event.target.x(), event.target.y()],
-        },
-      });
-    },
-    [node, onNodeChange],
-  );
 
   const handleTransformStart = useCallback(() => {
     if (node.style.animated && animation) {
@@ -69,31 +51,11 @@ const RectDrawable = ({
     [node.style.size, node.style.line, stageScale],
   );
 
-  const handleTransformEnd = useCallback(
-    (event: Konva.KonvaEventObject<Event>) => {
-      const rect = event.target as Konva.Rect;
-
-      const { width, height } = getRectSize(rect);
-
-      onNodeChange({
-        ...node,
-        nodeProps: {
-          ...node.nodeProps,
-          point: [rect.x(), rect.y()],
-          width,
-          height,
-          rotation: rect.rotation(),
-        },
-      });
-
-      rect.scale({ x: 1, y: 1 });
-
-      if (node.style.animated && animation?.isRunning() === false) {
-        animation.start();
-      }
-    },
-    [node, animation, onNodeChange],
-  );
+  const handleTransformEnd = useCallback(() => {
+    if (node.style.animated && animation?.isRunning() === false) {
+      animation.start();
+    }
+  }, [node, animation]);
 
   // Sanitize rect size
   const { width, height } = useMemo(() => {
@@ -110,28 +72,18 @@ const RectDrawable = ({
   }, [node.nodeProps.width, node.nodeProps.height]);
   
   return (
-    <>
-      <Rect
-        ref={nodeRef}
-        {...config}
-        x={node.nodeProps.point[0]}
-        y={node.nodeProps.point[1]}
-        width={width}
-        height={height}
-        cornerRadius={RECT.CORNER_RADIUS}
-        onDragEnd={handleDragEnd}
-        onTransformStart={handleTransformStart}
-        onTransform={handlTransform}
-        onTransformEnd={handleTransformEnd}
-      />
-      {selected && (
-        <NodeTransformer
-          ref={transformerRef}
-          stageScale={stageScale}
-          transformerConfig={{ keepRatio: false }}
-        />
-      )}
-    </>
+    <Rect
+      ref={nodeRef}
+      {...config}
+      x={node.nodeProps.point[0]}
+      y={node.nodeProps.point[1]}
+      width={width}
+      height={height}
+      cornerRadius={RECT.CORNER_RADIUS}
+      onTransformStart={handleTransformStart}
+      onTransform={handlTransform}
+      onTransformEnd={handleTransformEnd}
+    />
   );
 };
 

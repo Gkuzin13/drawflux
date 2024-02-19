@@ -1,9 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { Ellipse } from 'react-konva';
-import NodeTransformer from '@/components/Canvas/Transformer/NodeTransformer';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
-import useTransformer from '@/hooks/useTransformer';
 import { calculateCircumference } from '@/utils/math';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
 import { getEllipseRadius } from './helpers/calc';
@@ -13,11 +11,9 @@ import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 
 const EllipseDrawable = ({
   node,
-  selected,
   stageScale,
-  onNodeChange,
 }: NodeComponentProps<'ellipse'>) => {
-  const { nodeRef, transformerRef } = useTransformer<Konva.Ellipse>([selected]);
+  const nodeRef = useRef<Konva.Ellipse>(null);
 
   const { config } = useNode(node, stageScale);
   const { animation } = useAnimatedDash({
@@ -28,19 +24,6 @@ const EllipseDrawable = ({
 
   const radiusX = Math.max(node.nodeProps.width ?? 0, ELLIPSE.MIN_RADIUS);
   const radiusY = Math.max(node.nodeProps.height ?? 0, ELLIPSE.MIN_RADIUS);
-
-  const handleDragEnd = useCallback(
-    (event: Konva.KonvaEventObject<DragEvent>) => {
-      onNodeChange({
-        ...node,
-        nodeProps: {
-          ...node.nodeProps,
-          point: [event.target.x(), event.target.y()],
-        },
-      });
-    },
-    [node, onNodeChange],
-  );
 
   const handleTransformStart = useCallback(() => {
     if (node.style.animated && animation) {
@@ -67,54 +50,24 @@ const EllipseDrawable = ({
     [node.style.size, node.style.line, stageScale],
   );
 
-  const handleTransformEnd = useCallback(
-    (event: Konva.KonvaEventObject<Event>) => {
-      const ellipse = event.target as Konva.Ellipse;
-
-      const { radiusX, radiusY } = getEllipseRadius(ellipse);
-
-      onNodeChange({
-        ...node,
-        nodeProps: {
-          ...node.nodeProps,
-          point: [ellipse.x(), ellipse.y()],
-          width: radiusX,
-          height: radiusY,
-          rotation: ellipse.rotation(),
-        },
-      });
-
-      if (node.style.animated && animation?.isRunning() === false) {
-        animation.start();
-      }
-
-      ellipse.scale({ x: 1, y: 1 });
-    },
-    [node, animation, onNodeChange],
-  );
+  const handleTransformEnd = useCallback(() => {
+    if (node.style.animated && animation?.isRunning() === false) {
+      animation.start();
+    }
+  }, [node, animation]);
 
   return (
-    <>
-      <Ellipse
-        ref={nodeRef}
-        radiusX={radiusX}
-        radiusY={radiusY}
-        x={node.nodeProps.point[0]}
-        y={node.nodeProps.point[1]}
-        {...config}
-        onDragEnd={handleDragEnd}
-        onTransformStart={handleTransformStart}
-        onTransform={handlTransform}
-        onTransformEnd={handleTransformEnd}
-      />
-      {selected && (
-        <NodeTransformer
-          ref={transformerRef}
-          stageScale={stageScale}
-          transformerConfig={{ keepRatio: false }}
-        />
-      )}
-    </>
+    <Ellipse
+      ref={nodeRef}
+      radiusX={radiusX}
+      radiusY={radiusY}
+      x={node.nodeProps.point[0]}
+      y={node.nodeProps.point[1]}
+      {...config}
+      onTransformStart={handleTransformStart}
+      onTransform={handlTransform}
+      onTransformEnd={handleTransformEnd}
+    />
   );
 };
 
