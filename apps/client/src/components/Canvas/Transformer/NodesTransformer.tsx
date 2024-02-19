@@ -56,11 +56,13 @@ const NodesTransformer = ({
   }, [selectedNodes, onlySingleNode]);
 
   useEffect(() => {
-    if (!transformerRef.current) {
+    const transformer = transformerRef.current;
+    const layer = transformer?.getLayer();
+
+    if (!transformer || !layer) {
       return;
     }
 
-    const layer = transformerRef.current.getLayer() as Konva.Layer;
     const nodeIds = new Set(selectedNodes.map(({ nodeProps }) => nodeProps.id));
     const nodes = layer.find((node: Konva.Node) => nodeIds.has(node.id()));
 
