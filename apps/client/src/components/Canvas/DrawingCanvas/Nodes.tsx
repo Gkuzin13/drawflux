@@ -29,17 +29,13 @@ const Nodes = ({
     return selectedSingleNode ? selectedNodes[0].nodeProps.id : null;
   }, [selectedNodes]);
 
-  const selectedMultipleNodes = useMemo(() => {
-    return selectedNodes.length > 1;
-  }, [selectedNodes.length]);
-
   const handleNodeChange = useCallback(
     (node: NodeObject) => {
       onNodesChange([node]);
     },
     [onNodesChange],
   );
-  
+
   return (
     <>
       {nodes.map((node) => {
@@ -55,13 +51,11 @@ const Nodes = ({
           />
         );
       })}
-      {selectedMultipleNodes && (
-        <NodesTransformer
-          selectedNodes={selectedNodes}
-          stageScale={stageScale}
-          onNodesChange={onNodesChange}
-        />
-      )}
+      <NodesTransformer
+        selectedNodes={selectedNodes}
+        stageScale={stageScale}
+        onNodesChange={onNodesChange}
+      />
     </>
   );
 };

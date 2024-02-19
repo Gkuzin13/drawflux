@@ -37,14 +37,6 @@ import {
   addCollabActionsListeners,
   subscribeToIncomingCollabMessages,
 } from './services/collaboration/listeners';
-import {
-  getIntersectingNodes,
-  getLayerNodes,
-  getLayerTransformers,
-  getMainLayer,
-  getPointerRect,
-  haveIntersection,
-} from './components/Canvas/DrawingCanvas/helpers/stage';
 import { setCursorByToolType } from './components/Canvas/DrawingCanvas/helpers/cursor';
 import { TEXT } from './constants/shape';
 import * as Styled from './App.styled';
@@ -167,46 +159,13 @@ const App = () => {
 
   const handleContextMenuOpen = useCallback(
     (open: boolean) => {
-      const stage = stageRef.current;
-      const pointerPosition = stage?.getPointerPosition();
-
-      if (!stage || !pointerPosition || !open) {
+      if (!open) {
         return;
       }
 
-      const pointerRect = getPointerRect(pointerPosition, stage.scaleX());
-      const layer = getMainLayer(stage);
-      const layerTransformer = getLayerTransformers(layer)[0];
-
-      if (layerTransformer) {
-        const clickedOnTransformer = haveIntersection(
-          layerTransformer.getClientRect(),
-          pointerRect,
-        );
-
-        if (clickedOnTransformer) {
-          setMenuType((prevType) => {
-            return prevType === 'node-menu' ? prevType : 'node-menu';
-          });
-          return;
-        }
-      }
-
-      const layerNodes = getLayerNodes(layer);
-      const nodesInClickArea = getIntersectingNodes(layerNodes, pointerRect);
-      const clickedOnNodes = Boolean(nodesInClickArea.length);
-
-      if (clickedOnNodes) {
-        const nodesIds = nodesInClickArea.map((node) => node.id());
-        dispatch(canvasActions.setSelectedNodeIds(nodesIds));
-        setMenuType('node-menu');
-        return;
-      }
-
-      dispatch(canvasActions.setSelectedNodeIds([]));
-      setMenuType('canvas-menu');
+      setMenuType(selectedNodeIds.length ? 'node-menu' : 'canvas-menu');
     },
-    [dispatch],
+    [selectedNodeIds.length],
   );
 
   useEffect(() => {

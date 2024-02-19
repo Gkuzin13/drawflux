@@ -27,8 +27,10 @@ import {
   getIntersectingNodes,
   getLayerNodes,
   getMainLayer,
+  getPointerRect,
   getRelativePointerPosition,
   getUnregisteredPointerPosition,
+  haveIntersection,
 } from './helpers/stage';
 import useRefValue from '@/hooks/useRefValue/useRefValue';
 import { calculateStageZoomRelativeToPoint } from './helpers/zoom';
@@ -93,7 +95,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const isHandTool = toolType === 'hand';
     const isSelectTool = toolType === 'select';
     const isSelecting = drawing && isSelectTool;
-    const isLayerListening = !isHandTool && !drawing && isSelectTool;
+    const isLayerListening = !isHandTool;
     const hasSelectedNodes = selectedNodeIds.length > 0;
 
     /**
@@ -573,38 +575,62 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         if (editingNodeId) {
           event.evt.preventDefault();
           event.evt.stopPropagation();
+          return;
+        }
+
+        const clickedOnEmpty = event.target === event.target.getStage();
+
+        if (clickedOnEmpty) {
+          onNodesSelect([]);
+          dispatch(canvasActions.setSelectedNodeIds([]));
+        } else if (!event.target.parent?.hasName(TRANSFORMER.NAME)) {
+          onNodesSelect([event.target.id()]);
+          dispatch(canvasActions.setSelectedNodeIds([event.target.id()]));
         }
       },
-      [editingNodeId],
+      [editingNodeId, dispatch, onNodesSelect],
     );
 
     const handleDoublePress = useCallback(
       (event: KonvaEventObject<MouseEvent | Event>) => {
-        if ('button' in event.evt && event.evt.button !== 0) {
+        if (
+          toolType !== 'select' ||
+          ('button' in event.evt && event.evt.button !== 0)
+        ) {
           return;
         }
 
         const stage = event.target.getStage();
+
+        if (!stage) {
+          return;
+        }
+
         const clickedOnEmpty = event.target === stage;
 
-        if (!clickedOnEmpty || toolType !== 'select') {
-          const element = event.target;
-          const clickedOnTextNode =
-            element.parent?.attrs.type === TEXT.TRANSFORMER_TYPE;
+        if (!clickedOnEmpty && event.target.parent?.hasName(TRANSFORMER.NAME)) {
+          const transformer = event.target.parent as Konva.Transformer;
+          const position = stage.getPointerPosition() as Konva.Vector2d;
+          const pointerRect = getPointerRect(position);
 
-          if (clickedOnTextNode) {
-            const transformer = element.parent as Konva.Transformer;
+          const textNode = transformer.nodes().find((node) => {
+            return (
+              haveIntersection(node.getClientRect(), pointerRect) &&
+              node.hasName(TEXT.NAME)
+            );
+          });
 
-            setEditingNodeId(transformer.getNode().id());
+          if (textNode) {
+            setEditingNodeId(textNode.id());
+            dispatch(canvasActions.setSelectedNodeIds([textNode.id()]));
           }
           return;
         }
 
         const position = getRelativePointerPosition(stage);
-
         handleDraftCreate('text', position);
       },
-      [toolType, handleDraftCreate],
+      [toolType, handleDraftCreate, dispatch],
     );
 
     const handleNodesChange = useCallback(
@@ -629,6 +655,7 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
         ref={sharedStageRef}
         tabIndex={0}
         name={DRAWING_CANVAS.NAME}
+        className={DRAWING_CANVAS.CONTAINER_CLASS}
         x={stageConfig.position.x}
         y={stageConfig.position.y}
         width={width}

@@ -2,10 +2,9 @@ import { colors } from 'shared';
 
 export const TRANSFORMER = {
   NAME: 'transformer',
-  TYPE: 'transformer',
   MIN_SIZE: 10,
   ROTATION_SNAPS: [0, 90, 180, 270],
-  ROTATION_ANCHOR_OFFSET: 14,
+  ROTATION_ANCHOR_OFFSET: 24,
   PADDING: 6,
   ANCHOR_CORNER_RADIUS: 5,
   ANCHOR_SIZE: 9,
@@ -48,7 +47,7 @@ export const TEXT = {
   LINE_HEIGHT: 1,
   FONT_FAMILY: 'Klee One',
   FONT_WEIGHT: 'bold',
-  TRANSFORMER_TYPE: 'text-transformer',
+  NAME: 'text',
 };
 
 export const SELECT_RECT = {

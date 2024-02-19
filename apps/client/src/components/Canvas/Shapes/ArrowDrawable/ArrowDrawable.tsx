@@ -4,8 +4,8 @@ import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import ArrowTransformer from './ArrowTransformer';
 import { calculateLengthFromPoints, getValueFromRatio } from '@/utils/math';
-import { getPointsAbsolutePosition } from '@/utils/position';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
+import { ARROW } from '@/constants/shape';
 import {
   calculateMinMaxMovementPoints,
   getBendValue,
@@ -14,9 +14,6 @@ import {
 import type Konva from 'konva';
 import type { Point, NodeProps } from 'shared';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
-import { ARROW } from '@/constants/shape';
-import NodeTransformer from '../../Transformer/NodeTransformer';
-import useTransformer from '@/hooks/useTransformer';
 
 const ArrowDrawable = ({
   node,
@@ -28,7 +25,6 @@ const ArrowDrawable = ({
   const [bendValue, setBendValue] = useState(getBendValue(node));
   const [dragging, setDragging] = useState(false);
 
-  const { transformerRef, nodeRef } = useTransformer<Konva.Line>([selected]);
   const { config } = useNode(node, stageScale);
 
   const lineRef = useRef<Konva.Line>(null);
@@ -66,35 +62,7 @@ const ArrowDrawable = ({
   }, [node]);
 
   const handleDragStart = useCallback(() => setDragging(true), []);
-
-  const handleDragEnd = useCallback(
-    (event: Konva.KonvaEventObject<DragEvent>) => {
-      const group = event.target as Konva.Group & Konva.Shape;
-      const stage = group.getStage() as Konva.Stage;
-
-      const [firstPoint, ...restPoints] = getPointsAbsolutePosition(
-        points,
-        group,
-        stage,
-      );
-
-      setPoints([firstPoint, ...restPoints]);
-
-      onNodeChange({
-        ...node,
-        nodeProps: {
-          ...node.nodeProps,
-          point: firstPoint,
-          points: restPoints,
-        },
-      });
-
-      setDragging(false);
-
-      group.position({ x: 0, y: 0 });
-    },
-    [node, points, onNodeChange],
-  );
+  const handleDragEnd = useCallback(() => setDragging(false), []);
 
   const handleTransformStart = useCallback(() => {
     if (node.style.animated && animation?.isRunning()) {
@@ -137,12 +105,12 @@ const ArrowDrawable = ({
     if (node.style.animated && animation?.isRunning() === false) {
       animation.start();
     }
-  }, [node, bendValue, points, animation, onNodeChange]);
+  }, [node, animation, bendValue, points, onNodeChange]);
 
   return (
     <>
       <Line
-        ref={nodeRef}
+        ref={lineRef}
         {...config}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
@@ -151,7 +119,7 @@ const ArrowDrawable = ({
         sceneFunc={(ctx, shape) => {
           // draw arrow line
           ctx.beginPath();
-          ctx.setLineDash(config.dash);
+          ctx.setLineDash(shape.dash());
 
           ctx.moveTo(start[0], start[1]);
           ctx.quadraticCurveTo(control[0], control[1], end[0], end[1]);
@@ -164,8 +132,8 @@ const ArrowDrawable = ({
 
           const PI2 = Math.PI * 2;
           const radians = (Math.atan2(dy, dx) + PI2) % PI2;
-          const length = (ARROW.HEAD_LENGTH / stageScale) * config.strokeWidth;
-          const width = (ARROW.HEAD_WIDTH / stageScale) * config.strokeWidth;
+          const length = (ARROW.HEAD_LENGTH / stageScale) * shape.strokeWidth();
+          const width = (ARROW.HEAD_WIDTH / stageScale) * shape.strokeWidth();
 
           ctx.beginPath();
 
@@ -183,24 +151,6 @@ const ArrowDrawable = ({
           ctx.fillStrokeShape(shape);
         }}
       />
-      {selected && (
-        <NodeTransformer
-          ref={transformerRef}
-          stageScale={stageScale}
-          transformerConfig={{
-            visible: false,
-            enabledAnchors: [],
-            resizeEnabled: false,
-            rotateEnabled: false,
-            flipEnabled: false,
-            listening: false,
-          }}
-          transformerEvents={{
-            onDragStart: undefined,
-            onDragEnd: undefined,
-          }}
-        />
-      )}
       {shouldTransformerRender && (
         <ArrowTransformer
           start={start}

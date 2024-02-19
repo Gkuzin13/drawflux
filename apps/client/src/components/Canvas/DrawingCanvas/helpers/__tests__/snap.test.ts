@@ -8,6 +8,7 @@ import {
 } from '../snap';
 import { renderScene } from '@/test/test-utils';
 import type { SnapLineGuide, SnappingEdges, LineGuideStops } from '../snap';
+import { act } from '@testing-library/react';
 
 describe('getLineGuideStops', () => {
   const scene = renderScene();
@@ -234,7 +235,7 @@ describe('findClosestSnap', () => {
 });
 
 describe('snapNodesToEdges', () => {
-  it('snaps nodes to vertical and horizontal edges', () => {
+  it('snaps nodes to vertical and horizontal edges', async () => {
     const scene = renderScene();
 
     const rect1 = new Konva.Rect({ x: 50, y: 50, width: 50, height: 50 });
@@ -263,7 +264,9 @@ describe('snapNodesToEdges', () => {
       },
     ];
 
-    snapNodesToEdges(lineGuides, transformer);
+    await act(async () => {
+      snapNodesToEdges(lineGuides, transformer);
+    })
 
     expect(rect2.absolutePosition()).toEqual({ x: 70, y: 70 });
     expect(rect3.absolutePosition()).toEqual({ x: 110, y: 110 });
