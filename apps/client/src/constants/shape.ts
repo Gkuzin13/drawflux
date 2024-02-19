@@ -60,8 +60,8 @@ export const SELECT_RECT = {
 export const LASER = {
   TRIM_COUNT: 2,
   TRIM_INTERVAL: 24,
-  TRIM_DELAY: 300,
-  MAX_LENGTH: 70,
+  TRIM_DELAY: 250,
+  MAX_LENGTH: 50,
   WIDTH: 3.5,
   COLOR: colors.red500,
 } as const;
