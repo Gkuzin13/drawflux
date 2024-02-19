@@ -42,8 +42,11 @@ jobs:
 
       - name: 📥 Monorepo install
         uses: ./.github/actions/pnpm-install
+      
+      - name: 📥 Install Playwright Browsers
+        run: npx playwright install --with-deps
 
-      - name: Build Packages
+      - name: 📦 Build Packages
         working-directory: ./
         run: pnpm packages:build
 
