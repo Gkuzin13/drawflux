@@ -51,11 +51,13 @@ const Nodes = ({
           />
         );
       })}
-      <NodesTransformer
-        selectedNodes={selectedNodes}
-        stageScale={stageScale}
-        onNodesChange={onNodesChange}
-      />
+      {!editingNodeId && (
+        <NodesTransformer
+          selectedNodes={selectedNodes}
+          stageScale={stageScale}
+          onNodesChange={onNodesChange}
+        />
+      )}
     </>
   );
 };
