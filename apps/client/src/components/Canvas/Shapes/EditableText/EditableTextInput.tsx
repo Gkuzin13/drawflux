@@ -6,6 +6,7 @@ import { getColorValue, getFontSize, getSizeValue } from '@/utils/shape';
 import { getSizePropsFromTextValue } from './helpers/size';
 import useDefaultThemeColors from '@/hooks/useThemeColors';
 import useAutoFocus from '@/hooks/useAutoFocus/useAutoFocus';
+import useEvent from '@/hooks/useEvent/useEvent';
 import * as Styled from './EditableTextInput.styled';
 import type { NodeObject } from 'shared';
 import type { OnTextSaveArgs } from './EditableText';
@@ -106,6 +107,15 @@ const EditableTextInput = ({
     event.stopPropagation();
   };
 
+  const handleOnWheel = (event: WheelEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  useEvent('wheel', handleOnWheel, ref.current?.parentElement, {
+    eventOptions: { passive: false },
+  });
+
   return (
     <Html
       groupProps={{
@@ -113,14 +123,12 @@ const EditableTextInput = ({
         y: node.nodeProps.point[1],
         rotation: node.nodeProps.rotation,
       }}
-      divProps={{ style: { zIndex: 0 } }}
+      divProps={{ style: { height } }}
     >
       <Styled.TextArea
         ref={ref}
         defaultValue={initialValue}
         style={{ ...style, width, height }}
-        onChange={handleValueChange}
-        onKeyDown={handleKeyDown}
         autoFocus
         tabIndex={0}
         autoCapitalize="false"
@@ -128,6 +136,8 @@ const EditableTextInput = ({
         autoSave="false"
         autoCorrect="false"
         wrap="off"
+        onChange={handleValueChange}
+        onKeyDown={handleKeyDown}
         onContextMenu={handleOnContextMenu}
         data-testid="editable-text-input"
       />

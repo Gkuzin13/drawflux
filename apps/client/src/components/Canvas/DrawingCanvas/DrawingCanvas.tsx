@@ -470,14 +470,15 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
 
     const handleOnWheel = useCallback(
       (event: KonvaEventObject<WheelEvent>) => {
+        event.evt.preventDefault();
+
         const stage = event.target.getStage();
 
-        if (event.evt.ctrlKey && stage) {
-          event.evt.preventDefault();
+        if (!editingNodeId && event.evt.ctrlKey && stage) {
           zoomStageRelativeToPointerPosition(stage, event.evt.deltaY);
         }
       },
-      [zoomStageRelativeToPointerPosition],
+      [editingNodeId, zoomStageRelativeToPointerPosition],
     );
 
     const handleStageDragStart = useCallback(
