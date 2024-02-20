@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createShape, getDrawingCanvas } from 'e2e/utils/canvas';
+import { drawShape, getDrawingCanvas } from 'e2e/utils/canvas';
 
 test.describe('context menu', async () => {
   test('opens canvas menu when right clicking on empty', async ({ page }) => {
@@ -19,7 +19,7 @@ test.describe('context menu', async () => {
   }) => {
     await page.goto('/');
 
-    await createShape(page, [
+    await drawShape(page, [
       [400, 450],
       [450, 500],
     ]);

@@ -2,29 +2,48 @@ import { DRAWING_CANVAS } from '@/constants/canvas';
 import type { Page } from '@playwright/test';
 import type { NodeType, Point } from 'shared';
 
-type DrawPosition = [start: Point, end: Point];
-
-type CreateShapeOptions = {
+type DrawPoints = [start: Point, end: Point];
+type DrawShapeOptions = {
   type: Omit<NodeType, 'text'>;
   unselect?: boolean;
 };
-
-export async function draw(page: Page, [start, end]: DrawPosition) {
+type CreateTextOptions = {
+  text: string;
+  unselect?: boolean;
+};
+export async function draw(page: Page, [start, end]: DrawPoints) {
   await page.mouse.move(start[0], start[1]);
   await page.mouse.down();
   await page.mouse.move(end[0], end[1]);
   await page.mouse.up();
 }
 
-export async function createShape(
+export async function drawShape(
   page: Page,
-  position: DrawPosition,
-  options: CreateShapeOptions = {
-    type: 'rectangle',
-  },
+  points: DrawPoints,
+  options: DrawShapeOptions = { type: 'rectangle' },
 ) {
   await page.getByTestId(`tool-button-${options.type}`).click();
-  await draw(page, position);
+  await draw(page, points);
+
+  if (options.unselect) {
+    await getDrawingCanvas(page).click({ position: { x: 0, y: 0 } });
+  }
+}
+
+export async function createText(
+  page: Page,
+  point: Point,
+  options: CreateTextOptions,
+) {
+  await page.getByTestId('tool-button-text').click();
+  await getDrawingCanvas(page).click({
+    position: { x: point[0], y: point[1] },
+  });
+  
+  if (options.unselect) {
+    await getDrawingCanvas(page).click({ position: { x: 0, y: 0 } });
+  }
 }
 
 export function getDrawingCanvas(page: Page) {
