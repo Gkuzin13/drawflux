@@ -96,7 +96,6 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
     const isSelectTool = toolType === 'select';
     const isSelecting = drawing && isSelectTool;
     const isLayerListening = !isHandTool;
-    const hasSelectedNodes = selectedNodeIds.length > 0;
 
     /**
      * syncs with store state when selected nodes change
@@ -340,18 +339,15 @@ const DrawingCanvas = forwardRef<Konva.Stage, Props>(
           handleDraftCreate(toolType, pointerPosition);
         }
 
-        if (hasSelectedNodes && toolType === 'select') {
-          setSelectedNodeIds([]);
-          dispatch(canvasActions.setSelectedNodeIds([]));
-        }
-
         if (editingNodeId) {
           setEditingNodeId(null);
         }
+
+        setSelectedNodeIds([]);
+        dispatch(canvasActions.setSelectedNodeIds([]));
       },
       [
         toolType,
-        hasSelectedNodes,
         editingNodeId,
         handleDraftCreate,
         setDrawingPosition,
