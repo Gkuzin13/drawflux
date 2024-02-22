@@ -1,5 +1,13 @@
 import { ARROW } from '@/constants/shape';
+import { getRatioFromValue } from '@/utils/math';
+import type Konva from 'konva';
 import type { NodeObject, Point } from 'shared';
+import type { AnchorType } from './ArrowTransformer';
+
+type BendMovement = {
+  min: Konva.Vector2d;
+  max: Konva.Vector2d;
+};
 
 export function calculateMidPointAndPerp(start: Point, end: Point) {
   const dx = end[0] - start[0];
@@ -65,12 +73,31 @@ export function calculateClampedMidPoint(
   };
 }
 
-export function getPoints(node: NodeObject<'arrow'>) {
+export function getDefaultPoints(node: NodeObject<'arrow'>) {
   const { point, points } = node.nodeProps;
 
   return [point, ...(points || [point])];
 }
 
-export function getBendValue(node: NodeObject<'arrow'>) {
+export function getDefaultBend(node: NodeObject<'arrow'>) {
   return node.nodeProps.bend ?? ARROW.DEFAULT_BEND;
+}
+
+export function getBendValue(dragPosition: Point, bendMovement: BendMovement) {
+  const bendX = getRatioFromValue(
+    dragPosition[0],
+    bendMovement.min.x,
+    bendMovement.max.x,
+  );
+  const bendY = getRatioFromValue(
+    dragPosition[1],
+    bendMovement.min.y,
+    bendMovement.max.y,
+  );
+
+  return +((bendX + bendY) / 2).toFixed(2);
+}
+
+export function getAnchorType(anchorNode: Konva.Circle): AnchorType | null {
+  return anchorNode.getAttrs().type;
 }

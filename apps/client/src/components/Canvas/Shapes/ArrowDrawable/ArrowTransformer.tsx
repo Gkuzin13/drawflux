@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Circle, Group } from 'react-konva';
-import { getRatioFromValue } from '@/utils/math';
-import { calculateClampedMidPoint } from './helpers';
+import { calculateClampedMidPoint, getAnchorType } from './helpers';
 import { ARROW_TRANSFORMER } from '@/constants/shape';
 import useDefaultThemeColors from '@/hooks/useThemeColors';
 import { hexToRGBa } from '@/utils/string';
@@ -12,56 +11,36 @@ import {
 import type { Point } from 'shared';
 import type Konva from 'konva';
 
-type BendMovement = {
-  min: Konva.Vector2d;
-  max: Konva.Vector2d;
+export type AnchorType = 'start' | 'control' | 'end';
+type AnchorPoint = {
+  type: AnchorType;
+  point: Point;
 };
-
+export type OnTransformFnParams = {
+  point: Point;
+  anchorType: AnchorType;
+};
+type OnTransformFn = (params: OnTransformFnParams) => void;
 type ArrowTransformerProps = {
   start: Point;
+  control: Point;
   end: Point;
-  bendPoint: Point;
-  bendMovement: BendMovement;
   stageScale: number;
-  onTranformStart: () => void;
-  onTransform: (updatedPoints: Point[], bend?: number) => void;
-  onTransformEnd: () => void;
+  onTranformStart: OnTransformFn;
+  onTransform: OnTransformFn;
+  onTransformEnd: OnTransformFn;
 };
-
-type AnchorProps = {
-  x: number;
-  y: number;
-  scale: number;
-  onDragStart: (e: Konva.KonvaEventObject<DragEvent>) => void;
-  onDragMove: (e: Konva.KonvaEventObject<DragEvent>) => void;
-  onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
-  dragBoundFunc?: (position: Konva.Vector2d) => void;
-};
-
-const getBendValue = (dragPosition: Point, bendMovement: BendMovement) => {
-  const bendX = getRatioFromValue(
-    dragPosition[0],
-    bendMovement.min.x,
-    bendMovement.max.x,
-  );
-  const bendY = getRatioFromValue(
-    dragPosition[1],
-    bendMovement.min.y,
-    bendMovement.max.y,
-  );
-
-  return +((bendX + bendY) / 2).toFixed(2);
-};
-
-const bendPointIndex = 2;
+type AnchorProps = Konva.CircleConfig & { type: AnchorType };
 
 const Anchor = ({
   x,
   y,
+  type,
   scale,
   onDragStart,
   onDragMove,
   onDragEnd,
+  ...restProps
 }: AnchorProps) => {
   const themeColors = useDefaultThemeColors();
 
@@ -99,14 +78,14 @@ const Anchor = ({
     <Circle
       x={x}
       y={y}
-      scaleX={scale}
-      scaleY={scale}
+      scale={scale}
       stroke={ARROW_TRANSFORMER.STROKE}
       fill={themeColors['canvas-bg'].value}
       strokeWidth={ARROW_TRANSFORMER.ANCHOR_STROKE_WIDTH}
       hitStrokeWidth={ARROW_TRANSFORMER.HIT_STROKE_WIDTH}
       radius={ARROW_TRANSFORMER.RADIUS}
       name={ARROW_TRANSFORMER.ANCHOR_NAME}
+      type={type}
       fillAfterStrokeEnabled={true}
       draggable={true}
       perfectDrawEnabled={false}
@@ -116,15 +95,15 @@ const Anchor = ({
       onDragEnd={onDragEnd}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      {...restProps}
     />
   );
 };
 
 const ArrowTransformer = ({
   start,
+  control,
   end,
-  bendPoint,
-  bendMovement,
   stageScale,
   onTranformStart,
   onTransform,
@@ -134,22 +113,51 @@ const ArrowTransformer = ({
 
   const normalizedScale = 1 / stageScale;
 
+  const anchors: AnchorPoint[] = [
+    {
+      type: 'start',
+      point: start,
+    },
+    {
+      type: 'control',
+      point: control,
+    },
+    {
+      type: 'end',
+      point: end,
+    },
+  ];
+
   useEffect(() => {
     transformerRef.current?.moveToTop();
   }, []);
 
-  const handleAnchorDragStart = useCallback(() => {
-    onTranformStart();
-  }, [onTranformStart]);
+  const handleAnchorDragStart = useCallback(
+    (event: Konva.KonvaEventObject<DragEvent>) => {
+      const node = event.target as Konva.Circle;
+      const anchorType = getAnchorType(node);
+
+      if (anchorType) {
+        const { x, y } = node.position();
+
+        onTranformStart({ anchorType, point: [x, y] });
+      }
+    },
+    [onTranformStart],
+  );
 
   const handleAnchorDragMove = useCallback(
     (event: Konva.KonvaEventObject<DragEvent>) => {
       const node = event.target as Konva.Circle;
-      const stage = node.getStage() as Konva.Stage;
+      const anchorType = getAnchorType(node);
+      
+      if (!anchorType) {
+        return;
+      }
 
-      const { x, y } = node.getAbsolutePosition(stage);
+      const { x, y } = node.position();
 
-      if (node.index === bendPointIndex) {
+      if (anchorType === 'control') {
         const { x: clampedX, y: clampedY } = calculateClampedMidPoint(
           [x, y],
           start,
@@ -158,35 +166,40 @@ const ArrowTransformer = ({
 
         node.position({ x: clampedX, y: clampedY });
 
-        const updatedBend = getBendValue([clampedX, clampedY], bendMovement);
-
-        onTransform([start, end], updatedBend);
-
+        onTransform({ anchorType, point: [clampedX, clampedY] });
         return;
       }
 
-      const updatedPoints = [...[start, end]];
-
-      updatedPoints[node.index] = [x, y];
-
-      onTransform(updatedPoints);
+      onTransform({ anchorType, point: [x, y] });
     },
-    [start, end, bendMovement, onTransform],
+    [start, end, onTransform],
   );
 
-  const handleAnchorDragEnd = useCallback(() => {
-    onTransformEnd();
-  }, [onTransformEnd]);
+  const handleAnchorDragEnd = useCallback(
+    (event: Konva.KonvaEventObject<DragEvent>) => {
+      const node = event.target as Konva.Circle;
+      const anchorType = getAnchorType(node);
+
+      if (anchorType) {
+        const { x, y } = node.position();
+
+        onTransformEnd({ anchorType, point: [x, y] });
+      }
+    },
+    [onTransformEnd],
+  );
 
   return (
     <Group ref={transformerRef}>
-      {[start, end, bendPoint].map(([x, y], index) => {
+      {anchors.map((anchor) => {
         return (
           <Anchor
-            key={index}
-            x={x}
-            y={y}
-            scale={normalizedScale}
+            key={anchor.type}
+            type={anchor.type}
+            x={anchor.point[0]}
+            y={anchor.point[1]}
+            scaleX={normalizedScale}
+            scaleY={normalizedScale}
             onDragStart={handleAnchorDragStart}
             onDragMove={handleAnchorDragMove}
             onDragEnd={handleAnchorDragEnd}

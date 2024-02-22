@@ -39,3 +39,21 @@ export const Item = styled(RadioGroup.Item, Button, {
     size: 'xs',
   },
 });
+
+export const ArrowHeadsContainer = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+export const ArrowHeadsTriggers = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '$1',
+});
+
+export const ArrowHeadsPopoverContent = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '$1',
+  padding: '$1',
+});

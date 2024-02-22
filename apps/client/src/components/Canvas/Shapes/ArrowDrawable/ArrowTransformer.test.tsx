@@ -12,9 +12,8 @@ describe('ArrowTransformer', () => {
           <Layer>
             <ArrowTransformer
               start={[20, 30]}
+              control={[30, 40]}
               end={[40, 50]}
-              bendPoint={[30, 40]}
-              bendMovement={{ min: { x: 0, y: 0 }, max: { x: 0, y: 0 } }}
               stageScale={1}
               onTranformStart={vi.fn}
               onTransform={vi.fn}

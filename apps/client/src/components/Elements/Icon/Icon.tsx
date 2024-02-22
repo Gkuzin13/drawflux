@@ -54,6 +54,8 @@ const ICONS = {
   letterM: Icons.TbLetterM,
   letterL: Icons.TbLetterL,
   extraLarge: ExtraLarge,
+  arrowNarrowRight: Icons.TbArrowNarrowRight,
+  arrowNarrowLeft: Icons.TbArrowNarrowLeft,
 } as const;
 
 const Icon = (props: IconProps) => {
@@ -64,7 +66,14 @@ const Icon = (props: IconProps) => {
 
   const Component = ICONS[name];
 
-  return <Component size={sizeValue} strokeWidth={strokeValue} {...rest} />;
+  return (
+    <Component
+      size={sizeValue}
+      strokeWidth={strokeValue}
+      data-testid={`${name}-icon`}
+      {...rest}
+    />
+  );
 };
 
 export default Icon;

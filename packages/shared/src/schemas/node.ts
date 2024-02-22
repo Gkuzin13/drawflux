@@ -30,6 +30,8 @@ const Fill = z.union([
   z.literal('solid'),
 ]);
 
+const ArrowHead = z.union([z.literal('none'), z.literal('arrow')]);
+
 export const NodePoint = z.tuple([z.number(), z.number()]) as z.ZodTuple<
   [x: z.ZodNumber, y: z.ZodNumber]
 >;
@@ -52,6 +54,8 @@ const Style = z.object({
   size: Size,
   animated: z.boolean().optional(),
   opacity: z.number().min(0.2).max(1),
+  arrowStartHead: ArrowHead.optional(),
+  arrowEndHead: ArrowHead.optional(),
 });
 
 export const Node = z.object({

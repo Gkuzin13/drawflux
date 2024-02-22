@@ -29,6 +29,8 @@ const Nodes = ({
     return selectedSingleNode ? selectedNodes[0].nodeProps.id : null;
   }, [selectedNodes]);
 
+  const hasSelectedNodes = selectedNodes.length > 0;
+
   const handleNodeChange = useCallback(
     (node: NodeObject) => {
       onNodesChange([node]);
@@ -51,7 +53,7 @@ const Nodes = ({
           />
         );
       })}
-      {!editingNodeId && (
+      {hasSelectedNodes && !editingNodeId && (
         <NodesTransformer
           selectedNodes={selectedNodes}
           stageScale={stageScale}

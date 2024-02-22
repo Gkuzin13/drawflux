@@ -27,6 +27,11 @@ export type NodeLine = NodeStyle['line'];
 export type NodeSize = NodeStyle['size'];
 export type NodeColor = NodeStyle['color'];
 export type NodeFill = NodeStyle['fill'];
+export type ArrowStartHead = NodeStyle['arrowStartHead'];
+export type ArrowEndHead = NodeStyle['arrowEndHead'];
+
+export type ArrowHead = ArrowEndHead | ArrowStartHead;
+export type ArrowHeadDirection = 'start' | 'end';
 
 export type Point = z.infer<(typeof nodeProps)['shape']['point']>;
 
