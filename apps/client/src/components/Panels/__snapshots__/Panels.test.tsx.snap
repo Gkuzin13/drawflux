@@ -1,0 +1,79 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`style panel > arrow heads > displays correct values 1`] = `
+<button
+  aria-controls="radix-:rr7:"
+  aria-expanded="true"
+  aria-haspopup="dialog"
+  class="c-dzAnxj c-dzAnxj-eqRZFF-color-secondary c-dzAnxj-bICGYT-align-center c-dzAnxj-hptCGR-size-xs c-dzAnxj-zCRnq-cv"
+  data-state="open"
+  data-testid="arrow-start-head-trigger"
+  title="Arrow Heads — Start"
+  type="button"
+  value="start"
+>
+  <svg
+    data-testid="minus-icon"
+    fill="none"
+    height="18"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="1.75"
+    viewBox="0 0 24 24"
+    width="18"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M0 0h24v24H0z"
+      fill="none"
+      stroke="none"
+    />
+    <path
+      d="M5 12l14 0"
+    />
+  </svg>
+</button>
+`;
+
+exports[`style panel > arrow heads > displays correct values 2`] = `
+<button
+  aria-controls="radix-:rr8:"
+  aria-expanded="true"
+  aria-haspopup="dialog"
+  class="c-dzAnxj c-dzAnxj-eqRZFF-color-secondary c-dzAnxj-bICGYT-align-center c-dzAnxj-hptCGR-size-xs c-dzAnxj-zCRnq-cv"
+  data-state="open"
+  data-testid="arrow-end-head-trigger"
+  title="Arrow Heads — End"
+  type="button"
+  value="end"
+>
+  <svg
+    data-testid="arrowNarrowRight-icon"
+    fill="none"
+    height="18"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="1.75"
+    viewBox="0 0 24 24"
+    width="18"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M0 0h24v24H0z"
+      fill="none"
+      stroke="none"
+    />
+    <path
+      d="M5 12l14 0"
+    />
+    <path
+      d="M15 16l4 -4"
+    />
+    <path
+      d="M15 8l4 4"
+    />
+  </svg>
+</button>
+`;

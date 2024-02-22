@@ -245,6 +245,85 @@ describe('style panel', () => {
       );
     });
   });
+
+  describe('arrow heads', () => {
+    const arrow = nodesGenerator(1, 'arrow')[0];
+    arrow.style.arrowStartHead = 'none';
+    arrow.style.arrowEndHead = 'arrow';
+
+    const preloadedArrow = stateGenerator({
+      canvas: {
+        present: {
+          nodes: [arrow],
+          selectedNodeIds: { [arrow.nodeProps.id]: true },
+        },
+      },
+    });
+
+    it('displays correct values', async () => {
+      const { user } = renderWithProviders(
+        <Panels selectedNodeIds={[arrow.nodeProps.id]} />,
+        { preloadedState: preloadedArrow },
+      );
+
+      // open start head options
+      await user.click(screen.getByTestId(/arrow-start-head-trigger/));
+
+      expect(screen.getByTestId(/arrow-start-head-trigger/)).toMatchSnapshot();
+      expect(screen.getByTestId(/start-none-button/i)).toHaveAttribute(
+        'data-state',
+        'checked',
+      );
+
+      // open end head options
+      await user.click(screen.getByTestId(/arrow-end-head-trigger/));
+
+      expect(screen.getByTestId(/arrow-end-head-trigger/)).toMatchSnapshot();
+      expect(screen.getByTestId(/end-arrow-button/i)).toHaveAttribute(
+        'data-state',
+        'checked',
+      );
+    });
+
+    it('updates arrow head icon button', async () => {
+      const { user } = renderWithProviders(
+        <Panels selectedNodeIds={[arrow.nodeProps.id]} />,
+        { preloadedState: preloadedArrow },
+      );
+
+      const startHeadTrigger = screen.getByTestId(/arrow-start-head-trigger/);
+
+      // open start head options
+      await user.click(startHeadTrigger);
+
+      // select 'arrow' head
+      await user.click(screen.getByTestId(/start-arrow-button/i));
+
+      expect(screen.getByTestId(/start-arrow-button/i)).toHaveAttribute(
+        'data-state',
+        'checked',
+      );
+      expect(
+        within(startHeadTrigger).getByTestId('arrowNarrowLeft-icon'),
+      ).toBeInTheDocument();
+
+      const endHeadTrigger = screen.getByTestId(/arrow-end-head-trigger/);
+
+      // open end head options
+      await user.click(endHeadTrigger);
+
+      // select 'none' head
+      await user.click(screen.getByTestId(/end-none-button/i));
+
+      expect(screen.getByTestId(/end-none-button/i)).toHaveAttribute(
+        'data-state',
+        'checked',
+      );
+      expect(
+        within(endHeadTrigger).getByTestId('minus-icon'),
+      ).toBeInTheDocument();
+    });
+  });
 });
 
 describe('delete nodes button', () => {

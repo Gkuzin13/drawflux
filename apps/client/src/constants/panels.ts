@@ -3,7 +3,14 @@ import { Schemas } from 'shared';
 import type { HistoryActionKey } from '@/stores/reducers/history';
 import type { Entity } from '@/constants/index';
 import type { ShapesThumbnailStyle } from '@/components/Elements/ShapesThumbnail/ShapesThumbnail';
-import type { NodeColor, NodeFill, NodeLine, NodeSize } from 'shared';
+import type {
+  ArrowHead,
+  ArrowHeadDirection,
+  NodeColor,
+  NodeFill,
+  NodeLine,
+  NodeSize,
+} from 'shared';
 import type { ToolType } from './app';
 
 export type HistoryControlKey = Exclude<HistoryActionKey, 'reset'>;
@@ -103,6 +110,36 @@ export const FILL: Entity<NodeFill>[] = [
     icon: 'filledSolid',
   },
 ];
+
+export const ARROW_HEADS: Record<
+  ArrowHeadDirection,
+  Entity<NonNullable<ArrowHead>>[]
+> = {
+  start: [
+    {
+      value: 'arrow',
+      name: 'Arrow',
+      icon: 'arrowNarrowLeft',
+    },
+    {
+      value: 'none',
+      name: 'None',
+      icon: 'minus',
+    },
+  ],
+  end: [
+    {
+      value: 'none',
+      name: 'None',
+      icon: 'minus',
+    },
+    {
+      value: 'arrow',
+      name: 'Arrow',
+      icon: 'arrowNarrowRight',
+    },
+  ],
+};
 
 export const OPACITY = {
   minValue: Schemas.Node.shape.style.shape.opacity.minValue || 0.2,

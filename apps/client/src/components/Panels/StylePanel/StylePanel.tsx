@@ -5,10 +5,12 @@ import AnimatedSection from './AnimatedSection';
 import ColorSection from './ColorSection';
 import LineSection from './LineSection';
 import OpacitySection from './OpacitySection';
+import ArrowHeadsSection from './ArrowHeadsSection';
 import FillSection from './FillSection';
 import SizeSection from './SizeSection';
 import * as Styled from './StylePanel.styled';
 import type {
+  ArrowHeadDirection,
   NodeColor,
   NodeFill,
   NodeLine,
@@ -16,6 +18,7 @@ import type {
   NodeSize,
   NodeStyle,
 } from 'shared';
+import type { ArrowHead } from './ArrowHeadsSection';
 
 type Props = {
   selectedNodes: NodeObject[];
@@ -31,7 +34,7 @@ const getValueIfAllIdentical = <
 };
 
 const StylePanel = ({ selectedNodes, onStyleChange }: Props) => {
-  const mergedStyle = useMemo(() => {
+  const mergedStyle = useMemo((): Partial<NodeStyle> => {
     const styles: NodeStyle[] = selectedNodes.map(({ style }) => style);
 
     const colors = new Set(styles.map(({ color }) => color));
@@ -40,6 +43,10 @@ const StylePanel = ({ selectedNodes, onStyleChange }: Props) => {
     const sizes = new Set(styles.map(({ size }) => size));
     const opacities = new Set(styles.map(({ opacity }) => opacity));
     const allShapesAnimated = styles.every(({ animated }) => animated);
+    const arrowStartHeads = new Set(
+      styles.map((style) => style.arrowStartHead),
+    );
+    const arrowEndHeads = new Set(styles.map((style) => style.arrowEndHead));
 
     return {
       color: getValueIfAllIdentical(colors),
@@ -47,6 +54,8 @@ const StylePanel = ({ selectedNodes, onStyleChange }: Props) => {
       fill: getValueIfAllIdentical(fills),
       size: getValueIfAllIdentical(sizes),
       opacity: getValueIfAllIdentical(opacities),
+      arrowStartHead: getValueIfAllIdentical(arrowStartHeads),
+      arrowEndHead: getValueIfAllIdentical(arrowEndHeads),
       animated: allShapesAnimated,
     };
   }, [selectedNodes]);
@@ -60,7 +69,9 @@ const StylePanel = ({ selectedNodes, onStyleChange }: Props) => {
       return { line: false, size: true };
     }
 
-    return { line: true, size: true };
+    const hasArrowNodes = selectedNodesTypes.some((type) => type === 'arrow');
+
+    return { line: true, size: true, arrowHeads: hasArrowNodes };
   }, [selectedNodes]);
 
   const fillSectionValue = useMemo(() => {
@@ -104,12 +115,30 @@ const StylePanel = ({ selectedNodes, onStyleChange }: Props) => {
     onStyleChange({ fill: value });
   };
 
+  const handleArrowHeadChange = (
+    direction: ArrowHeadDirection,
+    value: ArrowHead,
+  ) => {
+    if (direction === 'start') {
+      onStyleChange({ arrowStartHead: value });
+    } else {
+      onStyleChange({ arrowEndHead: value });
+    }
+  };
+
   return (
     <Styled.Container data-testid="style-panel">
       <ColorSection
         value={mergedStyle.color}
         onColorChange={handleColorSelect}
       />
+      {enabledOptions.arrowHeads && (
+        <ArrowHeadsSection
+          startHead={mergedStyle.arrowStartHead}
+          endHead={mergedStyle.arrowEndHead}
+          onArrowHeadChange={handleArrowHeadChange}
+        />
+      )}
       <OpacitySection
         value={mergedStyle.opacity}
         onValueChange={handleOpacityChange}

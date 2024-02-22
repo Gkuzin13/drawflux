@@ -2,17 +2,18 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Line } from 'react-konva';
 import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
-import ArrowTransformer from './ArrowTransformer';
+import ArrowTransformer, { type OnTransformFnParams } from './ArrowTransformer';
 import { calculateLengthFromPoints, getValueFromRatio } from '@/utils/math';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
-import { ARROW } from '@/constants/shape';
 import {
   calculateMinMaxMovementPoints,
   getBendValue,
-  getPoints,
+  getDefaultBend,
+  getDefaultPoints,
 } from './helpers';
+import { drawArrowHead } from './heads';
 import type Konva from 'konva';
-import type { Point, NodeProps } from 'shared';
+import type { Point } from 'shared';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
 
 const ArrowDrawable = ({
@@ -21,8 +22,8 @@ const ArrowDrawable = ({
   stageScale,
   onNodeChange,
 }: NodeComponentProps<'arrow'>) => {
-  const [points, setPoints] = useState(getPoints(node));
-  const [bendValue, setBendValue] = useState(getBendValue(node));
+  const [points, setPoints] = useState(getDefaultPoints(node));
+  const [bendValue, setBendValue] = useState(getDefaultBend(node));
   const [dragging, setDragging] = useState(false);
 
   const { config } = useNode(node, stageScale);
@@ -34,6 +35,9 @@ const ArrowDrawable = ({
     nodeRef: lineRef,
     totalDashLength: getTotalDashLength(config.dash),
   });
+
+  const arrowStartHead = node.style.arrowStartHead ?? 'arrow';
+  const arrowEndHead = node.style.arrowEndHead;
 
   const [start, end] = points;
 
@@ -50,15 +54,17 @@ const ArrowDrawable = ({
     ];
   }, [bendValue, bendMovement]);
 
-  const pointsWithControl = [start, control, end];
+  const flattenedPoints = useMemo(() => {
+    return [start, control, end].flat();
+  }, [start, control, end]);
 
   const shouldTransformerRender = useMemo(() => {
     return selected && node.nodeProps.visible && !dragging;
   }, [selected, node.nodeProps.visible, dragging]);
 
   useEffect(() => {
-    setPoints(getPoints(node));
-    setBendValue(getBendValue(node));
+    setPoints(getDefaultPoints(node));
+    setBendValue(getDefaultBend(node));
   }, [node]);
 
   const handleDragStart = useCallback(() => setDragging(true), []);
@@ -71,14 +77,17 @@ const ArrowDrawable = ({
   }, [node.style.animated, animation]);
 
   const handleTransform = useCallback(
-    (updatedPoints: Point[], bend?: NodeProps['bend']) => {
-      setPoints(updatedPoints);
-
-      if (bend) {
+    (event: OnTransformFnParams) => {
+      if (event.anchorType === 'control') {
+        const bend = getBendValue(event.point, bendMovement);
         setBendValue(bend);
+      } else if (event.anchorType === 'start') {
+        setPoints((prevPoints) => [event.point, prevPoints[1]]);
+      } else {
+        setPoints((prevPoints) => [prevPoints[0], event.point]);
       }
 
-      const lineLength = calculateLengthFromPoints(updatedPoints);
+      const lineLength = calculateLengthFromPoints(points);
 
       const dash = getDashValue(
         lineLength,
@@ -88,7 +97,7 @@ const ArrowDrawable = ({
 
       lineRef.current?.dash(dash.map((d) => d * stageScale));
     },
-    [node.style.line, node.style.size, stageScale],
+    [points, bendMovement, stageScale, node.style.size, node.style.line],
   );
 
   const handleTransformEnd = useCallback(() => {
@@ -112,51 +121,32 @@ const ArrowDrawable = ({
       <Line
         ref={lineRef}
         {...config}
+        points={flattenedPoints}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
-        dashEnabled={false}
-        points={pointsWithControl.flat()}
         sceneFunc={(ctx, shape) => {
-          // draw arrow line
+          ctx.save();
           ctx.beginPath();
-          ctx.setLineDash(shape.dash());
-
           ctx.moveTo(start[0], start[1]);
           ctx.quadraticCurveTo(control[0], control[1], end[0], end[1]);
 
-          ctx.fillStrokeShape(shape);
-
-          // draw arrow head
-          const dx = end[0] - control[0];
-          const dy = end[1] - control[1];
-
-          const PI2 = Math.PI * 2;
-          const radians = (Math.atan2(dy, dx) + PI2) % PI2;
-          const length = (ARROW.HEAD_LENGTH / stageScale) * shape.strokeWidth();
-          const width = (ARROW.HEAD_WIDTH / stageScale) * shape.strokeWidth();
-
-          ctx.beginPath();
-
-          ctx.translate(end[0], end[1]);
-          ctx.rotate(radians);
-
-          ctx.moveTo(0, 0);
-          ctx.lineTo(-length, width / 2);
-
-          ctx.moveTo(0, 0);
-          ctx.lineTo(-length, -width / 2);
-
           ctx.restore();
-
           ctx.fillStrokeShape(shape);
+
+          if (arrowStartHead === 'arrow') {
+            drawArrowHead(ctx, shape, [end, control]);
+          }
+
+          if (arrowEndHead === 'arrow') {
+            drawArrowHead(ctx, shape, [start, control]);
+          }
         }}
       />
       {shouldTransformerRender && (
         <ArrowTransformer
           start={start}
+          control={control}
           end={end}
-          bendPoint={control}
-          bendMovement={bendMovement}
           stageScale={stageScale}
           onTranformStart={handleTransformStart}
           onTransform={handleTransform}
