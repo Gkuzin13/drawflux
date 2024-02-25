@@ -5,7 +5,6 @@ import { TRANSFORMER } from '@/constants/shape';
 import { Transformer } from 'react-konva';
 import { normalizeTransformerSize } from './helpers';
 import { getNodeSize } from '../Shapes/EditableText/helpers/size';
-import { getEllipseRadius } from '../Shapes/EllipseDrawable/helpers/calc';
 import { getRectSize } from '../Shapes/RectDrawable/helpers/calc';
 import type Konva from 'konva';
 import type { NodeObject, Point } from 'shared';
@@ -220,15 +219,14 @@ const NodesTransformer = ({
         }
         case 'ellipse': {
           const ellipse = element as Konva.Ellipse;
-          const { radiusX, radiusY } = getEllipseRadius(ellipse);
 
           updatedNodes.push({
             ...node,
             nodeProps: {
               ...node.nodeProps,
               point: [ellipse.x(), ellipse.y()],
-              width: radiusX,
-              height: radiusY,
+              width: ellipse.radiusX() * ellipse.scaleX(),
+              height: ellipse.radiusY() * ellipse.scaleY(),
               rotation: ellipse.rotation(),
             },
           });
