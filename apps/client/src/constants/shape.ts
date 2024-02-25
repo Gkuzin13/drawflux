@@ -21,6 +21,7 @@ export const ARROW_TRANSFORMER = {
   STROKE: colors.green300,
   NAME: 'arrow-transformer',
   ANCHOR_NAME: 'arrow-transformer-anchor',
+  SNAP_OFFSET: 8
 } as const;
 
 export const ARROW = {

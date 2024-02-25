@@ -216,3 +216,7 @@ export function getNormalizedInvertedRect(rect: IRect, scale: number): IRect {
 export function calculateCenterPoint(width: number, height: number) {
   return { x: width / 2, y: height / 2 };
 }
+
+export function inRange(value: number, start: number, end: number) {
+  return value > start && value < end;
+}
