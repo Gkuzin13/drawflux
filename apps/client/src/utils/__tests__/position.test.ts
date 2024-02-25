@@ -1,7 +1,12 @@
 import type { Point } from 'shared';
 import { nodesGenerator } from '@/test/data-generators';
 import { createNode } from '../node';
-import { getMiddleNode, getNodeRect, isNodeFullyInView } from '../position';
+import {
+  getMiddleNode,
+  getNodeRect,
+  inRange,
+  isNodeFullyInView,
+} from '../position';
 
 describe('getMiddleNode', () => {
   const nodes = nodesGenerator(3, 'rectangle').map((node) => ({
@@ -102,5 +107,15 @@ describe('isNodeFullyInView', () => {
     const node = createNode('rectangle', [60, 50]);
 
     expect(isNodeFullyInView(node, stageRect, 1)).toBe(true);
+  });
+});
+
+describe('inRange', () => {
+  it('returns true if value is in range', () => {
+    expect(inRange(5, 1, 10)).toBe(true);
+  });
+
+  it('returns false if value is not in range', () => {
+    expect(inRange(15, 1, 10)).toBe(false);
   });
 });

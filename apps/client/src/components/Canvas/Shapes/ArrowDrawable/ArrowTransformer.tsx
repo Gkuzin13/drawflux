@@ -4,6 +4,8 @@ import { calculateClampedMidPoint, getAnchorType } from './helpers';
 import { ARROW_TRANSFORMER } from '@/constants/shape';
 import useDefaultThemeColors from '@/hooks/useThemeColors';
 import { hexToRGBa } from '@/utils/string';
+import { calculateMidPointFromRange } from '@/utils/math';
+import { inRange } from '@/utils/position';
 import {
   resetCursor,
   setCursor,
@@ -150,7 +152,7 @@ const ArrowTransformer = ({
     (event: Konva.KonvaEventObject<DragEvent>) => {
       const node = event.target as Konva.Circle;
       const anchorType = getAnchorType(node);
-      
+
       if (!anchorType) {
         return;
       }
@@ -158,15 +160,20 @@ const ArrowTransformer = ({
       const { x, y } = node.position();
 
       if (anchorType === 'control') {
-        const { x: clampedX, y: clampedY } = calculateClampedMidPoint(
-          [x, y],
-          start,
-          end,
-        );
+        let updatedPoint = calculateClampedMidPoint([x, y], start, end);
+        const mid = calculateMidPointFromRange(start, end);
+        const offset = ARROW_TRANSFORMER.SNAP_OFFSET;
 
-        node.position({ x: clampedX, y: clampedY });
+        if (
+          inRange(updatedPoint[0], mid[0] - offset, mid[0] + offset) &&
+          inRange(updatedPoint[1], mid[1] - offset, mid[1] + offset)
+        ) {
+          updatedPoint = mid;
+        }
 
-        onTransform({ anchorType, point: [clampedX, clampedY] });
+        node.position({ x: updatedPoint[0], y: updatedPoint[1] });
+
+        onTransform({ anchorType, point: updatedPoint });
         return;
       }
 

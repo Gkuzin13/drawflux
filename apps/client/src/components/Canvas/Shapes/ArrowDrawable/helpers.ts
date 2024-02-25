@@ -58,7 +58,7 @@ export function calculateClampedMidPoint(
   dragPosition: Point,
   start: Point,
   end: Point,
-) {
+): Point {
   const { mid, perp, length } = calculateMidPointAndPerp(start, end);
 
   // Calculate the distance of the drag from the midpoint along the perpendicular vector
@@ -67,10 +67,10 @@ export function calculateClampedMidPoint(
 
   dragDist = Math.max(Math.min(dragDist, length / 2), -length / 2);
 
-  return {
-    x: mid.x + dragDist * perp.x,
-    y: mid.y + dragDist * perp.y,
-  };
+  return [
+    mid.x + dragDist * perp.x,
+    mid.y + dragDist * perp.y,
+  ];
 }
 
 export function getDefaultPoints(node: NodeObject<'arrow'>) {
