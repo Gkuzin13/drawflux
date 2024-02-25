@@ -4,7 +4,6 @@ import useAnimatedDash from '@/hooks/useAnimatedDash/useAnimatedDash';
 import useNode from '@/hooks/useNode/useNode';
 import { calculateCircumference } from '@/utils/math';
 import { getDashValue, getSizeValue, getTotalDashLength } from '@/utils/shape';
-import { getEllipseRadius } from './helpers/calc';
 import { ELLIPSE } from '@/constants/shape';
 import type Konva from 'konva';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
@@ -35,9 +34,10 @@ const EllipseDrawable = ({
     (event: Konva.KonvaEventObject<Event>) => {
       const ellipse = event.target as Konva.Ellipse;
 
-      const { radiusX, radiusY } = getEllipseRadius(ellipse);
-
-      const totalLength = calculateCircumference(radiusX, radiusY);
+      const totalLength = calculateCircumference(
+        ellipse.radiusX() * ellipse.scaleX(),
+        ellipse.radiusY() * ellipse.scaleY(),
+      );
 
       const dash = getDashValue(
         totalLength,
