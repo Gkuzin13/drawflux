@@ -4,17 +4,18 @@ import type { NodeType, Point } from 'shared';
 
 type DrawPoints = [start: Point, end: Point];
 type DrawShapeOptions = {
-  type: Omit<NodeType, 'text'>;
+  type: Exclude<NodeType, 'text'>;
   unselect?: boolean;
 };
 type CreateTextOptions = {
   text: string;
   unselect?: boolean;
 };
+
 export async function draw(page: Page, [start, end]: DrawPoints) {
   await page.mouse.move(start[0], start[1]);
   await page.mouse.down();
-  await page.mouse.move(end[0], end[1]);
+  await page.mouse.move(end[0], end[1], { steps: 2 });
   await page.mouse.up();
 }
 
