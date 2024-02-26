@@ -28,7 +28,6 @@ const LibraryDrawer = ({ items }: Props) => {
   const stageConfig = useAppSelector(selectConfig);
   const themeColors = useThemeColors();
 
-
   const selectedItemsCount = Object.keys(selectedItemsIds).length;
   const hasItems = Boolean(items.length);
   const hasSelectedItems = Boolean(selectedItemsCount);
@@ -67,7 +66,13 @@ const LibraryDrawer = ({ items }: Props) => {
 
   return (
     <Drawer modal={false}>
-      <Drawer.Trigger align="between" color="secondary" size="sm" gap="sm">
+      <Drawer.Trigger
+        align="between"
+        color="secondary"
+        size="sm"
+        gap="sm"
+        data-testid="library-drawer-trigger"
+      >
         <Icon name="book" />
         <Text size="sm">Library</Text>
       </Drawer.Trigger>
@@ -93,7 +98,7 @@ const LibraryDrawer = ({ items }: Props) => {
                 disabled={!hasSelectedItems}
                 onClick={handleRemoveSelectedItems}
                 squared
-                data-testid="remove-selected-items-button"
+                data-testid="remove-library-items-button"
               >
                 <Icon name="trash" />
               </Button>
