@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Shape } from 'react-konva';
 import { baseConfig } from '@/hooks/useNode/useNode';
 import { Animation } from 'konva/lib/Animation';
-import useRefValue from '@/hooks/useRefValue/useRefValue';
 import { LASER } from '@/constants/shape';
-import { calculateCurveControlPoint } from '@/utils/draw';
 import { now } from '@/utils/is';
+import { calculateMidPointFromRange } from '@/utils/math';
 import type { NodeComponentProps } from '@/components/Canvas/Node/Node';
+import type Konva from 'konva';
 
 const LaserDrawable = ({
   node,
@@ -14,8 +14,8 @@ const LaserDrawable = ({
   onNodeDelete,
 }: NodeComponentProps<'laser'>) => {
   const [path, setPath] = useState(node.nodeProps.points ?? []);
-  
-  const [lastDrawTime, setLastDrawTime] = useRefValue(now());
+
+  const lastDrawTime = useRef(now());
 
   useEffect(() => {
     setPath((prevPath) => {
@@ -30,8 +30,8 @@ const LaserDrawable = ({
       return updatedPath;
     });
 
-    setLastDrawTime(now());
-  }, [node.nodeProps.points, setLastDrawTime, setPath]);
+    lastDrawTime.current = now();
+  }, [node.nodeProps.points]);
 
   useEffect(() => {
     const pathTrimmingAnimation = new Animation((frame) => {
@@ -53,7 +53,7 @@ const LaserDrawable = ({
     return () => {
       pathTrimmingAnimation.stop();
     };
-  }, [lastDrawTime]);
+  }, []);
 
   useEffect(() => {
     if (!path.length) {
@@ -62,6 +62,41 @@ const LaserDrawable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, onNodeDelete]);
 
+  const drawPath = useCallback(
+    (ctx: Konva.Context, shape: Konva.Shape) => {
+      if (!path.length) return;
+
+      const startPoint = path[0];
+
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = LASER.COLOR;
+
+      ctx.moveTo(startPoint[0], startPoint[0]);
+
+      ctx.beginPath();
+
+      for (const [index, point] of path.entries()) {
+        const indexRatio = index / path.length;
+        const prevPoint = path[index - 1] ?? point;
+        const controlPoint = calculateMidPointFromRange(prevPoint, point);
+
+        ctx.quadraticCurveTo(
+          prevPoint[0],
+          prevPoint[1],
+          controlPoint[0],
+          controlPoint[1],
+        );
+
+        ctx.lineWidth = ((1 - indexRatio) * LASER.WIDTH) / stageScale;
+
+        ctx.stroke();
+      }
+
+      ctx.fillStrokeShape(shape);
+    },
+    [path, stageScale],
+  );
+
   return (
     <Shape
       {...baseConfig}
@@ -69,36 +104,7 @@ const LaserDrawable = ({
       listening={false}
       shadowEnabled={false}
       dashEnabled={false}
-      sceneFunc={(ctx, shape) => {
-        if (!path.length) return;
-        
-        const startPoint = path[0];
-
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = LASER.COLOR;
-
-        ctx.moveTo(startPoint[0], startPoint[0]);
-        ctx.beginPath();
-
-        for (const [pointIndex, point] of path.entries()) {
-          const prevPoint = path[pointIndex - 1] ?? point;
-          const controlPoint = calculateCurveControlPoint(prevPoint, point);
-          const pointIndexRatio = pointIndex / path.length;
-
-          ctx.quadraticCurveTo(
-            prevPoint[0],
-            prevPoint[1],
-            controlPoint[0],
-            controlPoint[1],
-          );
-
-          ctx.lineWidth = ((1 - pointIndexRatio) * LASER.WIDTH) / stageScale;
-
-          ctx.stroke();
-        }
-
-        ctx.fillStrokeShape(shape);
-      }}
+      sceneFunc={drawPath}
     />
   );
 };
